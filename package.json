@@ -1,0 +1,37 @@
+{
+  "name": "vistorias-jeriva",
+  "version": "1.0.0",
+  "description": "Gestao a Vista - Controle de Vistorias | Alto do Jeriva (Construtora Engertal)",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:watch": "node scripts/build.mjs --watch",
+    "check": "node scripts/check.mjs",
+    "import:data": "node --env-file-if-exists=.env scripts/import-sheets.mjs",
+    "export:reports": "node --env-file-if-exists=.env scripts/export-reports.mjs",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
+    "cap:run:android": "npx cap run android",
+    "cap:run:ios": "npx cap run ios"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.115.0",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "esbuild": "0.28.2",
+    "supabase": "2.116.0"
+  }
+}

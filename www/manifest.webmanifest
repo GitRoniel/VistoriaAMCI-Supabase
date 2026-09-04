@@ -1,0 +1,11 @@
+{
+  "name": "Vistorias · Alto do Jerivá",
+  "short_name": "Vistorias",
+  "description": "Controle de vistorias de obra e cliente — Construtora Engertal",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1F3D38",
+  "theme_color": "#1F3D38",
+  "icons": []
+}
