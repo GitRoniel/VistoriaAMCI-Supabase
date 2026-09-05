@@ -23,15 +23,10 @@ assert.ok(html.includes('.from("project_members")'), "Consulta de acessos por em
 assert.ok(html.includes('id="btnProjectSwitch"'), "Ação para trocar de empreendimento não encontrada.");
 assert.ok(html.includes("Acompanhamento da obra, vistorias dos clientes e mantenha toda a equipe trabalhando com informações atualizadas."), "Texto solicitado para o login não encontrado.");
 assert.ok(!html.includes('<span class="login-kicker">Alto do Jerivá Residencial</span>'), "O empreendimento ainda aparece indevidamente no login.");
-assert.ok(html.includes("alto-mangueiral-logo-transparent.svg"), "Logo transparente do Alto Mangueiral não encontrada no login.");
+assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do Alto Mangueiral não encontrada no login.");
+assert.ok(html.includes("Aprovação e revistorias por bloco"), "Progresso por bloco não encontrado no resumo.");
+assert.ok(html.includes("touch-action:pan-y"), "Rolagem tátil das telas de autenticação não encontrada.");
 assert.ok(html.includes("postgres_changes"), "Assinatura Realtime não encontrada.");
-
-const transparentLogo = await readFile(
-  resolve(root, "assets/alto-mangueiral-logo-transparent.svg"),
-  "utf8",
-);
-assert.match(transparentLogo, /<feColorMatrix/i);
-assert.match(transparentLogo, /alto-mangueiral-logo\.jpg/i);
 
 const edgeFunction = await readFile(
   resolve(root, "supabase/functions/admin-users/index.ts"),

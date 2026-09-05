@@ -15,5 +15,9 @@
     }
   },
   "android": { "allowMixedContent": false },
-  "ios": { "contentInset": "always" }
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "preferredContentMode": "mobile"
+  }
 }
