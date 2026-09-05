@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 469 200" role="img" aria-labelledby="title">
+  <title id="title">Alto Mangueiral</title>
+  <defs>
+    <filter id="black-to-alpha" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feColorMatrix
+        type="matrix"
+        values="0 0 0 0 1
+                0 0 0 0 1
+                0 0 0 0 1
+                0.2126 0.7152 0.0722 0 0"
+      />
+    </filter>
+  </defs>
+  <image href="alto-mangueiral-logo.jpg" width="469" height="200" preserveAspectRatio="xMidYMid meet" filter="url(#black-to-alpha)" />
+</svg>

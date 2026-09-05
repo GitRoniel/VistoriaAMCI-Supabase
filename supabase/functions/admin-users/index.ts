@@ -1,4 +1,5 @@
 import { withSupabase } from 'npm:@supabase/server@1.5.3'
+import { corsHeaders } from 'npm:@supabase/supabase-js@2.115.0/cors'
 
 const ROLES = new Set(['admin', 'acab', 'inst', 'qual', 'astec', 'visitante'])
 
@@ -13,11 +14,10 @@ type RequestBody = {
 }
 
 function fail(message: string, status = 400) {
-  return Response.json({ ok: false, error: message }, { status })
+  return Response.json({ ok: false, error: message }, { status, headers: corsHeaders })
 }
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+const handleRequest = withSupabase({ auth: 'user' }, async (req, ctx) => {
     if (req.method !== 'POST') return fail('Método não permitido.', 405)
 
     let body: RequestBody
@@ -45,15 +45,26 @@ export default {
     }
 
     if (body.action === 'list') {
-      const { data, error } = await ctx.supabaseAdmin
-        .from('project_members')
-        .select('user_id,role,active,profiles!inner(email,full_name)')
-        .eq('project_id', projectId)
-        .order('created_at', { ascending: true })
+      const [membersResult, requestsResult] = await Promise.all([
+        ctx.supabaseAdmin
+          .from('project_members')
+          .select('user_id,role,active,created_at,profiles!inner(email,full_name)')
+          .eq('project_id', projectId)
+          .order('created_at', { ascending: true }),
+        ctx.supabaseAdmin
+          .from('access_requests')
+          .select('user_id,email,full_name,requested_role,created_at')
+          .eq('project_id', projectId)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: true }),
+      ])
 
-      if (error) return fail('Não foi possível listar os usuários.', 500)
+      if (membersResult.error || requestsResult.error) {
+        return fail('Não foi possível listar os usuários.', 500)
+      }
 
-      const users = (data ?? []).map((row) => {
+      const memberIds = new Set((membersResult.data ?? []).map((row) => row.user_id))
+      const members = (membersResult.data ?? []).map((row) => {
         const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
         return {
           id: row.user_id,
@@ -61,10 +72,23 @@ export default {
           fullName: profile?.full_name ?? '',
           role: row.role,
           active: row.active,
+          pending: false,
+          createdAt: row.created_at,
         }
       })
+      const pending = (requestsResult.data ?? [])
+        .filter((request) => !memberIds.has(request.user_id))
+        .map((request) => ({
+          id: request.user_id,
+          email: request.email,
+          fullName: request.full_name,
+          role: request.requested_role,
+          active: false,
+          pending: true,
+          createdAt: request.created_at,
+        }))
 
-      return Response.json({ ok: true, users })
+      return Response.json({ ok: true, users: [...pending, ...members] }, { headers: corsHeaders })
     }
 
     if (body.action !== 'save') return fail('Ação inválida.')
@@ -153,6 +177,26 @@ export default {
 
     if (accessError) return fail('A conta foi criada, mas o acesso ao projeto não pôde ser salvo.', 500)
 
-    return Response.json({ ok: true, userId })
-  }),
+    const { error: requestError } = await ctx.supabaseAdmin
+      .from('access_requests')
+      .update({
+        status: active ? 'approved' : 'rejected',
+        reviewed_by: callerId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+
+    if (requestError) return fail('O acesso foi salvo, mas a solicitação não pôde ser concluída.', 500)
+
+    return Response.json({ ok: true, userId }, { headers: corsHeaders })
+})
+
+export default {
+  fetch(req: Request) {
+    if (req.method === 'OPTIONS') {
+      return new Response('ok', { headers: corsHeaders })
+    }
+    return handleRequest(req)
+  },
 }

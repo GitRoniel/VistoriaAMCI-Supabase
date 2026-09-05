@@ -317,18 +317,18 @@ security invoker
 set search_path = ''
 as $$
 declare
-  current_role text;
+  caller_role text;
 begin
   if (select auth.uid()) is null then
     return new;
   end if;
 
-  current_role := private.project_role(old.project_id);
-  if current_role = 'admin' then
+  caller_role := private.project_role(old.project_id);
+  if caller_role = 'admin' then
     return new;
   end if;
 
-  if current_role is distinct from old.stage
+  if caller_role is distinct from old.stage
      or new.id is distinct from old.id
      or new.project_id is distinct from old.project_id
      or new.bloco is distinct from old.bloco

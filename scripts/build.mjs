@@ -1,24 +1,27 @@
 import { build } from "esbuild";
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const www = resolve(root, "www");
 const watch = process.argv.includes("--watch");
 
+// Estes dois valores são públicos por definição: o navegador precisa recebê-los.
+// Variáveis da Vercel continuam tendo prioridade e permitem trocar de ambiente.
+const productionDefaults = {
+  SUPABASE_URL: "https://lelverljfukbekitqcjm.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_zvlhpZaRvPuaeYrBgOsndw_2eHO-4zK"
+};
+
 const config = {
-  SUPABASE_URL: process.env.SUPABASE_URL ?? "",
-  SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? "",
+  SUPABASE_URL: process.env.SUPABASE_URL ?? productionDefaults.SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY:
+    process.env.SUPABASE_PUBLISHABLE_KEY ?? productionDefaults.SUPABASE_PUBLISHABLE_KEY,
   APP_PROJECT_SLUG: process.env.APP_PROJECT_SLUG ?? "alto-do-jeriva"
 };
 
-if (process.env.VERCEL === "1" && (!config.SUPABASE_URL || !config.SUPABASE_PUBLISHABLE_KEY)) {
-  throw new Error(
-    "Configure SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY em Vercel > Project Settings > Environment Variables."
-  );
-}
-
 await mkdir(www, { recursive: true });
+await cp(resolve(root, "assets"), resolve(www, "assets"), { recursive: true });
 await writeFile(
   resolve(www, "config.js"),
   `window.APP_CONFIG = Object.freeze(${JSON.stringify(config)});\n`,

@@ -1,0 +1,24 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Gerados por `pnpm build`.
+www/config.js
+www/supabase-client.js
+www/assets/
+supabase/.temp/
+
+# Exportações das planilhas contêm dados pessoais e não devem ir para o Git.
+data-import/*.csv
+!data-import/.gitkeep
+
+# Relatórios gerados a partir do Supabase.
+exports/*.csv
+!exports/.gitkeep
+
+.vercel/
+android/
+ios/
+dist/
+*.log
