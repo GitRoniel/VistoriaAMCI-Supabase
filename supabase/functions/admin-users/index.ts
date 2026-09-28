@@ -4,8 +4,9 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2.115.0/cors'
 const ROLES = new Set(['admin', 'acab', 'inst', 'qual', 'astec', 'visitante'])
 
 type RequestBody = {
-  action?: 'list' | 'save'
+  action?: 'list' | 'save' | 'reject'
   projectId?: number
+  userId?: string
   email?: string
   password?: string
   fullName?: string
@@ -45,27 +46,31 @@ const handleRequest = withSupabase({ auth: 'user' }, async (req, ctx) => {
     }
 
     if (body.action === 'list') {
+      // project_members tem duas FKs para profiles (user_id e updated_by):
+      // o relacionamento precisa ser explícito, senão o PostgREST responde 300.
       const [membersResult, requestsResult] = await Promise.all([
         ctx.supabaseAdmin
           .from('project_members')
-          .select('user_id,role,active,created_at,profiles!inner(email,full_name)')
+          .select('user_id,role,active,created_at,updated_at,profiles!project_members_user_id_fkey!inner(email,full_name)')
           .eq('project_id', projectId)
           .order('created_at', { ascending: true }),
         ctx.supabaseAdmin
           .from('access_requests')
-          .select('user_id,email,full_name,requested_role,created_at')
+          .select('user_id,email,full_name,requested_role,status,created_at,reviewed_at')
           .eq('project_id', projectId)
-          .eq('status', 'pending')
           .order('created_at', { ascending: true }),
       ])
 
       if (membersResult.error || requestsResult.error) {
+        console.error('admin-users list', membersResult.error ?? requestsResult.error)
         return fail('Não foi possível listar os usuários.', 500)
       }
 
+      const requestsByUser = new Map((requestsResult.data ?? []).map((row) => [row.user_id, row]))
       const memberIds = new Set((membersResult.data ?? []).map((row) => row.user_id))
       const members = (membersResult.data ?? []).map((row) => {
         const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+        const request = requestsByUser.get(row.user_id)
         return {
           id: row.user_id,
           email: profile?.email ?? '',
@@ -73,22 +78,81 @@ const handleRequest = withSupabase({ auth: 'user' }, async (req, ctx) => {
           role: row.role,
           active: row.active,
           pending: false,
-          createdAt: row.created_at,
+          status: row.active ? 'approved' : 'rejected',
+          createdAt: request?.created_at ?? row.created_at,
+          reviewedAt: request?.reviewed_at ?? row.updated_at,
         }
       })
-      const pending = (requestsResult.data ?? [])
+      // Sem vínculo em project_members o acesso nunca foi liberado; a solicitação
+      // continua pendente mesmo que tenha sido marcada como aprovada manualmente.
+      const requests = (requestsResult.data ?? [])
         .filter((request) => !memberIds.has(request.user_id))
-        .map((request) => ({
-          id: request.user_id,
-          email: request.email,
-          fullName: request.full_name,
-          role: request.requested_role,
-          active: false,
-          pending: true,
-          createdAt: request.created_at,
-        }))
+        .map((request) => {
+          const rejected = request.status === 'rejected'
+          return {
+            id: request.user_id,
+            email: request.email,
+            fullName: request.full_name,
+            role: request.requested_role,
+            active: false,
+            pending: !rejected,
+            status: rejected ? 'rejected' : 'pending',
+            createdAt: request.created_at,
+            reviewedAt: request.reviewed_at,
+          }
+        })
 
-      return Response.json({ ok: true, users: [...pending, ...members] }, { headers: corsHeaders })
+      return Response.json({ ok: true, users: [...requests, ...members] }, { headers: corsHeaders })
+    }
+
+    const targetUserId = String(body.userId ?? '').trim()
+
+    async function ensureAnotherAdmin(userId: string, nextRole: string, nextActive: boolean) {
+      const { data: oldMember, error: oldMemberError } = await ctx.supabaseAdmin
+        .from('project_members')
+        .select('role,active')
+        .eq('project_id', projectId)
+        .eq('user_id', userId)
+        .maybeSingle()
+
+      if (oldMemberError) return { error: fail('Não foi possível consultar o acesso atual.', 500), member: null }
+
+      if (oldMember?.role === 'admin' && oldMember.active && (nextRole !== 'admin' || !nextActive)) {
+        const { count, error: countError } = await ctx.supabaseAdmin
+          .from('project_members')
+          .select('*', { count: 'exact', head: true })
+          .eq('project_id', projectId)
+          .eq('role', 'admin')
+          .eq('active', true)
+
+        if (countError) return { error: fail('Não foi possível validar os administradores.', 500), member: null }
+        if ((count ?? 0) <= 1) return { error: fail('O projeto precisa manter ao menos um administrador.'), member: null }
+      }
+      return { error: null, member: oldMember }
+    }
+
+    if (body.action === 'reject') {
+      if (!/^[0-9a-f-]{36}$/i.test(targetUserId)) return fail('Usuário inválido.')
+      const check = await ensureAnotherAdmin(targetUserId, '', false)
+      if (check.error) return check.error
+
+      if (check.member) {
+        const { error: memberError } = await ctx.supabaseAdmin
+          .from('project_members')
+          .update({ active: false, updated_by: callerId })
+          .eq('project_id', projectId)
+          .eq('user_id', targetUserId)
+        if (memberError) return fail('Não foi possível bloquear o acesso.', 500)
+      }
+
+      const { error: requestError } = await ctx.supabaseAdmin
+        .from('access_requests')
+        .update({ status: 'rejected', reviewed_by: callerId, reviewed_at: new Date().toISOString() })
+        .eq('project_id', projectId)
+        .eq('user_id', targetUserId)
+
+      if (requestError) return fail('Não foi possível rejeitar a solicitação.', 500)
+      return Response.json({ ok: true, userId: targetUserId }, { headers: corsHeaders })
     }
 
     if (body.action !== 'save') return fail('Ação inválida.')
@@ -102,11 +166,13 @@ const handleRequest = withSupabase({ auth: 'user' }, async (req, ctx) => {
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail('Informe um e-mail válido.')
     if (!ROLES.has(role)) return fail('Nível de acesso inválido.')
 
-    const { data: existingProfile, error: profileLookupError } = await ctx.supabaseAdmin
-      .from('profiles')
-      .select('id,email')
-      .ilike('email', email)
-      .maybeSingle()
+    // `_` e `%` são curingas no ILIKE; escapa para comparar o e-mail literalmente.
+    const profileQuery = ctx.supabaseAdmin.from('profiles').select('id,email')
+    const { data: existingProfile, error: profileLookupError } = await (
+      /^[0-9a-f-]{36}$/i.test(targetUserId)
+        ? profileQuery.eq('id', targetUserId)
+        : profileQuery.ilike('email', email.replace(/[\\%_]/g, (c) => '\\' + c))
+    ).maybeSingle()
 
     if (profileLookupError) return fail('Não foi possível consultar o usuário.', 500)
     if (!existingProfile && password.length < 8) {
@@ -141,26 +207,8 @@ const handleRequest = withSupabase({ auth: 'user' }, async (req, ctx) => {
       if (authUpdateError) return fail('Não foi possível atualizar a conta.', 500)
     }
 
-    const { data: oldMember, error: oldMemberError } = await ctx.supabaseAdmin
-      .from('project_members')
-      .select('role,active')
-      .eq('project_id', projectId)
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    if (oldMemberError) return fail('Não foi possível consultar o acesso atual.', 500)
-
-    if (oldMember?.role === 'admin' && oldMember.active && (role !== 'admin' || !active)) {
-      const { count, error: countError } = await ctx.supabaseAdmin
-        .from('project_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', projectId)
-        .eq('role', 'admin')
-        .eq('active', true)
-
-      if (countError) return fail('Não foi possível validar os administradores.', 500)
-      if ((count ?? 0) <= 1) return fail('O projeto precisa manter ao menos um administrador.')
-    }
+    const check = await ensureAnotherAdmin(userId, role, active)
+    if (check.error) return check.error
 
     const { error: profileError } = await ctx.supabaseAdmin
       .from('profiles')
