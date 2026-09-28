@@ -28,6 +28,9 @@ assert.ok(html.includes("Aprovações e Revistorias por Bloco"), "Progresso por 
 assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");
 assert.ok(!html.includes('data-view="obra"'), "A aba Vistoria · Obra ainda aparece no painel.");
 assert.ok(html.includes("Aprovações de Acesso"), "Página de aprovações de acesso não encontrada.");
+assert.ok(html.includes('id="projectAdmin"') && html.includes('id="adminOv"'), "Aprovações de acesso precisam ficar na seleção de obra.");
+assert.ok(!html.includes('data-view="acessos"'), "Aprovações de acesso não devem aparecer como aba do condomínio.");
+assert.ok(!html.includes('id="headProjectName"'), "Nome da obra duplicado no cabeçalho.");
 assert.ok(html.includes("touch-action:pan-y"), "Rolagem tátil das telas de autenticação não encontrada.");
 assert.ok(html.includes("postgres_changes"), "Assinatura Realtime não encontrada.");
 

@@ -644,6 +644,30 @@ body{background:var(--bg)}
   .apr-row{grid-template-columns:1fr;gap:11px;padding:13px}
   .apr-actions .btn{flex:1 1 auto}
 }
+
+/* SELEÇÃO DE OBRA · botão de aprovações e tela de administração */
+.project-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;align-self:flex-start;flex:0 0 auto}
+.project-actions .project-logout{align-self:auto}
+.project-admin-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--ink-2);color:#fff;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 6px 14px rgba(31,74,63,.2);transition:.15s}
+.project-admin-btn:hover{background:#173b32}
+.project-admin-btn[hidden]{display:none}
+.project-admin-btn svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex:0 0 auto}
+.admin-ov{z-index:195;align-items:flex-start}
+.admin-ov .project-shell{width:min(1240px,100%)}
+.admin-body{background:#f8faf8}
+#aprKpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+#aprKpis .kbox{min-width:0}
+@media(max-width:720px){#aprKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.admin-open>.toast{visibility:visible;z-index:260}
+@media(max-width:840px){.project-actions{margin-left:auto}}
+@media(max-width:520px){
+  .project-actions{display:contents}
+  .project-actions .project-logout{grid-area:logout}
+  .project-top{grid-template-areas:'logos logout' 'welcome welcome' 'admin admin'}
+  .project-admin-btn{grid-area:admin;width:100%;padding:11px 12px;font-size:13px}
+  .admin-body{padding:18px calc(12px + var(--safe-r)) calc(30px + var(--safe-b)) calc(12px + var(--safe-l))}
+}
+@media(max-width:360px){.project-top{grid-template-areas:'logos' 'welcome' 'logout' 'admin'}.project-actions .project-logout{justify-self:start}}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -659,7 +683,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       <div class="engertal-badge"><img src="./assets/engertal-logo.png" alt="Engertal Construtora"></div>
     </div>
     <div class="head-spacer"></div>
-    <div class="head-title"><strong id="headAppTitle">Controle de Vistorias</strong><span id="headProjectName">Obra selecionada</span></div>
+    <div class="head-title"><strong id="headAppTitle">Controle de Vistorias</strong></div>
     <div class="head-actions">
       <button class="icon-btn" id="btnLogin" title="Entrar para editar"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
       <button class="project-switch-btn" id="btnProjectSwitch" type="button" title="Trocar obra ou condomínio"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span id="activeProjectName">Trocar obra</span></button>
@@ -672,7 +696,6 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
     <div class="tabs">
       <button class="tab active" data-view="resumo"><span class="ti"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Resumo Geral</button>
       <button class="tab" data-view="cliente"><span class="ti"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Vistoria · Cliente</button>
-      <button class="tab tab-admin" data-view="acessos" style="display:none"><span class="ti"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span>Aprovações de Acesso<span class="tab-badge" id="aprTabBadge" hidden></span></button>
     </div>
   </div>
 </div>
@@ -726,63 +749,12 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       </div>
     </div>
   </section>
-  <section class="view" id="v-acessos">
-    <div class="sec-head">
-      <span class="icn"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span>
-      <h2>Aprovações de Acesso</h2>
-      <div class="sh-flow">Somente <b>administradores</b> · aprove, rejeite e ajuste permissões</div>
-    </div>
-    <div class="sec-body">
-      <div class="kstrip" id="aprKpis"></div>
-      <div class="clif" id="aprFilters">
-        <div class="clif-row clif-inputs">
-          <div class="fld"><label for="aprProject">Obra / Condomínio</label><select id="aprProject"></select></div>
-          <div class="fld clif-q"><label for="aprQ">Buscar usuário</label><input type="text" id="aprQ" placeholder="Nome ou e-mail..."></div>
-          <button class="btn g" id="aprRefresh" type="button">Atualizar lista</button>
-        </div>
-        <div class="clif-row">
-          <span class="clif-lbl">Status</span>
-          <div class="clif-chips" id="aprStatus">
-            <button class="chip active" type="button" data-apr-status="ALL">Todos</button>
-            <button class="chip" type="button" data-apr-status="pending">Pendentes</button>
-            <button class="chip" type="button" data-apr-status="approved">Aprovados</button>
-            <button class="chip" type="button" data-apr-status="rejected">Rejeitados / bloqueados</button>
-          </div>
-          <span class="clif-count" id="aprCount"></span>
-        </div>
-      </div>
-      <div class="apr-list" id="aprList"></div>
-      <div class="cbox" style="margin:14px 0 12px">
-        <div class="ch">Adicionar ou editar usuário manualmente</div>
-        <div style="padding:12px 13px">
-          <div class="note" style="margin:0 0 4px">Use para criar uma conta sem cadastro prévio ou alterar dados de quem já tem acesso. O vínculo é salvo na obra aberta no momento.</div>
-          <div class="acc-form">
-            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
-            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
-            <div class="fld"><label>Nome</label><input id="accNome"></div>
-            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
-            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
-          </div>
-          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
-          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
-        </div>
-      </div>
-      <div class="cbox">
-        <div class="ch">Registro de logs (últimas 100 ações)</div>
-        <div style="padding:12px 13px">
-          <div class="brow" style="margin-top:0;margin-bottom:10px"><button class="btn g" id="logRefresh">Atualizar logs</button></div>
-          <div class="log-list" id="logList"></div>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="botnav">
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
-  <button class="navbtn nav-admin" data-view="acessos" style="display:none"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Aprovações</span><span class="tab-badge nav-badge" id="aprNavBadge" hidden></span></button>
 </nav>
 
 <div class="pop" id="pop"></div>
@@ -859,13 +831,80 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
         <h2 id="projectTitle">Escolha a obra que deseja acessar</h2>
         <p id="projectSubtitle">Você verá somente os empreendimentos liberados para o seu usuário.</p>
       </div>
-      <button class="project-logout" id="projectLogout" type="button">Sair da conta</button>
+      <div class="project-actions">
+        <button class="project-logout" id="projectLogout" type="button">Sair da conta</button>
+        <button class="project-admin-btn" id="projectAdmin" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Aprovações de Acesso</span><span class="tab-badge" id="aprProjectBadge" hidden></span></button>
+      </div>
     </div>
     <div class="project-body">
       <div class="project-section-title">Obras e condomínios disponíveis</div>
       <div class="project-list" id="projectList"></div>
       <div class="project-feedback" id="projectFeedback" role="alert"></div>
       <p class="project-help">Novos condomínios aparecerão aqui quando forem cadastrados e liberados pelo administrador. Cada empreendimento poderá ter seu próprio fluxo de acompanhamento.</p>
+    </div>
+  </section>
+</div>
+
+<div class="project-ov admin-ov" id="adminOv" aria-hidden="true">
+  <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="project-top">
+      <div class="project-top-logos" aria-label="Alto Mangueiral e Engertal">
+        <span class="project-alto-logo-tile"><img class="login-logo-alto" src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"></span>
+        <span class="project-top-divider" aria-hidden="true"></span>
+        <img class="login-logo-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
+      </div>
+      <div class="project-welcome">
+        <small>Administração</small>
+        <h2 id="adminTitle">Aprovações de Acesso</h2>
+        <p>Aprove, rejeite e ajuste as permissões dos usuários de cada obra ou condomínio.</p>
+      </div>
+      <div class="project-actions">
+        <button class="project-logout" id="adminBack" type="button">← Voltar às obras</button>
+      </div>
+    </div>
+    <div class="project-body admin-body">
+      <div class="kstrip" id="aprKpis"></div>
+      <div class="clif" id="aprFilters">
+        <div class="clif-row clif-inputs">
+          <div class="fld"><label for="aprProject">Obra / Condomínio</label><select id="aprProject"></select></div>
+          <div class="fld clif-q"><label for="aprQ">Buscar usuário</label><input type="text" id="aprQ" placeholder="Nome ou e-mail..."></div>
+          <button class="btn g" id="aprRefresh" type="button">Atualizar lista</button>
+        </div>
+        <div class="clif-row">
+          <span class="clif-lbl">Status</span>
+          <div class="clif-chips" id="aprStatus">
+            <button class="chip active" type="button" data-apr-status="ALL">Todos</button>
+            <button class="chip" type="button" data-apr-status="pending">Pendentes</button>
+            <button class="chip" type="button" data-apr-status="approved">Aprovados</button>
+            <button class="chip" type="button" data-apr-status="rejected">Rejeitados / bloqueados</button>
+          </div>
+          <span class="clif-count" id="aprCount"></span>
+        </div>
+      </div>
+      <div class="apr-list" id="aprList"></div>
+      <div class="cbox" style="margin:14px 0 12px">
+        <div class="ch">Adicionar ou editar usuário manualmente</div>
+        <div style="padding:12px 13px">
+          <div class="note" style="margin:0 0 4px">Use para criar uma conta sem cadastro prévio ou alterar dados de quem já tem acesso. Escolha a obra ou condomínio em que o acesso será salvo.</div>
+          <div class="acc-form">
+            <div class="fld"><label for="accProject">Obra / Condomínio</label><select id="accProject"></select></div>
+            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
+            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
+            <div class="fld"><label>Nome</label><input id="accNome"></div>
+            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
+            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
+          </div>
+          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
+          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
+        </div>
+      </div>
+      <div class="cbox">
+        <div class="ch">Registro de logs (últimas 100 ações)</div>
+        <div style="padding:12px 13px">
+          <div class="brow" style="margin-top:0;margin-bottom:10px"><button class="btn g" id="logRefresh">Atualizar logs</button></div>
+          <div class="log-list" id="logList"></div>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -1038,7 +1077,6 @@ function updateProjectBrand(){
   const experience=appProject?projectExperience(appProject):null;
   const projectName=experience?.title||"Obra selecionada";
   document.getElementById("headAppTitle").textContent="Controle de Vistorias";
-  document.getElementById("headProjectName").textContent=projectName;
   document.getElementById("activeProjectName").textContent=projectName;
   document.title=appProject?"Vistorias · "+projectName:"Gestão de Obras";
 }
@@ -1372,7 +1410,6 @@ addEventListener("scroll",closePop,true);
 
 /* ── TABS ── */
 function switchView(v){
-  if(v==="acessos" && !(currentUser&&currentUser.nivel==="admin")){toast("Acesso restrito a administradores");v="resumo";}
   if(!document.getElementById("v-"+v))v="resumo";
   obraBlk="ALL"; cliBlk="ALL";
   document.querySelectorAll(".tab,.navbtn").forEach(t=>t.classList.toggle("active",t.dataset.view===v));
@@ -1380,7 +1417,7 @@ function switchView(v){
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
   if(v==="resumo"){renderResumo(); animateResumo();}
-  if(v==="acessos"){loadUsers();loadLogs();}
+
   animateView(v);
   closePop(); scrollTo(0,0);
 }
@@ -1557,11 +1594,23 @@ function renderProjectChooser(){
   }).join("");
   list.querySelectorAll("[data-project-id]:not(:disabled)").forEach(button=>button.addEventListener("click",()=>selectProject(button.dataset.projectId)));
 }
+function openAdminArea(){
+  if(!adminProjects().length){toast("Acesso restrito a administradores");return;}
+  const overlay=document.getElementById("adminOv");
+  document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
+  loadUsers();loadLogs();
+}
+function closeAdminArea(){
+  const overlay=document.getElementById("adminOv");
+  document.body.classList.remove("admin-open");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
+}
 function showProjectChooser(){
   document.body.classList.add("auth-locked");
   document.getElementById("loginOv").classList.remove("open");
   const overlay=document.getElementById("projectOv");
   renderProjectChooser();setProjectFeedback("");
+  const adminButton=document.getElementById("projectAdmin");adminButton.hidden=!adminProjects().length;
+  if(adminProjects().length)loadUsers();
   overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");
   requestAnimationFrame(()=>document.querySelector("#projectList .project-card:not(:disabled)")?.focus());
 }
@@ -1574,13 +1623,12 @@ async function selectProject(projectId){
   if(button)button.disabled=true;
   setProjectFeedback("");
   appProject={id:selected.id,slug:selected.slug,name:selected.name};
-  aprRows=[];aprFilt.project="";updateAprBadges();
   currentUser.nivel=selected.role;
   updateProjectBrand();
   const overlay=document.getElementById("projectOv");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
   updateAuthUI();initState();renderObra();renderCli();renderResumo();
   try{await load(false);}catch(e){}
-  startRealtime();if(currentUser.nivel==="admin")loadUsers();
+  startRealtime();
 }
 function chooseAnotherProject(){
   if(pendingWrites){toast("Aguarde a conclusão das alterações antes de trocar de obra.");return;}
@@ -1630,6 +1678,7 @@ async function bootAuth(){
   currentUser=null;appProject=null;availableProjects=[];updateAuthUI();setSync("");overlay.classList.add("open");
 }
 async function logout(){
+  closeAdminArea();aprRows=[];updateAprBadges();
   document.body.classList.add("auth-locked");stopRealtime();if(supabase)await supabase.auth.signOut().catch(()=>{});currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
 }
 /* ── APROVAÇÕES DE ACESSO ── */
@@ -1646,16 +1695,20 @@ function ensureAprProjects(){
   const select=document.getElementById("aprProject");if(!select)return;
   const projects=adminProjects();
   const options=(projects.length>1?[{value:"ALL",label:"Todas as obras"}]:[]).concat(projects.map(project=>({value:String(project.id),label:projectExperience(project).title||project.name})));
-  if(!options.some(o=>o.value===aprFilt.project))aprFilt.project=String(appProject.id);
+  if(!options.some(o=>o.value===aprFilt.project))aprFilt.project=options[0]?.value||"";
   select.innerHTML=options.map(o=>`<option value="${esc(o.value)}"${o.value===aprFilt.project?" selected":""}>${esc(o.label)}</option>`).join("");
   select.disabled=options.length<2;
+  const accSelect=document.getElementById("accProject");
+  if(accSelect){const current=accSelect.value;accSelect.innerHTML=projects.map(project=>`<option value="${esc(project.id)}">${esc(projectExperience(project).title||project.name)}</option>`).join("");
+    if(projects.some(project=>String(project.id)===current))accSelect.value=current;else if(aprFilt.project!=="ALL")accSelect.value=aprFilt.project;
+    accSelect.disabled=projects.length<2;}
 }
 function updateAprBadges(){
   const waiting=aprRows.filter(u=>u.status==="pending").length;
-  ["aprTabBadge","aprNavBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
+  ["aprProjectBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
 }
 async function loadUsers(){
-  if(!SUPABASE_READY||!isAdmin()||!appProject)return;
+  if(!SUPABASE_READY||!adminProjects().length)return;
   ensureAprProjects();
   const list=document.getElementById("aprList");
   const projects=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project);
@@ -1704,7 +1757,7 @@ function renderApr(){
   }).join("");
 }
 async function aprAction(act,index,button){
-  const u=aprView[index];if(!u||!isAdmin())return;
+  const u=aprView[index];if(!u||!adminProjects().length)return;
   const role=document.querySelector(`[data-apr-role="${index}"]`)?.value||u.role||"visitante";
   if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email}?`))return;
   const buttons=button.closest(".apr-actions").querySelectorAll("button");buttons.forEach(b=>b.disabled=true);
@@ -1718,9 +1771,9 @@ async function aprAction(act,index,button){
 }
 async function saveUser(){
   const u=document.getElementById("accU").value.trim(),p=document.getElementById("accP").value,nome=document.getElementById("accNome").value.trim(),niv=document.getElementById("accNiv").value,active=document.getElementById("accActive").value==="true";
-  if(!u){toast("Informe o e-mail");return;}if(!isAdmin()||!appProject){toast("Somente administrador");return;}
+  if(!u){toast("Informe o e-mail");return;}const projectId=Number(document.getElementById("accProject").value);if(!adminProjects().some(project=>Number(project.id)===projectId)){toast("Somente administrador");return;}
   const btn=document.getElementById("accSave");btn.disabled=true;btn.textContent="Salvando…";
-  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId:appProject.id,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
+  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
   catch(e){toast(e&&e.message?e.message:"Falha ao salvar");}
   finally{btn.disabled=false;btn.textContent=active?"Salvar e liberar acesso":"Salvar alterações";}
 }
@@ -1734,8 +1787,9 @@ function auditDetail(l){
   return (tables[l.table_name]||l.table_name)+(l.record_id?" #"+l.record_id:"")+(parts.length?" · "+parts.join(" · "):"");
 }
 async function loadLogs(){
-  if(!SUPABASE_READY||!isAdmin()||!appProject)return;const el=document.getElementById("logList");if(!el)return;
-  try{const {data,error}=await supabase.from("audit_log").select("id,actor_email,table_name,record_id,action,old_data,new_data,created_at").eq("project_id",appProject.id).order("created_at",{ascending:false}).limit(100);if(error)throw error;
+  const ids=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project).map(project=>project.id);
+  if(!SUPABASE_READY||!ids.length)return;const el=document.getElementById("logList");if(!el)return;
+  try{const {data,error}=await supabase.from("audit_log").select("id,actor_email,table_name,record_id,action,old_data,new_data,created_at").in("project_id",ids).order("created_at",{ascending:false}).limit(100);if(error)throw error;
     el.innerHTML=(data||[]).length?data.map(l=>`<div class="log-item"><span class="lt">${esc(new Date(l.created_at).toLocaleString("pt-BR"))}</span><span class="lu">${esc(l.actor_email||"Sistema")}</span><span class="ld">${esc(auditDetail(l))}</span></div>`).join(""):`<div class="log-item"><span class="ld" style="color:var(--text-light)">Sem registros.</span></div>`;
   }catch(e){el.innerHTML=`<div class="log-item"><span class="ld" style="color:var(--red)">Não foi possível carregar os registros.</span></div>`;}
 }
@@ -1801,10 +1855,12 @@ document.querySelectorAll("[data-auth-view]").forEach(btn=>btn.addEventListener(
 document.querySelectorAll("[data-password-target]").forEach(btn=>btn.addEventListener("click",()=>{const input=document.getElementById(btn.dataset.passwordTarget),show=input.type==="password";input.type=show?"text":"password";btn.textContent=show?"Ocultar":"Mostrar";btn.setAttribute("aria-label",(show?"Ocultar":"Mostrar")+" senha");}));
 document.getElementById("btnLogout").onclick=logout;
 document.getElementById("projectLogout").onclick=logout;
+document.getElementById("projectAdmin").onclick=openAdminArea;
+document.getElementById("adminBack").onclick=closeAdminArea;
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
 document.getElementById("accSave").onclick=saveUser;
 document.getElementById("logRefresh").onclick=loadLogs;
-document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();});
+document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();loadLogs();});
 document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.value;renderApr();});
 document.getElementById("aprRefresh").onclick=()=>loadUsers();
 document.getElementById("aprStatus").addEventListener("click",e=>{const b=e.target.closest("[data-apr-status]");if(!b)return;aprFilt.status=b.dataset.aprStatus;renderApr();});
