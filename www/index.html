@@ -499,6 +499,175 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .qapt .qd:active{transform:scale(.9)}
 .qapt .qnum{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:900;color:#12241a;pointer-events:none;text-shadow:0 0 3px #fff,0 0 4px #fff}
 .pavrow .pa .qapt{aspect-ratio:1.2/1}
+
+/* ══ PADRÃO VISUAL (mesma linguagem do Login e da Seleção de Obra) ══ */
+:root{--bg:#f3f6f4;--border:#dbe4dd;--ink:#173a32;--ink-2:#1f4a3f;--gold:#dccb91;--muted:#617168;
+  --shadow-card:0 6px 18px rgba(31,61,56,.06);--text-secondary:#617168;--red:#9e2f25}
+body{background:var(--bg)}
+.header{background:linear-gradient(145deg,#102a24 0%,#173a32 52%,#1f493e 100%);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(4,20,16,.28)}
+.head-title strong{color:var(--gold)}
+.icon-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:var(--gold);border-radius:9px}
+.icon-btn:hover{background:rgba(255,255,255,.15)}
+.project-switch-btn{border-radius:9px}
+.userchip .ub{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:5px 10px}
+.tabs-strip{background:linear-gradient(145deg,#132f29,#1b4238);box-shadow:0 8px 20px rgba(4,20,16,.18)}
+.tabs{padding:8px 16px 10px;gap:4px}
+.tab{border-radius:10px;padding:9px 16px;text-transform:none;letter-spacing:.1px;font-size:13px;color:rgba(255,255,255,.7);background:transparent}
+.tab:hover{color:#fff;background:rgba(255,255,255,.07)}
+.tab .ti{background:rgba(220,203,145,.14);color:var(--gold);border-radius:7px}
+.tab.active{background:#fff;color:var(--ink);box-shadow:0 3px 12px rgba(4,20,16,.22)}
+.tab.active .ti{background:linear-gradient(145deg,#244e42,#17362f);color:var(--gold)}
+.tab-badge{min-width:19px;height:19px;padding:0 6px;border-radius:999px;background:var(--sunset);color:#fff;font-size:10.5px;font-weight:900;display:inline-grid;place-items:center;letter-spacing:0}
+.tab-badge[hidden]{display:none}
+.nav-badge{position:absolute;top:4px;right:calc(50% - 22px);min-width:16px;height:16px;font-size:9px;padding:0 4px}
+.main{padding:18px 16px 26px}
+.sec-head{background:#fff;color:var(--ink);padding:18px 22px;border:1px solid var(--border);border-bottom:1px solid #e6ece8;border-radius:20px 20px 0 0;gap:14px}
+.sec-head .icn{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f)}
+.sec-head .icn svg{width:18px;height:18px;stroke:var(--gold)}
+.sec-head h2{font-size:21px;letter-spacing:-.5px;text-transform:none;color:var(--ink)}
+.sec-head .sh-flow{color:var(--muted);font-size:13px;font-weight:600;letter-spacing:0}
+.sec-head .sh-flow b{color:var(--fern)}
+.sec-body{background:#f8faf8;border-color:var(--border);border-radius:0 0 20px 20px;padding:20px 22px;box-shadow:var(--shadow-card)}
+.cbox,.rg-card{border-color:var(--border);border-radius:16px;box-shadow:var(--shadow-card);background:#fff}
+.cbox .ch,.rg-card .rgh{background:#fff;color:#37564a;border-bottom:1px solid #e6ece8;font-size:12px;font-weight:900;letter-spacing:.8px;padding:13px 16px}
+.rg-card .rgh b{color:var(--fern);font-size:15px;letter-spacing:0}
+.kbox{background:#fff;border-color:var(--border);border-radius:14px;padding:11px 14px;box-shadow:var(--shadow-card)}
+.kbox .kl{font-size:10px;letter-spacing:.8px;color:var(--muted)}
+.kbox .kv{font-size:26px}
+.chip{border-radius:999px;border-color:#d7e1da;background:#fff;padding:7px 14px;font-size:12px;color:#52675d}
+.chip:hover{border-color:#78917b;color:var(--ink)}
+.chip.active{background:var(--ink-2);border-color:var(--ink-2);color:#fff;box-shadow:0 4px 12px rgba(31,74,63,.2)}
+.blocosel .bl-lbl,.clif-lbl{font-size:11px;color:#37564a;letter-spacing:.8px}
+.modetog{background:#e8efea;border-radius:12px;padding:4px;margin-bottom:14px}
+.modetog button{min-height:40px;border-radius:9px;font-size:13px;color:#65766d}
+.modetog button.active{background:#fff;color:var(--ink);box-shadow:0 3px 12px rgba(31,61,56,.1)}
+.clif{background:#fff;border-color:var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card);margin-bottom:14px}
+.clif-row{gap:8px;margin-bottom:10px}
+.fld label{font-size:10.5px;color:#37564a;letter-spacing:.6px}
+.fld input,.fld select,.acc-form select{height:44px;padding:0 13px;border:1.5px solid #cad6cf;border-radius:11px;background:#fbfcfb;font-size:14px;color:#172c25;width:100%}
+.fld input:focus,.fld select:focus{outline:none;border-color:#53775f;background:#fff;box-shadow:0 0 0 4px rgba(107,128,64,.12)}
+.btn{min-height:42px;padding:0 16px;border-radius:11px;font-size:13px;justify-content:center}
+.btn.p{background:var(--ink-2);box-shadow:0 8px 18px rgba(31,74,63,.18)} .btn.p:hover{background:#173b32}
+.btn.g{background:#eef3ef;color:var(--ink);border:1px solid #d6e0d9} .btn.g:hover{background:#e5ece7}
+.btn.danger{background:#fff0ee;color:#9e2f25;border:1px solid #f0c0ba} .btn.danger:hover{background:#fde4e0}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.gridscroll{border-color:var(--border);border-radius:14px;background:#fff}
+.mx th.corner,.mx th.blkh{background:var(--ink)}
+.mx th.corner{color:var(--gold)}
+.mx td.pavh{background:#f1f5f2}
+.pavrow{background:#fff;border-color:var(--border);border-radius:12px;padding:9px 11px}
+.apt{border-radius:7px}
+.legend{background:#fff;border:1px solid var(--border);border-radius:14px;padding:11px 14px}
+.legend .sw{border-radius:5px}
+.clitop{gap:14px;margin-bottom:14px}
+.resumo .rv{font-size:23px}
+.ctbl thead th{background:var(--ink)}
+.pop{border-radius:14px;border-color:var(--border)}
+.toast{background:var(--ink);border-color:rgba(220,203,145,.5);border-radius:12px}
+.note{background:#f4f7f4;border-left-color:var(--fern);border-radius:0 10px 10px 0}
+.log-list{border-color:var(--border);border-radius:12px}
+.ro-banner{border-radius:12px}
+@media(max-width:720px){
+  .botnav{border-radius:18px 18px 0 0;border-top-color:var(--border)}
+  .navbtn.active{color:var(--ink-2)}
+  .navbtn.active::before{background:var(--fern)}
+  .main{padding:12px 11px 18px}
+  .sec-head{padding:14px 15px;border-radius:16px 16px 0 0}
+  .sec-head .icn{width:34px;height:34px;border-radius:10px}
+  .sec-head h2{font-size:18px}
+  .sec-head .sh-flow{font-size:12px;flex-basis:100%}
+  .sec-body{padding:14px 12px;border-radius:0 0 16px 16px}
+  .clif{padding:12px}
+  .clif-inputs .fld,.clif-inputs .btn{flex:1 1 100%}
+}
+
+/* RESUMO · layout e gráfico empilhado */
+.rg-grid{grid-template-columns:1fr}
+.rg-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:26px;padding:18px 20px}
+.rg-layout .rg-col{min-width:0}
+.rg-layout .rg-col+.rg-col{border-left:1px solid #e6ece8;padding-left:26px}
+.rg-layout .rg-sub{margin-top:0;font-size:12px;letter-spacing:.8px;color:#37564a}
+.rg-charts{gap:20px}
+.stk-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:4px 0 14px;font-size:12px;font-weight:700;color:var(--muted)}
+.stk-legend span{display:inline-flex;align-items:center;gap:6px}
+.stk-legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.stk-ok{background:#2f9e5b}.stk-rev{background:var(--sunset)}.stk-na{background:#c9d1cc}
+.stk-chart{display:grid;gap:11px}
+.stk-row{display:grid;grid-template-columns:62px minmax(0,1fr) 52px;align-items:center;gap:10px}
+.stk-lbl{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap}
+.stk-bar{display:flex;height:26px;border-radius:8px;overflow:hidden;background:#eef3ef}
+.stk-bar i{display:flex;align-items:center;justify-content:center;height:100%;min-width:0;font-style:normal;cursor:default;transition:filter .15s;outline:none}
+.stk-bar i+i{box-shadow:inset 1px 0 0 rgba(255,255,255,.7)}
+.stk-bar i:hover,.stk-bar i:focus-visible{filter:brightness(.9)}
+.stk-bar i span{font-size:10.5px;font-weight:800;color:#fff;pointer-events:none;white-space:nowrap}
+.stk-bar i.stk-na span{color:#4a5a52}
+.stk-tot{font-size:11px;font-weight:800;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.chart-tip{position:fixed;z-index:120;max-width:280px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;line-height:1.4;padding:8px 11px;border-radius:10px;box-shadow:0 12px 28px rgba(4,20,16,.3);pointer-events:none;opacity:0;transition:opacity .12s}
+.chart-tip.show{opacity:1}
+@media(max-width:960px){
+  .rg-layout{grid-template-columns:1fr;gap:18px}
+  .rg-layout .rg-col+.rg-col{border-left:none;padding-left:0;border-top:1px solid #e6ece8;padding-top:18px}
+}
+@media(max-width:520px){
+  .rg-layout{padding:14px}
+  .rg-charts{justify-content:center}
+  .rg-charts .donut{width:128px;height:128px}
+  .rg-mini{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .rg-mini .m{padding:6px 2px}.rg-mini .m .ml{font-size:7px}
+  .stk-row{grid-template-columns:52px minmax(0,1fr) 44px;gap:7px}
+  .stk-bar{height:22px}
+}
+
+/* APROVAÇÕES DE ACESSO */
+.apr-list{display:grid;gap:10px}
+.apr-row{display:grid;grid-template-columns:minmax(200px,1.6fr) minmax(120px,1fr) minmax(120px,.9fr) minmax(140px,1fr) minmax(150px,1fr) 236px;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.apr-row[data-status="pending"]{border-color:#efd9a6;background:linear-gradient(90deg,#fffaf0,#fff 40%)}
+.apr-user{display:flex;align-items:center;gap:12px;min-width:0}
+.apr-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f);color:var(--gold);display:grid;place-items:center;font-size:13px;font-weight:900;flex:0 0 auto}
+.apr-id{min-width:0}
+.apr-id strong{display:block;font-size:14px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.apr-id strong em{font-style:normal;color:var(--fern);font-weight:700;font-size:12px}
+.apr-id span{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.apr-meta{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12.5px;color:var(--text);font-weight:600}
+.apr-k{font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.apr-perm select{height:38px;padding:0 10px;border:1.5px solid #cad6cf;border-radius:10px;background:#fbfcfb;font-size:13px;color:#172c25;width:100%}
+.apr-perm select:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 4px rgba(107,128,64,.12)}
+.apr-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.apr-actions .btn{min-height:38px;padding:0 13px}
+.apr-error{color:var(--red);font-weight:700}
+@media(max-width:1180px){
+  .apr-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .apr-user{grid-column:1/-1}
+  .apr-actions{grid-column:1/-1;justify-content:flex-start}
+}
+@media(max-width:520px){
+  .apr-row{grid-template-columns:1fr;gap:11px;padding:13px}
+  .apr-actions .btn{flex:1 1 auto}
+}
+
+/* SELEÇÃO DE OBRA · botão de aprovações e tela de administração */
+.project-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;align-self:flex-start;flex:0 0 auto}
+.project-actions .project-logout{align-self:auto}
+.project-admin-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--ink-2);color:#fff;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 6px 14px rgba(31,74,63,.2);transition:.15s}
+.project-admin-btn:hover{background:#173b32}
+.project-admin-btn[hidden]{display:none}
+.project-admin-btn svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2;flex:0 0 auto}
+.admin-ov{z-index:195;align-items:flex-start}
+.admin-ov .project-shell{width:min(1240px,100%)}
+.admin-body{background:#f8faf8}
+#aprKpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+#aprKpis .kbox{min-width:0}
+@media(max-width:720px){#aprKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.admin-open>.toast{visibility:visible;z-index:260}
+@media(max-width:840px){.project-actions{margin-left:auto}}
+@media(max-width:520px){
+  .project-actions{display:contents}
+  .project-actions .project-logout{grid-area:logout}
+  .project-top{grid-template-areas:'logos logout' 'welcome welcome' 'admin admin'}
+  .project-admin-btn{grid-area:admin;width:100%;padding:11px 12px;font-size:13px}
+  .admin-body{padding:18px calc(12px + var(--safe-r)) calc(30px + var(--safe-b)) calc(12px + var(--safe-l))}
+}
+@media(max-width:360px){.project-top{grid-template-areas:'logos' 'welcome' 'logout' 'admin'}.project-actions .project-logout{justify-self:start}}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -514,7 +683,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       <div class="engertal-badge"><img src="./assets/engertal-logo.png" alt="Engertal Construtora"></div>
     </div>
     <div class="head-spacer"></div>
-    <div class="head-title"><strong id="headAppTitle">Controle de Vistorias</strong><span id="headProjectName">Obra selecionada</span></div>
+    <div class="head-title"><strong id="headAppTitle">Controle de Vistorias</strong></div>
     <div class="head-actions">
       <button class="icon-btn" id="btnLogin" title="Entrar para editar"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
       <button class="project-switch-btn" id="btnProjectSwitch" type="button" title="Trocar obra ou condomínio"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span id="activeProjectName">Trocar obra</span></button>
@@ -526,9 +695,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
   <div class="tabs-strip">
     <div class="tabs">
       <button class="tab active" data-view="resumo"><span class="ti"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Resumo Geral</button>
-      <button class="tab" data-view="obra"><span class="ti"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></span>Vistoria · Obra</button>
       <button class="tab" data-view="cliente"><span class="ti"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Vistoria · Cliente</button>
-      <button class="tab tab-admin" data-view="acessos" style="display:none"><span class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Acessos</button>
     </div>
   </div>
 </div>
@@ -540,26 +707,10 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
     <div class="sec-head">
       <span class="icn"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
       <h2>Resumo Geral</h2>
-      <div class="sh-flow">Panorama da <b>Obra</b> e da <b>Cliente</b></div>
+      <div class="sh-flow">Panorama da <b>Vistoria Cliente</b></div>
     </div>
     <div class="sec-body">
       <div class="rg-grid" id="resumoGrid"></div>
-    </div>
-  </section>
-  <section class="view" id="v-obra">
-    <div class="sec-head">
-      <span class="icn"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></span>
-      <h2>Liberação por Apartamento</h2>
-      <div class="sh-flow"><b>Acabamento</b> + <b>Instalações</b> <span class="arw">→</span> <b>Qualidade</b> <span class="arw">→</span> <b>Assist. Técnica</b></div>
-    </div>
-    <div class="sec-body">
-      <div class="ro-banner" id="roBannerObra" style="display:none"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span class="ro-msg"></span></div>
-      <div class="modetog" id="obraModeTog"><button data-mode="frente" class="active">Por frente</button><button data-mode="geral">Visão geral (todos os setores)</button></div>
-      <div class="kstrip" id="obraKpis"></div>
-      <div class="frentes" id="frentes"></div>
-      <div class="blocosel" id="obraBlocos"></div>
-      <div id="obraGrid"></div>
-      <div class="legend" id="obraLegend"></div>
     </div>
   </section>
 
@@ -598,47 +749,12 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       </div>
     </div>
   </section>
-  <section class="view" id="v-acessos">
-    <div class="sec-head">
-      <span class="icn"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      <h2>Acessos &amp; Logs</h2>
-      <div class="sh-flow">Somente <b>administradores</b></div>
-    </div>
-    <div class="sec-body">
-      <div class="cbox" style="margin-bottom:12px">
-        <div class="ch">Gestão de acessos <span class="nivpill pending" id="pendingCount" style="margin-left:8px;display:none"></span></div>
-        <div style="padding:12px 13px">
-          <div class="note" style="margin:0 0 12px">Cadastros feitos na tela inicial aparecem aqui como pendentes. Revise o nome, escolha o nível e libere o acesso.</div>
-          <div style="overflow-x:auto"><table class="acc-tbl" id="accTbl"><thead><tr><th>E-mail</th><th>Nome</th><th>Nível</th><th>Situação</th><th></th></tr></thead><tbody id="accBody"></tbody></table></div>
-          <div class="rg-sub" style="margin-top:14px">Adicionar, aprovar ou editar usuário</div>
-          <div class="acc-form">
-            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
-            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
-            <div class="fld"><label>Nome</label><input id="accNome"></div>
-            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
-            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
-          </div>
-          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
-          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
-        </div>
-      </div>
-      <div class="cbox">
-        <div class="ch">Registro de logs (últimas 100 ações)</div>
-        <div style="padding:12px 13px">
-          <div class="brow" style="margin-top:0;margin-bottom:10px"><button class="btn g" id="logRefresh">Atualizar logs</button></div>
-          <div class="log-list" id="logList"></div>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="botnav">
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
-  <button class="navbtn" data-view="obra"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span>Obra</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
-  <button class="navbtn nav-admin" data-view="acessos" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Acessos</span></button>
 </nav>
 
 <div class="pop" id="pop"></div>
@@ -715,13 +831,80 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
         <h2 id="projectTitle">Escolha a obra que deseja acessar</h2>
         <p id="projectSubtitle">Você verá somente os empreendimentos liberados para o seu usuário.</p>
       </div>
-      <button class="project-logout" id="projectLogout" type="button">Sair da conta</button>
+      <div class="project-actions">
+        <button class="project-logout" id="projectLogout" type="button">Sair da conta</button>
+        <button class="project-admin-btn" id="projectAdmin" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Aprovações de Acesso</span><span class="tab-badge" id="aprProjectBadge" hidden></span></button>
+      </div>
     </div>
     <div class="project-body">
       <div class="project-section-title">Obras e condomínios disponíveis</div>
       <div class="project-list" id="projectList"></div>
       <div class="project-feedback" id="projectFeedback" role="alert"></div>
       <p class="project-help">Novos condomínios aparecerão aqui quando forem cadastrados e liberados pelo administrador. Cada empreendimento poderá ter seu próprio fluxo de acompanhamento.</p>
+    </div>
+  </section>
+</div>
+
+<div class="project-ov admin-ov" id="adminOv" aria-hidden="true">
+  <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="project-top">
+      <div class="project-top-logos" aria-label="Alto Mangueiral e Engertal">
+        <span class="project-alto-logo-tile"><img class="login-logo-alto" src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"></span>
+        <span class="project-top-divider" aria-hidden="true"></span>
+        <img class="login-logo-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
+      </div>
+      <div class="project-welcome">
+        <small>Administração</small>
+        <h2 id="adminTitle">Aprovações de Acesso</h2>
+        <p>Aprove, rejeite e ajuste as permissões dos usuários de cada obra ou condomínio.</p>
+      </div>
+      <div class="project-actions">
+        <button class="project-logout" id="adminBack" type="button">← Voltar às obras</button>
+      </div>
+    </div>
+    <div class="project-body admin-body">
+      <div class="kstrip" id="aprKpis"></div>
+      <div class="clif" id="aprFilters">
+        <div class="clif-row clif-inputs">
+          <div class="fld"><label for="aprProject">Obra / Condomínio</label><select id="aprProject"></select></div>
+          <div class="fld clif-q"><label for="aprQ">Buscar usuário</label><input type="text" id="aprQ" placeholder="Nome ou e-mail..."></div>
+          <button class="btn g" id="aprRefresh" type="button">Atualizar lista</button>
+        </div>
+        <div class="clif-row">
+          <span class="clif-lbl">Status</span>
+          <div class="clif-chips" id="aprStatus">
+            <button class="chip active" type="button" data-apr-status="ALL">Todos</button>
+            <button class="chip" type="button" data-apr-status="pending">Pendentes</button>
+            <button class="chip" type="button" data-apr-status="approved">Aprovados</button>
+            <button class="chip" type="button" data-apr-status="rejected">Rejeitados / bloqueados</button>
+          </div>
+          <span class="clif-count" id="aprCount"></span>
+        </div>
+      </div>
+      <div class="apr-list" id="aprList"></div>
+      <div class="cbox" style="margin:14px 0 12px">
+        <div class="ch">Adicionar ou editar usuário manualmente</div>
+        <div style="padding:12px 13px">
+          <div class="note" style="margin:0 0 4px">Use para criar uma conta sem cadastro prévio ou alterar dados de quem já tem acesso. Escolha a obra ou condomínio em que o acesso será salvo.</div>
+          <div class="acc-form">
+            <div class="fld"><label for="accProject">Obra / Condomínio</label><select id="accProject"></select></div>
+            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
+            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
+            <div class="fld"><label>Nome</label><input id="accNome"></div>
+            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
+            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
+          </div>
+          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
+          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
+        </div>
+      </div>
+      <div class="cbox">
+        <div class="ch">Registro de logs (últimas 100 ações)</div>
+        <div style="padding:12px 13px">
+          <div class="brow" style="margin-top:0;margin-bottom:10px"><button class="btn g" id="logRefresh">Atualizar logs</button></div>
+          <div class="log-list" id="logList"></div>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -857,15 +1040,16 @@ function buildObraGeral(){
   PAVS.forEach(p=>{ h+=`<tr><td class="pavh">${PAVL[p].toUpperCase()}</td>`+BLOCOS.map(b=>`<td class="cell"><div class="apts">`+APTS.map(a=>cell(b,p,a)).join("")+`</div></td>`).join("")+"</tr>"; });
   return h+"</tbody></table></div>";
 }
-function donut(pct,color,label){
+function donut(pct,color,label,size=118){
   const R=52,C=2*Math.PI*R,off=C*(1-Math.max(0,Math.min(100,pct))/100);
-  return `<svg class="donut" viewBox="0 0 130 130" width="118" height="118"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e6ece3" stroke-width="13"/><circle class="dprog" cx="65" cy="65" r="${R}" fill="none" stroke="${color}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" data-off="${off.toFixed(1)}" data-c="${C.toFixed(1)}" transform="rotate(-90 65 65)"/><text x="65" y="63" text-anchor="middle" class="dv">${pct}%</text><text x="65" y="82" text-anchor="middle" class="dl">${label}</text></svg>`;
+  return `<svg class="donut" viewBox="0 0 130 130" width="${size}" height="${size}"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e6ece3" stroke-width="13"/><circle class="dprog" cx="65" cy="65" r="${R}" fill="none" stroke="${color}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" data-off="${off.toFixed(1)}" data-c="${C.toFixed(1)}" transform="rotate(-90 65 65)"/><text x="65" y="63" text-anchor="middle" class="dv">${pct}%</text><text x="65" y="82" text-anchor="middle" class="dl">${label}</text></svg>`;
 }
 function animateResumo(){
   if(!window.gsap)return;
   gsap.from("#resumoGrid .rg-card",{y:16,opacity:0,duration:.5,stagger:.12,ease:"power2.out",clearProps:"all"});
   document.querySelectorAll("#resumoGrid .dprog").forEach(el=>{const off=+el.getAttribute("data-off"),c=+el.getAttribute("data-c");gsap.fromTo(el,{strokeDashoffset:c},{strokeDashoffset:off,duration:1.1,ease:"power2.out"});});
   gsap.from("#resumoGrid .track i",{scaleX:0,transformOrigin:"left center",duration:.9,stagger:.02,ease:"power2.out",clearProps:"transform"});
+  gsap.from("#resumoGrid .stk-bar",{scaleX:0,transformOrigin:"left center",duration:.8,stagger:.05,ease:"power2.out",clearProps:"transform"});
   gsap.from("#resumoGrid .rb .n",{opacity:0,y:8,duration:.5,stagger:.05,delay:.15,clearProps:"all"});
 }
 function animateView(v){
@@ -893,7 +1077,6 @@ function updateProjectBrand(){
   const experience=appProject?projectExperience(appProject):null;
   const projectName=experience?.title||"Obra selecionada";
   document.getElementById("headAppTitle").textContent="Controle de Vistorias";
-  document.getElementById("headProjectName").textContent=projectName;
   document.getElementById("activeProjectName").textContent=projectName;
   document.title=appProject?"Vistorias · "+projectName:"Gestão de Obras";
 }
@@ -908,6 +1091,8 @@ function blocoSelector(kind){
 
 /* ── OBRA render ── */
 function renderObra(){
+  // O painel do Alto do Jerivá não exibe mais a aba "Vistoria · Obra"; os dados da obra seguem carregados.
+  if(!document.getElementById("v-obra"))return;
   const tog=document.getElementById("obraModeTog");
   if(tog)tog.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.mode===obraMode));
   const roB=document.getElementById("roBannerObra");
@@ -1225,14 +1410,14 @@ addEventListener("scroll",closePop,true);
 
 /* ── TABS ── */
 function switchView(v){
-  if(v==="acessos" && !(currentUser&&currentUser.nivel==="admin")){toast("Acesso restrito a administradores");v="resumo";}
+  if(!document.getElementById("v-"+v))v="resumo";
   obraBlk="ALL"; cliBlk="ALL";
   document.querySelectorAll(".tab,.navbtn").forEach(t=>t.classList.toggle("active",t.dataset.view===v));
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active",s.id==="v-"+v));
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
   if(v==="resumo"){renderResumo(); animateResumo();}
-  if(v==="acessos"){loadUsers();loadLogs();}
+
   animateView(v);
   closePop(); scrollTo(0,0);
 }
@@ -1409,11 +1594,23 @@ function renderProjectChooser(){
   }).join("");
   list.querySelectorAll("[data-project-id]:not(:disabled)").forEach(button=>button.addEventListener("click",()=>selectProject(button.dataset.projectId)));
 }
+function openAdminArea(){
+  if(!adminProjects().length){toast("Acesso restrito a administradores");return;}
+  const overlay=document.getElementById("adminOv");
+  document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
+  loadUsers();loadLogs();
+}
+function closeAdminArea(){
+  const overlay=document.getElementById("adminOv");
+  document.body.classList.remove("admin-open");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
+}
 function showProjectChooser(){
   document.body.classList.add("auth-locked");
   document.getElementById("loginOv").classList.remove("open");
   const overlay=document.getElementById("projectOv");
   renderProjectChooser();setProjectFeedback("");
+  const adminButton=document.getElementById("projectAdmin");adminButton.hidden=!adminProjects().length;
+  if(adminProjects().length)loadUsers();
   overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");
   requestAnimationFrame(()=>document.querySelector("#projectList .project-card:not(:disabled)")?.focus());
 }
@@ -1431,7 +1628,7 @@ async function selectProject(projectId){
   const overlay=document.getElementById("projectOv");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
   updateAuthUI();initState();renderObra();renderCli();renderResumo();
   try{await load(false);}catch(e){}
-  startRealtime();if(currentUser.nivel==="admin")loadUsers();
+  startRealtime();
 }
 function chooseAnotherProject(){
   if(pendingWrites){toast("Aguarde a conclusão das alterações antes de trocar de obra.");return;}
@@ -1481,37 +1678,102 @@ async function bootAuth(){
   currentUser=null;appProject=null;availableProjects=[];updateAuthUI();setSync("");overlay.classList.add("open");
 }
 async function logout(){
+  closeAdminArea();aprRows=[];updateAprBadges();
   document.body.classList.add("auth-locked");stopRealtime();if(supabase)await supabase.auth.signOut().catch(()=>{});currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
 }
+/* ── APROVAÇÕES DE ACESSO ── */
+const APR_STATUS={pending:{label:"Pendente",cls:"pending"},approved:{label:"Aprovado",cls:"active"},rejected:{label:"Rejeitado / bloqueado",cls:"blocked"}};
+let aprRows=[],aprView=[],aprFilt={project:"",status:"ALL",q:""};
+function adminProjects(){return availableProjects.filter(project=>project.role==="admin");}
+async function adminUsersCall(body){
+  const {data,error}=await supabase.functions.invoke("admin-users",{body});
+  if(error){let message="";try{message=(await error.context?.json?.())?.error||"";}catch(_){}throw new Error(message||"Falha na comunicação com o servidor.");}
+  if(!data?.ok)throw new Error(data?.error||"Operação não concluída.");
+  return data;
+}
+function ensureAprProjects(){
+  const select=document.getElementById("aprProject");if(!select)return;
+  const projects=adminProjects();
+  const options=(projects.length>1?[{value:"ALL",label:"Todas as obras"}]:[]).concat(projects.map(project=>({value:String(project.id),label:projectExperience(project).title||project.name})));
+  if(!options.some(o=>o.value===aprFilt.project))aprFilt.project=options[0]?.value||"";
+  select.innerHTML=options.map(o=>`<option value="${esc(o.value)}"${o.value===aprFilt.project?" selected":""}>${esc(o.label)}</option>`).join("");
+  select.disabled=options.length<2;
+  const accSelect=document.getElementById("accProject");
+  if(accSelect){const current=accSelect.value;accSelect.innerHTML=projects.map(project=>`<option value="${esc(project.id)}">${esc(projectExperience(project).title||project.name)}</option>`).join("");
+    if(projects.some(project=>String(project.id)===current))accSelect.value=current;else if(aprFilt.project!=="ALL")accSelect.value=aprFilt.project;
+    accSelect.disabled=projects.length<2;}
+}
+function updateAprBadges(){
+  const waiting=aprRows.filter(u=>u.status==="pending").length;
+  ["aprProjectBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
+}
 async function loadUsers(){
-  if(!SUPABASE_READY||!isAdmin()||!appProject)return;
-  const body=document.getElementById("accBody"),pendingCount=document.getElementById("pendingCount");
-  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"list",projectId:appProject.id}});if(error||!data?.ok)throw error||new Error(data?.error||"Falha ao listar.");
-    const rows=data.users||[];
-    const waiting=rows.filter(u=>u.pending).length;
-    pendingCount.textContent=waiting+" "+(waiting===1?"pendente":"pendentes");pendingCount.style.display=waiting?"inline-flex":"none";
-    body.innerHTML=rows.length?rows.map(u=>{
-      const niv=String(u.role||"visitante").toLowerCase();
-      const status=u.pending?"Aguardando":u.active?"Liberado":"Bloqueado",statusClass=u.pending?"pending":u.active?"active":"blocked";
-      return `<tr><td style="font-weight:800">${esc(u.email)}</td><td>${esc(u.fullName||"")}</td><td><span class="nivpill ${esc(niv)}">${esc(NIVL[niv]||niv)}</span></td><td><span class="nivpill ${statusClass}">${status}</span></td><td><button class="btn ${u.pending?"p":"g"}" style="padding:5px 10px" data-edit="${esc(u.email)}" data-nome="${esc(u.fullName||"")}" data-niv="${esc(niv)}" data-active="${u.pending||u.active?"true":"false"}">${u.pending?"Aprovar":"Editar"}</button></td></tr>`;
-    }).join(""):`<tr><td colspan="5" style="color:var(--text-light)">Nenhum usuário. Adicione abaixo.</td></tr>`;
-    body.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{
-      document.getElementById("accU").value=b.dataset.edit;
-      document.getElementById("accNome").value=b.dataset.nome;
-      document.getElementById("accNiv").value=b.dataset.niv;
-      document.getElementById("accActive").value=b.dataset.active;
-      document.getElementById("accP").value="";
-      document.getElementById("accSave").textContent=b.textContent==="Aprovar"?"Salvar e liberar acesso":"Salvar alterações";
-      document.getElementById("accU").scrollIntoView({behavior:"smooth",block:"center"});
-      toast(b.textContent==="Aprovar"?"Revise o nível e libere o acesso":"Edite os dados e salve");
-    });
-  }catch(e){pendingCount.style.display="none";body.innerHTML=`<tr><td colspan="5" style="color:var(--red)">Não foi possível carregar os usuários.</td></tr>`;}
+  if(!SUPABASE_READY||!adminProjects().length)return;
+  ensureAprProjects();
+  const list=document.getElementById("aprList");
+  const projects=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project);
+  if(list&&!aprRows.length)list.innerHTML='<div class="clif-empty">Carregando solicitações…</div>';
+  const results=await Promise.allSettled(projects.map(project=>adminUsersCall({action:"list",projectId:project.id}).then(data=>(data.users||[]).map(user=>({...user,projectId:project.id,projectName:projectExperience(project).title||project.name})))));
+  const failed=results.filter(r=>r.status==="rejected");
+  aprRows=results.filter(r=>r.status==="fulfilled").flatMap(r=>r.value);
+  updateAprBadges();renderApr();
+  if(failed.length&&list){
+    const msg=failed[0].reason?.message||"Não foi possível carregar os usuários.";
+    if(!aprRows.length)list.innerHTML=`<div class="clif-empty apr-error">${esc(msg)}</div>`;else toast(msg);
+  }
+}
+function renderApr(){
+  const list=document.getElementById("aprList");if(!list)return;
+  const count=status=>aprRows.filter(u=>u.status===status).length;
+  document.getElementById("aprKpis").innerHTML=`
+    <div class="kbox warn"><div class="kl">Pendentes</div><div class="kv">${count("pending")}</div></div>
+    <div class="kbox ok"><div class="kl">Aprovados</div><div class="kv">${count("approved")}</div></div>
+    <div class="kbox"><div class="kl">Rejeitados / bloqueados</div><div class="kv">${count("rejected")}</div></div>
+    <div class="kbox blue"><div class="kl">Total</div><div class="kv">${aprRows.length}</div></div>`;
+  document.querySelectorAll("[data-apr-status]").forEach(b=>b.classList.toggle("active",b.dataset.aprStatus===aprFilt.status));
+  const q=aprFilt.q.trim().toLowerCase();
+  const order={pending:0,approved:1,rejected:2};
+  aprView=aprRows.filter(u=>(aprFilt.status==="ALL"||u.status===aprFilt.status)&&(!q||(u.fullName||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q)))
+    .sort((x,y)=>(order[x.status]-order[y.status])||String(y.createdAt||"").localeCompare(String(x.createdAt||"")));
+  document.getElementById("aprCount").textContent=aprView.length+" usuário(s)";
+  if(!aprView.length){list.innerHTML='<div class="clif-empty">Nenhum usuário encontrado com esses filtros.</div>';return;}
+  list.innerHTML=aprView.map((u,i)=>{
+    const st=APR_STATUS[u.status]||APR_STATUS.pending,role=String(u.role||"visitante").toLowerCase(),self=currentUser&&u.id===currentUser.id;
+    const when=u.createdAt?new Date(u.createdAt).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"—";
+    const initials=String(u.fullName||u.email||"?").split(/[\s@.]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+    const roleSel=`<select data-apr-role="${i}" aria-label="Permissão de ${esc(u.fullName||u.email)}">${Object.keys(NIVL).map(k=>`<option value="${k}"${k===role?" selected":""}>${esc(NIVL[k])}</option>`).join("")}</select>`;
+    let actions="";
+    if(u.status==="pending")actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}">Rejeitar</button>`;
+    else if(u.status==="approved")actions=`<button class="btn g" data-apr-act="save" data-apr-i="${i}">Salvar permissão</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}"${self?' disabled title="Você não pode bloquear o próprio acesso"':""}>Bloquear</button>`;
+    else actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button>`;
+    return `<article class="apr-row" data-status="${esc(u.status)}">
+      <div class="apr-user"><span class="apr-avatar">${esc(initials||"?")}</span><div class="apr-id"><strong>${esc(u.fullName||"Sem nome")}${self?' <em>(você)</em>':""}</strong><span>${esc(u.email)}</span></div></div>
+      <div class="apr-meta"><span class="apr-k">Obra / Condomínio</span><span>${esc(u.projectName)}</span></div>
+      <div class="apr-meta"><span class="apr-k">Solicitado em</span><span>${esc(when)}</span></div>
+      <div class="apr-meta"><span class="apr-k">Situação</span><span><span class="nivpill ${st.cls}">${st.label}</span></span></div>
+      <div class="apr-meta apr-perm"><span class="apr-k">Permissão</span>${roleSel}</div>
+      <div class="apr-actions">${actions}</div>
+    </article>`;
+  }).join("");
+}
+async function aprAction(act,index,button){
+  const u=aprView[index];if(!u||!adminProjects().length)return;
+  const role=document.querySelector(`[data-apr-role="${index}"]`)?.value||u.role||"visitante";
+  if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email}?`))return;
+  const buttons=button.closest(".apr-actions").querySelectorAll("button");buttons.forEach(b=>b.disabled=true);
+  const label=button.textContent;button.textContent="Salvando…";
+  try{
+    if(act==="reject")await adminUsersCall({action:"reject",projectId:u.projectId,userId:u.id});
+    else await adminUsersCall({action:"save",projectId:u.projectId,userId:u.id,email:u.email,fullName:u.fullName||"",role,active:true});
+    toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Permissão atualizada");
+    await loadUsers();loadLogs();
+  }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;}
 }
 async function saveUser(){
   const u=document.getElementById("accU").value.trim(),p=document.getElementById("accP").value,nome=document.getElementById("accNome").value.trim(),niv=document.getElementById("accNiv").value,active=document.getElementById("accActive").value==="true";
-  if(!u){toast("Informe o e-mail");return;}if(!isAdmin()||!appProject){toast("Somente administrador");return;}
+  if(!u){toast("Informe o e-mail");return;}const projectId=Number(document.getElementById("accProject").value);if(!adminProjects().some(project=>Number(project.id)===projectId)){toast("Somente administrador");return;}
   const btn=document.getElementById("accSave");btn.disabled=true;btn.textContent="Salvando…";
-  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId:appProject.id,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
+  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
   catch(e){toast(e&&e.message?e.message:"Falha ao salvar");}
   finally{btn.disabled=false;btn.textContent=active?"Salvar e liberar acesso":"Salvar alterações";}
 }
@@ -1525,57 +1787,67 @@ function auditDetail(l){
   return (tables[l.table_name]||l.table_name)+(l.record_id?" #"+l.record_id:"")+(parts.length?" · "+parts.join(" · "):"");
 }
 async function loadLogs(){
-  if(!SUPABASE_READY||!isAdmin()||!appProject)return;const el=document.getElementById("logList");if(!el)return;
-  try{const {data,error}=await supabase.from("audit_log").select("id,actor_email,table_name,record_id,action,old_data,new_data,created_at").eq("project_id",appProject.id).order("created_at",{ascending:false}).limit(100);if(error)throw error;
+  const ids=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project).map(project=>project.id);
+  if(!SUPABASE_READY||!ids.length)return;const el=document.getElementById("logList");if(!el)return;
+  try{const {data,error}=await supabase.from("audit_log").select("id,actor_email,table_name,record_id,action,old_data,new_data,created_at").in("project_id",ids).order("created_at",{ascending:false}).limit(100);if(error)throw error;
     el.innerHTML=(data||[]).length?data.map(l=>`<div class="log-item"><span class="lt">${esc(new Date(l.created_at).toLocaleString("pt-BR"))}</span><span class="lu">${esc(l.actor_email||"Sistema")}</span><span class="ld">${esc(auditDetail(l))}</span></div>`).join(""):`<div class="log-item"><span class="ld" style="color:var(--text-light)">Sem registros.</span></div>`;
   }catch(e){el.innerHTML=`<div class="log-item"><span class="ld" style="color:var(--red)">Não foi possível carregar os registros.</span></div>`;}
 }
 const BARCLR=p=>p>=80?"#2f9e5b":p>=40?"#6B8040":"#ED7A12";
+const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
-  const total=448;
-  const sec=FRENTES.map(f=>{const vals=Object.values(state.obra).map(o=>o[f.key]);const c=x=>vals.filter(v=>v===x).length;const done=vals.filter(v=>f.done.includes(v)).length;return {name:f.name,done,rv:c("rv"),pct:Math.round(done/total*100)};});
-  const obraGlobal=Math.round(sec.reduce((s,x)=>s+x.pct,0)/sec.length);
-  let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Obra</span><b>${obraGlobal}%</b></div><div class="rg-body">`;
-  h+=`<div class="rg-charts">${donut(obraGlobal,"#6B8040","Concluído")}<div class="rg-stats"><div class="rg-big">`+
-     `<div class="rb"><div class="n">${total}</div><div class="l">Apartamentos</div></div>`+
-     `<div class="rb ok"><div class="n">${sec.reduce((s,x)=>s+x.done,0)}</div><div class="l">Etapas concluídas</div></div>`+
-     `<div class="rb warn"><div class="n">${sec.reduce((s,x)=>s+x.rv,0)}</div><div class="l">Pendências</div></div></div></div></div>`;
-  sec.forEach(x=>{ h+=`<div class="pbar"><div class="pt"><span>${x.name}</span><b>${x.done}/${total} · ${x.pct}%</b></div><div class="track"><i style="width:${x.pct}%;background:${BARCLR(x.pct)}"></i></div></div>`; });
-  h+=`<div class="rg-sub">Progresso por bloco</div><div class="rg-blocos">`;
-  BLOCOS.forEach(b=>{let d=0,tt=0;PAVS.forEach(p=>APTS.forEach(a=>{const o=state.obra[kO(b,p,a)];FRENTES.forEach(f=>{tt++;if(f.done.includes(o[f.key]))d++;});}));const pc=Math.round(d/tt*100);h+=`<div class="brow"><span class="bn">${b}</span><span class="track"><i style="width:${pc}%"></i></span><span class="bv">${pc}%</span></div>`;});
-  h+=`</div></div></div>`;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
   const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),ap=cc("ap");
-  const vist=ap+rv, aprovPct=vist?Math.round(ap/vist*100):0, entPct=Math.round((ct-na)/ct*100);
-  h+=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body">`;
-  h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação")}<div class="rg-stats"><div class="rg-big">`+
+  const vist=ap+rv, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
+  let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
+  h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
      `<div class="rb"><div class="n">${ct}</div><div class="l">Unidades</div></div>`+
      `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
      `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
   const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Aprovado",ap]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
-  const unitsPerBlock=PAVS.length*APTS.length;
-  h+=`<div class="rg-sub">Aprovação e revistorias por bloco</div><div class="client-block-grid">`;
+  h+=`</div><div class="rg-col">`;
+  h+=`<div class="rg-sub">Aprovações e Revistorias por Bloco</div>`;
+  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
   BLOCOS.forEach(block=>{
     const statuses=[];PAVS.forEach(pav=>APTS.forEach(apt=>statuses.push(state.cli[kC(block,pav,apt)])));
+    const total=statuses.length||1;
     const approved=statuses.filter(status=>status==="ap").length;
     const reviews=statuses.filter(status=>status==="rv").length;
-    const approvedPct=Math.round(approved/unitsPerBlock*100),reviewPct=Math.round(reviews/unitsPerBlock*100);
-    h+=`<div class="client-block-card"><div class="client-block-head"><strong>Bloco ${block}</strong><span>${unitsPerBlock} unidades</span></div>`+
-      `<div class="client-block-metric"><span class="client-block-label">Aprovados ${approved}/${unitsPerBlock}</span><span class="client-block-value">${approvedPct}%</span><span class="client-block-track"><i style="width:${approvedPct}%"></i></span></div>`+
-      `<div class="client-block-metric review"><span class="client-block-label">Revistorias ${reviews}/${unitsPerBlock}</span><span class="client-block-value">${reviewPct}%</span><span class="client-block-track"><i style="width:${reviewPct}%"></i></span></div></div>`;
+    const waiting=statuses.filter(status=>status==="ag"||status==="rm").length;
+    const rest=total-approved-reviews;
+    const segs=[
+      {cls:"stk-ok",label:"Aprovados",n:approved},
+      {cls:"stk-rev",label:"Revistorias / Reprovados",n:reviews},
+      {cls:"stk-na",label:"Sem agendamento",n:rest,extra:waiting?` · inclui ${waiting} agendado(s)/remarcado(s) aguardando vistoria`:""}
+    ];
+    const aria=segs.map(x=>`${x.label}: ${x.n} (${fmtPct(x.n/total*100)})`).join("; ");
+    h+=`<div class="stk-row"><span class="stk-lbl">Bloco ${block}</span><div class="stk-bar" role="img" aria-label="Bloco ${block}: ${esc(aria)}">`+
+      segs.filter(x=>x.n>0).map(x=>{const pct=x.n/total*100;const tip=`Bloco ${block} · ${x.label}: ${x.n} de ${total} (${fmtPct(pct)})${x.extra||""}`;
+        return `<i class="${x.cls}" style="width:${pct}%" data-tip="${esc(tip)}" tabindex="0">${pct>=9?`<span>${Math.round(pct)}%</span>`:""}</i>`;}).join("")+
+      `</div><span class="stk-tot">${approved}/${total}</span></div>`;
   });
-  h+=`</div>`;
-  h+=`</div></div>`;
+  h+=`</div></div></div></div>`;
   grid.innerHTML=h;
 }
+/* tooltip dos gráficos (mouse, teclado e toque) */
+const chartTip=document.createElement("div");chartTip.className="chart-tip";chartTip.setAttribute("role","tooltip");document.body.appendChild(chartTip);
+function showTip(el,x,y){chartTip.textContent=el.dataset.tip;chartTip.classList.add("show");
+  const w=chartTip.offsetWidth,hgt=chartTip.offsetHeight;let left=x-w/2,top=y-hgt-12;
+  left=Math.max(8,Math.min(left,innerWidth-w-8));if(top<8)top=y+16;chartTip.style.left=left+"px";chartTip.style.top=top+"px";}
+function hideTip(){chartTip.classList.remove("show");}
+document.addEventListener("pointermove",e=>{const t=e.target.closest?.("[data-tip]");if(t)showTip(t,e.clientX,e.clientY);else if(e.pointerType==="mouse")hideTip();});
+document.addEventListener("pointerdown",e=>{const t=e.target.closest?.("[data-tip]");if(t&&e.pointerType!=="mouse"){showTip(t,e.clientX,e.clientY);}else if(!t)hideTip();});
+document.addEventListener("focusin",e=>{const t=e.target.closest?.("[data-tip]");if(t){const r=t.getBoundingClientRect();showTip(t,r.left+r.width/2,r.top);}});
+document.addEventListener("focusout",hideTip);
+addEventListener("scroll",hideTip,true);
 
 /* BOOT */
 initState();
 renderObra(); renderCli(); renderResumo();
-document.getElementById("obraModeTog").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;obraMode=b.dataset.mode;renderObra();});
+document.getElementById("obraModeTog")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;obraMode=b.dataset.mode;renderObra();});
 document.getElementById("cliModeTog").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cliMode=b.dataset.mode;renderCli();});
 document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();doLogin();});
 document.getElementById("signupForm").addEventListener("submit",e=>{e.preventDefault();doSignup();});
@@ -1583,9 +1855,16 @@ document.querySelectorAll("[data-auth-view]").forEach(btn=>btn.addEventListener(
 document.querySelectorAll("[data-password-target]").forEach(btn=>btn.addEventListener("click",()=>{const input=document.getElementById(btn.dataset.passwordTarget),show=input.type==="password";input.type=show?"text":"password";btn.textContent=show?"Ocultar":"Mostrar";btn.setAttribute("aria-label",(show?"Ocultar":"Mostrar")+" senha");}));
 document.getElementById("btnLogout").onclick=logout;
 document.getElementById("projectLogout").onclick=logout;
+document.getElementById("projectAdmin").onclick=openAdminArea;
+document.getElementById("adminBack").onclick=closeAdminArea;
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
 document.getElementById("accSave").onclick=saveUser;
 document.getElementById("logRefresh").onclick=loadLogs;
+document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();loadLogs();});
+document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.value;renderApr();});
+document.getElementById("aprRefresh").onclick=()=>loadUsers();
+document.getElementById("aprStatus").addEventListener("click",e=>{const b=e.target.closest("[data-apr-status]");if(!b)return;aprFilt.status=b.dataset.aprStatus;renderApr();});
+document.getElementById("aprList").addEventListener("click",e=>{const b=e.target.closest("[data-apr-act]");if(b&&!b.disabled)aprAction(b.dataset.aprAct,+b.dataset.aprI,b);});
 if(window.gsap){gsap.from(".header",{y:-38,opacity:0,duration:.5,ease:"power2.out"});gsap.from(".tabs .tab",{y:-8,opacity:0,duration:.4,stagger:.06,delay:.15,clearProps:"all"});}
 switchView("resumo");
 setSync("");

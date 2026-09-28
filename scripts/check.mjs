@@ -24,7 +24,13 @@ assert.ok(html.includes('id="btnProjectSwitch"'), "Ação para trocar de empreen
 assert.ok(html.includes("Acompanhamento da obra, vistorias dos clientes e mantenha toda a equipe trabalhando com informações atualizadas."), "Texto solicitado para o login não encontrado.");
 assert.ok(!html.includes('<span class="login-kicker">Alto do Jerivá Residencial</span>'), "O empreendimento ainda aparece indevidamente no login.");
 assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do Alto Mangueiral não encontrada no login.");
-assert.ok(html.includes("Aprovação e revistorias por bloco"), "Progresso por bloco não encontrado no resumo.");
+assert.ok(html.includes("Aprovações e Revistorias por Bloco"), "Progresso por bloco não encontrado no resumo.");
+assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");
+assert.ok(!html.includes('data-view="obra"'), "A aba Vistoria · Obra ainda aparece no painel.");
+assert.ok(html.includes("Aprovações de Acesso"), "Página de aprovações de acesso não encontrada.");
+assert.ok(html.includes('id="projectAdmin"') && html.includes('id="adminOv"'), "Aprovações de acesso precisam ficar na seleção de obra.");
+assert.ok(!html.includes('data-view="acessos"'), "Aprovações de acesso não devem aparecer como aba do condomínio.");
+assert.ok(!html.includes('id="headProjectName"'), "Nome da obra duplicado no cabeçalho.");
 assert.ok(html.includes("touch-action:pan-y"), "Rolagem tátil das telas de autenticação não encontrada.");
 assert.ok(html.includes("postgres_changes"), "Assinatura Realtime não encontrada.");
 
@@ -63,6 +69,8 @@ assert.match(accessMigration, /create table public\.access_requests/i);
 assert.match(accessMigration, /alter table public\.access_requests enable row level security/i);
 assert.match(accessMigration, /revoke all on table public\.access_requests from public, anon, authenticated/i);
 assert.match(edgeFunction, /\.from\(['"]access_requests['"]\)/);
+assert.match(edgeFunction, /profiles!project_members_user_id_fkey/, "Relacionamento project_members → profiles precisa ser explícito.");
+assert.match(edgeFunction, /action === ['"]reject['"]/);
 
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
