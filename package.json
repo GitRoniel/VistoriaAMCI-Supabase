@@ -15,11 +15,13 @@
     "export:reports": "node --env-file-if-exists=.env scripts/export-reports.mjs",
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
-    "cap:sync": "npx cap sync",
+    "cap:sync": "pnpm build && npx cap sync",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios",
     "cap:run:android": "npx cap run android",
-    "cap:run:ios": "npx cap run ios"
+    "cap:run:ios": "pnpm cap:sync:ios && npx cap run ios",
+    "cap:sync:ios": "pnpm build && npx cap sync ios",
+    "ios:open": "pnpm cap:sync:ios && npx cap open ios"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.115.0",

@@ -7,6 +7,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vistorias">
+<link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="./assets/icons/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png">
 <title>Gestão de Obras · Vistorias</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -953,6 +959,90 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 }
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
+/* MAPA · grade estável (corrige sobreposição no iOS/Safari).
+   As colunas usavam 1fr (= minmax(auto,1fr)) e os botões tinham aspect-ratio sem min-width:0:
+   no WebKit o tamanho mínimo automático do item vinha da altura esticada da linha e empurrava o
+   botão para fora da célula, cobrindo o bloco vizinho. Colunas minmax(0,1fr) + min-width:0 +
+   align-self:start mantêm cada número dentro da própria célula em qualquer largura. */
+.apts{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pavrow .pa{grid-template-columns:repeat(8,minmax(0,1fr))}
+@media(max-width:420px){.pavrow .pa{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.apts .apt,.pavrow .pa .apt,.casa-wrap .apt{min-width:0;align-self:start}
+.pavrow .pa,.casa-wrap{min-width:0}
+/* A rolagem do mapa vira um contexto de empilhamento próprio: número selecionado/hover não passa
+   por cima da coluna fixa (PAV/CONJ.), do cabeçalho, do filtro nem da barra inferior. */
+.gridscroll{position:relative;isolation:isolate;z-index:0}
+.mx th.corner{z-index:9}
+.mx td.pavh{z-index:8}
+/* Buriti: números de referência das casas no mesmo tamanho dos números das casas. */
+.mx.casas th.casah{font-size:12px}
+
+/* VISTORIA · CLIENTE · cabeçalho compacto */
+#v-cliente .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
+#v-cliente .sec-head .icn{width:30px;height:30px;border-radius:9px}
+#v-cliente .sec-head .icn svg{width:15px;height:15px}
+#v-cliente .sec-head h2{font-size:17px;white-space:nowrap}
+#v-cliente .sec-head .sh-flow{font-size:12px;min-width:0}
+#v-cliente .sec-body{padding:12px 14px}
+#v-cliente .clitop{gap:10px;margin-bottom:10px}
+#v-cliente .cbox .ch{padding:7px 12px;font-size:10.5px}
+#v-cliente .cbox{display:flex;flex-direction:column}
+#v-cliente .cbox>.resumo,#v-cliente .cbox>.aprov{flex:1 1 auto}
+#v-cliente .resumo .rc{padding:6px 10px}
+#v-cliente .resumo .rv{font-size:19px;line-height:1.15;margin-top:1px}
+#v-cliente .resumo .rc.tot{display:flex;align-items:baseline;gap:8px;padding:5px 10px}
+#v-cliente .resumo .rc.tot .rv{margin:0;font-size:17px}
+#v-cliente .aprov .ac{padding:7px 12px}
+#v-cliente .aprov .av{font-size:23px}
+#v-cliente .aprov .abar{margin-top:5px}
+#v-cliente .aprov .af{margin-top:4px}
+/* Alternância Mapa/Lista compacta e integrada */
+#v-cliente .modetog{padding:3px;border-radius:10px;margin-bottom:10px;gap:3px}
+#v-cliente .modetog button{min-height:32px;padding:0 6px;border-radius:8px;font-size:12.5px}
+@media(max-width:720px){
+  #v-cliente .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
+  #v-cliente .sec-head .icn{width:26px;height:26px;border-radius:8px}
+  #v-cliente .sec-head .icn svg{width:13px;height:13px}
+  #v-cliente .sec-head h2{font-size:15px}
+  #v-cliente .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
+  #v-cliente .sec-body{padding:8px}
+  #v-cliente .clitop{gap:7px;margin-bottom:8px}
+  #v-cliente .cbox{border-radius:11px}
+  #v-cliente .cbox .ch{padding:6px 10px;font-size:9.5px}
+  #v-cliente .resumo .rc{padding:4px 8px}
+  #v-cliente .resumo .rl{font-size:8px;gap:4px}
+  #v-cliente .resumo .rl .sw{width:9px;height:9px}
+  #v-cliente .resumo .rv{font-size:16px}
+  #v-cliente .resumo .rc.tot{padding:4px 8px;gap:6px}
+  #v-cliente .resumo .rc.tot .rv{font-size:15px}
+  #v-cliente .aprov .ac{padding:5px 8px}
+  #v-cliente .aprov .av{font-size:19px}
+  #v-cliente .aprov .abar{height:4px;margin-top:4px}
+  #v-cliente .aprov .af,#v-cliente .aprov .af-goal{font-size:9px;margin-top:2px}
+  #v-cliente .modetog{margin-bottom:8px}
+  #v-cliente .modetog button{min-height:36px}
+  #v-cliente .blocosel{margin-bottom:6px}
+  #v-cliente .legend{margin-top:8px;padding:7px 10px;gap:6px 10px}
+}
+
+/* iOS (Safari, tela de início e app Capacitor) */
+@supports (-webkit-touch-callout:none){
+  /* Campos de data/hora nativos do iOS têm largura intrínseca própria e ignoravam o layout,
+     sobrepondo os campos vizinhos. */
+  input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;line-height:normal}
+  input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:1.2em}
+  .fx-field input[type=date]{flex:1 1 auto}
+  /* A rolagem com inércia é nativa desde o iOS 13; a antiga criava camadas que cobriam outros elementos. */
+  .gridscroll{-webkit-overflow-scrolling:auto}
+  /* Em paisagem, o conteúdo não fica sob o notch/Dynamic Island. */
+  @media(orientation:landscape){
+    .main{padding-left:max(11px,var(--safe-l));padding-right:max(11px,var(--safe-r))}
+    .header-inner{padding-left:max(12px,var(--safe-l));padding-right:max(12px,var(--safe-r))}
+  }
+}
+/* App nativo (Capacitor): sem rolagem elástica revelando o fundo e sem seleção acidental ao tocar. */
+html.native,html.native body{overscroll-behavior:none}
+html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style>
 </head>
 <body class="auth-locked">
@@ -1240,6 +1330,9 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 <script src="./supabase-client.js"></script>
 <script>
 const CONFIG=window.APP_CONFIG||{};
+/* App nativo (Capacitor): marca a página e evita o zoom automático do iOS ao focar campos. A versão WEB não muda. */
+const IS_NATIVE=!!window.Capacitor?.isNativePlatform?.();
+if(IS_NATIVE){document.documentElement.classList.add("native");const vp=document.querySelector('meta[name="viewport"]');if(vp&&!/maximum-scale/.test(vp.content))vp.content+=", maximum-scale=1";}
 const SUPABASE_READY=!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_PUBLISHABLE_KEY&&window.createSupabaseClient);
 const PENDING_MSG="Seu cadastro está aguardando a aprovação de um administrador. Assim que o acesso for liberado, você poderá entrar.";
 // Lido antes do cliente do Supabase processar a URL: indica retorno do link de confirmação de e-mail.
@@ -2377,7 +2470,7 @@ async function doSignup(){
   if(password!==confirmation){setAuthFeedback("signupFeedback","As senhas informadas não são iguais.");return;}
   setAuthBusy(btn,true,"Enviando solicitação…");
   try{
-    const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:window.location.origin+window.location.pathname}});
+    const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:IS_NATIVE?(CONFIG.APP_PUBLIC_URL||undefined):window.location.origin+window.location.pathname}});
     if(error)throw error;
     // O cadastro nunca abre o sistema: a sessão criada é encerrada e o acesso depende da aprovação do admin.
     if(data.session)await supabase.auth.signOut();

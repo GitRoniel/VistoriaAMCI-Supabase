@@ -80,6 +80,21 @@ assert.match(edgeFunction, /\.from\(['"]access_requests['"]\)/);
 assert.match(edgeFunction, /profiles!project_members_user_id_fkey/, "Relacionamento project_members → profiles precisa ser explícito.");
 assert.match(edgeFunction, /action === ['"]reject['"]/);
 
+// App iOS (Capacitor) e ícones.
+const capConfig = JSON.parse(await readFile(resolve(root, "capacitor.config.json"), "utf8"));
+assert.equal(capConfig.webDir, "www");
+assert.ok(capConfig.appId && capConfig.appName, "Capacitor precisa de appId e appName.");
+const manifest = JSON.parse(await readFile(resolve(root, "www/manifest.webmanifest"), "utf8"));
+assert.ok(manifest.icons.some((i) => i.sizes === "512x512"), "Manifest precisa do ícone 512.");
+for (const icon of ["favicon.svg", "favicon.ico", "favicon-32.png", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"]) {
+  await readFile(resolve(root, "assets/icons", icon));
+}
+assert.match(html, /rel="apple-touch-icon"[^>]+apple-touch-icon\.png/);
+assert.match(html, /rel="icon" href="\.\/assets\/icons\/favicon\.svg"/);
+assert.match(html, /viewport-fit=cover/);
+assert.match(html, /const IS_NATIVE=/);
+assert.match(html, /\.apts\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)\}/, "Grade do mapa precisa de colunas minmax(0,1fr) (iOS).");
+assert.match(html, /\.mx\.casas th\.casah\{font-size:12px\}/);
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 

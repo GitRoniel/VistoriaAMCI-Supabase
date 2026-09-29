@@ -7,6 +7,7 @@ node_modules/
 www/config.js
 www/supabase-client.js
 www/assets/
+www/favicon.ico
 supabase/.temp/
 
 # Exportações das planilhas contêm dados pessoais e não devem ir para o Git.
@@ -19,6 +20,5 @@ exports/*.csv
 
 .vercel/
 android/
-ios/
 dist/
 *.log
