@@ -30,6 +30,9 @@ assert.ok(html.includes("units!inner(project_id)"), "Consultas precisam ficar re
 assert.ok(html.includes('id="projectOverview"') && html.includes('id="overviewOv"'), "Visão Geral não encontrada na seleção de obra.");
 assert.ok(html.includes("technical_escort") && html.includes("Acomp. Técnico"), "Campo Acomp. Técnico não encontrado.");
 assert.ok(!html.includes("fonts.googleapis.com/css2?family=Geist"), "A fonte do projeto deve ser a do sistema (SF Pro).");
+assert.ok(html.includes("family=Inter") && html.includes("-webkit-touch-callout:none"), "Inter no desktop/Android e fonte nativa no iOS.");
+assert.ok(!/transform:scale\(/.test(html), "Não usar scale() em elementos com texto.");
+assert.ok(html.includes('data-cfg="cond"') && html.includes("sort_order"), "Configuração de Condomínio não encontrada.");
 assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");
 assert.ok(!html.includes('data-view="obra"'), "A aba Vistoria · Obra ainda aparece no painel.");
 assert.ok(html.includes("Aprovações de Acesso"), "Página de aprovações de acesso não encontrada.");
