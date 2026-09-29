@@ -1,5 +1,6 @@
 import { build } from "esbuild";
-import { copyFile, cp, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { inject as injectDarkTheme } from "./theme-dark.mjs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -25,6 +26,11 @@ const config = {
 };
 
 await mkdir(www, { recursive: true });
+// Mantém o Modo Escuro sincronizado com o CSS do Modo Claro.
+const pagePath = resolve(www, "index.html");
+const page = await readFile(pagePath, "utf8");
+const themed = injectDarkTheme(page);
+if (themed !== page) await writeFile(pagePath, themed, "utf8");
 await cp(resolve(root, "assets"), resolve(www, "assets"), { recursive: true });
 // Navegadores pedem /favicon.ico automaticamente.
 await copyFile(resolve(root, "assets/icons/favicon.ico"), resolve(www, "favicon.ico"));

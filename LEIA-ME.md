@@ -73,3 +73,10 @@ pnpm ios:open       # abre no Xcode (escolha o Team em Signing & Capabilities e 
 
 Sempre que alterar `www/index.html`, rode `pnpm cap:sync:ios` antes de gerar o app.
 No app o endereço interno é `capacitor://localhost`; o link do e-mail de confirmação aponta para `https://amci-vistoria.vercel.app` (padrão de `APP_PUBLIC_URL` em `scripts/build.mjs`, pode ser trocado no `.env`).
+
+## Tema claro/escuro
+
+- Botão de sol/lua no cabeçalho e na tela de escolha de obra; a escolha fica salva no aparelho (`localStorage`, chave `amci-theme`).
+- O Modo Escuro é gerado automaticamente a partir do CSS do Modo Claro por `scripts/theme-dark.mjs` (roda no `pnpm build`; o `pnpm check` falha se estiver desatualizado). Ajustes manuais ficam logo após o bloco gerado em `www/index.html`.
+- As cores de status (Não agendado, Agendado, Remarcado, Revistoria, Revistoria Finalizada, Aprovado) são iguais nos dois temas.
+- A área da barra de status no iPhone (tela cheia/app) usa `--chrome-top`, que acompanha o tema.

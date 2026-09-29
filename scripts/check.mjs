@@ -95,6 +95,14 @@ assert.match(html, /viewport-fit=cover/);
 assert.match(html, /const IS_NATIVE=/);
 assert.match(html, /\.apts\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)\}/, "Grade do mapa precisa de colunas minmax(0,1fr) (iOS).");
 assert.match(html, /\.mx\.casas th\.casah\{font-size:12px\}/);
+// Tema claro/escuro, topo do iPhone e Revistoria Finalizada.
+const { inject: injectDarkTheme } = await import("./theme-dark.mjs");
+assert.equal(injectDarkTheme(html), html, "Tema escuro desatualizado: rode `node scripts/theme-dark.mjs`.");
+assert.match(html, /:root\[data-theme="dark"\]\{color-scheme:dark;--chrome-top:/);
+assert.match(html, /html\{background-color:var\(--chrome-top\)\}/);
+assert.match(html, /localStorage\.getItem\("amci-theme"\)/);
+assert.match(html, /data-theme-toggle/);
+assert.match(html, /const showRev=cur==="rf";/);
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 
