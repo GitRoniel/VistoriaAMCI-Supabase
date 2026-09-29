@@ -93,3 +93,17 @@ Na **Visão Geral**, administradores veem **📥 Atualizar Agendamentos** e **Hi
 A planilha só atualiza **Cliente, Data, Horário e Status** da vistoria. As colunas do Atendimento ao Cliente (**Responsável pelo agendamento, Observação e Etapa de Categoria Atendimento**) são ignoradas: nem são lidas, e a função do banco recusa qualquer alteração em responsável, observações ou etapa vinda da importação. O responsável pela vistoria e as observações continuam sendo definidos só no site.
 
 Origem de cada campo em `client_inspections.field_sources` / `updated_source` (MANUAL, PLANILHA, SISTEMA). Histórico em `importacoes_agendamentos` e `importacoes_agendamentos_itens`.
+
+## Cadastro de condomínios
+
+Em **Configurações › Configuração de Condomínio** (administradores):
+
+- **+ Novo condomínio:** nome, tipo, cor de destaque e descrição (opcional; se vazia, é gerada).
+  - **Apartamentos:** gera automaticamente 448 unidades, no mesmo modelo do Alto do Jerivá (blocos A–H × Térreo e 1º ao 6º × aptos 01–08).
+  - **Casas:** escolha o intervalo de conjuntos (ex.: A até P) e informe a quantidade de casas de cada um; são geradas as casas 01…N de cada conjunto, como no Alto do Buriti.
+- Quem cadastra e todos os demais administradores recebem acesso de administrador ao novo condomínio.
+- **Conjuntos e casas** (condomínios de casas): acrescentar/remover conjuntos e ajustar quantidades. Casas com dados cadastrados (cliente, data, status…) não podem ser removidas.
+- **Cor** aparece no cartão da escolha de obra, no botão do condomínio no cabeçalho e nas etiquetas da Visão Geral.
+- **Nomes na planilha de Vendas:** outros nomes do condomínio usados na planilha (comparados sem acento/maiúsculas). A importação vincula as linhas pelo nome do condomínio e lista o que não for encontrado.
+
+Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funções `criar_condominio` e `atualizar_estrutura_condominio` (transação única, só administradores).

@@ -1233,6 +1233,65 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
   .ov-sum-wrap .ov-sum td.ov-n,.ov-sum-wrap .ov-sum thead th:nth-child(n+4){width:auto;min-width:42px;padding:4px}
   .ov-sum-wrap .ov-sum-date{padding:5px 6px}
 }
+/* Cor de destaque do condomínio */
+.project-card[style*="--pc"]{box-shadow:inset 4px 0 0 var(--pc),var(--shadow-card,0 1px 2px rgba(0,0,0,.04))}
+.project-monogram[style*="--pc"]{background:linear-gradient(145deg,var(--pc),color-mix(in srgb,var(--pc) 62%,#000));color:#fff}
+#btnProjectSwitch::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--pc,transparent);box-shadow:0 0 0 1.5px rgba(255,255,255,.75);flex:0 0 auto}
+/* CONFIGURAÇÃO DE CONDOMÍNIO · cadastro, cor e estrutura */
+.cond-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.cond-top .note{margin:0;flex:1}
+.cond-top .btn{flex:0 0 auto;white-space:nowrap}
+.cond-top .btn[hidden],.cond-panel[hidden]{display:none}
+.cond-fields{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)}
+.cond-alias{grid-column:1/-1}
+.cond-meta{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cond-kind-tag{font-size:11px;font-weight:700;letter-spacing:.03em;padding:4px 10px;border-radius:999px;background:#eef3ef;color:#37564a}
+.cond-color{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 4px;border:1.5px solid #d3ddd6;border-radius:9px;background:#fff;font-size:12px;font-weight:600;color:#37564a;cursor:pointer}
+.cond-color input{width:26px;height:24px;padding:0;border:0;background:none;cursor:pointer}
+.cond-struct-btn{min-height:32px;height:32px;padding:0 12px;font-size:12px}
+.cond-panel{background:#fff;border:1.5px solid #cfdcd3;border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow-card);display:grid;gap:12px}
+.cond-new-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cond-new-head small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6a7a71}
+.cond-new-head b{font-size:16px;color:var(--ink)}
+.cond-new-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px}
+.cond-new-grid .fld{margin:0}
+.cond-new-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cond-new-row .fx-lbl{min-width:120px}
+.cond-new-foot [data-cp="create"],.cond-new-foot [data-cp="save-struct"]{min-width:180px}
+.cond-kind{margin:0;flex:0 0 auto}
+.cond-kind button{min-height:34px;padding:0 14px;font-size:12.5px;white-space:nowrap}
+.cond-x{width:32px;height:32px;border-radius:9px;border:1.5px solid #d3ddd6;background:#fff;color:#52675d;font-size:18px;line-height:1;display:inline-grid;place-items:center;flex:0 0 auto}
+.cond-x:hover{border-color:#e29d93;color:#9e2f25;background:#fff5f3}
+.cond-swatches{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cond-sw{width:26px;height:26px;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 0 0 1.5px #d3ddd6;cursor:pointer}
+.cond-sw.on{box-shadow:0 0 0 2.5px var(--ink)}
+.cond-preview .project-monogram{width:38px;height:38px;font-size:13px}
+.cond-range{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#37564a}
+.cond-range select{height:34px;padding:0 8px;border:1.5px solid #cad6cf;border-radius:9px;background:#fbfcfb;font-size:13px}
+.cond-info{font-size:12.5px;color:#52675d;line-height:1.5;margin:0}
+.cond-gtable{max-width:520px}
+.cond-gtable .ctbl{min-width:0}
+.cond-gtable td{padding:4px 10px;font-size:12.5px}
+.cond-n{width:84px;height:32px;padding:0 8px;border:1.5px solid #cad6cf;border-radius:8px;background:#fbfcfb;font-size:13px;text-align:center}
+.cond-n:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 3px rgba(107,128,64,.14)}
+.cond-gen{color:#6a7a71}
+.cond-gen small{color:#a15c00;font-weight:600}
+.cond-gtable tfoot td{background:#f4f7f5;font-weight:700;color:var(--ink);padding:6px 10px}
+.cond-add{display:flex}
+.cond-add .btn{min-height:34px;height:34px;font-size:12.5px}
+.cond-err{background:#fde8e5;color:#9e2f25;border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:600;line-height:1.45}
+.cond-new-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.cond-sum{margin-right:auto;font-size:12.5px;color:#37564a}
+.cond-new-foot .btn{min-height:38px;height:38px}
+@media(max-width:720px){
+  .cond-top{flex-direction:column}.cond-top .btn{width:100%}
+  .cond-new-grid{grid-template-columns:1fr}
+  .cond-new-row .fx-lbl{min-width:0;flex-basis:100%}
+  .cond-kind{flex:1 1 100%}.cond-kind button{flex:1 1 0;padding:0 8px}
+  .cond-panel{padding:12px}
+  .cond-sum{flex-basis:100%}.cond-new-foot .btn{flex:1 1 0}
+  .cond-n{font-size:16px}
+}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--chrome-top)}
@@ -1809,6 +1868,29 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
 :root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:focus-visible{background:#1c221e;box-shadow:inset 0 0 0 2px rgba(0,0,0,0.6);outline:none}
 :root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:focus-visible{background:#1f2622;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ov) 55%,transparent);outline:none}
 :root[data-theme="dark"] .ov-sum-go{color:#79d8b5}
+:root[data-theme="dark"] .project-card[style*="--pc"]{box-shadow:inset 4px 0 0 var(--pc),var(--shadow-card,0 1px 2px rgba(0,0,0,0.072))}
+:root[data-theme="dark"] .project-monogram[style*="--pc"]{background:linear-gradient(145deg,var(--pc),color-mix(in srgb,var(--pc) 62%,#000));color:#fff}
+:root[data-theme="dark"] #btnProjectSwitch::after{background:var(--pc,transparent);box-shadow:0 0 0 1.5px rgba(40,40,40,0.75)}
+:root[data-theme="dark"] .cond-kind-tag{background:#1f2420;color:#bac9c3}
+:root[data-theme="dark"] .cond-color{border:1.5px solid #444c47;background:#282828;color:#bac9c3}
+:root[data-theme="dark"] .cond-color input{border:0;background:none}
+:root[data-theme="dark"] .cond-panel{background:#282828;border:1.5px solid #444e47;box-shadow:var(--shadow-card)}
+:root[data-theme="dark"] .cond-new-head small{color:#a0ada6}
+:root[data-theme="dark"] .cond-new-head b{color:#cfd9d7}
+:root[data-theme="dark"] .cond-x{border:1.5px solid #444c47;background:#282828;color:#abbcb4}
+:root[data-theme="dark"] .cond-x:hover{border-color:#614844;color:#de7b73;background:#2d1f1d}
+:root[data-theme="dark"] .cond-sw{background:var(--c);border:2px solid #3b3b3b;box-shadow:0 0 0 1.5px #2c322e}
+:root[data-theme="dark"] .cond-sw.on{box-shadow:0 0 0 2.5px rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .cond-range{color:#bac9c3}
+:root[data-theme="dark"] .cond-range select{border:1.5px solid #474f4a;background:#242924}
+:root[data-theme="dark"] .cond-info{color:#abbcb4}
+:root[data-theme="dark"] .cond-n{border:1.5px solid #474f4a;background:#242924}
+:root[data-theme="dark"] .cond-n:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 3px rgba(0,0,0,0.252)}
+:root[data-theme="dark"] .cond-gen{color:#a0ada6}
+:root[data-theme="dark"] .cond-gen small{color:#ffb552}
+:root[data-theme="dark"] .cond-gtable tfoot td{background:#212623;color:#cfd9d7}
+:root[data-theme="dark"] .cond-err{background:#291c1a;color:#de7b73}
+:root[data-theme="dark"] .cond-sum{color:#bac9c3}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -2125,7 +2207,8 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       <div class="apr-list" id="aprList"></div>
       </div>
       <div class="cfg-pane" data-pane="cond" hidden>
-        <div class="note" style="margin:0 0 12px">Defina a ordem em que os condomínios aparecem na tela de seleção e o título e a descrição exibidos em cada um. As alterações valem para todos os usuários.</div>
+        <div class="cond-top"><div class="note">Cadastre condomínios, defina a ordem na tela de seleção, o título, a descrição, a cor de destaque e os nomes usados na planilha de Vendas. As alterações valem para todos os usuários.</div><button class="btn p" id="condNewBtn" type="button">+ Novo condomínio</button></div>
+        <div class="cond-panel" id="condPanel" hidden></div>
         <div class="cond-list" id="condList"></div>
         <div class="brow cond-actions"><span class="cond-hint" id="condHint"></span><button class="btn g" id="condReset" type="button" hidden>Descartar</button><button class="btn p" id="condSave" type="button" disabled>Salvar configurações</button></div>
       </div>
@@ -2215,27 +2298,25 @@ function normCli(t){t=(t||"").toString().trim().toLowerCase();
   return"na";}
 function esc(s){return (s==null?"":""+s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 const NIVL={admin:"Admin",revistorias:"Revistorias",visitante:"Visitante"};
-const PROJECT_EXPERIENCES={
-  // Só o tipo de módulo fica no código; título, descrição e ordem vêm de public.projects.
-  "alto-do-jeriva":{ready:true,layout:"apartamento"},
-  "alto-do-buriti":{ready:true,layout:"casa"}
-};
+// Tipo, cor, título, descrição e ordem de cada condomínio vêm de public.projects.
+const DEFAULT_PROJECT_COLOR="#1f4a3f";
+const projectColor=p=>/^#[0-9a-f]{6}$/i.test(p?.color||"")?p.color:DEFAULT_PROJECT_COLOR;
 /* Layout das unidades por condomínio: apartamentos (bloco/pavimento/apto) ou casas (conjunto/número). */
-const BURITI_CONJUNTOS={A:7,B:42,C:10,D:10,E:10,F:10,G:10,H:53,I:49,J:7,K:8,L:47,M:10,N:10,O:10,P:10,Q:10,R:6};
 function apartmentLayout(){
   const units=[];BLOCOS.forEach(b=>PAVS.forEach(p=>APTS.forEach(a=>units.push({b,p,a}))));
   return {kind:"apartamento",group:"Bloco",groupShort:"Bloco",unit:"Apto",unitsWord:"apartamentos",groups:BLOCOS,units,
     summary:`${units.length} unidades · ${BLOCOS.length} blocos × ${PAVS.length} pav × ${APTS.length} aptos`,unitHint:"Ex.: 604 ou A604"};
 }
 function houseLayout(counts){
-  const groups=Object.keys(counts).sort(),units=[];
+  // Conjuntos e quantidade de casas vêm das unidades cadastradas no banco (ver load()).
+  counts=counts||{};const groups=Object.keys(counts).sort((x,y)=>x.length-y.length||x.localeCompare(y)),units=[];
   groups.forEach(b=>{for(let n=1;n<=counts[b];n++)units.push({b,p:"",a:String(n).padStart(2,"0")});});
   return {kind:"casa",group:"Conjunto",groupShort:"Conj.",unit:"Casa",unitsWord:"casas",groups,units,counts,
-    maxHouses:Math.max(...groups.map(b=>counts[b])),
-    summary:`${units.length} casas · ${groups.length} conjuntos (${groups[0]} a ${groups[groups.length-1]})`,unitHint:"Ex.: 35 ou B35"};
+    maxHouses:groups.length?Math.max(...groups.map(b=>counts[b])):0,
+    summary:groups.length?`${units.length} casas · ${groups.length} conjuntos (${groups[0]} a ${groups[groups.length-1]})`:"Carregando unidades…",unitHint:"Ex.: 35 ou B35"};
 }
 let LAYOUT=apartmentLayout();
-function layoutFor(project){return projectExperience(project).layout==="casa"?houseLayout(BURITI_CONJUNTOS):apartmentLayout();}
+function layoutFor(project){return projectExperience(project).layout==="casa"?houseLayout({}):apartmentLayout();}
 function unitCode(b,p,a){return LAYOUT.kind==="casa"?String(+a):unitCode_(p,a);}
 function unitTitle(b,p,a){return LAYOUT.kind==="casa"?`Casa ${+a} · Conjunto ${b}`:`Apto ${a} · Bloco ${b} ${PAVL[p]}`;}
 function unitShort(b,p,a){return LAYOUT.kind==="casa"?`Conj. ${b} casa ${+a}`:`${b} ${PAVL[p]} apto ${a}`;}
@@ -2373,9 +2454,9 @@ function updateAuthUI(){
   if(inl)document.getElementById("userName").textContent=(currentUser.nome||currentUser.usuario)+" · "+(NIVL[currentUser.nivel]||currentUser.nivel);
 }
 function projectExperience(project){
-  const configured=PROJECT_EXPERIENCES[project?.slug],title=project?.name||"Empreendimento";
-  return {ready:!!configured?.ready,layout:configured?.layout||"apartamento",code:projectInitials(title),title,
-    description:project?.description||(configured?"":"Módulo específico em preparação.")};
+  const title=project?.name||"Empreendimento",kind=project?.kind==="casas"?"casas":"apartamentos";
+  return {ready:true,kind,layout:kind==="casas"?"casa":"apartamento",code:projectInitials(title),title,color:projectColor(project),
+    description:project?.description||""};
 }
 function sortProjects(){availableProjects.sort((x,y)=>((x.sort_order??100)-(y.sort_order??100))||String(x.name).localeCompare(String(y.name),"pt-BR"));}
 const INITIALS_SKIP=new Set(["de","do","da","dos","das","e"]);
@@ -2385,6 +2466,7 @@ function updateProjectBrand(){
   const projectName=experience?.title||"Obra selecionada";
   document.getElementById("headAppTitle").textContent="Controle de Vistorias";
   document.getElementById("activeProjectName").textContent=projectName;
+  document.getElementById("btnProjectSwitch").style.setProperty("--pc",experience?.color||"transparent");
   document.title=appProject?"Vistorias · "+projectName:"Gestão de Obras";
 }
 function blocoSelector(kind){
@@ -3051,7 +3133,7 @@ async function loadIdentity(authUser){
   const {data:memberships,error:memberError}=await supabase.from("project_members").select("project_id,role,active").eq("user_id",authUser.id).eq("active",true);
   if(memberError||!memberships?.length)throw new Error(PENDING_MSG);
   const projectIds=[...new Set(memberships.map(item=>item.project_id))];
-  const {data:projects,error:projectError}=await supabase.from("projects").select("id,slug,name,description,sort_order").in("id",projectIds).order("sort_order",{ascending:true}).order("name",{ascending:true});
+  const {data:projects,error:projectError}=await supabase.from("projects").select("id,slug,name,description,sort_order,kind,color,import_aliases").in("id",projectIds).order("sort_order",{ascending:true}).order("name",{ascending:true});
   if(projectError||!projects?.length)throw new Error(PENDING_MSG);
   const {data:profile}=await supabase.from("profiles").select("full_name,email").eq("id",authUser.id).maybeSingle();
   availableProjects=projects.map(project=>{
@@ -3073,8 +3155,8 @@ function renderProjectChooser(){
   const list=document.getElementById("projectList");
   list.innerHTML=availableProjects.map(project=>{
     const experience=projectExperience(project),ready=experience.ready;
-    return `<button class="project-card${ready?"":" pending"}" type="button" data-project-id="${esc(project.id)}" ${ready?"":"disabled aria-disabled=\"true\""}>
-      <span class="project-card-top"><span class="project-monogram">${esc(experience.code)}</span><span class="project-card-copy"><strong>${esc(experience.title)}</strong><span>${esc(experience.description)}</span></span></span>
+    return `<button class="project-card${ready?"":" pending"}" type="button" data-project-id="${esc(project.id)}" style="--pc:${experience.color}" ${ready?"":"disabled aria-disabled=\"true\""}>
+      <span class="project-card-top"><span class="project-monogram" style="--pc:${experience.color}">${esc(experience.code)}</span><span class="project-card-copy"><strong>${esc(experience.title)}</strong><span>${esc(experience.description)}</span></span></span>
       <span class="project-card-foot"><span class="project-role">${ready?esc(NIVL[project.role]||project.role):"Módulo em preparação"}</span>${ready?'<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>':""}</span>
     </button>`;
   }).join("");
@@ -3092,7 +3174,7 @@ const OV_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b
 const OV_EMPTY=()=>({period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""});
 let ovRows=[],ovView=[],ovMode="lista",ovFiltOpen=false,ovFilt=OV_EMPTY();
 function ovProjects(){return [...availableProjects];}
-function ovColor(projectId){const i=ovProjects().findIndex(p=>String(p.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
+function ovColor(projectId){const p=ovProjects().find(x=>String(x.id)===String(projectId));if(p&&/^#[0-9a-f]{6}$/i.test(p.color||""))return p.color;const i=ovProjects().findIndex(x=>String(x.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
 function ovUnit(u){
   const b=_blk(u.bloco),p=_pav(u.pav),a=_apt(u.apto),casa=u.kind==="casa";
   const code=casa?String(+a):unitCode_(p,a);
@@ -3351,7 +3433,7 @@ function impFindColumns(sheets){
 /* 2) Identificação: condomínio pelo nome, unidade pela chave condomínio + bloco/conjunto + número. */
 function impProjectMatcher(){
   const clean=s=>impNorm(s).replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
-  const list=availableProjects.map(p=>({p,keys:[p.name,projectExperience(p).title,String(p.slug||"").replace(/-/g," ")].map(clean).filter(Boolean)}));
+  const list=availableProjects.map(p=>({p,keys:[p.name,projectExperience(p).title,String(p.slug||"").replace(/-/g," "),...(p.import_aliases||[])].map(clean).filter(Boolean)}));
   return raw=>{const n=clean(raw);if(!n)return null;let best=null,len=0;
     for(const {p,keys} of list)for(const k of keys)if((n===k||n.startsWith(k+" "))&&k.length>len){best=p;len=k.length;}
     return best;};
@@ -3711,13 +3793,15 @@ let condDraft=[];
 function showCfgTab(tab){
   document.querySelectorAll("#cfgTabs [data-cfg]").forEach(b=>{const on=b.dataset.cfg===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
   document.querySelectorAll("#adminOv [data-pane]").forEach(p=>p.hidden=p.dataset.pane!==tab);
-  if(tab==="cond")resetCondDraft();
+  if(tab==="cond"){resetCondDraft();condPanel=null;renderCondPanel();}
   if(tab==="logs")loadLogs();
 }
-function resetCondDraft(){condDraft=adminProjects().map(p=>({id:p.id,name:p.name||"",description:p.description||"",sort_order:p.sort_order}));renderCondConfig();}
+const condAliasText=p=>(p?.import_aliases||[]).join(", ");
+const condAliasList=t=>[...new Set(String(t||"").split(/[,;\n]/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean))].slice(0,20);
+function resetCondDraft(){condDraft=adminProjects().map(p=>({id:p.id,name:p.name||"",description:p.description||"",sort_order:p.sort_order,kind:p.kind||"apartamentos",color:projectColor(p),aliases:condAliasText(p)}));renderCondConfig();}
 function condChanged(){
   const original=adminProjects().map(p=>String(p.id)),order=condDraft.map(p=>String(p.id));
-  return order.join()!==original.join()||condDraft.some(d=>{const p=availableProjects.find(x=>String(x.id)===String(d.id));return !p||p.name!==d.name||(p.description||"")!==d.description;});
+  return order.join()!==original.join()||condDraft.some(d=>{const p=availableProjects.find(x=>String(x.id)===String(d.id));return !p||p.name!==d.name||(p.description||"")!==d.description||projectColor(p)!==d.color||condAliasList(condAliasText(p)).join("|")!==condAliasList(d.aliases).join("|");});
 }
 function renderCondConfig(){
   const list=document.getElementById("condList");if(!list)return;
@@ -3726,10 +3810,16 @@ function renderCondConfig(){
     <div class="cond-order"><span class="cond-pos" title="Posição na tela de seleção">${i+1}º</span>
       <button type="button" class="pp-icon cond-move" data-cond-move="-1" ${i===0?"disabled":""} aria-label="Subir ${esc(d.name)}">↑</button>
       <button type="button" class="pp-icon cond-move" data-cond-move="1" ${i===condDraft.length-1?"disabled":""} aria-label="Descer ${esc(d.name)}">↓</button></div>
-    <span class="project-monogram">${esc(projectInitials(d.name))}</span>
+    <span class="project-monogram" style="--pc:${esc(d.color)}">${esc(projectInitials(d.name))}</span>
     <div class="cond-fields">
       <div class="fld"><label>Título</label><input data-cond-field="name" value="${esc(d.name)}" maxlength="80" placeholder="Nome do condomínio"></div>
       <div class="fld"><label>Descrição</label><input data-cond-field="description" value="${esc(d.description)}" maxlength="160" placeholder="Texto exibido no cartão do condomínio"></div>
+      <div class="fld cond-alias"><label>Nomes na planilha de Vendas (opcional)</label><input data-cond-field="aliases" value="${esc(d.aliases)}" maxlength="400" placeholder="Outros nomes, separados por vírgula"></div>
+      <div class="cond-meta">
+        <span class="cond-kind-tag">${d.kind==="casas"?"Casas · conjuntos":"Apartamentos · 8 blocos"}</span>
+        <label class="cond-color" title="Cor de destaque"><input type="color" data-cond-field="color" value="${esc(d.color)}" aria-label="Cor de destaque de ${esc(d.name)}"><span>Cor</span></label>
+        ${d.kind==="casas"?`<button type="button" class="btn g cond-struct-btn" data-cond-struct="${esc(d.id)}">Conjuntos e casas</button>`:""}
+      </div>
     </div></article>`).join("");
   const changed=condChanged();
   document.getElementById("condSave").disabled=!changed;document.getElementById("condReset").hidden=!changed;
@@ -3740,10 +3830,10 @@ async function saveCondConfig(){
   const btn=document.getElementById("condSave");btn.disabled=true;btn.textContent="Salvando…";
   try{
     for(const [i,d] of condDraft.entries()){
-      const patch={name:d.name.trim(),description:d.description.trim(),sort_order:(i+1)*10};
+      const patch={name:d.name.trim(),description:d.description.trim(),sort_order:(i+1)*10,color:d.color,import_aliases:condAliasList(d.aliases)};
       const p=availableProjects.find(x=>String(x.id)===String(d.id));
-      if(p&&p.name===patch.name&&(p.description||"")===patch.description&&p.sort_order===patch.sort_order)continue;
-      const {data,error}=await supabase.from("projects").update(patch).eq("id",d.id).select("id,name,description,sort_order").maybeSingle();
+      if(p&&p.name===patch.name&&(p.description||"")===patch.description&&p.sort_order===patch.sort_order&&projectColor(p)===patch.color&&condAliasText(p)===patch.import_aliases.join(", "))continue;
+      const {data,error}=await supabase.from("projects").update(patch).eq("id",d.id).select("id,name,description,sort_order,color,import_aliases").maybeSingle();
       if(error||!data)throw error||new Error("Sem permissão para alterar "+d.name);
       Object.assign(p,data);
     }
@@ -3773,7 +3863,7 @@ async function selectProject(projectId){
   const button=document.querySelector(`[data-project-id="${CSS.escape(String(projectId))}"]`);
   if(button)button.disabled=true;
   setProjectFeedback("");
-  appProject={id:selected.id,slug:selected.slug,name:selected.name};
+  appProject={id:selected.id,slug:selected.slug,name:selected.name,kind:selected.kind,color:selected.color};
   currentUser.nivel=selected.role;
   // Cada condomínio tem seu próprio layout de unidades e seus próprios filtros.
   LAYOUT=layoutFor(selected);closePop(true);
@@ -4055,9 +4145,146 @@ document.getElementById("adminBack").onclick=closeAdminArea;
 document.getElementById("cfgTabs").addEventListener("click",e=>{const b=e.target.closest("[data-cfg]");if(b)showCfgTab(b.dataset.cfg);});
 document.getElementById("condList").addEventListener("input",e=>{const f=e.target.dataset.condField,row=e.target.closest("[data-cond-i]");if(!f||!row)return;
   condDraft[+row.dataset.condI][f]=e.target.value;if(f==="name")row.querySelector(".project-monogram").textContent=projectInitials(e.target.value);
+  if(f==="color")row.querySelector(".project-monogram").style.setProperty("--pc",e.target.value);
   const changed=condChanged();document.getElementById("condSave").disabled=!changed;document.getElementById("condReset").hidden=!changed;document.getElementById("condHint").textContent=changed?"Alterações não salvas":"";});
-document.getElementById("condList").addEventListener("click",e=>{const b=e.target.closest("[data-cond-move]");if(!b)return;const i=+b.closest("[data-cond-i]").dataset.condI,j=i+(+b.dataset.condMove);
+document.getElementById("condList").addEventListener("click",e=>{const st=e.target.closest("[data-cond-struct]");if(st){openCondStruct(st.dataset.condStruct);return;}const b=e.target.closest("[data-cond-move]");if(!b)return;const i=+b.closest("[data-cond-i]").dataset.condI,j=i+(+b.dataset.condMove);
   if(j<0||j>=condDraft.length)return;[condDraft[i],condDraft[j]]=[condDraft[j],condDraft[i]];renderCondConfig();document.querySelector(`[data-cond-i="${j}"] [data-cond-move="${b.dataset.condMove}"]`)?.focus();});
+/* ── CADASTRO DE CONDOMÍNIOS ──
+   Apartamentos: mesmo modelo do Alto do Jerivá (8 blocos A–H × Térreo + 1º ao 6º × 8 aptos = 448).
+   Casas: intervalo de conjuntos + quantidade de casas de cada um (como o Alto do Buriti).
+   A criação e a estrutura são gravadas pelas funções do banco criar_condominio e
+   atualizar_estrutura_condominio (numa única transação, só para administradores). */
+const COND_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b7950b","#1f4a3f"];
+const COND_LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+let condPanel=null;
+function condPanelEl(){return document.getElementById("condPanel");}
+function condRange(from,to,prev){
+  const a=COND_LETTERS.indexOf(from),b=COND_LETTERS.indexOf(to),m=new Map((prev||[]).map(g=>[g.b,g]));
+  const out=[];for(let i=Math.min(a,b);i<=Math.max(a,b);i++){const L=COND_LETTERS[i];out.push(m.get(L)||{b:L,n:""});}return out;
+}
+const condTotal=groups=>groups.reduce((t,g)=>t+(parseInt(g.n,10)||0),0);
+function condGroupsValid(groups){return groups.length&&groups.every(g=>{const n=Number(g.n);return Number.isInteger(n)&&n>=1&&n<=300;});}
+function condGroupsTable(groups,withRemove){
+  return `<div class="gridscroll cond-gtable"><table class="ctbl"><thead><tr><th>Conjunto</th><th>Casas</th><th>Unidades geradas</th>${withRemove?"<th></th>":""}</tr></thead><tbody>`+
+    groups.map((g,i)=>`<tr><td class="cunit">${esc(g.b)}</td><td><input class="cond-n" type="number" inputmode="numeric" min="1" max="300" step="1" data-cond-n="${i}" value="${esc(g.n)}" aria-label="Casas no conjunto ${esc(g.b)}"${g.orig!=null?` placeholder="${g.orig}"`:""}></td>
+      <td class="cond-gen" data-cond-gen="${i}">${parseInt(g.n,10)>0?`Casa 01 a ${String(parseInt(g.n,10)).padStart(2,"0")}`:"—"}${g.orig!=null&&String(g.orig)!==String(g.n)?` <small>(hoje ${g.orig})</small>`:""}</td>
+      ${withRemove?`<td><button type="button" class="cond-x" data-cond-del="${i}" aria-label="Remover conjunto ${esc(g.b)}" title="Remover conjunto">×</button></td>`:""}</tr>`).join("")+
+    `</tbody><tfoot><tr><td>Total</td><td colspan="${withRemove?3:2}"><b data-cond-total>${condTotal(groups)}</b> casas em ${groups.length} conjunto(s)</td></tr></tfoot></table></div>`;
+}
+function openCondNew(){
+  const used=new Set(availableProjects.map(p=>projectColor(p).toLowerCase()));
+  condPanel={mode:"new",name:"",description:"",kind:"apartamentos",color:COND_COLORS.find(c=>!used.has(c))||COND_COLORS[availableProjects.length%COND_COLORS.length],from:"A",to:"P",groups:condRange("A","P"),error:"",busy:false};
+  renderCondPanel();condPanelEl().querySelector('[data-cp-f="name"]')?.focus();
+}
+async function openCondStruct(projectId){
+  const p=availableProjects.find(x=>String(x.id)===String(projectId));if(!p)return;
+  condPanel={mode:"struct",projectId:p.id,name:p.name,groups:[],error:"",busy:true};renderCondPanel();
+  try{
+    const units=await fetchAll("units","id,bloco,apto",q=>q.eq("project_id",p.id));
+    const counts={};units.forEach(u=>{const b=_blk(u.bloco);counts[b]=Math.max(counts[b]||0,parseInt(u.apto,10)||0);});
+    condPanel.groups=Object.keys(counts).sort((x,y)=>x.length-y.length||x.localeCompare(y)).map(b=>({b,n:counts[b],orig:counts[b]}));condPanel.original=condPanel.groups.map(g=>g.b);
+  }catch(e){condPanel.error="Não foi possível carregar a estrutura atual.";}
+  condPanel.busy=false;renderCondPanel();
+}
+function closeCondPanel(){condPanel=null;renderCondPanel();}
+function renderCondPanel(){
+  const el=condPanelEl();if(!el)return;const c=condPanel;
+  document.getElementById("condNewBtn").hidden=!!c;
+  if(!c){el.hidden=true;el.innerHTML="";return;}
+  el.hidden=false;
+  const err=c.error?`<div class="cond-err" role="alert">${esc(c.error)}</div>`:"";
+  if(c.mode==="struct"){
+    el.innerHTML=`<div class="cond-new-head"><div><small>Conjuntos e casas</small><b>${esc(c.name)}</b></div><button type="button" class="cond-x" data-cp="close" aria-label="Fechar" title="Fechar">×</button></div>
+      ${c.busy&&!c.groups.length?'<div class="clif-empty">Carregando estrutura…</div>':`<p class="cond-info">Ajuste a quantidade de casas, acrescente ou remova conjuntos. Casas que já têm dados cadastrados (cliente, data ou status) não podem ser removidas.</p>
+      ${condGroupsTable(c.groups,true)}
+      <div class="cond-add"><button type="button" class="btn g" data-cp="add">+ Adicionar conjunto</button></div>`}
+      ${err}<div class="cond-new-foot"><button type="button" class="btn g" data-cp="close">Cancelar</button><button type="button" class="btn p" data-cp="save-struct" ${c.busy?"disabled":""}>${c.busy&&c.groups.length?"Salvando…":"Salvar estrutura"}</button></div>`;
+    return;
+  }
+  const opts=sel=>COND_LETTERS.map(L=>`<option${L===sel?" selected":""}>${L}</option>`).join("");
+  const units=c.kind==="apartamentos"?448:condTotal(c.groups);
+  el.innerHTML=`<div class="cond-new-head"><div><small>Novo condomínio</small><b>Cadastro</b></div><button type="button" class="cond-x" data-cp="close" aria-label="Fechar" title="Fechar">×</button></div>
+    <div class="cond-new-grid">
+      <div class="fld"><label>Nome do condomínio</label><input data-cp-f="name" value="${esc(c.name)}" maxlength="80" placeholder="Ex.: Alto do Murici" autocomplete="off"></div>
+      <div class="fld"><label>Descrição (opcional)</label><input data-cp-f="description" value="${esc(c.description)}" maxlength="160" placeholder="Texto exibido no cartão"></div>
+    </div>
+    <div class="cond-new-row"><span class="fx-lbl">Tipo</span><div class="modetog cond-kind" role="radiogroup"><button type="button" role="radio" data-cp-kind="apartamentos" class="${c.kind==="apartamentos"?"active":""}" aria-checked="${c.kind==="apartamentos"}">Apartamentos (blocos)</button><button type="button" role="radio" data-cp-kind="casas" class="${c.kind==="casas"?"active":""}" aria-checked="${c.kind==="casas"}">Casas (conjuntos)</button></div></div>
+    <div class="cond-new-row"><span class="fx-lbl">Cor de destaque</span><div class="cond-swatches">${COND_COLORS.map(col=>`<button type="button" class="cond-sw${col===c.color?" on":""}" data-cp-color="${col}" style="--c:${col}" aria-label="Cor ${col}"></button>`).join("")}<label class="cond-color"><input type="color" data-cp-f="color" value="${esc(c.color)}" aria-label="Outra cor"><span>Outra</span></label></div>
+      <span class="cond-preview"><span class="project-monogram" style="--pc:${esc(c.color)}" data-cp-mono>${esc(projectInitials(c.name||"Novo"))}</span></span></div>
+    ${c.kind==="apartamentos"?`<p class="cond-info">Serão criadas <b>448</b> unidades: 8 blocos (A a H) × Térreo e 1º ao 6º pavimento × 8 apartamentos — mesmo modelo do Alto do Jerivá.</p>`:
+      `<div class="cond-new-row"><span class="fx-lbl">Conjuntos</span><label class="cond-range">de <select data-cp-range="from">${opts(c.from)}</select></label><label class="cond-range">até <select data-cp-range="to">${opts(c.to)}</select></label></div>
+       <p class="cond-info">Preencha a quantidade de casas de cada conjunto. As casas são numeradas de 01 até a quantidade informada.</p>
+       ${condGroupsTable(c.groups,false)}`}
+    ${err}
+    <div class="cond-new-foot"><span class="cond-sum"><b data-cp-units>${units}</b> unidade(s) serão criadas</span><button type="button" class="btn g" data-cp="close">Cancelar</button><button type="button" class="btn p" data-cp="create" ${c.busy?"disabled":""}>${c.busy?"Cadastrando…":"Cadastrar condomínio"}</button></div>`;
+}
+async function refreshProjects(){
+  const {data:ms,error:me}=await supabase.from("project_members").select("project_id,role,active").eq("user_id",currentUser.id).eq("active",true);
+  if(me)throw me;
+  const ids=[...new Set((ms||[]).map(m=>m.project_id))];
+  const {data:ps,error}=await supabase.from("projects").select("id,slug,name,description,sort_order,kind,color,import_aliases").in("id",ids);
+  if(error)throw error;
+  availableProjects=(ps||[]).map(p=>({...p,role:String((ms||[]).find(m=>String(m.project_id)===String(p.id))?.role||"visitante").toLowerCase()}));
+  sortProjects();resetCondDraft();renderProjectChooser();
+}
+async function createCondominio(){
+  const c=condPanel;if(!c||c.busy)return;
+  const name=c.name.replace(/\s+/g," ").trim();
+  if(name.length<3){c.error="Informe o nome do condomínio (mínimo de 3 caracteres).";renderCondPanel();return;}
+  const key=impNorm(name);
+  if(availableProjects.some(p=>impNorm(p.name)===key)){c.error=`Já existe um condomínio chamado "${name}".`;renderCondPanel();return;}
+  if(c.kind==="casas"&&!condGroupsValid(c.groups)){c.error="Informe a quantidade de casas (1 a 300) em todos os conjuntos.";renderCondPanel();return;}
+  const units=c.kind==="apartamentos"?448:condTotal(c.groups);
+  if(!confirm(`Cadastrar "${name}" (${c.kind==="apartamentos"?"apartamentos":"casas"}) e criar ${units} unidades?`))return;
+  c.busy=true;c.error="";renderCondPanel();
+  const groups=c.kind==="casas"?Object.fromEntries(c.groups.map(g=>[g.b,parseInt(g.n,10)])):null;
+  const bl=c.kind==="casas"?c.groups.map(g=>g.b):[];
+  const autoDesc=c.kind==="apartamentos"?"Vistorias dos clientes · 448 apartamentos nos blocos A a H.":`Vistorias dos clientes · ${units} casas nos conjuntos ${bl[0]} a ${bl[bl.length-1]}.`;
+  const {data,error}=await supabase.rpc("criar_condominio",{p_name:name,p_kind:c.kind,p_color:c.color,p_groups:groups,p_description:c.description.trim()||autoDesc});
+  if(error){c.busy=false;c.error=error.message||"Não foi possível cadastrar o condomínio.";renderCondPanel();return;}
+  closeCondPanel();
+  try{await refreshProjects();}catch(e){}
+  toast(`${name} cadastrado com ${data?.units??units} unidades`);
+}
+async function saveCondStruct(){
+  const c=condPanel;if(!c||c.busy)return;
+  if(!condGroupsValid(c.groups)){c.error="Informe a quantidade de casas (1 a 300) em todos os conjuntos.";renderCondPanel();return;}
+  const removed=c.groups.filter(g=>g.orig!=null&&parseInt(g.n,10)<g.orig).map(g=>`Conj. ${g.b}: ${g.orig}→${g.n}`);
+  const gone=(c.original||[]).filter(b=>!c.groups.some(g=>g.b===b));
+  const warn=[...removed,...gone.map(b=>`Conj. ${b} removido`)];
+  if(warn.length&&!confirm("Algumas casas serão removidas ("+warn.join(", ")+"). Casas com dados cadastrados bloqueiam a alteração. Continuar?"))return;
+  c.busy=true;c.error="";renderCondPanel();
+  const {data,error}=await supabase.rpc("atualizar_estrutura_condominio",{p_project:c.projectId,p_groups:Object.fromEntries(c.groups.map(g=>[g.b,parseInt(g.n,10)]))});
+  if(error){c.busy=false;c.error=error.message||"Não foi possível salvar a estrutura.";renderCondPanel();return;}
+  closeCondPanel();
+  toast(`Estrutura salva: ${data?.added||0} casa(s) criada(s), ${data?.removed||0} removida(s), total ${data?.total??"—"}`);
+  if(appProject&&String(appProject.id)===String(c.projectId))load(true).catch(()=>{});
+}
+document.getElementById("condNewBtn").onclick=openCondNew;
+document.getElementById("condPanel").addEventListener("input",e=>{
+  const c=condPanel;if(!c)return;const t=e.target;
+  if(c.error){c.error="";condPanelEl().querySelector(".cond-err")?.remove();}
+  if(t.dataset.cpF){c[t.dataset.cpF]=t.value;
+    if(t.dataset.cpF==="name")condPanelEl().querySelector("[data-cp-mono]").textContent=projectInitials(t.value||"Novo");
+    if(t.dataset.cpF==="color"){condPanelEl().querySelector("[data-cp-mono]").style.setProperty("--pc",t.value);condPanelEl().querySelectorAll(".cond-sw").forEach(b=>b.classList.toggle("on",b.dataset.cpColor===t.value));}
+    return;}
+  if(t.dataset.condN!=null){const g=c.groups[+t.dataset.condN];g.n=t.value;const n=parseInt(t.value,10);
+    const gen=condPanelEl().querySelector(`[data-cond-gen="${t.dataset.condN}"]`);if(gen)gen.innerHTML=(n>0?`Casa 01 a ${String(n).padStart(2,"0")}`:"—")+(g.orig!=null&&String(g.orig)!==String(t.value)?` <small>(hoje ${g.orig})</small>`:"");
+    condPanelEl().querySelector("[data-cond-total]").textContent=condTotal(c.groups);const u=condPanelEl().querySelector("[data-cp-units]");if(u)u.textContent=condTotal(c.groups);}
+});
+document.getElementById("condPanel").addEventListener("change",e=>{const c=condPanel,t=e.target;if(!c||!t.dataset.cpRange)return;c[t.dataset.cpRange]=t.value;c.groups=condRange(c.from,c.to,c.groups);renderCondPanel();});
+document.getElementById("condPanel").addEventListener("click",e=>{
+  const c=condPanel;if(!c)return;
+  const k=e.target.closest("[data-cp-kind]");if(k){c.kind=k.dataset.cpKind;c.error="";renderCondPanel();return;}
+  const col=e.target.closest("[data-cp-color]");if(col){c.color=col.dataset.cpColor;renderCondPanel();return;}
+  const del=e.target.closest("[data-cond-del]");if(del){c.groups.splice(+del.dataset.condDel,1);renderCondPanel();return;}
+  const a=e.target.closest("[data-cp]");if(!a)return;
+  if(a.dataset.cp==="close")closeCondPanel();
+  else if(a.dataset.cp==="create")createCondominio();
+  else if(a.dataset.cp==="save-struct")saveCondStruct();
+  else if(a.dataset.cp==="add"){const used=new Set(c.groups.map(g=>g.b));const next=COND_LETTERS.find(L=>!used.has(L));if(!next){toast("Todos os conjuntos de A a Z já existem");return;}
+    c.groups.push({b:next,n:""});c.groups.sort((x,y)=>x.b.localeCompare(y.b));renderCondPanel();condPanelEl().querySelector(`[data-cond-n="${c.groups.findIndex(g=>g.b===next)}"]`)?.focus();}
+});
 document.getElementById("condSave").onclick=saveCondConfig;
 document.getElementById("condReset").onclick=resetCondDraft;
 document.getElementById("projectOverview").onclick=openOverview;
