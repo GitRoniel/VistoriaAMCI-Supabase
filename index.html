@@ -1309,12 +1309,9 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .ctbl td.crev{color:#2459b5;font-weight:600}
 .ctbl th.th-rev{white-space:nowrap}
 .pp-rev{display:grid;grid-template-columns:1fr;gap:9px;padding:11px 12px;border:1.5px solid #c9d8f4;border-radius:12px;background:#f4f8ff}
-.pp-rev.pending{border-color:#2f6fdb;box-shadow:0 0 0 3px rgba(47,111,219,.12)}
 .pp-rev-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#2459b5}
+.pp-rev-t small{font-weight:600;text-transform:none;letter-spacing:0;color:#6a7a71}
 .pp-rev .pp-f{margin:0}
-.pp-star{font-style:normal;color:#c0392b}
-.pp-f.pp-invalid input{border-color:#c0392b!important;box-shadow:0 0 0 3px rgba(192,57,43,.12)}
-.pp-st.pending{outline:2px dashed #2f6fdb;outline-offset:2px}
 .ov-export{height:32px;padding:0 10px;font-size:12px}
 /* Excluir obra (arquivar) e obras excluídas */
 .cond-del-btn{background:#fff5f3;border:1.5px solid #f0c0ba;color:#9e2f25;font-weight:700;margin-left:auto}
@@ -1949,11 +1946,8 @@ html{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .fx-sel select{border:0;background:transparent;color:#d4ddda;outline:none}
 :root[data-theme="dark"] .ctbl td.crev{color:#2459b5}
 :root[data-theme="dark"] .pp-rev{border:1.5px solid #394253;background:#1d232e}
-:root[data-theme="dark"] .pp-rev.pending{border-color:#2f6fdb;box-shadow:0 0 0 3px rgba(47,111,219,.12)}
 :root[data-theme="dark"] .pp-rev-t{color:#2459b5}
-:root[data-theme="dark"] .pp-star{color:#c0392b}
-:root[data-theme="dark"] .pp-f.pp-invalid input{border-color:#c0392b!important;box-shadow:0 0 0 3px rgba(0,0,0,0.216)}
-:root[data-theme="dark"] .pp-st.pending{outline:2px dashed #2f6fdb}
+:root[data-theme="dark"] .pp-rev-t small{color:#a0ada6}
 :root[data-theme="dark"] .cond-del-btn{background:#2d1f1d;border:1.5px solid #573f3c;color:#de7b73}
 :root[data-theme="dark"] .cond-del-btn:hover{border-color:#614844;color:#e17970}
 :root[data-theme="dark"] .cond-panel.cond-danger{border-color:#5e4541}
@@ -2960,10 +2954,10 @@ function cliChanges(){
   return changes;
 }
 function refreshPopActions(){
-  const pending=ctx.pendingStatus==="rf",n=Object.keys(cliChanges()).length+(pending?1:0);ctx.dirty=n>0;
+  const n=Object.keys(cliChanges()).length;ctx.dirty=n>0;
   const save=pop.querySelector(".pp-actions [type=submit]"),discard=pop.querySelector('[data-pp="discard"]'),hint=pop.querySelector(".pp-hint");
-  if(save){save.disabled=!n;save.textContent=pending?"Finalizar revistoria":"Salvar";}if(discard)discard.hidden=!n;
-  if(hint)hint.textContent=pending?"Data e responsável são obrigatórios":n?`${n} alteração(ões) não salva(s)`:"Ctrl+Enter salva · Esc fecha";
+  if(save)save.disabled=!n;if(discard)discard.hidden=!n;
+  if(hint)hint.textContent=n?`${n} alteração(ões) não salva(s)`:"Ctrl+Enter salva · Esc fecha";
   pop.classList.toggle("is-dirty",!!n);
   const name=pop.querySelector(".pp-client b");if(name)name.textContent=cliDraftValue("cliente")||"Sem cliente vinculado";
   pop.querySelectorAll("[data-time]").forEach(b=>b.classList.toggle("sel",b.dataset.time===cliDraftValue("horario_vistoria")));
@@ -2975,19 +2969,18 @@ function renderCliPop(){
   const stDis=c=>(scope==="all"||(scope==="rev"&&cur==="rv"&&c==="rf"))?"":"disabled";
   const idx=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a);
   const responsaveis=[...new Set(Object.values(state.cliInfo).flatMap(i=>[i.responsavel,i.resp_revistoria]).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
-  const pendingRf=ctx.pendingStatus==="rf",shownSt=pendingRf?"rf":cur;
   const kicker=LAYOUT.kind==="casa"?`Conjunto ${ctx.b}`:`Bloco ${ctx.b} · ${PAVL[ctx.p]}`;
   const name=LAYOUT.kind==="casa"?`Casa ${+ctx.a}`:`Apto ${unitCode_(ctx.p,ctx.a)}`;
   const cliente=cliDraftValue("cliente");
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
-  // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (ou ao finalizar); os valores salvos são mantidos.
-  const showRev=cur==="rf"||pendingRf;
-  const dateField=(field,label,req)=>`<label class="pp-f${req?" pp-req":""}"><span>${label}${req?' <em class="pp-star">*</em>':""}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}${req?" required":""}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
-  const revBlock=showRev?`<div class="pp-rev pp-full${pendingRf?" pending":""}">
-          <div class="pp-rev-t">${pendingRf?"Para finalizar, informe a data e o responsável pela revistoria":"Revistoria finalizada"}</div>
-          ${dateField("data_revistoria","Data da revistoria",true)}
-          <label class="pp-f pp-req"><span>Responsável pela revistoria <em class="pp-star">*</em></span><input name="resp_revistoria" list="ppRespList" value="${val("resp_revistoria")}" placeholder="Quem fez a revistoria" autocomplete="off" required ${fdis("resp_revistoria")}></label>
+  // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (opcionais); os valores salvos são mantidos.
+  const showRev=cur==="rf";
+  const dateField=(field,label)=>`<label class="pp-f"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
+  const revBlock=showRev?`<div class="pp-rev pp-full">
+          <div class="pp-rev-t">Revistoria finalizada <small>(opcional)</small></div>
+          ${dateField("data_revistoria","Data da revistoria")}
+          <label class="pp-f"><span>Responsável pela revistoria</span><input name="resp_revistoria" list="ppRespList" value="${val("resp_revistoria")}" placeholder="Quem fez a revistoria" autocomplete="off" ${fdis("resp_revistoria")}></label>
         </div>`:"";
   pop.innerHTML=`
     <div class="pp-head">
@@ -3001,7 +2994,7 @@ function renderCliPop(){
     <div class="pp-body">
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
-      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===shownSt}" class="pp-st${c===shownSt?" sel":""}${pendingRf&&c==="rf"?" pending":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
@@ -3018,13 +3011,13 @@ function renderCliPop(){
   pop.setAttribute("tabindex","-1");pop.setAttribute("role","dialog");pop.setAttribute("aria-label",name+" · "+kicker);
   pop.querySelectorAll(".pp-st").forEach(b=>b.onclick=()=>setStatus(b.dataset.code));
   const form=pop.querySelector(".pp-form");
-  form.addEventListener("input",e=>{const f=e.target.name;if(!CLI_FIELDS.includes(f))return;e.target.closest(".pp-f")?.classList.remove("pp-invalid");ctx.draft={...(ctx.draft||{}),[f]:e.target.value};refreshPopActions();});
+  form.addEventListener("input",e=>{const f=e.target.name;if(!CLI_FIELDS.includes(f))return;ctx.draft={...(ctx.draft||{}),[f]:e.target.value};refreshPopActions();});
   form.addEventListener("submit",e=>{e.preventDefault();saveCliDraft();});
   pop.querySelectorAll("[data-time]").forEach(b=>b.onclick=()=>{const i=form.elements.horario_vistoria;i.value=b.dataset.time;i.dispatchEvent(new Event("input",{bubbles:true}));});
   pop.querySelectorAll("[data-today]").forEach(b=>b.onclick=()=>{const i=form.elements[b.dataset.today];i.value=todayISO();i.dispatchEvent(new Event("input",{bubbles:true}));});
   pop.querySelectorAll("[data-pp]").forEach(b=>b.onclick=()=>{const a=b.dataset.pp;
     if(a==="prev")gotoUnit(-1);else if(a==="next")gotoUnit(1);else if(a==="close")requestClosePop();
-    else if(a==="discard"){ctx.draft=null;ctx.dirty=false;ctx.pendingStatus=null;renderPop();}});
+    else if(a==="discard"){ctx.draft=null;ctx.dirty=false;renderPop();}});
   refreshPopActions();
 }
 async function saveAcomp(select){
@@ -3043,27 +3036,20 @@ async function saveCliDraft(){
   if(!ctx||ctx.k!=="cli")return;
   const scope=cliEditScope(kC(ctx.b,ctx.p,ctx.a));if(!scope)return;
   if(scope==="rev"&&Object.keys(cliChanges()).some(f=>!REV_FIELDS.includes(f))){toast("A permissão Revistorias altera apenas data e responsável da revistoria e observações");return;}
-  const key=kC(ctx.b,ctx.p,ctx.a),pending=ctx.pendingStatus==="rf";
-  const changes=cliChanges();if(!Object.keys(changes).length&&!pending){refreshPopActions();return;}
-  // Revistoria Finalizada exige data e responsável da revistoria (o banco aplica a mesma regra).
-  if(pending||state.cli[key]==="rf"){
-    const miss=[["data_revistoria",!cliDraftValue("data_revistoria")],["resp_revistoria",!String(cliDraftValue("resp_revistoria")).trim()]].filter(x=>x[1]).map(x=>x[0]);
-    pop.querySelectorAll(".pp-rev [name]").forEach(i=>i.closest(".pp-f")?.classList.toggle("pp-invalid",miss.includes(i.name)));
-    if(miss.length){toast("Informe a data e o responsável pela revistoria");pop.querySelector(`.pp-rev [name="${miss[0]}"]`)?.focus();return;}
-  }
-  const snapshot=ctx,old={...state.cliInfo[key]},oldCode=state.cli[key];
-  const payload={...changes};if(pending)payload.status="rf";
-  if("resp_revistoria" in payload)payload.resp_revistoria=String(payload.resp_revistoria).trim();
+  const key=kC(ctx.b,ctx.p,ctx.a);
+  const changes=cliChanges();if(!Object.keys(changes).length){refreshPopActions();return;}
+  const snapshot=ctx,old={...state.cliInfo[key]};
+  if("resp_revistoria" in changes)changes.resp_revistoria=String(changes.resp_revistoria).trim();
   const btn=pop.querySelector(".pp-actions [type=submit]");if(btn){btn.disabled=true;btn.textContent="Salvando…";}
-  const {status:_st,...fields}=payload;Object.assign(state.cliInfo[key],fields);if(pending)state.cli[key]="rf";
+  Object.assign(state.cliInfo[key],changes);
   try{
-    await setCliFields(snapshot.b,snapshot.p,snapshot.a,payload);
-    toast(pending?"Revistoria finalizada":"Vistoria salva");
-    if(ctx===snapshot){ctx.draft=null;ctx.dirty=false;ctx.pendingStatus=null;}
+    await setCliFields(snapshot.b,snapshot.p,snapshot.a,changes);
+    toast("Vistoria salva");
+    if(ctx===snapshot){ctx.draft=null;ctx.dirty=false;}
     renderCli();renderResumo();if(ctx===snapshot){renderPop();pop.classList.add("just-saved");setTimeout(()=>pop.classList.remove("just-saved"),900);}
   }catch(e){
-    state.cliInfo[key]=old;state.cli[key]=oldCode;renderCli();renderResumo();
-    if(ctx===snapshot&&btn){btn.disabled=false;btn.textContent=pending?"Finalizar revistoria":"Salvar";}
+    state.cliInfo[key]=old;renderCli();renderResumo();
+    if(ctx===snapshot&&btn){btn.disabled=false;btn.textContent="Salvar";}
     toast(syncErrorMessage(e));load(true).catch(()=>{});
   }
 }
@@ -3082,20 +3068,13 @@ async function setStatus(code){
     if(!canEditCli()&&!(cliEditScope(scopeKey)==="rev"&&state.cli[scopeKey]==="rv"&&code==="rf")){
       toast(currentUser?.nivel==="revistorias"?"A permissão Revistorias só finaliza revistorias":"Somente administrador edita a Vistoria Cliente");return;}
     const target={...ctx},key=kC(target.b,target.p,target.a);const old=state.cli[key];
-    // Finalizar revistoria: pede data e responsável e grava tudo junto em "Finalizar revistoria".
-    if(code==="rf"&&old!=="rf"){
-      ctx.pendingStatus="rf";renderPop();
-      const empty=["data_revistoria","resp_revistoria"].find(f=>!String(cliDraftValue(f)).trim());
-      if(empty){pop.querySelector(`.pp-rev [name="${empty}"]`)?.focus();toast("Informe a data e o responsável pela revistoria");}
-      else saveCliDraft();
-      return;
-    }
-    if(ctx.pendingStatus){ctx.pendingStatus=null;if(old===code){renderPop();return;}}
     if(old===code)return;
     state.cli[key]=code;
     const detalhe="CLIENTE · "+unitShort(target.b,target.p,target.a)+": "+(CLL[old]||old)+" → "+(CLL[code]||code);
     renderCli(); renderResumo(); renderPop();
     if((code==="ag"||code==="rm")&&!cliDraftValue("data_vistoria"))pop.querySelector('[name="data_vistoria"]')?.focus();
+    // Revistoria Finalizada: data e responsável da revistoria são opcionais (aparecem para preencher se quiser).
+    if(code==="rf"&&!cliDraftValue("data_revistoria"))pop.querySelector('[name="data_revistoria"]')?.focus();
     try{await setCell("cli",target.b,target.p,target.a,"status",CLL[code],detalhe);toast("Status: "+CLL[code]);}
     catch(e){state.cli[key]=old;renderCli();renderResumo();if(ctx&&kC(ctx.b,ctx.p,ctx.a)===key)renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   }

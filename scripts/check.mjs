@@ -108,16 +108,17 @@ assert.match(html, /html\{background-color:var\(--status-top,var\(--chrome-top\)
 assert.match(html, /apple-mobile-web-app-status-bar-style" content="default"/, "iOS 26: barra opaca; a translúcida ganha a faixa de desfoque.");
 assert.match(html, /localStorage\.getItem\("amci-theme"\)/);
 assert.match(html, /data-theme-toggle/);
-assert.match(html, /const showRev=cur==="rf"\|\|pendingRf;/);
+assert.match(html, /const showRev=cur==="rf";/);
 // Revistoria: data e responsável próprios, obrigatórios para finalizar; visíveis na lista, impressão e exportação.
 assert.ok(html.includes('resp_revistoria:"reinspection_responsible"') && html.includes("reinspection_responsible"), "Responsável da revistoria precisa ter coluna própria.");
 assert.ok(html.includes('<th class="cw-d th-rev">Data revistoria</th>') && html.includes("function exportCliList") && html.includes("Responsável revistoria"), "Lista geral precisa mostrar e exportar data e responsável da revistoria.");
-assert.ok(html.includes('ctx.pendingStatus="rf"') && html.includes("Informe a data e o responsável pela revistoria"), "Finalizar revistoria exige data e responsável.");
+assert.ok(!html.includes("pendingStatus") && !html.includes("Informe a data e o responsável pela revistoria"), "Revistoria Finalizada não exige data nem responsável.");
 // Excluir obra: exclusão lógica, confirmação por nome, só administradores, com log.
 assert.ok(html.includes('supabase.rpc("arquivar_condominio"') && html.includes("condArchiveMatch") && html.includes('supabase.rpc("restaurar_condominio"'), "Excluir obra precisa arquivar com confirmação e permitir restaurar.");
 const revMigration = await readFile(resolve(root, "supabase/migrations/20260929145956_revistoria_responsavel_arquivar_obra.sql"), "utf8");
 assert.match(revMigration, /add column if not exists reinspection_responsible text not null default ''/);
-assert.match(revMigration, /create trigger client_inspections_16_revistoria_final/);
+const revOptional = await readFile(resolve(root, "supabase/migrations/20260929152323_revistoria_final_sem_obrigatorios.sql"), "utf8");
+assert.match(revOptional, /drop trigger if exists client_inspections_16_revistoria_final/);
 assert.match(revMigration, /and p\.archived_at is null/);
 assert.match(revMigration, /private\.log_project_event\(p_project, 'ARCHIVE'/);
 assert.doesNotMatch(revMigration, /delete from public\.(projects|units|client_inspections)/i, "Excluir obra não pode apagar linhas.");

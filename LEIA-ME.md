@@ -121,7 +121,7 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 - A data da revistoria sempre foi gravada (`client_inspections.reinspection_date`); a lista só não a exibia. Agora a lista do condomínio e a Visão Geral mostram **Data vistoria** e **Data revistoria** lado a lado, com o **Responsável** de cada uma.
 - O responsável pela revistoria tem coluna própria (`reinspection_responsible`) e não substitui o responsável da vistoria primária (`responsible`).
-- Ao escolher **Revistoria Finalizada**, o status só é gravado depois de informar data e responsável ("Finalizar revistoria"), tudo numa única atualização. O banco aplica a mesma regra (gatilho `client_inspections_16_revistoria_final`); a importação da planilha não é barrada.
+- Ao escolher **Revistoria Finalizada**, o status é gravado na hora; data e responsável da revistoria aparecem no popup e são **opcionais**.
 - Cada unidade guarda a revistoria mais recente; as anteriores ficam no registro de logs.
 - Filtros da lista: período por data da vistoria, da revistoria ou ambas; ordenação por qualquer uma das duas. **Imprimir** e **Exportar** (CSV que abre no Excel) incluem as duas datas e os dois responsáveis.
 
