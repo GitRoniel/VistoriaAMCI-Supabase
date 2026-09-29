@@ -510,7 +510,11 @@ body{background:var(--bg)}
 .icon-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:var(--gold);border-radius:9px}
 .icon-btn:hover{background:rgba(255,255,255,.15)}
 .project-switch-btn{border-radius:9px}
-.userchip .ub{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:5px 10px}
+/* UserChip: mesmo padrão visual do botão de troca de obra */
+.userchip{min-height:32px;max-width:240px;padding:5px 10px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;align-items:center;gap:7px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;transition:.15s;cursor:default}
+.userchip:hover{background:rgba(255,255,255,.15);border-color:rgba(220,203,145,.5)}
+.userchip svg{width:15px;height:15px;stroke:var(--lioness);fill:none;stroke-width:2;flex:0 0 auto}
+.userchip .ub{background:none;border:0;padding:0;border-radius:0;color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
 .tabs-strip{background:linear-gradient(145deg,#132f29,#1b4238);box-shadow:0 8px 20px rgba(4,20,16,.18)}
 .tabs{padding:8px 16px 10px;gap:4px}
 .tab{border-radius:10px;padding:9px 16px;text-transform:none;letter-spacing:.1px;font-size:13px;color:rgba(255,255,255,.7);background:transparent}
@@ -676,12 +680,12 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .mx.casas td.pavh{font-size:12px;font-weight:700;border-radius:7px;border-right:none;width:54px;min-width:54px}
 .mx.casas td.casa-cell{padding:0}
 .mx.casas td.casa-void{background:transparent}
-.mx.casas .apt{width:30px;min-width:30px;height:28px;aspect-ratio:auto;font-size:10.5px;border-radius:6px;padding:0}
+.mx.casas .apt{width:30px;min-width:30px;height:28px;aspect-ratio:auto;font-size:12px;border-radius:6px;padding:0}
 .mx.casas .apt.pcd::after{top:1px;right:1px;width:5px;height:5px}
 .casa-single{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
 .casa-single-head{font-size:12px;font-weight:700;color:#37564a;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
 .casa-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
-.casa-wrap .apt{aspect-ratio:1/1;font-size:13px;border-radius:9px}
+.casa-wrap .apt{aspect-ratio:1/1;font-size:12px;border-radius:9px}
 .apt{position:relative}
 .apt.pcd::after{content:'';position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#0b6fd4;box-shadow:0 0 0 1.5px #fff}
 .apt.is-sel,.cstat.is-sel{outline:3px solid #0b6fd4;outline-offset:1px;z-index:6;box-shadow:0 0 0 5px rgba(11,111,212,.18)}
@@ -795,6 +799,54 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .pp-select{width:100%;height:42px;padding:0 11px;border:1.5px solid #cad6cf;border-radius:11px;background:#fbfcfb;font-size:14px;color:#172c25}
 .pp-select:focus{outline:none;border-color:#53775f;background:#fff;box-shadow:0 0 0 4px rgba(107,128,64,.14)}
 .pp-select:disabled{background:#f1f4f2;color:#6a7a71}
+/* MOBILE · indicadores compactos (Resumo Geral, Percentual de Aprovação, cards) */
+@media(max-width:720px){
+  .sec-head{padding:11px 13px;gap:10px}
+  .sec-head .icn{width:30px;height:30px;border-radius:9px}
+  .sec-head .icn svg{width:15px;height:15px}
+  .sec-head h2{font-size:16px}
+  .sec-head .sh-flow{font-size:11px}
+  .sec-body{padding:11px 10px}
+  .clitop{gap:9px;margin-bottom:10px}
+  .cbox,.rg-card{border-radius:13px}
+  .cbox .ch,.rg-card .rgh{padding:9px 12px;font-size:10.5px;letter-spacing:.6px}
+  .rg-card .rgh b{font-size:13px}
+  .resumo .rc{padding:6px 10px}
+  .resumo .rl{font-size:8px}
+  .resumo .rv{font-size:18px;margin-top:0}
+  .resumo .rc.tot .rv{font-size:18px}
+  .resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .resumo .rc,.resumo .rc:nth-child(5n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
+  .resumo .rc:nth-child(3n){border-right:none}
+  .resumo .rc:nth-child(n+4){border-bottom:none}
+  .resumo .rc.tot{grid-column:auto;background:#f6f8f4}
+  .resumo .rc.tot .rv span{display:block;font-size:10px!important;line-height:1.1}
+  .aprov .ac{padding:8px 10px}
+  .aprov .al{font-size:8.5px}
+  .aprov .av{font-size:22px}
+  .aprov .abar{height:5px;margin-top:5px}
+  .aprov .af,.aprov .af-goal{font-size:9px;margin-top:3px}
+  .kstrip{gap:6px;margin-bottom:10px}
+  .kbox{padding:7px 10px;border-radius:11px}
+  .kbox .kl{font-size:8.5px}
+  .kbox .kv{font-size:20px}
+  .modetog{margin-bottom:10px}
+  .modetog button{min-height:34px;font-size:12px}
+  .rg-layout{padding:11px 12px;gap:12px}
+  .rg-layout .rg-col+.rg-col{padding-top:12px}
+  .rg-charts{gap:10px;margin-bottom:4px}
+  .rg-charts .donut{width:104px;height:104px}
+  .rg-big{gap:6px;margin-bottom:8px}
+  .rg-big .rb{padding:6px 4px;min-width:0}
+  .rg-big .rb .n{font-size:19px}
+  .rg-big .rb .l{font-size:7.8px;margin-top:2px}
+  .pbar{margin-bottom:6px}
+  .rg-mini{margin-top:7px}
+  .stk-legend{font-size:11px;margin:2px 0 9px;gap:5px 12px}
+  .stk-chart{gap:8px}
+  .ov-cards{gap:7px;margin-bottom:10px}
+  .ov-cards .kbox .kv{font-size:20px}
+}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -814,7 +866,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
     <div class="head-actions">
       <button class="icon-btn" id="btnLogin" title="Entrar para editar"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
       <button class="project-switch-btn" id="btnProjectSwitch" type="button" title="Trocar obra ou condomínio"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span id="activeProjectName">Trocar obra</span></button>
-      <span class="userchip" id="userChip" style="display:none"><span class="ub" id="userName">—</span></span>
+      <span class="userchip" id="userChip" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ub" id="userName">—</span></span>
       <button class="icon-btn" id="btnLogout" title="Sair" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
       <span class="sync-dot" id="syncDot" title="Modo local"></span>
     </div>
@@ -1053,22 +1105,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
         </div>
       </div>
       <div class="apr-list" id="aprList"></div>
-      <div class="cbox" style="margin:14px 0 12px">
-        <div class="ch">Adicionar ou editar usuário manualmente</div>
-        <div style="padding:12px 13px">
-          <div class="note" style="margin:0 0 4px">Use para criar uma conta sem cadastro prévio ou alterar dados de quem já tem acesso. Escolha a obra ou condomínio em que o acesso será salvo.</div>
-          <div class="acc-form">
-            <div class="fld"><label for="accProject">Obra / Condomínio</label><select id="accProject"></select></div>
-            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
-            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
-            <div class="fld"><label>Nome</label><input id="accNome"></div>
-            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
-            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
-          </div>
-          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
-          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
-        </div>
-      </div>
+      <div style="height:14px"></div>
       <div class="cbox">
         <div class="ch">Registro de logs (últimas 100 ações)</div>
         <div style="padding:12px 13px">
@@ -1484,7 +1521,7 @@ function renderCliList(){
     h+=`<tr>
       <td class="cap">${r.b}</td>
       <td class="cunit" title="${esc(unitTitle(r.b,r.p,r.a))}">${unitCode(r.b,r.p,r.a)}${r.pcd?' <span class="tag pcd">PCD</span>':""}</td>
-      <td class="ccli">${esc(i.cliente)||"—"}${i.sale_stage?` <span class="tag stage${/distrato/i.test(i.sale_stage)?" warn":""}">${esc(i.sale_stage)}</span>`:""}</td>
+      <td class="ccli">${esc(i.cliente)||"—"}</td>
       <td>${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td>
       <td>${esc(i.horario_vistoria)||"—"}</td>
       <td>${esc(i.responsavel)||"—"}</td>
@@ -2190,10 +2227,6 @@ function ensureAprProjects(){
   if(!options.some(o=>o.value===aprFilt.project))aprFilt.project=options[0]?.value||"";
   select.innerHTML=options.map(o=>`<option value="${esc(o.value)}"${o.value===aprFilt.project?" selected":""}>${esc(o.label)}</option>`).join("");
   select.disabled=options.length<2;
-  const accSelect=document.getElementById("accProject");
-  if(accSelect){const current=accSelect.value;accSelect.innerHTML=projects.map(project=>`<option value="${esc(project.id)}">${esc(projectExperience(project).title||project.name)}</option>`).join("");
-    if(projects.some(project=>String(project.id)===current))accSelect.value=current;else if(aprFilt.project!=="ALL")accSelect.value=aprFilt.project;
-    accSelect.disabled=projects.length<2;}
 }
 function updateAprBadges(){
   const waiting=aprRows.filter(u=>u.status==="pending").length;
@@ -2260,14 +2293,6 @@ async function aprAction(act,index,button){
     toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Permissão atualizada");
     await loadUsers();loadLogs();
   }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;}
-}
-async function saveUser(){
-  const u=document.getElementById("accU").value.trim(),p=document.getElementById("accP").value,nome=document.getElementById("accNome").value.trim(),niv=document.getElementById("accNiv").value,active=document.getElementById("accActive").value==="true";
-  if(!u){toast("Informe o e-mail");return;}const projectId=Number(document.getElementById("accProject").value);if(!adminProjects().some(project=>Number(project.id)===projectId)){toast("Somente administrador");return;}
-  const btn=document.getElementById("accSave");btn.disabled=true;btn.textContent="Salvando…";
-  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
-  catch(e){toast(e&&e.message?e.message:"Falha ao salvar");}
-  finally{btn.disabled=false;btn.textContent=active?"Salvar e liberar acesso":"Salvar alterações";}
 }
 function auditValue(v){if(v==null||v==="")return "(vazio)";const text=typeof v==="string"?v:JSON.stringify(v);return text.length>55?text.slice(0,52)+"…":text;}
 function auditDetail(l){
@@ -2366,7 +2391,6 @@ document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target
 document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
-document.getElementById("accSave").onclick=saveUser;
 document.getElementById("logRefresh").onclick=loadLogs;
 document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();loadLogs();});
 document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.value;renderApr();});
