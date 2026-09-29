@@ -116,3 +116,16 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
   1. **Emails → Reset Password**: use `{{ .Token }}` no corpo (o código) em vez do link `{{ .ConfirmationURL }}`.
   2. **Providers/Email → Email OTP Expiration**: 1800 segundos (30 minutos).
   3. **Emails → SMTP Settings**: configure um SMTP próprio. Sem ele, o Supabase só entrega e-mails para membros da equipe do projeto, com limite baixo por hora.
+
+## Revistoria: data e responsável
+
+- A data da revistoria sempre foi gravada (`client_inspections.reinspection_date`); a lista só não a exibia. Agora a lista do condomínio e a Visão Geral mostram **Data vistoria** e **Data revistoria** lado a lado, com o **Responsável** de cada uma.
+- O responsável pela revistoria tem coluna própria (`reinspection_responsible`) e não substitui o responsável da vistoria primária (`responsible`).
+- Ao escolher **Revistoria Finalizada**, o status só é gravado depois de informar data e responsável ("Finalizar revistoria"), tudo numa única atualização. O banco aplica a mesma regra (gatilho `client_inspections_16_revistoria_final`); a importação da planilha não é barrada.
+- Cada unidade guarda a revistoria mais recente; as anteriores ficam no registro de logs.
+- Filtros da lista: período por data da vistoria, da revistoria ou ambas; ordenação por qualquer uma das duas. **Imprimir** e **Exportar** (CSV que abre no Excel) incluem as duas datas e os dois responsáveis.
+
+## Excluir obra
+
+- Em Configurações › Configuração de Condomínio, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
+- A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.

@@ -1304,6 +1304,42 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .auth-help{font-size:13.5px;line-height:1.55;color:#52675d;margin:0 0 14px}
 .auth-code{letter-spacing:.45em;font-size:20px!important;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
 #resetForm [data-reset-step][hidden],#resetCodeField[hidden]{display:none}
+/* Revistoria: data e responsável próprios (lista, filtros e popup) */
+.fx-sel select{flex:1;min-width:0;border:0;background:transparent;height:100%;font-size:13px;font-weight:600;color:#172c25;outline:none;padding:0;cursor:pointer}
+.ctbl td.crev{color:#2459b5;font-weight:600}
+.ctbl th.th-rev{white-space:nowrap}
+.pp-rev{display:grid;grid-template-columns:1fr;gap:9px;padding:11px 12px;border:1.5px solid #c9d8f4;border-radius:12px;background:#f4f8ff}
+.pp-rev.pending{border-color:#2f6fdb;box-shadow:0 0 0 3px rgba(47,111,219,.12)}
+.pp-rev-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#2459b5}
+.pp-rev .pp-f{margin:0}
+.pp-star{font-style:normal;color:#c0392b}
+.pp-f.pp-invalid input{border-color:#c0392b!important;box-shadow:0 0 0 3px rgba(192,57,43,.12)}
+.pp-st.pending{outline:2px dashed #2f6fdb;outline-offset:2px}
+.ov-export{height:32px;padding:0 10px;font-size:12px}
+/* Excluir obra (arquivar) e obras excluídas */
+.cond-del-btn{background:#fff5f3;border:1.5px solid #f0c0ba;color:#9e2f25;font-weight:700;margin-left:auto}
+.cond-del-btn:hover{border-color:#e29d93;color:#8a261d}
+.cond-panel.cond-danger{border-color:#e7a79e}
+.cond-del-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:4px 0 12px}
+.cond-del-stats div{border:1.5px solid #f0c0ba;background:#fff8f6;border-radius:12px;padding:10px;text-align:center}
+.cond-del-stats b{display:block;font-size:22px;color:#9e2f25;font-variant-numeric:tabular-nums}
+.cond-del-stats span{font-size:11px;font-weight:600;color:#6a5a57}
+.cond-del-confirm{margin-top:10px}
+.cond-del-confirm label b{color:#9e2f25}
+.cond-del-go{background:#b83227;border:1.5px solid #b83227;color:#fff;font-weight:700;min-width:160px}
+.cond-del-go:disabled{opacity:.45;cursor:not-allowed}
+.cond-archived{margin-top:18px;border:1.5px dashed #cfd9d2;border-radius:14px;padding:12px 14px;background:#fafcfa}
+.cond-arch-h{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#52675d;margin-bottom:8px}
+.cond-arch-h small{text-transform:none;letter-spacing:0;font-weight:500;color:#7b8d83}
+.cond-arch-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 0;border-top:1px solid #e3eae5}
+.cond-arch-row:first-of-type{border-top:0}
+.cond-arch-row .project-monogram{opacity:.6}
+.cond-arch-txt{display:flex;flex-direction:column;min-width:0}
+.cond-arch-txt b{font-size:13.5px}
+.cond-arch-txt span{font-size:11.5px;color:#6a7a71}
+@media(max-width:720px){.cond-del-btn{margin-left:0}.cond-del-stats b{font-size:18px}.cond-arch-row .project-monogram{display:none}.cond-arch-row{grid-template-columns:minmax(0,1fr) auto}}
+@media(max-width:720px){.fx-sel select{font-size:16px}}
+@media(max-width:520px){.ov-export span{display:none}}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--status-top,var(--chrome-top))}
@@ -1910,6 +1946,28 @@ html{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .auth-link:hover{color:#cbd6d4}
 :root[data-theme="dark"] .auth-link:disabled{color:#8a9690}
 :root[data-theme="dark"] .auth-help{color:#abbcb4}
+:root[data-theme="dark"] .fx-sel select{border:0;background:transparent;color:#d4ddda;outline:none}
+:root[data-theme="dark"] .ctbl td.crev{color:#2459b5}
+:root[data-theme="dark"] .pp-rev{border:1.5px solid #394253;background:#1d232e}
+:root[data-theme="dark"] .pp-rev.pending{border-color:#2f6fdb;box-shadow:0 0 0 3px rgba(47,111,219,.12)}
+:root[data-theme="dark"] .pp-rev-t{color:#2459b5}
+:root[data-theme="dark"] .pp-star{color:#c0392b}
+:root[data-theme="dark"] .pp-f.pp-invalid input{border-color:#c0392b!important;box-shadow:0 0 0 3px rgba(0,0,0,0.216)}
+:root[data-theme="dark"] .pp-st.pending{outline:2px dashed #2f6fdb}
+:root[data-theme="dark"] .cond-del-btn{background:#2d1f1d;border:1.5px solid #573f3c;color:#de7b73}
+:root[data-theme="dark"] .cond-del-btn:hover{border-color:#614844;color:#e17970}
+:root[data-theme="dark"] .cond-panel.cond-danger{border-color:#5e4541}
+:root[data-theme="dark"] .cond-del-stats div{border:1.5px solid #573f3c;background:#2e211d}
+:root[data-theme="dark"] .cond-del-stats b{color:#de7b73}
+:root[data-theme="dark"] .cond-del-stats span{color:#b9acaa}
+:root[data-theme="dark"] .cond-del-confirm label b{color:#de7b73}
+:root[data-theme="dark"] .cond-del-go{background:#b83227;border:1.5px solid #b83227;color:#fff}
+:root[data-theme="dark"] .cond-archived{border:1.5px dashed #464e48;background:#222a22}
+:root[data-theme="dark"] .cond-arch-h{color:#abbcb4}
+:root[data-theme="dark"] .cond-arch-h small{color:#97a59d}
+:root[data-theme="dark"] .cond-arch-row{border-top:1px solid #3f4841}
+:root[data-theme="dark"] .cond-arch-row:first-of-type{border-top:0}
+:root[data-theme="dark"] .cond-arch-txt span{color:#a0ada6}
 html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .safe-top{background:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -2164,7 +2222,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
           <div class="ov-grp ov-only-lista"><span class="fx-lbl">Status</span><div class="fx-scroll" id="ovStatus"></div></div>
         </div>
       </div>
-      <div class="ov-meta"><span class="clif-count" id="ovCount"></span><span class="ov-updated" id="ovUpdated"></span><button class="fx-btn ov-refresh" id="ovRefresh" type="button" title="Atualizar dados" aria-label="Atualizar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
+      <div class="ov-meta"><span class="clif-count" id="ovCount"></span><span class="ov-updated" id="ovUpdated"></span><button class="fx-btn ov-export" id="ovExport" type="button" title="Exportar a lista filtrada (abre no Excel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg><span>Exportar</span></button><button class="fx-btn ov-refresh" id="ovRefresh" type="button" title="Atualizar dados" aria-label="Atualizar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
       <div id="ovList"></div>
     </div>
   </section>
@@ -2250,6 +2308,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
         <div class="cond-panel" id="condPanel" hidden></div>
         <div class="cond-list" id="condList"></div>
         <div class="brow cond-actions"><span class="cond-hint" id="condHint"></span><button class="btn g" id="condReset" type="button" hidden>Descartar</button><button class="btn p" id="condSave" type="button" disabled>Salvar configurações</button></div>
+        <div class="cond-archived" id="condArchived" hidden></div>
       </div>
       <div class="cfg-pane" data-pane="logs" hidden>
       <div class="cbox">
@@ -2420,7 +2479,7 @@ const SEED=[{"bloco": "A", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst":
 
 const SEED_CRON=[["A","6º","","","","","2026-05-12","2026-05-12","",""],["A","5º","","","","","2026-05-18","2026-05-18","2026-06-22",""],["A","4º","","","","","2026-05-26","2026-05-26","2026-06-24",""],["A","3º","","","","","2026-05-28","2026-05-28","2026-06-26",""],["A","2º","","","","","2026-06-02","2026-06-02","2026-06-29",""],["A","1º","","","","","2026-06-05","2026-06-05","2026-07-01",""],["A","T","","","","","2026-06-09","2026-06-09","2026-07-03",""],["B","6º","2026-07-20","","2026-07-20","","2026-07-20","","2026-07-20",""],["B","5º","2026-07-20","","2026-07-20","","2026-07-21","","2026-07-21",""],["B","4º","2026-07-21","","2026-07-21","","2026-07-21","","2026-07-21",""],["B","3º","2026-07-21","","2026-07-21","","2026-07-22","","2026-07-22",""],["B","2º","2026-07-22","","2026-07-22","","2026-07-22","","2026-07-22",""],["B","1º","2026-07-22","","2026-07-22","","2026-07-23","","2026-07-23",""],["B","T","2026-07-23","","2026-07-23","","2026-07-24","","2026-07-24",""],["C","6º","2026-06-11","","2026-06-11","","2026-06-15","2026-07-01","2026-06-15",""],["C","5º","2026-06-12","","2026-06-12","","2026-06-16","","2026-06-16",""],["C","4º","2026-06-15","","2026-06-15","","2026-06-17","","2026-06-17",""],["C","3º","2026-06-16","","2026-06-16","","2026-06-17","","2026-06-17",""],["C","2º","2026-06-17","","2026-06-17","","2026-06-18","","2026-06-18",""],["C","1º","2026-06-18","","2026-06-18","","2026-06-19","","2026-06-19",""],["C","T","2026-06-19","","2026-06-19","","2026-06-22","","2026-06-22",""],["D","6º","2026-07-14","","2026-07-14","","2026-07-14","","2026-07-14",""],["D","5º","2026-07-14","","2026-07-14","","2026-07-15","","2026-07-15",""],["D","4º","2026-07-15","","2026-07-15","","2026-07-15","","2026-07-15",""],["D","3º","2026-07-15","","2026-07-15","","2026-07-16","","2026-07-16",""],["D","2º","2026-07-16","","2026-07-16","","2026-07-16","","2026-07-16",""],["D","1º","2026-07-16","","2026-07-16","","2026-07-17","","2026-07-17",""],["D","T","2026-07-17","","2026-07-17","","2026-07-20","","2026-07-20",""],["E","6º","2026-06-22","","2026-06-22","","2026-06-22","","2026-06-22",""],["E","5º","2026-06-22","","2026-06-22","","2026-06-23","","2026-06-23",""],["E","4º","2026-06-23","","2026-06-23","","2026-06-23","","2026-06-23",""],["E","3º","2026-06-23","","2026-06-23","","2026-06-24","","2026-06-24",""],["E","2º","2026-06-24","","2026-06-24","","2026-06-24","","2026-06-24",""],["E","1º","2026-06-24","","2026-06-24","","2026-06-25","","2026-06-25",""],["E","T","2026-06-25","","2026-06-25","","2026-06-26","","2026-06-26",""],["F","6º","2026-07-08","","2026-07-08","","2026-07-08","","2026-07-08",""],["F","5º","2026-07-08","","2026-07-08","","2026-07-09","","2026-07-09",""],["F","4º","2026-07-09","","2026-07-09","","2026-07-09","","2026-07-09",""],["F","3º","2026-07-09","","2026-07-09","","2026-07-10","","2026-07-10",""],["F","2º","2026-07-10","","2026-07-10","","2026-07-10","","2026-07-10",""],["F","1º","2026-07-10","","2026-07-10","","2026-07-13","","2026-07-13",""],["F","T","2026-07-13","","2026-07-13","","2026-07-14","","2026-07-14",""],["G","6º","2026-06-26","","2026-06-26","","2026-06-26","","2026-06-26",""],["G","5º","2026-06-26","","2026-06-26","","2026-06-29","","2026-06-29",""],["G","4º","2026-06-29","","2026-06-29","","2026-06-29","","2026-06-29",""],["G","3º","2026-06-29","","2026-06-29","","2026-06-30","","2026-06-30",""],["G","2º","2026-06-30","","2026-06-30","","2026-06-30","","2026-06-30",""],["G","1º","2026-06-30","","2026-06-30","","2026-07-01","","2026-07-01",""],["G","T","2026-07-01","","2026-07-01","","2026-07-02","","2026-07-02",""],["H","6º","2026-07-02","","2026-07-02","","2026-07-02","","2026-07-02",""],["H","5º","2026-07-02","","2026-07-02","","2026-07-03","","2026-07-03",""],["H","4º","2026-07-03","","2026-07-03","","2026-07-03","","2026-07-03",""],["H","3º","2026-07-03","","2026-07-03","","2026-07-06","","2026-07-06",""],["H","2º","2026-07-06","","2026-07-06","","2026-07-06","","2026-07-06",""],["H","1º","2026-07-06","","2026-07-06","","2026-07-07","","2026-07-07",""],["H","T","2026-07-07","","2026-07-07","","2026-07-08","","2026-07-08",""]];
 const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{}};
-const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:"",acomp:""});
+const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",resp_revistoria:"",obs:"",sale_stage:"",acomp:""});
 /* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
 const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
 function acompSelect(value,attrs,empty="— Não informado"){
@@ -2444,7 +2503,9 @@ function initState(){
 
 /* state */
 let obraFrente="acab", obraBlk="ALL", cliBlk="ALL", obraMode="frente";
-let cliMode="mapa", cliFilt={status:[],bloco:"ALL",dtIni:"",dtFim:"",hrSort:"asc",u:"",q:""};
+/* dtTipo: qual data o período filtra (vistoria, revistoria ou qualquer das duas); ordem: data usada na ordenação. */
+const CLI_FILT0=()=>({status:[],bloco:"ALL",dtIni:"",dtFim:"",dtTipo:"vist",ordem:"vist",hrSort:"asc",u:"",q:""});
+let cliMode="mapa", cliFilt=CLI_FILT0();
 let cliListLastRows=[];
 let isMobile=matchMedia("(max-width:720px)").matches;
 
@@ -2666,7 +2727,8 @@ const FX_ICON={search:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="1
   filter:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>',
   clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   print:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 18H4v-7h16v7h-3M7 14h10v7H7z"/></svg>',
-  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'};
+  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  download:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>'};
 let cliFiltOpen=false;
 function hrSortLabel(){return `${FX_ICON.clock}Horário ${cliFilt.hrSort==="asc"?"↑":"↓"}`;}
 function ensureCliFilters(){
@@ -2678,10 +2740,13 @@ function ensureCliFilters(){
       <label class="fx-search${cliFilt.q?" on":""}">${FX_ICON.search}<input type="search" id="clifQ" placeholder="Buscar cliente" value="${esc(cliFilt.q)}" autocomplete="off" aria-label="Buscar cliente"></label>
       <div class="fx-adv" id="clifAdv">
         <label class="fx-field fx-unit${cliFilt.u?" on":""}"><span>Unid.</span><input type="text" id="clifU" placeholder="${LAYOUT.unitHint.replace("Ex.: ","")}" value="${esc(cliFilt.u)}" autocomplete="off" aria-label="Unidade"></label>
-        <label class="fx-field${cliFilt.dtIni?" on":""}"><span>De</span><input type="date" id="clifDtIni" value="${esc(cliFilt.dtIni)}" aria-label="Vistoria a partir de"></label>
-        <label class="fx-field${cliFilt.dtFim?" on":""}"><span>Até</span><input type="date" id="clifDtFim" value="${esc(cliFilt.dtFim)}" aria-label="Vistoria até"></label>
+        <label class="fx-field fx-sel${cliFilt.dtTipo!=="vist"?" on":""}"><span>Período</span><select id="clifDtTipo" aria-label="Data usada no período">${[["vist","Vistoria"],["rev","Revistoria"],["ambas","Ambas"]].map(([v,l])=>`<option value="${v}"${cliFilt.dtTipo===v?" selected":""}>${l}</option>`).join("")}</select></label>
+        <label class="fx-field${cliFilt.dtIni?" on":""}"><span>De</span><input type="date" id="clifDtIni" value="${esc(cliFilt.dtIni)}" aria-label="Data a partir de"></label>
+        <label class="fx-field${cliFilt.dtFim?" on":""}"><span>Até</span><input type="date" id="clifDtFim" value="${esc(cliFilt.dtFim)}" aria-label="Data até"></label>
+        <label class="fx-field fx-sel${cliFilt.ordem!=="vist"?" on":""}"><span>Ordenar</span><select id="clifOrdem" aria-label="Ordenar por">${[["vist","Vistoria"],["rev","Revistoria"]].map(([v,l])=>`<option value="${v}"${cliFilt.ordem===v?" selected":""}>${l}</option>`).join("")}</select></label>
         <button class="fx-btn" id="clifHrSort" type="button" aria-label="Ordenar horário">${hrSortLabel()}</button>
         <button class="fx-btn" id="clifPrint" type="button">${FX_ICON.print}Imprimir</button>
+        <button class="fx-btn" id="clifExport" type="button" title="Exportar a lista filtrada (abre no Excel)">${FX_ICON.download}Exportar</button>
       </div>
       <div class="fx-end">
         <span class="clif-count" id="clifCount"></span>
@@ -2711,18 +2776,21 @@ function ensureCliFilters(){
   el.querySelector("#clifQ").oninput=e=>{cliFilt.q=e.target.value;renderCliList();};
   el.querySelector("#clifU").oninput=e=>{cliFilt.u=e.target.value;renderCliList();};
   el.querySelector("#clifHrSort").onclick=e=>{cliFilt.hrSort=cliFilt.hrSort==="asc"?"desc":"asc";e.currentTarget.innerHTML=hrSortLabel();renderCliList();};
-  el.querySelector("#clifClear").onclick=()=>{cliFilt={status:[],bloco:"ALL",dtIni:"",dtFim:"",hrSort:"asc",u:"",q:""};el.dataset.built="";ensureCliFilters();renderCliList();};
+  el.querySelector("#clifClear").onclick=()=>{cliFilt=CLI_FILT0();el.dataset.built="";ensureCliFilters();renderCliList();};
   el.querySelector("#clifPrint").onclick=printCliList;
+  el.querySelector("#clifExport").onclick=exportCliList;
+  el.querySelector("#clifDtTipo").onchange=e=>{cliFilt.dtTipo=e.target.value;renderCliList();};
+  el.querySelector("#clifOrdem").onchange=e=>{cliFilt.ordem=e.target.value;renderCliList();};
   el.querySelector("#clifMore").onclick=e=>{cliFiltOpen=!cliFiltOpen;el.classList.toggle("fx-open",cliFiltOpen);e.currentTarget.setAttribute("aria-expanded",String(cliFiltOpen));};
 }
 /* Destaca só o que está filtrando e mostra "Limpar" quando há filtro ativo. */
 function syncCliFilterUI(){
   const el=document.getElementById("cliFilters");if(!el||!el.dataset.built)return;
-  const adv=[cliFilt.u,cliFilt.dtIni,cliFilt.dtFim].filter(Boolean).length;
+  const adv=[cliFilt.u,cliFilt.dtIni,cliFilt.dtFim,cliFilt.dtTipo!=="vist",cliFilt.ordem!=="vist"].filter(Boolean).length;
   const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.bloco!=="ALL"?1:0);
   const clear=el.querySelector("#clifClear"),badge=el.querySelector("#clifBadge");
   if(clear)clear.hidden=!total;if(badge){badge.textContent=adv;badge.hidden=!adv;}
-  [["#clifQ",cliFilt.q],["#clifU",cliFilt.u],["#clifDtIni",cliFilt.dtIni],["#clifDtFim",cliFilt.dtFim]].forEach(([id,v])=>el.querySelector(id)?.closest("label")?.classList.toggle("on",!!v));
+  [["#clifQ",cliFilt.q],["#clifU",cliFilt.u],["#clifDtIni",cliFilt.dtIni],["#clifDtFim",cliFilt.dtFim],["#clifDtTipo",cliFilt.dtTipo!=="vist"],["#clifOrdem",cliFilt.ordem!=="vist"]].forEach(([id,v])=>el.querySelector(id)?.closest("label")?.classList.toggle("on",!!v));
 }
 function renderCliList(){
   const wrap=document.getElementById("cliListTbl"); if(!wrap)return;
@@ -2733,11 +2801,17 @@ function renderCliList(){
   });
   if(cliFilt.status.length) rows=rows.filter(r=>cliFilt.status.includes(r.code));
   if(cliFilt.bloco!=="ALL") rows=rows.filter(r=>r.b===cliFilt.bloco);
-  if(cliFilt.dtIni) rows=rows.filter(r=>r.info.data_vistoria && r.info.data_vistoria>=cliFilt.dtIni);
-  if(cliFilt.dtFim) rows=rows.filter(r=>r.info.data_vistoria && r.info.data_vistoria<=cliFilt.dtFim);
+  if(cliFilt.dtIni||cliFilt.dtFim){
+    const inRange=d=>!!d&&(!cliFilt.dtIni||d>=cliFilt.dtIni)&&(!cliFilt.dtFim||d<=cliFilt.dtFim);
+    rows=rows.filter(r=>cliFilt.dtTipo==="rev"?inRange(r.info.data_revistoria):cliFilt.dtTipo==="ambas"?(inRange(r.info.data_vistoria)||inRange(r.info.data_revistoria)):inRange(r.info.data_vistoria));
+  }
   if(cliFilt.q){ const q=cliFilt.q.trim().toLowerCase(); rows=rows.filter(r=>(r.info.cliente||"").toLowerCase().includes(q)); }
   if(cliFilt.u){ const uq=cliFilt.u.trim().toLowerCase(); rows=rows.filter(r=>LAYOUT.kind==="casa"?((r.b+unitCode(r.b,r.p,r.a)).toLowerCase()===uq||unitCode(r.b,r.p,r.a)===uq.replace(/^0+/,"")||(r.b+unitCode(r.b,r.p,r.a)).toLowerCase().startsWith(uq)):((r.b+unitCode_(r.p,r.a)).toLowerCase().includes(uq)||unitCode_(r.p,r.a).toLowerCase().includes(uq))); }
   rows.sort((x,y)=>{
+    if(cliFilt.ordem==="rev"){ // revistorias com data primeiro (mais cedo primeiro); sem data vão para o fim
+      const rx=x.info.data_revistoria||"9999-99-99", ry=y.info.data_revistoria||"9999-99-99";
+      if(rx!==ry)return rx<ry?-1:1;
+    }
     const dx=x.info.data_vistoria||"9999-99-99", dy=y.info.data_vistoria||"9999-99-99";
     if(dx!==dy)return dx<dy?-1:1; // agrupa por dia (mais cedo primeiro)
     const hx=x.info.horario_vistoria||"", hy=y.info.horario_vistoria||"";
@@ -2749,7 +2823,7 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
@@ -2759,6 +2833,8 @@ function renderCliList(){
       <td>${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td>
       <td>${esc(i.horario_vistoria)||"—"}</td>
       <td>${esc(i.responsavel)||"—"}</td>
+      <td class="crev">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
+      <td class="crev">${esc(i.resp_revistoria)||"—"}</td>
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
       <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`,"—"):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
@@ -2782,14 +2858,14 @@ function printCliList(){
     th{background:#2f4a34;color:#fff;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px}
     tr:nth-child(even) td{background:#f7f9f6}
     th.w-cli,td.w-cli{text-align:left}
-    th.w-b,td.w-b{width:9%} th.w-u,td.w-u{width:10%} th.w-d,td.w-d{width:13%} th.w-h,td.w-h{width:10%}
+    th.w-b,td.w-b{width:7%} th.w-u,td.w-u{width:8%} th.w-d,td.w-d{width:10%} th.w-h,td.w-h{width:7%}
   </style></head><body>
     <h1>${esc(projectExperience(appProject).title)} · Vistoria Cliente</h1>
     <div class="sub">Lista filtrada — gerado em ${now} — ${rows.length} unidade(s)</div>
-    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data</th><th class="w-h">Horário</th><th>Responsável</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
+    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data vistoria</th><th class="w-h">Horário</th><th>Responsável</th><th class="w-d">Data revistoria</th><th>Resp. revistoria</th><th>Status</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const i=r.info;
-    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
+    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td class="w-d">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td><td>${esc(i.resp_revistoria)||"—"}</td><td>${esc(CLL[r.code]||"")}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
   });
   body+='</tbody></table></body></html>';
   const w=window.open("","_blank");
@@ -2797,11 +2873,30 @@ function printCliList(){
   w.document.write(body); w.document.close();
   w.onload=()=>{ w.focus(); w.print(); };
 }
+/* Exportação (CSV com ; e BOM: abre direto no Excel em português). */
+function downloadCsv(name,header,rows){
+  const cell=v=>{const s=String(v??"");return /[";\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  const text="﻿"+[header,...rows].map(r=>r.map(cell).join(";")).join("\r\n");
+  const url=URL.createObjectURL(new Blob([text],{type:"text/csv;charset=utf-8"}));
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+const csvDate=d=>d?fmtDate(d):"";
+const fileStamp=()=>todayISO();
+function exportCliList(){
+  const rows=cliListLastRows;
+  if(!rows||!rows.length){ toast("Nada para exportar com esses filtros"); return; }
+  const slug=(appProject?.slug||"condominio");
+  downloadCsv(`vistorias-${slug}-${fileStamp()}.csv`,
+    [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações"],
+    rows.map(r=>{const i=r.info;return [r.b,unitCode(r.b,r.p,r.a),i.cliente,csvDate(i.data_vistoria),i.horario_vistoria,i.responsavel,csvDate(i.data_revistoria),i.resp_revistoria,CLL[r.code]||"",ACOMP[i.acomp]||"",i.obs];}));
+  toast(rows.length+" unidade(s) exportada(s)");
+}
 
 /* ── POPOVER ── */
 const pop=document.getElementById("pop"); let ctx=null, popAnchor=null;
 const popBackdrop=document.createElement("div");popBackdrop.className="pop-backdrop";document.body.appendChild(popBackdrop);
-const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","obs","acomp"];
+const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","resp_revistoria","obs","acomp"];
 const TIME_PRESETS=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00"];
 const sheetMode=()=>matchMedia("(max-width:720px)").matches;
 const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
@@ -2865,10 +2960,10 @@ function cliChanges(){
   return changes;
 }
 function refreshPopActions(){
-  const n=Object.keys(cliChanges()).length;ctx.dirty=n>0;
+  const pending=ctx.pendingStatus==="rf",n=Object.keys(cliChanges()).length+(pending?1:0);ctx.dirty=n>0;
   const save=pop.querySelector(".pp-actions [type=submit]"),discard=pop.querySelector('[data-pp="discard"]'),hint=pop.querySelector(".pp-hint");
-  if(save)save.disabled=!n;if(discard)discard.hidden=!n;
-  if(hint)hint.textContent=n?`${n} alteração(ões) não salva(s)`:"Ctrl+Enter salva · Esc fecha";
+  if(save){save.disabled=!n;save.textContent=pending?"Finalizar revistoria":"Salvar";}if(discard)discard.hidden=!n;
+  if(hint)hint.textContent=pending?"Data e responsável são obrigatórios":n?`${n} alteração(ões) não salva(s)`:"Ctrl+Enter salva · Esc fecha";
   pop.classList.toggle("is-dirty",!!n);
   const name=pop.querySelector(".pp-client b");if(name)name.textContent=cliDraftValue("cliente")||"Sem cliente vinculado";
   pop.querySelectorAll("[data-time]").forEach(b=>b.classList.toggle("sel",b.dataset.time===cliDraftValue("horario_vistoria")));
@@ -2879,15 +2974,21 @@ function renderCliPop(){
   const fdis=f=>(scope==="all"||(scope==="rev"&&REV_FIELDS.includes(f)))?"":"disabled";
   const stDis=c=>(scope==="all"||(scope==="rev"&&cur==="rv"&&c==="rf"))?"":"disabled";
   const idx=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a);
-  const responsaveis=[...new Set(Object.values(state.cliInfo).map(i=>i.responsavel).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
+  const responsaveis=[...new Set(Object.values(state.cliInfo).flatMap(i=>[i.responsavel,i.resp_revistoria]).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
+  const pendingRf=ctx.pendingStatus==="rf",shownSt=pendingRf?"rf":cur;
   const kicker=LAYOUT.kind==="casa"?`Conjunto ${ctx.b}`:`Bloco ${ctx.b} · ${PAVL[ctx.p]}`;
   const name=LAYOUT.kind==="casa"?`Casa ${+ctx.a}`:`Apto ${unitCode_(ctx.p,ctx.a)}`;
   const cliente=cliDraftValue("cliente");
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
-  // A data da revistoria aparece só em "Revistoria Finalizada"; o valor salvo no banco é mantido.
-  const showRev=cur==="rf";
-  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
+  // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (ou ao finalizar); os valores salvos são mantidos.
+  const showRev=cur==="rf"||pendingRf;
+  const dateField=(field,label,req)=>`<label class="pp-f${req?" pp-req":""}"><span>${label}${req?' <em class="pp-star">*</em>':""}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}${req?" required":""}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
+  const revBlock=showRev?`<div class="pp-rev pp-full${pendingRf?" pending":""}">
+          <div class="pp-rev-t">${pendingRf?"Para finalizar, informe a data e o responsável pela revistoria":"Revistoria finalizada"}</div>
+          ${dateField("data_revistoria","Data da revistoria",true)}
+          <label class="pp-f pp-req"><span>Responsável pela revistoria <em class="pp-star">*</em></span><input name="resp_revistoria" list="ppRespList" value="${val("resp_revistoria")}" placeholder="Quem fez a revistoria" autocomplete="off" required ${fdis("resp_revistoria")}></label>
+        </div>`:"";
   pop.innerHTML=`
     <div class="pp-head">
       <div class="pp-title"><small>${kicker}</small><strong>${name}</strong></div>
@@ -2900,30 +3001,30 @@ function renderCliPop(){
     <div class="pp-body">
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
-      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===shownSt}" class="pp-st${c===shownSt?" sel":""}${pendingRf&&c==="rf"?" pending":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
         <label class="pp-f"><span>Horário</span><input type="time" name="horario_vistoria" step="900" value="${val("horario_vistoria")}" ${dis}></label>
         <div class="pp-times pp-full" aria-label="Horários rápidos">${TIME_PRESETS.map(t=>`<button type="button" class="pp-chip${cliDraftValue("horario_vistoria")===t?" sel":""}" data-time="${t}" ${dis}>${t}</button>`).join("")}</div>
         <label class="pp-f pp-full"><span>Responsável pela vistoria</span><input name="responsavel" list="ppRespList" value="${val("responsavel")}" placeholder="Nome do responsável" autocomplete="off" ${dis}><datalist id="ppRespList">${responsaveis.map(r=>`<option value="${esc(r)}"></option>`).join("")}</datalist></label>
-        ${showRev?dateField("data_revistoria","Data da revistoria (combinar c/ cliente)"):""}
+        ${revBlock}
         <label class="pp-f pp-full"><span>Acomp. Técnico</span>${acompSelect(cliDraftValue("acomp"),`name="acomp" class="pp-select" ${dis}`)}</label>
         <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${fdis("obs")}>${val("obs")}</textarea></label>
-        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: finalize a revistoria e ajuste a data da revistoria e as observações.</div>`:""}
+        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: finalize a revistoria e ajuste a data, o responsável pela revistoria e as observações.</div>`:""}
         ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">${currentUser?.nivel==="revistorias"?"Com a permissão Revistorias você altera apenas unidades em Revistoria.":"Somente administradores editam a vistoria do cliente."}</div>`}
       </form>
     </div>`;
   pop.setAttribute("tabindex","-1");pop.setAttribute("role","dialog");pop.setAttribute("aria-label",name+" · "+kicker);
   pop.querySelectorAll(".pp-st").forEach(b=>b.onclick=()=>setStatus(b.dataset.code));
   const form=pop.querySelector(".pp-form");
-  form.addEventListener("input",e=>{const f=e.target.name;if(!CLI_FIELDS.includes(f))return;ctx.draft={...(ctx.draft||{}),[f]:e.target.value};refreshPopActions();});
+  form.addEventListener("input",e=>{const f=e.target.name;if(!CLI_FIELDS.includes(f))return;e.target.closest(".pp-f")?.classList.remove("pp-invalid");ctx.draft={...(ctx.draft||{}),[f]:e.target.value};refreshPopActions();});
   form.addEventListener("submit",e=>{e.preventDefault();saveCliDraft();});
   pop.querySelectorAll("[data-time]").forEach(b=>b.onclick=()=>{const i=form.elements.horario_vistoria;i.value=b.dataset.time;i.dispatchEvent(new Event("input",{bubbles:true}));});
   pop.querySelectorAll("[data-today]").forEach(b=>b.onclick=()=>{const i=form.elements[b.dataset.today];i.value=todayISO();i.dispatchEvent(new Event("input",{bubbles:true}));});
   pop.querySelectorAll("[data-pp]").forEach(b=>b.onclick=()=>{const a=b.dataset.pp;
     if(a==="prev")gotoUnit(-1);else if(a==="next")gotoUnit(1);else if(a==="close")requestClosePop();
-    else if(a==="discard"){ctx.draft=null;ctx.dirty=false;renderPop();}});
+    else if(a==="discard"){ctx.draft=null;ctx.dirty=false;ctx.pendingStatus=null;renderPop();}});
   refreshPopActions();
 }
 async function saveAcomp(select){
@@ -2941,19 +3042,28 @@ async function saveAcomp(select){
 async function saveCliDraft(){
   if(!ctx||ctx.k!=="cli")return;
   const scope=cliEditScope(kC(ctx.b,ctx.p,ctx.a));if(!scope)return;
-  if(scope==="rev"&&Object.keys(cliChanges()).some(f=>!REV_FIELDS.includes(f))){toast("A permissão Revistorias altera apenas data da revistoria e observações");return;}
-  const changes=cliChanges();if(!Object.keys(changes).length){refreshPopActions();return;}
-  const key=kC(ctx.b,ctx.p,ctx.a),snapshot=ctx,old={...state.cliInfo[key]};
+  if(scope==="rev"&&Object.keys(cliChanges()).some(f=>!REV_FIELDS.includes(f))){toast("A permissão Revistorias altera apenas data e responsável da revistoria e observações");return;}
+  const key=kC(ctx.b,ctx.p,ctx.a),pending=ctx.pendingStatus==="rf";
+  const changes=cliChanges();if(!Object.keys(changes).length&&!pending){refreshPopActions();return;}
+  // Revistoria Finalizada exige data e responsável da revistoria (o banco aplica a mesma regra).
+  if(pending||state.cli[key]==="rf"){
+    const miss=[["data_revistoria",!cliDraftValue("data_revistoria")],["resp_revistoria",!String(cliDraftValue("resp_revistoria")).trim()]].filter(x=>x[1]).map(x=>x[0]);
+    pop.querySelectorAll(".pp-rev [name]").forEach(i=>i.closest(".pp-f")?.classList.toggle("pp-invalid",miss.includes(i.name)));
+    if(miss.length){toast("Informe a data e o responsável pela revistoria");pop.querySelector(`.pp-rev [name="${miss[0]}"]`)?.focus();return;}
+  }
+  const snapshot=ctx,old={...state.cliInfo[key]},oldCode=state.cli[key];
+  const payload={...changes};if(pending)payload.status="rf";
+  if("resp_revistoria" in payload)payload.resp_revistoria=String(payload.resp_revistoria).trim();
   const btn=pop.querySelector(".pp-actions [type=submit]");if(btn){btn.disabled=true;btn.textContent="Salvando…";}
-  Object.assign(state.cliInfo[key],changes);
+  const {status:_st,...fields}=payload;Object.assign(state.cliInfo[key],fields);if(pending)state.cli[key]="rf";
   try{
-    await setCliFields(snapshot.b,snapshot.p,snapshot.a,changes);
-    toast("Vistoria salva");
-    if(ctx===snapshot){ctx.draft=null;ctx.dirty=false;}
+    await setCliFields(snapshot.b,snapshot.p,snapshot.a,payload);
+    toast(pending?"Revistoria finalizada":"Vistoria salva");
+    if(ctx===snapshot){ctx.draft=null;ctx.dirty=false;ctx.pendingStatus=null;}
     renderCli();renderResumo();if(ctx===snapshot){renderPop();pop.classList.add("just-saved");setTimeout(()=>pop.classList.remove("just-saved"),900);}
   }catch(e){
-    state.cliInfo[key]=old;renderCli();renderResumo();
-    if(ctx===snapshot&&btn){btn.disabled=false;btn.textContent="Salvar";}
+    state.cliInfo[key]=old;state.cli[key]=oldCode;renderCli();renderResumo();
+    if(ctx===snapshot&&btn){btn.disabled=false;btn.textContent=pending?"Finalizar revistoria":"Salvar";}
     toast(syncErrorMessage(e));load(true).catch(()=>{});
   }
 }
@@ -2972,12 +3082,20 @@ async function setStatus(code){
     if(!canEditCli()&&!(cliEditScope(scopeKey)==="rev"&&state.cli[scopeKey]==="rv"&&code==="rf")){
       toast(currentUser?.nivel==="revistorias"?"A permissão Revistorias só finaliza revistorias":"Somente administrador edita a Vistoria Cliente");return;}
     const target={...ctx},key=kC(target.b,target.p,target.a);const old=state.cli[key];
+    // Finalizar revistoria: pede data e responsável e grava tudo junto em "Finalizar revistoria".
+    if(code==="rf"&&old!=="rf"){
+      ctx.pendingStatus="rf";renderPop();
+      const empty=["data_revistoria","resp_revistoria"].find(f=>!String(cliDraftValue(f)).trim());
+      if(empty){pop.querySelector(`.pp-rev [name="${empty}"]`)?.focus();toast("Informe a data e o responsável pela revistoria");}
+      else saveCliDraft();
+      return;
+    }
+    if(ctx.pendingStatus){ctx.pendingStatus=null;if(old===code){renderPop();return;}}
     if(old===code)return;
     state.cli[key]=code;
     const detalhe="CLIENTE · "+unitShort(target.b,target.p,target.a)+": "+(CLL[old]||old)+" → "+(CLL[code]||code);
     renderCli(); renderResumo(); renderPop();
     if((code==="ag"||code==="rm")&&!cliDraftValue("data_vistoria"))pop.querySelector('[name="data_vistoria"]')?.focus();
-    if(code==="rf")pop.querySelector('[name="data_revistoria"]')?.focus();
     try{await setCell("cli",target.b,target.p,target.a,"status",CLL[code],detalhe);toast("Status: "+CLL[code]);}
     catch(e){state.cli[key]=old;renderCli();renderResumo();if(ctx&&kC(ctx.b,ctx.p,ctx.a)===key)renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   }
@@ -3046,7 +3164,12 @@ function setSync(m){const d=document.getElementById("syncDot");d.className="sync
 let appProject=null,availableProjects=[],realtimeChannel=null,pendingWrites=0,lastSyncFailed=false;
 const writeQueues=new Map();
 const dbIndex={unitByKey:new Map(),unitKeyById:new Map(),stageByKey:new Map(),clientByUnit:new Map(),scheduleByKey:new Map()};
-function syncErrorMessage(e){return e&&e.code==="CONFLICT"?"Outra pessoa alterou este item. Os dados foram atualizados.":"Não foi possível salvar. Verifique a conexão.";}
+function syncErrorMessage(e){
+  if(e&&e.code==="CONFLICT")return "Outra pessoa alterou este item. Os dados foram atualizados.";
+  // Regras do banco com mensagem para o usuário (ex.: finalizar revistoria sem data/responsável).
+  if(e&&e.code==="23514"&&/revistoria/i.test(e.message||""))return e.message;
+  return "Não foi possível salvar. Verifique a conexão.";
+}
 function queueWrite(key,task){
   const previous=writeQueues.get(key)||Promise.resolve();
   const next=previous.catch(()=>{}).then(task);
@@ -3101,12 +3224,14 @@ async function setCell(t,b,pav,a,field,value,detalhe){
   throw new Error("Tabela inválida.");
 }
 /* Salva vários campos da vistoria do cliente numa única atualização versionada. */
-const CLI_COLUMNS={acomp:"technical_escort",cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",obs:"notes"};
+const CLI_COLUMNS={acomp:"technical_escort",cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",resp_revistoria:"reinspection_responsible",obs:"notes"};
 async function setCliFields(b,pav,a,changes){
   if(!SUPABASE_READY||!currentUser||!appProject)throw new Error("Sessão indisponível.");
   const unit=dbIndex.unitByKey.get(kC(b,pav,a));if(!unit)throw new Error("Unidade não encontrada.");
   const patch={};
   Object.entries(changes).forEach(([field,value])=>{
+    // Status junto com os campos (ex.: finalizar revistoria com data e responsável numa única gravação).
+    if(field==="status"){if(!CLL[value])throw new Error("Status inválido.");patch.status=CLL[value];return;}
     const column=CLI_COLUMNS[field];if(!column)throw new Error("Campo inválido.");
     patch[column]=(column==="inspection_date"||column==="inspection_time"||column==="reinspection_date")?(value||null):(value==null?"":String(value).trim());
   });
@@ -3135,7 +3260,7 @@ function applyStageRecord(r){
 function applyClientRecord(r){
   dbIndex.clientByUnit.set(r.unit_id,r);const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;
   state.cli[key]=normCli(r.status);
-  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),obs:r.notes||"",sale_stage:r.sale_stage||"",acomp:r.technical_escort||""};
+  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),resp_revistoria:r.reinspection_responsible||"",obs:r.notes||"",sale_stage:r.sale_stage||"",acomp:r.technical_escort||""};
 }
 function applyScheduleRecord(r){
   const key=kPV(_blk(r.bloco),_pav(r.pav)),mapKey=key+"|"+r.stage;dbIndex.scheduleByKey.set(mapKey,r);
@@ -3187,7 +3312,7 @@ function canEditFrente(fr){if(!SUPABASE_READY||!currentUser)return false;return 
 function canEditCli(){return SUPABASE_READY&&isAdmin();}
 /* Permissão "Revistorias": só unidades em Revistoria / Revistoria Finalizada, status apenas Revistoria → Finalizada,
    e somente data da revistoria e observações (o banco aplica a mesma regra via RLS + trigger). */
-const REV_FIELDS=["data_revistoria","obs"];
+const REV_FIELDS=["data_revistoria","resp_revistoria","obs"];
 function cliEditScope(key){
   if(canEditCli())return "all";
   if(SUPABASE_READY&&currentUser?.nivel==="revistorias"&&(state.cli[key]==="rv"||state.cli[key]==="rf"))return "rev";
@@ -3278,13 +3403,13 @@ async function loadOverview(){
   const list=document.getElementById("ovList");
   if(!ovRows.length)list.innerHTML='<div class="clif-empty">Carregando agendamentos…</div>';
   try{
-    const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)");
+    const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,reinspection_responsible,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)");
     const projects=new Map(availableProjects.map(p=>[String(p.id),p]));
     ovRows=rows.map(r=>{
       const u=r.units||{},project=projects.get(String(u.project_id));if(!project)return null;
       return {projectId:project.id,projectName:projectExperience(project).title||project.name,...ovUnit(u),pcd:!!u.pcd,code:normCli(r.status),
         cliente:r.client_name||"",data:dstr(r.inspection_date),hora:(""+(r.inspection_time||"")).slice(0,5),resp:r.responsible||"",
-        rev:dstr(r.reinspection_date),obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||""};
+        rev:dstr(r.reinspection_date),revResp:r.reinspection_responsible||"",obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||""};
     }).filter(r=>r&&(r.code!=="na"||r.data));
     document.getElementById("ovUpdated").textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
     renderOvFilters();renderOverview();
@@ -3339,10 +3464,10 @@ function renderOverview(){
   const dayLabel=d=>{if(!d)return "Sem data definida";const dt=new Date(d+"T12:00:00");const w=dt.toLocaleDateString("pt-BR",{weekday:"long"});
     return (d===today?"Hoje · ":"")+w.charAt(0).toUpperCase()+w.slice(1)+", "+fmtDate(d);};
   const perDay={};rows.forEach(r=>{perDay[r.data]=(perDay[r.data]||0)+1;});
-  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   let lastDay=null;
   rows.forEach((r,i)=>{
-    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="10"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
+    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="12"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
     const s=CLR_C[r.code]||CLR_C.na,color=ovColor(r.projectId);
     h+=`<tr class="ov-row" data-ov="${i}" tabindex="0" style="--ov:${color}" title="Abrir ${esc(r.unitLabel)} no ${esc(r.projectName)}">
       <td class="ov-proj"><span class="ov-badge"><i></i>${esc(r.projectName)}</span></td>
@@ -3352,6 +3477,8 @@ function renderOverview(){
       <td>${r.data?fmtDate(r.data):"—"}</td>
       <td>${esc(r.hora)||"—"}</td>
       <td>${esc(r.resp)||"—"}</td>
+      <td class="crev">${r.rev?fmtDate(r.rev):"—"}</td>
+      <td class="crev">${esc(r.revResp)||"—"}</td>
       <td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td>
       <td class="clif-obs" title="${esc(r.obs)}">${r.obs?(esc(r.obs).slice(0,28)+(r.obs.length>28?"…":"")):"—"}</td>
       <td class="cacomp">${ACOMP[r.acomp]||"—"}</td>
@@ -3876,7 +4003,7 @@ let condDraft=[];
 function showCfgTab(tab){
   document.querySelectorAll("#cfgTabs [data-cfg]").forEach(b=>{const on=b.dataset.cfg===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
   document.querySelectorAll("#adminOv [data-pane]").forEach(p=>p.hidden=p.dataset.pane!==tab);
-  if(tab==="cond"){resetCondDraft();condPanel=null;renderCondPanel();}
+  if(tab==="cond"){resetCondDraft();condPanel=null;renderCondPanel();loadCondArchived();}
   if(tab==="logs")loadLogs();
 }
 const condAliasText=p=>(p?.import_aliases||[]).join(", ");
@@ -3902,6 +4029,7 @@ function renderCondConfig(){
         <span class="cond-kind-tag">${d.kind==="casas"?"Casas · conjuntos":"Apartamentos · 8 blocos"}</span>
         <label class="cond-color" title="Cor de destaque"><input type="color" data-cond-field="color" value="${esc(d.color)}" aria-label="Cor de destaque de ${esc(d.name)}"><span>Cor</span></label>
         ${d.kind==="casas"?`<button type="button" class="btn g cond-struct-btn" data-cond-struct="${esc(d.id)}">Conjuntos e casas</button>`:""}
+        <button type="button" class="btn cond-del-btn" data-cond-archive="${esc(d.id)}" title="Excluir esta obra (pode ser restaurada depois)">Excluir obra</button>
       </div>
     </div></article>`).join("");
   const changed=condChanged();
@@ -3950,7 +4078,7 @@ async function selectProject(projectId){
   currentUser.nivel=selected.role;
   // Cada condomínio tem seu próprio layout de unidades e seus próprios filtros.
   LAYOUT=layoutFor(selected);closePop(true);
-  cliBlk="ALL";cliMode="mapa";cliFilt={status:[],bloco:"ALL",dtIni:"",dtFim:"",hrSort:"asc",u:"",q:""};
+  cliBlk="ALL";cliMode="mapa";cliFilt=CLI_FILT0();
   const filters=document.getElementById("cliFilters");if(filters){filters.dataset.built="";filters.innerHTML="";}
   updateProjectBrand();
   const overlay=document.getElementById("projectOv");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
@@ -4150,9 +4278,10 @@ async function aprAction(act,index,button){
 }
 function auditValue(v){if(v==null||v==="")return "(vazio)";const text=typeof v==="string"?v:JSON.stringify(v);return text.length>55?text.slice(0,52)+"…":text;}
 function auditDetail(l){
-  const tables={unit_stage_status:"Etapa da obra",client_inspections:"Vistoria do cliente",floor_schedule:"Cronograma",project_members:"Acesso"};
-  const fields={technical_escort:"Acomp. Técnico",sale_stage:"Etapa da venda",status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
-  const old=l.old_data||{},now=l.new_data||{},ignored=new Set(["version","updated_at","updated_by"]);
+  if(l.table_name==="projects"&&(l.action==="ARCHIVE"||l.action==="RESTORE"))return (l.action==="ARCHIVE"?"Obra excluída (arquivada): ":"Obra restaurada: ")+((l.new_data||l.old_data||{}).name||"#"+l.record_id);
+  const tables={unit_stage_status:"Etapa da obra",client_inspections:"Vistoria do cliente",floor_schedule:"Cronograma",project_members:"Acesso",projects:"Obra"};
+  const fields={technical_escort:"Acomp. Técnico",sale_stage:"Etapa da venda",status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",reinspection_responsible:"Responsável da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
+  const old=l.old_data||{},now=l.new_data||{},ignored=new Set(["version","updated_at","updated_by","field_sources","updated_source"]);
   const changed=[...new Set([...Object.keys(old),...Object.keys(now)])].filter(k=>!ignored.has(k)&&JSON.stringify(old[k])!==JSON.stringify(now[k]));
   const parts=changed.slice(0,4).map(k=>(fields[k]||k)+": "+auditValue(old[k])+" → "+auditValue(now[k]));
   return (tables[l.table_name]||l.table_name)+(l.record_id?" #"+l.record_id:"")+(parts.length?" · "+parts.join(" · "):"");
@@ -4309,7 +4438,8 @@ document.getElementById("condList").addEventListener("input",e=>{const f=e.targe
   condDraft[+row.dataset.condI][f]=e.target.value;if(f==="name")row.querySelector(".project-monogram").textContent=projectInitials(e.target.value);
   if(f==="color")row.querySelector(".project-monogram").style.setProperty("--pc",e.target.value);
   const changed=condChanged();document.getElementById("condSave").disabled=!changed;document.getElementById("condReset").hidden=!changed;document.getElementById("condHint").textContent=changed?"Alterações não salvas":"";});
-document.getElementById("condList").addEventListener("click",e=>{const st=e.target.closest("[data-cond-struct]");if(st){openCondStruct(st.dataset.condStruct);return;}const b=e.target.closest("[data-cond-move]");if(!b)return;const i=+b.closest("[data-cond-i]").dataset.condI,j=i+(+b.dataset.condMove);
+document.getElementById("condList").addEventListener("click",e=>{const st=e.target.closest("[data-cond-struct]");if(st){openCondStruct(st.dataset.condStruct);return;}
+  const ar=e.target.closest("[data-cond-archive]");if(ar){openCondArchive(ar.dataset.condArchive);return;}const b=e.target.closest("[data-cond-move]");if(!b)return;const i=+b.closest("[data-cond-i]").dataset.condI,j=i+(+b.dataset.condMove);
   if(j<0||j>=condDraft.length)return;[condDraft[i],condDraft[j]]=[condDraft[j],condDraft[i]];renderCondConfig();document.querySelector(`[data-cond-i="${j}"] [data-cond-move="${b.dataset.condMove}"]`)?.focus();});
 /* ── CADASTRO DE CONDOMÍNIOS ──
    Apartamentos: mesmo modelo do Alto do Jerivá (8 blocos A–H × Térreo + 1º ao 6º × 8 aptos = 448).
@@ -4353,8 +4483,18 @@ function renderCondPanel(){
   const el=condPanelEl();if(!el)return;const c=condPanel;
   document.getElementById("condNewBtn").hidden=!!c;
   if(!c){el.hidden=true;el.innerHTML="";return;}
-  el.hidden=false;
+  el.hidden=false;el.classList.toggle("cond-danger",c.mode==="archive");
   const err=c.error?`<div class="cond-err" role="alert">${esc(c.error)}</div>`:"";
+  if(c.mode==="archive"){
+    const s=c.summary,ok=condArchiveMatch(c);
+    el.innerHTML=`<div class="cond-new-head"><div><small>Excluir obra</small><b>${esc(c.name)}</b></div><button type="button" class="cond-x" data-cp="close" aria-label="Fechar" title="Fechar">×</button></div>
+      ${!s?'<div class="clif-empty">Carregando dados da obra…</div>':`
+      <div class="cond-del-stats"><div><b>${s.units}</b><span>unidades</span></div><div><b>${s.inspections}</b><span>vistorias com dados</span></div><div><b>${s.members}</b><span>usuários com acesso</span></div></div>
+      <p class="cond-info">A obra some das telas, do seletor de obras e da Visão Geral para todos os usuários. <b>Nada é apagado</b>: unidades, vistorias e históricos ficam guardados e a obra pode ser restaurada em "Obras excluídas". A exclusão fica registrada no log com o seu usuário e o horário.</p>
+      <div class="fld cond-del-confirm"><label>Para confirmar, digite o nome da obra: <b>${esc(c.name)}</b></label><input data-cp-f="confirm" value="${esc(c.confirm)}" autocomplete="off" placeholder="${esc(c.name)}" aria-label="Nome da obra para confirmar"></div>`}
+      ${err}<div class="cond-new-foot"><button type="button" class="btn g" data-cp="close">Cancelar</button><button type="button" class="btn cond-del-go" data-cp="archive" ${!s||c.busy||!ok?"disabled":""}>${c.busy&&s?"Excluindo…":"Excluir obra"}</button></div>`;
+    return;
+  }
   if(c.mode==="struct"){
     el.innerHTML=`<div class="cond-new-head"><div><small>Conjuntos e casas</small><b>${esc(c.name)}</b></div><button type="button" class="cond-x" data-cp="close" aria-label="Fechar" title="Fechar">×</button></div>
       ${c.busy&&!c.groups.length?'<div class="clif-empty">Carregando estrutura…</div>':`<p class="cond-info">Ajuste a quantidade de casas, acrescente ou remova conjuntos. Casas que já têm dados cadastrados (cliente, data ou status) não podem ser removidas.</p>
@@ -4422,10 +4562,58 @@ async function saveCondStruct(){
   toast(`Estrutura salva: ${data?.added||0} casa(s) criada(s), ${data?.removed||0} removida(s), total ${data?.total??"—"}`);
   if(appProject&&String(appProject.id)===String(c.projectId))load(true).catch(()=>{});
 }
+/* ── EXCLUIR OBRA (exclusão lógica) ──
+   A obra é arquivada pela função arquivar_condominio (só administradores da obra, confirmando o nome).
+   Some de todas as telas; os dados ficam guardados e a obra pode ser restaurada em "Obras excluídas". */
+const condNameKey=t=>String(t||"").replace(/\s+/g," ").trim().toLowerCase();
+const condArchiveMatch=c=>!!c.confirm&&condNameKey(c.confirm)===condNameKey(c.name);
+async function openCondArchive(projectId){
+  const p=availableProjects.find(x=>String(x.id)===String(projectId));if(!p)return;
+  if(p.role!=="admin"){toast("Somente administradores podem excluir a obra");return;}
+  if(condChanged()&&!confirm("Há alterações não salvas nas configurações. Continuar mesmo assim?"))return;
+  condPanel={mode:"archive",projectId:p.id,name:p.name,confirm:"",summary:null,error:"",busy:true};renderCondPanel();
+  condPanelEl().scrollIntoView({block:"nearest",behavior:"smooth"});
+  const {data,error}=await supabase.rpc("resumo_exclusao_condominio",{p_project:p.id});
+  if(condPanel?.projectId!==p.id)return;
+  condPanel.busy=false;
+  if(error){condPanel.error=error.message||"Não foi possível carregar os dados da obra.";condPanel.summary={units:"—",inspections:"—",members:"—"};}
+  else condPanel.summary=data||{units:0,inspections:0,members:0};
+  renderCondPanel();condPanelEl().querySelector('[data-cp-f="confirm"]')?.focus();
+}
+async function archiveCondominio(){
+  const c=condPanel;if(!c||c.busy||!condArchiveMatch(c))return;
+  c.busy=true;c.error="";renderCondPanel();
+  const {error}=await supabase.rpc("arquivar_condominio",{p_project:c.projectId,p_confirm_name:c.confirm});
+  if(error){c.busy=false;c.error=error.message||"Não foi possível excluir a obra.";renderCondPanel();return;}
+  closeCondPanel();
+  if(appProject&&String(appProject.id)===String(c.projectId)){stopRealtime();appProject=null;}
+  try{await refreshProjects();}catch(e){}
+  loadCondArchived();toast(`Obra "${c.name}" excluída. Ela pode ser restaurada em Obras excluídas.`);
+}
+async function loadCondArchived(){
+  const el=document.getElementById("condArchived");if(!el||!SUPABASE_READY)return;
+  const {data,error}=await supabase.rpc("listar_condominios_arquivados");
+  if(error||!data?.length){el.hidden=true;el.innerHTML="";return;}
+  el.hidden=false;
+  el.innerHTML=`<div class="cond-arch-h">Obras excluídas <small>(dados guardados · podem ser restauradas)</small></div>`+data.map(p=>`<div class="cond-arch-row">
+    <span class="project-monogram" style="--pc:${esc(p.color||"#1f4a3f")}">${esc(projectInitials(p.name))}</span>
+    <div class="cond-arch-txt"><b>${esc(p.name)}</b><span>${p.units} unidade(s) · excluída em ${esc(new Date(p.archived_at).toLocaleString("pt-BR"))}${p.archived_by_email?" por "+esc(p.archived_by_email):""}</span></div>
+    <button type="button" class="btn g" data-cond-restore="${esc(p.id)}" data-cond-name="${esc(p.name)}">Restaurar</button></div>`).join("");
+}
+document.getElementById("condArchived").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-cond-restore]");if(!b)return;
+  if(!confirm(`Restaurar a obra "${b.dataset.condName}"? Ela volta a aparecer para os usuários com acesso.`))return;
+  b.disabled=true;b.textContent="Restaurando…";
+  const {error}=await supabase.rpc("restaurar_condominio",{p_project:+b.dataset.condRestore});
+  if(error){b.disabled=false;b.textContent="Restaurar";toast(error.message||"Não foi possível restaurar");return;}
+  try{await refreshProjects();}catch(err){}
+  loadCondArchived();toast(`Obra "${b.dataset.condName}" restaurada`);
+});
 document.getElementById("condNewBtn").onclick=openCondNew;
 document.getElementById("condPanel").addEventListener("input",e=>{
   const c=condPanel;if(!c)return;const t=e.target;
   if(c.error){c.error="";condPanelEl().querySelector(".cond-err")?.remove();}
+  if(t.dataset.cpF==="confirm"){c.confirm=t.value;const go=condPanelEl().querySelector('[data-cp="archive"]');if(go)go.disabled=c.busy||!condArchiveMatch(c);return;}
   if(t.dataset.cpF){c[t.dataset.cpF]=t.value;
     if(t.dataset.cpF==="name")condPanelEl().querySelector("[data-cp-mono]").textContent=projectInitials(t.value||"Novo");
     if(t.dataset.cpF==="color"){condPanelEl().querySelector("[data-cp-mono]").style.setProperty("--pc",t.value);condPanelEl().querySelectorAll(".cond-sw").forEach(b=>b.classList.toggle("on",b.dataset.cpColor===t.value));}
@@ -4444,6 +4632,7 @@ document.getElementById("condPanel").addEventListener("click",e=>{
   if(a.dataset.cp==="close")closeCondPanel();
   else if(a.dataset.cp==="create")createCondominio();
   else if(a.dataset.cp==="save-struct")saveCondStruct();
+  else if(a.dataset.cp==="archive")archiveCondominio();
   else if(a.dataset.cp==="add"){const used=new Set(c.groups.map(g=>g.b));const next=COND_LETTERS.find(L=>!used.has(L));if(!next){toast("Todos os conjuntos de A a Z já existem");return;}
     c.groups.push({b:next,n:""});c.groups.sort((x,y)=>x.b.localeCompare(y.b));renderCondPanel();condPanelEl().querySelector(`[data-cond-n="${c.groups.findIndex(g=>g.b===next)}"]`)?.focus();}
 });
@@ -4452,6 +4641,13 @@ document.getElementById("condReset").onclick=resetCondDraft;
 document.getElementById("projectOverview").onclick=openOverview;
 document.getElementById("overviewBack").onclick=closeOverview;
 document.getElementById("ovRefresh").onclick=()=>loadOverview();
+document.getElementById("ovExport").onclick=()=>{
+  if(ovMode!=="lista"||!ovView.length){toast(ovMode!=="lista"?"Mude para Lista para exportar":"Nada para exportar com esses filtros");return;}
+  downloadCsv(`agendamentos-${fileStamp()}.csv`,
+    ["Condomínio","Bloco / Conj.","Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações"],
+    ovView.map(r=>[r.projectName,r.groupLabel,r.ucode,r.cliente,csvDate(r.data),r.hora,r.resp,csvDate(r.rev),r.revResp,CLL[r.code]||"",ACOMP[r.acomp]||"",r.obs]));
+  toast(ovView.length+" agendamento(s) exportado(s)");
+};
 document.getElementById("ovClear").onclick=()=>{ovFilt=OV_EMPTY();renderOvFilters();renderOverview();};
 document.getElementById("ovMode").addEventListener("click",e=>{const b=e.target.closest("[data-ovmode]");if(!b||b.dataset.ovmode===ovMode)return;ovMode=b.dataset.ovmode;renderOvFilters();renderOverview();});
 document.getElementById("ovMore").onclick=()=>{ovFiltOpen=!ovFiltOpen;renderOvFilters();};
