@@ -1131,6 +1131,76 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 }
 .login-theme{position:absolute;top:calc(14px + var(--safe-t));right:calc(14px + var(--safe-r));z-index:5;width:36px;height:36px}
 @media(max-width:720px){.login-theme{position:fixed;top:calc(10px + var(--safe-t));right:calc(10px + var(--safe-r));background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold);backdrop-filter:blur(6px)}}
+/* VISÃO GERAL · filtros compactos e modos Lista/Resumo */
+.ov-fx{padding:10px 12px;margin-bottom:8px}
+.ov-bar{gap:8px}
+.ov-seg{margin:0;flex:0 0 auto;padding:3px;border-radius:10px;gap:2px}
+.ov-seg button{min-height:30px;padding:0 12px;font-size:12.5px;border-radius:8px;flex:0 0 auto}
+.ov-fx .fx-search{flex:1 1 170px;max-width:280px}
+.ov-fx .fx-unit input{width:86px}
+.ov-chips{flex-wrap:wrap;gap:6px 18px}
+.ov-grp{display:flex;align-items:center;gap:8px;min-width:0}
+.ov-fx .fx-lbl{min-width:0}
+.ov-fx.ov-resumo .ov-only-lista{display:none!important}
+.ov-meta{display:flex;align-items:center;gap:10px;margin:0 2px 8px;font-size:11.5px}
+.ov-meta .clif-count{margin:0;font-size:12px;color:var(--ink)}
+.ov-meta .ov-updated{margin-left:auto}
+.ov-refresh{height:30px;width:30px;padding:0}
+.ov-sum-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.ov-sum-k{background:#fff;border:1px solid var(--border);border-left:4px solid #2f9e5b;border-radius:12px;padding:8px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
+.ov-sum-k span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6a7a71}
+.ov-sum-k b{font-size:22px;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.ov-sum-k.rv{border-left-color:#e8842a}.ov-sum-k.rv b{color:#c96a1a}
+.ov-sum-k.tot{border-left-color:#1f4a3f}
+.ov-sum{min-width:560px}
+.ov-sum td.ov-sum-date,.ov-sum td.ov-sum-proj,.ov-sum thead th:nth-child(-n+2){width:1%;white-space:nowrap}
+.ov-sum td.ov-sum-proj{padding-right:18px}
+.ov-pre{font-style:normal}.ov-s{display:none}
+.ov-sum thead th:nth-child(n+4){text-align:right;padding-right:14px}
+.ov-sum td{padding:6px 10px;font-size:12.5px;text-align:left}
+.ov-sum td.ov-n{text-align:right;font-variant-numeric:tabular-nums;width:1%;padding-right:14px}
+.ov-sum-date{vertical-align:top;background:#f4f7f5;border-right:1px solid var(--border);min-width:96px}
+.ov-sum-date b{display:block;font-size:13px;color:var(--ink)}
+.ov-sum-date small{display:block;font-size:11px;color:#6a7a71;font-weight:600}
+.ov-sum-row.is-today .ov-sum-date{background:#e3efff}
+.ov-sum-proj{vertical-align:top}
+.ov-sum-row{cursor:pointer}
+.ov-sum-row:hover td:not(.ov-sum-date):not(.ov-sum-proj),.ov-sum-row:focus td:not(.ov-sum-date):not(.ov-sum-proj){background:#f5f8f6}
+.ov-sum-row:focus{outline:none}
+.ov-sum-local{font-weight:700;color:var(--ink)}
+.ov-n-rv{color:#c96a1a}
+.ov-n-tot{font-weight:700;color:var(--ink)}
+.ov-sum-first td{border-top:2px solid var(--border)}
+.ov-sum-day td{background:#f7f9f7;font-size:11.5px;font-weight:700;color:#52675d;border-bottom:1px solid var(--border)}
+.ov-sum tfoot td{background:#1f4a3f;color:#fff;font-weight:700;padding:8px 10px;font-size:12.5px}
+.ov-sum tfoot td.ov-n{text-align:right;padding-right:14px}
+.ov-sum-note{font-size:12px;color:#6a7a71;margin-top:8px}
+@media(max-width:720px){
+  .ov-fx{padding:8px}
+  .ov-bar{gap:6px}
+  .ov-mode{flex:1 1 38%}.ov-period{flex:1 1 56%}
+  .ov-seg button{flex:1 1 0;padding:0 6px;min-height:32px;font-size:12px}
+  .ov-fx .fx-search{max-width:none;flex:1 1 0}
+  .ov-fx .fx-end{margin-left:auto}
+  .ov-fx .fx-unit input{width:100%}
+  .ov-chips{gap:6px}
+  .ov-grp{flex:1 1 100%}
+  .ov-grp .fx-scroll{flex:1 1 auto}
+  .ov-meta{margin-bottom:6px}
+  .ov-sum-kpis{gap:6px}
+  .ov-sum-k{flex-direction:column;align-items:flex-start;gap:0;padding:6px 9px}
+  .ov-sum-k span{font-size:9.5px;white-space:nowrap}.ov-sum-k b{font-size:18px}
+  .ov-pre,.ov-l{display:none}.ov-s{display:inline}
+  .ov-fx.ov-resumo .fx-adv{display:grid}
+  .ov-fx.ov-resumo .fx-more{display:none}
+  .ov-sum td.ov-sum-proj{padding-right:6px;white-space:normal}
+  .ov-sum{min-width:0}
+  .ov-sum td{padding:5px 6px;font-size:12px}
+  .ov-sum td.ov-n,.ov-sum tfoot td.ov-n{padding-right:8px}
+  .ov-sum thead th{padding:6px;font-size:9px}
+  .ov-sum-date{min-width:74px}
+  .ov-sum .ov-badge{font-size:10.5px;padding:2px 6px;white-space:normal}
+}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--chrome-top)}
@@ -1684,6 +1754,26 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
 @media(max-width:720px){
   :root[data-theme="dark"] .login-theme{background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold)}
 }
+:root[data-theme="dark"] .ov-meta .clif-count{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-k{background:#282828;border:1px solid #414a43;border-left:4px solid #2f9e5b}
+:root[data-theme="dark"] .ov-sum-k span{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-k b{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-k.rv{border-left-color:#e8842a}
+:root[data-theme="dark"] .ov-sum-k.rv b{color:#c96a1a}
+:root[data-theme="dark"] .ov-sum-k.tot{border-left-color:#1f4a3f}
+:root[data-theme="dark"] .ov-sum-date{background:#212623;border-right:1px solid #414a43}
+:root[data-theme="dark"] .ov-sum-date b{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-date small{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-row.is-today .ov-sum-date{background:#1a2129}
+:root[data-theme="dark"] .ov-sum-row:hover td:not(.ov-sum-date):not(.ov-sum-proj),:root[data-theme="dark"] .ov-sum-row:focus td:not(.ov-sum-date):not(.ov-sum-proj){background:#212723}
+:root[data-theme="dark"] .ov-sum-row:focus{outline:none}
+:root[data-theme="dark"] .ov-sum-local{color:#cfd9d7}
+:root[data-theme="dark"] .ov-n-rv{color:#c96a1a}
+:root[data-theme="dark"] .ov-n-tot{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-first td{border-top:2px solid #414a43}
+:root[data-theme="dark"] .ov-sum-day td{background:#222722;color:#abbcb4;border-bottom:1px solid #414a43}
+:root[data-theme="dark"] .ov-sum tfoot td{background:#1f4a3f;color:#fff}
+:root[data-theme="dark"] .ov-sum-note{color:#a0ada6}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -1898,23 +1988,27 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
     <div class="project-body admin-body">
       <div class="imp-launch" id="ovImportBar" hidden><span>Agendamentos do Atendimento</span><button class="btn g" id="ovHistory" type="button">Histórico de importações</button><button class="btn p" id="ovImport" type="button">Atualizar Agendamentos</button></div>
       <div class="ov-cards" id="ovCards"></div>
-      <div class="clif" id="ovFilters">
-        <div class="clif-row ov-toprow">
-          <div class="modetog ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
-          <span class="ov-updated" id="ovUpdated"></span>
-          <span class="clif-count" id="ovCount"></span>
+      <div class="clif fx ov-fx" id="ovFilters">
+        <div class="fx-row fx-main ov-bar">
+          <div class="modetog ov-seg ov-mode" id="ovMode" role="tablist" aria-label="Visualização"><button type="button" role="tab" data-ovmode="lista" class="active">Lista</button><button type="button" role="tab" data-ovmode="resumo">Resumo</button></div>
+          <div class="modetog ov-seg ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
+          <label class="fx-search ov-only-lista" id="ovQWrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="ovQ" placeholder="Buscar cliente" autocomplete="off" aria-label="Buscar cliente"></label>
+          <div class="fx-adv" id="ovAdv">
+            <label class="fx-field"><span>De</span><input type="date" id="ovDtIni" aria-label="Data inicial"></label>
+            <label class="fx-field"><span>Até</span><input type="date" id="ovDtFim" aria-label="Data final"></label>
+            <label class="fx-field fx-unit ov-only-lista"><span>Unid.</span><input type="text" id="ovU" placeholder="A604 ou B35" autocomplete="off" aria-label="Unidade"></label>
+          </div>
+          <div class="fx-end">
+            <button class="fx-btn fx-clear" id="ovClear" type="button" title="Limpar filtros" aria-label="Limpar filtros" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Limpar</button>
+            <button class="fx-btn fx-more" id="ovMore" type="button" aria-expanded="false" aria-controls="ovAdv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>Datas<b class="fx-badge" id="ovBadge" hidden></b></button>
+          </div>
         </div>
-        <div class="clif-row"><span class="clif-lbl">Condomínio</span><div class="clif-chips" id="ovProjects"></div></div>
-        <div class="clif-row"><span class="clif-lbl">Status</span><div class="clif-chips" id="ovStatus"></div></div>
-        <div class="clif-row clif-inputs">
-          <div class="fld"><label for="ovDtIni">Data de</label><input type="date" id="ovDtIni"></div>
-          <div class="fld"><label for="ovDtFim">Até</label><input type="date" id="ovDtFim"></div>
-          <div class="fld clif-q"><label for="ovQ">Cliente</label><input type="text" id="ovQ" placeholder="Nome do cliente..." autocomplete="off"></div>
-          <div class="fld clif-q"><label for="ovU">Unidade</label><input type="text" id="ovU" placeholder="Ex.: A604 ou B35" autocomplete="off"></div>
-          <button class="btn g" id="ovClear" type="button">Limpar filtros</button>
-          <button class="btn g" id="ovRefresh" type="button">Atualizar</button>
+        <div class="fx-row ov-chips">
+          <div class="ov-grp"><span class="fx-lbl">Condomínio</span><div class="fx-scroll" id="ovProjects"></div></div>
+          <div class="ov-grp ov-only-lista"><span class="fx-lbl">Status</span><div class="fx-scroll" id="ovStatus"></div></div>
         </div>
       </div>
+      <div class="ov-meta"><span class="clif-count" id="ovCount"></span><span class="ov-updated" id="ovUpdated"></span><button class="fx-btn ov-refresh" id="ovRefresh" type="button" title="Atualizar dados" aria-label="Atualizar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
       <div id="ovList"></div>
     </div>
   </section>
@@ -2960,7 +3054,8 @@ function openAdminArea(){
 /* ── VISÃO GERAL: agendamentos de todos os condomínios do usuário ──
    Uma única consulta em client_inspections + units (RLS limita aos condomínios liberados). */
 const OV_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b7950b","#7b241c"];
-let ovRows=[],ovView=[],ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};
+const OV_EMPTY=()=>({period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""});
+let ovRows=[],ovView=[],ovMode="lista",ovFiltOpen=false,ovFilt=OV_EMPTY();
 function ovProjects(){return [...availableProjects];}
 function ovColor(projectId){const i=ovProjects().findIndex(p=>String(p.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
 function ovUnit(u){
@@ -2997,13 +3092,19 @@ async function loadOverview(){
 }
 function renderOvFilters(){
   const projects=ovProjects();
-  document.getElementById("ovProjects").innerHTML=`<button class="chip${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL">Todos</button>`+
-    projects.map(p=>`<button class="chip ov-chip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--ov:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
+  document.getElementById("ovProjects").innerHTML=`<button class="fchip fx-all${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL" style="--c:#1f4a3f">Todos</button>`+
+    projects.map(p=>`<button class="fchip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--c:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
   document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na"].map(c=>
-    `<button class="chip${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+    `<button class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+  const fx=document.getElementById("ovFilters");fx.classList.toggle("ov-resumo",ovMode==="resumo");fx.classList.toggle("fx-open",ovFiltOpen);
+  document.querySelectorAll("#ovMode [data-ovmode]").forEach(b=>{const on=b.dataset.ovmode===ovMode;b.classList.toggle("active",on);b.setAttribute("aria-selected",on);});
+  const adv=[ovFilt.dtIni,ovFilt.dtFim,ovMode==="lista"&&ovFilt.u].filter(Boolean).length;
+  const active=adv+(ovFilt.period!=="ALL")+(ovFilt.projects.length>0)+(ovMode==="lista"&&(!!ovFilt.q||ovFilt.status.length>0));
+  document.getElementById("ovClear").hidden=!active;const badge=document.getElementById("ovBadge");badge.textContent=adv;badge.hidden=!adv;
+  document.getElementById("ovMore").setAttribute("aria-expanded",String(ovFiltOpen));
+  [["ovQ",ovFilt.q],["ovU",ovFilt.u],["ovDtIni",ovFilt.dtIni],["ovDtFim",ovFilt.dtFim]].forEach(([id,v])=>document.getElementById(id).closest("label").classList.toggle("on",!!v));
   document.querySelectorAll("#ovPeriod [data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===ovFilt.period));
-  document.getElementById("ovDtIni").value=ovFilt.dtIni;document.getElementById("ovDtFim").value=ovFilt.dtFim;
-  document.getElementById("ovQ").value=ovFilt.q;document.getElementById("ovU").value=ovFilt.u;
+  [["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el.value!==ovFilt[k])el.value=ovFilt[k];});
 }
 function renderOverview(){
   const today=todayISO(),count=f=>ovRows.filter(f).length;
@@ -3016,13 +3117,15 @@ function renderOverview(){
     ["rf","Revistorias finalizadas",count(r=>r.code==="rf"),"fin"],
     ["active","Condomínios ativos",active.size,""]];
   document.getElementById("ovCards").innerHTML=cards.map(([k,l,v,c])=>`<button type="button" class="kbox ov-card ${c}" data-ovcard="${k}"><div class="kl">${l}</div><div class="kv">${v}</div></button>`).join("");
+  // Período, condomínio e datas valem para os dois modos; status, cliente e unidade só para a Lista.
   let rows=ovRows.slice();
   if(ovFilt.period==="today")rows=rows.filter(r=>r.data===today);
   else if(ovFilt.period==="next")rows=rows.filter(r=>r.data&&r.data>=today);
   if(ovFilt.projects.length)rows=rows.filter(r=>ovFilt.projects.includes(String(r.projectId)));
-  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
   if(ovFilt.dtIni)rows=rows.filter(r=>r.data&&r.data>=ovFilt.dtIni);
   if(ovFilt.dtFim)rows=rows.filter(r=>r.data&&r.data<=ovFilt.dtFim);
+  if(ovMode==="resumo"){renderOvSummary(rows,today);return;}
+  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
   const q=ovFilt.q.trim().toLowerCase();if(q)rows=rows.filter(r=>r.cliente.toLowerCase().includes(q));
   const uq=ovFilt.u.trim().toLowerCase().replace(/\s+/g,"");
   if(uq)rows=rows.filter(r=>{const full=(r.b+r.ucode).toLowerCase();return full.startsWith(uq)||r.ucode.toLowerCase()===uq.replace(/^0+(?=\d)/,"")||(!r.casa&&r.ucode.toLowerCase().includes(uq));});
@@ -3055,6 +3158,50 @@ function renderOverview(){
     </tr>`;
   });
   list.innerHTML=h+"</tbody></table></div>";
+}
+/* Resumo: quantitativo por Data + Condomínio + Local (bloco ou conjunto), sem dados individuais.
+   Revistorias = unidades com status "Revistoria"; Vistorias = demais agendamentos do dia. */
+let ovSumView=[];
+function renderOvSummary(rows,today){
+  const dated=rows.filter(r=>r.data),noDate=rows.length-dated.length;
+  const days=new Map();
+  for(const r of dated){
+    if(!days.has(r.data))days.set(r.data,new Map());
+    const k=r.projectId+"|"+r.b,m=days.get(r.data);
+    if(!m.has(k))m.set(k,{date:r.data,projectId:r.projectId,projectName:r.projectName,local:r.groupLabel,b:r.b,v:0,rv:0});
+    const g=m.get(k);if(r.code==="rv")g.rv++;else g.v++;
+  }
+  const order=[...days.keys()].sort();
+  const totV=dated.filter(r=>r.code!=="rv").length,totR=dated.length-totV;
+  document.getElementById("ovCount").textContent=`${order.length} dia(s) · ${[...days.values()].reduce((n,m)=>n+m.size,0)} local(is)`;
+  const list=document.getElementById("ovList");
+  let h=`<div class="ov-sum-kpis"><div class="ov-sum-k"><span><i class="ov-pre">Total de </i>vistorias</span><b>${totV}</b></div><div class="ov-sum-k rv"><span><i class="ov-pre">Total de </i>revistorias</span><b>${totR}</b></div><div class="ov-sum-k tot"><span>Total geral</span><b>${totV+totR}</b></div></div>`;
+  if(!order.length){list.innerHTML=h+'<div class="clif-empty">Nenhuma vistoria com data nesse período.</div>';ovSumView=[];return;}
+  const dayLabel=d=>{const w=new Date(d+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","");return `<b>${fmtDate(d)}</b><small>${d===today?"Hoje":w.charAt(0).toUpperCase()+w.slice(1)}</small>`;};
+  ovSumView=[];
+  h+='<div class="gridscroll"><table class="ctbl ov-sum"><thead><tr><th class="th-cli">Data</th><th class="th-cli">Condomínio</th><th class="th-cli">Local</th><th><span class="ov-l">Vistorias</span><span class="ov-s">Vist.</span></th><th><span class="ov-l">Revistorias</span><span class="ov-s">Rev.</span></th><th>Total</th></tr></thead><tbody>';
+  for(const d of order){
+    const groups=[...days.get(d).values()].sort((x,y)=>x.projectName.localeCompare(y.projectName,"pt-BR")||x.b.localeCompare(y.b,"pt-BR",{numeric:true}));
+    const dv=groups.reduce((n,g)=>n+g.v,0),dr=groups.reduce((n,g)=>n+g.rv,0);
+    const perProject=new Map();groups.forEach(g=>perProject.set(g.projectId,(perProject.get(g.projectId)||0)+1));
+    let lastProject=null;
+    groups.forEach((g,i)=>{
+      const idx=ovSumView.push(g)-1,color=ovColor(g.projectId);
+      h+=`<tr class="ov-sum-row${i===0?" ov-sum-first":""}${d===today?" is-today":""}" data-ovsum="${idx}" tabindex="0" style="--ov:${color}" title="Ver agendamentos de ${esc(g.local)} em ${fmtDate(d)}">`;
+      if(i===0)h+=`<td class="ov-sum-date" rowspan="${groups.length+(groups.length>1?1:0)}">${dayLabel(d)}</td>`;
+      if(g.projectId!==lastProject){lastProject=g.projectId;h+=`<td class="ov-sum-proj" rowspan="${perProject.get(g.projectId)}"><span class="ov-badge"><i></i>${esc(g.projectName)}</span></td>`;}
+      h+=`<td class="ov-sum-local">${esc(g.local)}</td><td class="ov-n">${g.v}</td><td class="ov-n ov-n-rv">${g.rv||"—"}</td><td class="ov-n ov-n-tot">${g.v+g.rv}</td></tr>`;
+    });
+    if(groups.length>1)h+=`<tr class="ov-sum-day"><td colspan="2">Total do dia</td><td class="ov-n">${dv}</td><td class="ov-n ov-n-rv">${dr||"—"}</td><td class="ov-n ov-n-tot">${dv+dr}</td></tr>`;
+  }
+  h+=`</tbody><tfoot><tr><td colspan="3">Total geral</td><td class="ov-n">${totV}</td><td class="ov-n">${totR}</td><td class="ov-n">${totV+totR}</td></tr></tfoot></table></div>`;
+  if(noDate)h+=`<p class="ov-sum-note">${noDate} agendamento(s) sem data definida não entram no resumo.</p>`;
+  list.innerHTML=h;
+}
+function openOvSummaryRow(g){
+  if(!g)return;
+  ovMode="lista";ovFilt={...OV_EMPTY(),projects:[String(g.projectId)],dtIni:g.date,dtFim:g.date,u:g.b};ovFiltOpen=true;
+  renderOvFilters();renderOverview();document.getElementById("ovFilters").scrollIntoView({block:"start",behavior:"smooth"});
 }
 async function openOverviewUnit(r){
   if(!r)return;
@@ -3876,15 +4023,19 @@ document.getElementById("condReset").onclick=resetCondDraft;
 document.getElementById("projectOverview").onclick=openOverview;
 document.getElementById("overviewBack").onclick=closeOverview;
 document.getElementById("ovRefresh").onclick=()=>loadOverview();
-document.getElementById("ovClear").onclick=()=>{ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();};
+document.getElementById("ovClear").onclick=()=>{ovFilt=OV_EMPTY();renderOvFilters();renderOverview();};
+document.getElementById("ovMode").addEventListener("click",e=>{const b=e.target.closest("[data-ovmode]");if(!b||b.dataset.ovmode===ovMode)return;ovMode=b.dataset.ovmode;renderOvFilters();renderOverview();});
+document.getElementById("ovMore").onclick=()=>{ovFiltOpen=!ovFiltOpen;renderOvFilters();};
 document.getElementById("ovPeriod").addEventListener("click",e=>{const b=e.target.closest("[data-period]");if(!b)return;ovFilt.period=b.dataset.period;renderOvFilters();renderOverview();});
 document.getElementById("ovProjects").addEventListener("click",e=>{const b=e.target.closest("[data-ovproj]");if(!b)return;const id=b.dataset.ovproj;
   if(id==="ALL")ovFilt.projects=[];else{const i=ovFilt.projects.indexOf(id);if(i>=0)ovFilt.projects.splice(i,1);else ovFilt.projects.push(id);}renderOvFilters();renderOverview();});
 document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.target.closest("[data-ovstatus]");if(!b)return;const c=b.dataset.ovstatus;
   if(c==="ALL")ovFilt.status=[];else{const i=ovFilt.status.indexOf(c);if(i>=0)ovFilt.status.splice(i,1);else ovFilt.status.push(c);}renderOvFilters();renderOverview();});
-[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOverview();}));
+[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOvFilters();renderOverview();}));
+document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ovsum]");if(r)openOvSummaryRow(ovSumView[+r.dataset.ovsum]);});
+document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ovsum]");if(r){e.preventDefault();openOvSummaryRow(ovSumView[+r.dataset.ovsum]);}});
 document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
-  ovFilt={period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",projects:[],status:k==="rv"?["rv"]:k==="rf"?["rf"]:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();});
+  ovFilt={...OV_EMPTY(),period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",status:k==="rv"?["rv"]:k==="rf"?["rf"]:[]};if(k==="rv"||k==="rf")ovMode="lista";renderOvFilters();renderOverview();});
 document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;

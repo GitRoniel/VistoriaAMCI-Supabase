@@ -126,6 +126,11 @@ assert.match(html, /const IMPORT_COLUMNS=\[/);
 assert.match(html, /supabase\.rpc\("aplicar_importacao_agendamentos"/);
 assert.doesNotMatch(html.slice(html.indexOf("async function onImportFile"), html.indexOf("function impRows")), /supabase\.(rpc|from)\(/, "Selecionar o arquivo não pode gravar no banco.");
 await readFile(resolve(root, "src/xlsx-entry.js"), "utf8");
+// Visão Geral: modos Lista/Resumo, resumo por Data + Condomínio + Local sem dados individuais.
+assert.match(html, /data-ovmode="lista"[^>]*>Lista<\/button><button[^>]*data-ovmode="resumo"/);
+const ovSummary = html.slice(html.indexOf("function renderOvSummary"), html.indexOf("function openOvSummaryRow"));
+assert.doesNotMatch(ovSummary, /\.cliente|\.hora\b|\.resp\b/, "O Resumo não pode exibir cliente, horário ou responsável.");
+assert.match(ovSummary, /r\.code==="rv"/);
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 
