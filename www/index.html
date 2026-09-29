@@ -1218,6 +1218,12 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .ov-sum-wrap .ov-sum .ov-badge{font-size:11px;padding:2px 8px}
 .ov-sum-wrap .ov-sum-day td{padding:3px 10px;font-size:11px}
 .ov-sum-wrap .ov-sum-note{text-align:center}
+/* Data, Condomínio e Local centralizados; a data fica no centro do bloco do dia */
+.ov-sum-wrap .ov-sum thead th:nth-child(-n+3){text-align:center}
+.ov-sum-wrap .ov-sum td.ov-sum-date,.ov-sum-wrap .ov-sum td.ov-sum-proj,.ov-sum-wrap .ov-sum td.ov-sum-local{text-align:center}
+.ov-sum-wrap .ov-sum td.ov-sum-date{vertical-align:middle}
+.ov-sum-wrap .ov-sum-day td:first-child{text-align:center}
+.ov-sum-wrap .ov-sum tfoot td:first-child{text-align:center}
 @media(max-width:720px){
   .ov-sum-wrap .ov-sum td{padding:4px 6px;font-size:12px}
   .ov-sum-wrap .ov-sum td.ov-n,.ov-sum-wrap .ov-sum thead th:nth-child(n+4){width:auto;min-width:42px;padding:4px}
