@@ -24,7 +24,10 @@ assert.ok(html.includes('id="btnProjectSwitch"'), "Ação para trocar de empreen
 assert.ok(html.includes("Acompanhamento da obra, vistorias dos clientes e mantenha toda a equipe trabalhando com informações atualizadas."), "Texto solicitado para o login não encontrado.");
 assert.ok(!html.includes('<span class="login-kicker">Alto do Jerivá Residencial</span>'), "O empreendimento ainda aparece indevidamente no login.");
 assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do Alto Mangueiral não encontrada no login.");
-assert.ok(html.includes("Aprovações e Revistorias por Bloco"), "Progresso por bloco não encontrado no resumo.");
+assert.ok(html.includes("Aprovações e Revistorias por ${LAYOUT.group}"), "Progresso por bloco/conjunto não encontrado no resumo.");
+assert.ok(html.includes("alto-do-buriti") && html.includes("houseLayout"), "Módulo do Alto do Buriti não encontrado.");
+assert.ok(html.includes("units!inner(project_id)"), "Consultas precisam ficar restritas ao condomínio selecionado.");
+assert.ok(!html.includes("fonts.googleapis.com/css2?family=Geist"), "A fonte do projeto deve ser a do sistema (SF Pro).");
 assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");
 assert.ok(!html.includes('data-view="obra"'), "A aba Vistoria · Obra ainda aparece no painel.");
 assert.ok(html.includes("Aprovações de Acesso"), "Página de aprovações de acesso não encontrada.");
