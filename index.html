@@ -1113,6 +1113,7 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .imp-cf-box p{font-size:13.5px;line-height:1.55;color:#37564a}
 .imp-cf-box .imp-actions{justify-content:flex-end}
 .imp-done-ico{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#e3f4ea;color:#1d6b3e;font-size:24px;font-weight:700}
+.imp-done-ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .imp-done p{font-size:13.5px;color:#37564a}
 .imp-done .imp-kpis{margin:6px 0}
 @media(max-width:960px){.imp-head{grid-template-columns:1fr}.imp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -1128,6 +1129,8 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
   .imp-foot{margin:10px 0 0}.imp-foot-txt{flex-basis:100%}.imp-foot .btn{flex:1 1 0}
   .imp-busy,.imp-error,.imp-done{padding:24px 8px}
 }
+.login-theme{position:absolute;top:calc(14px + var(--safe-t));right:calc(14px + var(--safe-r));z-index:5;width:36px;height:36px}
+@media(max-width:720px){.login-theme{position:fixed;top:calc(10px + var(--safe-t));right:calc(10px + var(--safe-r));background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold);backdrop-filter:blur(6px)}}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--chrome-top)}
@@ -1676,7 +1679,11 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
 :root[data-theme="dark"] .imp-cf-box b{color:#cfd9d7}
 :root[data-theme="dark"] .imp-cf-box p{color:#bac9c3}
 :root[data-theme="dark"] .imp-done-ico{background:#19251e;color:#77daa1}
+:root[data-theme="dark"] .imp-done-ico svg{fill:none;stroke:currentColor}
 :root[data-theme="dark"] .imp-done p{color:#bac9c3}
+@media(max-width:720px){
+  :root[data-theme="dark"] .login-theme{background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold)}
+}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -1787,6 +1794,7 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
 <div class="toast" id="toast"></div>
 
 <div class="login-ov open" id="loginOv" aria-live="polite">
+  <button class="icon-btn login-theme" id="loginTheme" type="button" data-theme-toggle title="Usar tema escuro" aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
   <div class="login-shell">
     <section class="login-brand-panel" aria-label="Alto Mangueiral e Engertal">
       <div class="login-logos">
@@ -1884,10 +1892,11 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="overviewBack" type="button">← Voltar às obras</button>
+        <button class="project-logout project-theme" id="overviewTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
       </div>
     </div>
     <div class="project-body admin-body">
-      <div class="imp-launch" id="ovImportBar" hidden><span>Agendamentos do Atendimento</span><button class="btn g" id="ovHistory" type="button">Histórico de importações</button><button class="btn p" id="ovImport" type="button">📥 Atualizar Agendamentos</button></div>
+      <div class="imp-launch" id="ovImportBar" hidden><span>Agendamentos do Atendimento</span><button class="btn g" id="ovHistory" type="button">Histórico de importações</button><button class="btn p" id="ovImport" type="button">Atualizar Agendamentos</button></div>
       <div class="ov-cards" id="ovCards"></div>
       <div class="clif" id="ovFilters">
         <div class="clif-row ov-toprow">
@@ -1926,6 +1935,7 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="importBack" type="button">← Voltar à Visão Geral</button>
+        <button class="project-logout project-theme" id="importTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
       </div>
     </div>
     <div class="project-body admin-body" id="impBody"></div>
@@ -1955,6 +1965,7 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="adminBack" type="button">← Voltar às obras</button>
+        <button class="project-logout project-theme" id="adminTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
       </div>
     </div>
     <div class="project-body admin-body">
@@ -3071,19 +3082,16 @@ const IMPORT_COLUMNS=[
   {key:"cliente",label:"Cliente",required:true,aliases:["ds nome cliente","nome cliente","nome do cliente","cliente","proprietario"]},
   {key:"data",label:"Data da vistoria",required:true,aliases:["data da vistoria","data vistoria","dt vistoria","data do agendamento","data"]},
   {key:"hora",label:"Horário",required:true,aliases:["horario do agendamento","horario da vistoria","horario","hora"]},
-  {key:"status",label:"Status da vistoria",required:false,aliases:["status da vistoria","status do agendamento","status","situacao"]},
-  {key:"responsavel",label:"Responsável",required:false,aliases:["responsavel","vistoriador","responsavel pela vistoria"]},
-  {key:"obs",label:"Observação",required:false,aliases:["observacao","observacoes","obs"]},
-  {key:"etapa",label:"Etapa do atendimento",required:false,aliases:["ds etapa categoria atendimento","etapa do atendimento","etapa"]}];
+  {key:"status",label:"Status da vistoria",required:false,aliases:["status da vistoria","status do agendamento","status","situacao"]}];
+// Colunas do Atendimento ao Cliente que NUNCA alimentam o sistema (nem são lidas):
+// Responsável pelo agendamento, Observação e Etapa de Categoria Atendimento.
+// O responsável pela vistoria e as observações continuam sendo definidos só no site.
 // Campos do agendamento que a planilha pode preencher ("agenda" = data + horário juntos).
 const IMPORT_FIELDS=[
   {key:"cliente",label:"Cliente",db:"client_name"},
   {key:"agenda",label:"Data/horário"},
-  {key:"status",label:"Status",db:"status"},
-  {key:"responsavel",label:"Responsável",db:"responsible"},
-  {key:"obs",label:"Observação",db:"notes"},
-  {key:"etapa",label:"Etapa",db:"sale_stage"}];
-const IMP_DB_LABEL={client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",status:"Status",responsible:"Responsável",notes:"Observação",sale_stage:"Etapa"};
+  {key:"status",label:"Status",db:"status"}];
+const IMP_DB_LABEL={client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",status:"Status"};
 const IMP_ACTION={preenchido:"Preenchido",usado_planilha:"Usado da planilha",mantido_sistema:"Mantido do sistema",conflito_pendente:"Conflito não resolvido",nao_encontrado:"Não encontrado",ignorado:"Ignorado",alterado_no_sistema:"Alterado no sistema (pulado)"};
 const IMP_TABS=[["all","Todos"],["update","Atualizações"],["same","Sem alterações"],["new","Novos dados"],["conflict","Conflitos"],["missing","Não encontrados"]];
 
@@ -3179,7 +3187,7 @@ function impUnitCode(u){
 }
 
 async function impLoadSystem(projectIds){
-  const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,notes,sale_stage,field_sources,units!inner(id,project_id,bloco,pav,apto,kind)",q=>q.in("units.project_id",projectIds));
+  const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,field_sources,units!inner(id,project_id,bloco,pav,apto,kind)",q=>q.in("units.project_id",projectIds));
   const byKey=new Map(),blocks=new Map(),byUnit=new Map();
   for(const r of rows){const u=r.units||{};if(!u.project_id)continue;
     const pid=String(u.project_id),bloco=_blk(u.bloco);
@@ -3220,9 +3228,6 @@ function impCompare(sys,sheet){
     else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur:sys.status,next});
     else items.push({key:"status",label:"Status",kind:"conflict",cur:sys.status,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:next}]});
   }
-  text("responsavel","Responsável","responsible",sheet.responsavel);
-  text("obs","Observação","notes",sheet.obs);
-  text("etapa","Etapa","sale_stage",sheet.etapa);
   return items;
 }
 
@@ -3239,7 +3244,7 @@ async function impAnalyze(file,sheets){
     if(!rawProj&&!rawUnit)return;
     const d=impParseDate(get(row,"data")),h=impParseTime(get(row,"hora")),st=impStatusCode(get(row,"status"));
     const sheet={cliente:impClean(get(row,"cliente")),data:d.value||"",dataInvalid:d.invalid||"",hora:h.value||"",horaInvalid:h.invalid||"",
-      status:st||"",statusInvalid:st===null?impCell(get(row,"status")):"",responsavel:impClean(get(row,"responsavel")),obs:impClean(get(row,"obs")),etapa:impClean(get(row,"etapa"))};
+      status:st||"",statusInvalid:st===null?impCell(get(row,"status")):""};
     const rec={row:rowNum,rawProj,rawUnit,sheet,cliente:sheet.cliente,items:[],warnings:[]};
     const project=matchProject(rawProj);
     if(!rawProj){rec.cls="missing";rec.error="Condomínio não informado na planilha";}
@@ -3287,7 +3292,7 @@ async function impAnalyze(file,sheets){
   // Conflito de agenda: mesmo responsável em duas unidades na mesma data/horário (aviso).
   const slots=new Map();
   for(const rec of records){if(!rec.unitId||rec.error)continue;
-    const c=rec.current,d=rec.sheet.data||dstr(c.inspection_date),h=rec.sheet.hora||(c.inspection_time||"").slice(0,5),resp=impCmp(rec.sheet.responsavel||c.responsible);
+    const c=rec.current,d=rec.sheet.data||dstr(c.inspection_date),h=rec.sheet.hora||(c.inspection_time||"").slice(0,5),resp=impCmp(c.responsible);
     if(!d||!h||!resp)continue;const k=d+"|"+h+"|"+resp;if(!slots.has(k))slots.set(k,[]);slots.get(k).push(rec);}
   for(const list of slots.values())if(list.length>1)list.forEach(r=>r.warnings.push(`Mesmo responsável em ${list.length} vistorias no mesmo dia e horário (${list.filter(x=>x!==r).map(x=>x.label).join(", ")})`));
   // Unidades do sistema ausentes na planilha: só informadas, nunca alteradas.
@@ -3369,11 +3374,11 @@ function impRows(st){
 }
 function impActionCell(st,r,it,i){
   if(r.cls==="notinsheet")return '<span class="imp-tag y">Não encontrada na planilha</span>';
-  if(r.error)return `<span class="imp-tag r">🔴 ${esc(r.error)}</span>`;
-  if(r.blocked)return `<span class="imp-tag r">🔴 ${esc(r.blocked)}</span>`;
+  if(r.error)return `<span class="imp-tag r">${esc(r.error)}</span>`;
+  if(r.blocked)return `<span class="imp-tag r">${esc(r.blocked)}</span>`;
   if(r.dup||!it)return '<span class="imp-tag y">Sem alteração</span>';
   if(it.kind==="same")return '<span class="imp-tag y">Sem alteração</span>';
-  if(it.kind==="fill")return `<span class="imp-tag ${r.cls==="new"?"b":"g"}">${r.cls==="new"?"🔵 Novo dado":"🟢 Preencher"}</span>`;
+  if(it.kind==="fill")return `<span class="imp-tag ${r.cls==="new"?"b":"g"}">${r.cls==="new"?"Novo dado":"Preencher"}</span>`;
   if(it.kind==="invalid")return `<span class="imp-tag n">Ignorado · ${esc(it.message)}</span>`;
   const k=impDecisionKey(r,i),d=st.decisions.get(k);
   return `<div class="imp-dec" role="radiogroup" aria-label="Decisão do conflito">${it.note?`<small>${esc(it.note)}</small>`:""}<button type="button" class="${d==="keep"?"on":""}" data-dec="${k}" data-v="keep" aria-pressed="${d==="keep"}">Manter sistema</button><button type="button" class="${d==="sheet"?"on":""}" data-dec="${k}" data-v="sheet" aria-pressed="${d==="sheet"}">Usar planilha</button></div>`;
@@ -3387,11 +3392,11 @@ function renderImportPreview(){
   let h=`<div class="imp-head">
     <div class="imp-file"><span>Arquivo</span><b>${esc(st.file)}</b><small>${esc(projNames||"Nenhum condomínio identificado")} · ${s.total} linha(s) analisada(s)</small></div>
     <div class="imp-kpis">
-      <div class="imp-kpi g"><b>${s.updated}</b><span>🟢 Atualizações</span></div>
-      <div class="imp-kpi y"><b>${s.unchanged}</b><span>🟡 Sem alterações</span></div>
-      <div class="imp-kpi b"><b>${s.new}</b><span>🔵 Novos dados</span></div>
-      <div class="imp-kpi r"><b>${s.conflictRecords}</b><span>🔴 Conflitos${s.conflicts?` · ${s.resolved}/${s.conflicts} campo(s) decidido(s)`:""}</span></div>
-      <div class="imp-kpi n"><b>${s.notFound}</b><span>⚠️ Não encontrados</span></div>
+      <div class="imp-kpi g"><b>${s.updated}</b><span>Atualizações</span></div>
+      <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alterações</span></div>
+      <div class="imp-kpi b"><b>${s.new}</b><span>Novos dados</span></div>
+      <div class="imp-kpi r"><b>${s.conflictRecords}</b><span>Conflitos${s.conflicts?` · ${s.resolved}/${s.conflicts} campo(s) decidido(s)`:""}</span></div>
+      <div class="imp-kpi n"><b>${s.notFound}</b><span>Não encontrados</span></div>
     </div></div>
   <div class="imp-bar">
     <div class="modetog imp-tabs" role="tablist">${IMP_TABS.map(([k,l])=>`<button type="button" role="tab" data-imptab="${k}" class="${st.tab===k?"active":""}" aria-selected="${st.tab===k}">${l}<small>${tabCount[k]}</small></button>`).join("")}</div>
@@ -3399,12 +3404,12 @@ function renderImportPreview(){
     <label class="fx-search imp-q">${FX_ICON.search}<input type="search" id="impQ" placeholder="Buscar unidade ou cliente" value="${esc(st.q)}" autocomplete="off" aria-label="Buscar unidade ou cliente"></label>
     ${st.tab==="conflict"&&s.conflicts?`<div class="imp-bulk"><button type="button" class="btn g" data-bulk="keep">Manter sistema${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button><button type="button" class="btn g" data-bulk="sheet">Usar planilha${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button></div>`:""}
   </div>`;
-  if(st.tab==="missing"&&s.notInSheet)h+=`<p class="imp-note">🟡 ${s.notInSheet} unidade(s) do sistema não aparecem na planilha. Elas não serão excluídas nem alteradas.</p>`;
+  if(st.tab==="missing"&&s.notInSheet)h+=`<p class="imp-note">${s.notInSheet} unidade(s) do sistema não aparecem na planilha. Elas não serão excluídas nem alteradas.</p>`;
   if(!rows.length)h+='<div class="clif-empty">Nenhum registro nesta aba.</div>';
   else{
     h+='<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Condomínio</th><th>Unidade</th><th class="th-cli">Cliente</th><th>Campo</th><th>Atual</th><th>Planilha</th><th>Ação</th></tr></thead><tbody>';
     shown.forEach(({r,it,i})=>{
-      const warn=r.warnings.length?`<div class="imp-warn">⚠️ ${r.warnings.map(esc).join("<br>⚠️ ")}</div>`:"";
+      const warn=r.warnings.length?`<div class="imp-warn">${r.warnings.map(w=>"<span>"+esc(w)+"</span>").join("")}</div>`:"";
       const cur=it?(it.cur?esc(it.cur):'<span class="imp-empty">vazio</span>')+(it.kind==="conflict"&&it.source&&it.source!=="—"?` <span class="imp-src" title="Origem do valor no sistema">${esc(it.source)}</span>`:""):"—";
       h+=`<tr class="imp-${r.cls}${it?" k-"+it.kind:""}">
         <td>${esc(r.projectName||r.rawProj||"—")}</td>
@@ -3452,14 +3457,14 @@ function renderImportReport(){
   const {summary:s,applied,skipped,records,import_id}=impState.result;
   impSetTitle("Atualizar agendamentos","Importação concluída");
   impBody(`<div class="imp-done">
-    <div class="imp-done-ico">✓</div>
+    <div class="imp-done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
     <p><b>${s.total}</b> registros analisados · arquivo <b>${esc(impState.file)}</b></p>
     <div class="imp-kpis">
-      <div class="imp-kpi g"><b>${records}</b><span>🟢 Unidades atualizadas</span></div>
-      <div class="imp-kpi y"><b>${s.unchanged}</b><span>🟡 Sem alteração</span></div>
-      <div class="imp-kpi b"><b>${applied}</b><span>🔵 Campos preenchidos</span></div>
-      <div class="imp-kpi r"><b>${s.resolved}</b><span>🔴 Conflitos resolvidos${s.pending?` · ${s.pending} pendente(s)`:""}</span></div>
-      <div class="imp-kpi n"><b>${s.notFound}</b><span>⚠️ Unidades não encontradas</span></div>
+      <div class="imp-kpi g"><b>${records}</b><span>Unidades atualizadas</span></div>
+      <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alteração</span></div>
+      <div class="imp-kpi b"><b>${applied}</b><span>Campos preenchidos</span></div>
+      <div class="imp-kpi r"><b>${s.resolved}</b><span>Conflitos resolvidos${s.pending?` · ${s.pending} pendente(s)`:""}</span></div>
+      <div class="imp-kpi n"><b>${s.notFound}</b><span>Unidades não encontradas</span></div>
     </div>
     ${skipped?`<p class="imp-pend">${skipped} campo(s) foram alterados no sistema durante a revisão e não foram sobrescritos.</p>`:""}
     <div class="imp-actions"><button type="button" class="btn g" data-imp="details" data-id="${import_id}">Ver detalhes da importação</button><button type="button" class="btn p" data-imp="close">Concluir</button></div>

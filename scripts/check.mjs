@@ -112,7 +112,16 @@ assert.match(importMigration, /private\.is_project_admin\(p\.id\)/, "RPC precisa
 assert.match(importMigration, /coalesce\(c ->> 'new', ''\) = ''/, "A importação não pode apagar valores.");
 assert.match(importMigration, /alterado_no_sistema/, "Campo alterado depois da prévia não pode ser sobrescrito.");
 assert.match(importMigration, /revoke all on function public\.aplicar_importacao_agendamentos\(text, jsonb, jsonb, jsonb\) from public, anon;/);
-assert.match(html, /id="ovImport"[^>]*>📥 Atualizar Agendamentos</);
+assert.match(html, /id="ovImport"[^>]*>Atualizar Agendamentos</);
+const importUi = html.slice(html.indexOf("/* ── IMPORTAÇÃO DE AGENDAMENTOS"), html.indexOf("/* ── CONFIGURAÇÕES ── */"));
+assert.doesNotMatch(importUi, /[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u, "Sem emojis na importação.");
+const importFieldsUi = importUi.slice(importUi.indexOf("const IMPORT_COLUMNS"), importUi.indexOf("const IMP_ACTION"));
+assert.doesNotMatch(importFieldsUi, /db:"(responsible|notes|sale_stage)"|key:"(responsavel|obs|etapa)"/, "Responsável, Observação e Etapa da planilha não podem ser importados.");
+assert.doesNotMatch(importUi, /text\("(responsavel|obs|etapa)"/, "Responsável, Observação e Etapa da planilha não podem ser comparados/importados.");
+const importFields = await readFile(resolve(root, "supabase/migrations/20260929033637_importacao_campos_atendimento.sql"), "utf8");
+assert.match(importFields, /allowed text\[\] := array\['client_name', 'inspection_date', 'inspection_time', 'status'\];/);
+assert.doesNotMatch(importFields, /(responsible|notes|sale_stage) = v_rec/, "A função não pode gravar responsável, observação ou etapa.");
+assert.ok((html.match(/data-theme-toggle/g) || []).length >= 6, "Botão de tema em todas as telas.");
 assert.match(html, /const IMPORT_COLUMNS=\[/);
 assert.match(html, /supabase\.rpc\("aplicar_importacao_agendamentos"/);
 assert.doesNotMatch(html.slice(html.indexOf("async function onImportFile"), html.indexOf("function impRows")), /supabase\.(rpc|from)\(/, "Selecionar o arquivo não pode gravar no banco.");
