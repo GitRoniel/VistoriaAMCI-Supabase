@@ -4002,7 +4002,9 @@ async function doSignup(){
       setAuthFeedback("signupFeedback","Este e-mail já possui cadastro. Use a aba Entrar; se o acesso ainda não foi liberado, aguarde a aprovação de um administrador.","info");return;
     }
     setAuthFeedback("signupFeedback","Cadastro realizado com sucesso. Aguarde a liberação de acesso por um administrador."+(data.session?"":" Se receber um e-mail de confirmação, clique no link para validar seu endereço."),"success");
-  }catch(e){const msg=String(e?.message||"");setAuthFeedback("signupFeedback",msg.toLowerCase().includes("rate")?"Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.":"Não foi possível concluir o cadastro. Confira os dados e tente novamente.");}
+  }catch(e){const msg=String(e?.message||"");const low=msg.toLowerCase();
+    // Falha no envio do e-mail de confirmação (SMTP): o Supabase desfaz o cadastro, então os dados não são o problema.
+    setAuthFeedback("signupFeedback",low.includes("rate")?"Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.":/sending|send|email|smtp|mail/.test(low)&&!/invalid|already|registered/.test(low)?"Não foi possível enviar o e-mail de confirmação agora. O cadastro não foi concluído; tente novamente mais tarde ou avise o administrador.":"Não foi possível concluir o cadastro. Confira os dados e tente novamente.");}
   finally{setAuthBusy(btn,false,"Solicitar acesso");}
 }
 async function afterLogin(){
