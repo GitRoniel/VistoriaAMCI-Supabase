@@ -107,3 +107,12 @@ Em **Configurações › Configuração de Condomínio** (administradores):
 - **Nomes na planilha de Vendas:** outros nomes do condomínio usados na planilha (comparados sem acento/maiúsculas). A importação vincula as linhas pelo nome do condomínio e lista o que não for encontrado.
 
 Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funções `criar_condominio` e `atualizar_estrutura_condominio` (transação única, só administradores).
+
+## Esqueci minha senha e Manter conectado
+
+- **Esqueci minha senha** (tela de login): o usuário informa o e-mail e recebe um **código de 6 dígitos**. Depois digita o código, a nova senha (mínimo de 8 caracteres) e a confirmação. A mensagem é sempre a mesma, exista ou não o e-mail, para não revelar quem tem cadastro. Depois da troca, todas as sessões abertas são encerradas e o usuário entra de novo com a nova senha. As senhas ficam só no Supabase Auth, com hash; nada é salvo em tabela própria nem em planilha.
+- **Manter conectado** (vem marcado): a sessão fica salva no aparelho por até 30 dias. Desmarcado, ela dura só enquanto a aba ou o app estiver aberto. **Sair** encerra apenas a sessão daquele aparelho.
+- Configuração no painel do Supabase (Authentication):
+  1. **Emails → Reset Password**: use `{{ .Token }}` no corpo (o código) em vez do link `{{ .ConfirmationURL }}`.
+  2. **Providers/Email → Email OTP Expiration**: 1800 segundos (30 minutos).
+  3. **Emails → SMTP Settings**: configure um SMTP próprio. Sem ele, o Supabase só entrega e-mails para membros da equipe do projeto, com limite baixo por hora.
