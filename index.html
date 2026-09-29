@@ -18,7 +18,7 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%}
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
   --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','SF Pro','Helvetica Neue','Segoe UI',Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;
+body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;
   min-height:100dvh;padding-bottom:calc(64px + var(--safe-b));overflow-x:hidden}
 body.auth-locked{overflow:hidden;padding-bottom:0}
 body.auth-locked>.header,body.auth-locked>.main,body.auth-locked>.botnav,body.auth-locked>.pop,body.auth-locked>.toast{visibility:hidden;pointer-events:none;user-select:none}
@@ -211,7 +211,7 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 .fld input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;color:var(--text)}
 .fld input:focus{outline:none;border-color:var(--fern);box-shadow:0 0 0 2px rgba(107,128,64,.14)}
 pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-size:11px;line-height:1.5;overflow:auto;max-height:230px;
-  font-family:ui-monospace,Menlo,monospace;margin:6px 0}
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;margin:6px 0}
 .brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .btn{padding:10px 15px;border-radius:8px;font-weight:800;font-size:12px;letter-spacing:.3px;transition:.14s;display:inline-flex;gap:6px;align-items:center}
 .btn.p{background:var(--moss);color:#fff} .btn.p:hover{background:#163028}
@@ -671,11 +671,11 @@ body.admin-open>.toast{visibility:visible;z-index:260}
 /* MAPA DE CASAS (Alto do Buriti): conjuntos nas linhas, casas nas colunas */
 table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .mx.casas th.corner{border-radius:8px;width:54px;min-width:54px}
-.mx.casas th.casah{background:#f1f5f2;color:#52675d;font-size:9px;font-weight:800;min-width:22px;padding:5px 0;text-align:center;border-radius:5px;font-variant-numeric:tabular-nums}
+.mx.casas th.casah{background:#f1f5f2;color:#52675d;font-size:10px;font-weight:800;min-width:30px;padding:5px 0;text-align:center;border-radius:5px;font-variant-numeric:tabular-nums}
 .mx.casas td.pavh{font-size:12px;font-weight:900;border-radius:7px;border-right:none;width:54px;min-width:54px}
 .mx.casas td.casa-cell{padding:0}
 .mx.casas td.casa-void{background:transparent}
-.mx.casas .apt{width:22px;height:24px;aspect-ratio:auto;font-size:9.5px;border-radius:5px;padding:0}
+.mx.casas .apt{width:30px;min-width:30px;height:28px;aspect-ratio:auto;font-size:10.5px;border-radius:6px;padding:0}
 .mx.casas .apt.pcd::after{top:1px;right:1px;width:5px;height:5px}
 .casa-single{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
 .casa-single-head{font-size:12px;font-weight:800;color:#37564a;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
@@ -691,7 +691,7 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 @media(max-width:720px){.casa-wrap{grid-template-columns:repeat(auto-fill,minmax(42px,1fr))}}
 
 /* POPUP DA VISTORIA DO CLIENTE */
-.pop.pp{width:380px;min-width:0;max-width:calc(100vw - 16px);max-height:min(680px,calc(100vh - 16px));padding:0;border-radius:18px;overflow:hidden;display:none;flex-direction:column;outline:none;box-shadow:0 24px 60px rgba(9,24,18,.3),0 0 0 1px rgba(31,61,56,.06)}
+.pop.pp{width:600px;min-width:0;max-width:calc(100vw - 16px);max-height:min(680px,calc(100vh - 16px));padding:0;border-radius:18px;overflow:hidden;display:none;flex-direction:column;outline:none;box-shadow:0 24px 60px rgba(9,24,18,.3),0 0 0 1px rgba(31,61,56,.06)}
 .pop.pp.open{display:flex}
 .pp-head{display:flex;align-items:center;gap:10px;padding:14px 14px 12px 18px;background:linear-gradient(145deg,#173a32,#1f4a3f);color:#fff;flex:0 0 auto}
 .pp-title{flex:1;min-width:0}
@@ -748,7 +748,8 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .pop.pp.sheet .pp-body{padding-bottom:calc(16px + var(--safe-b))}
 .pop.pp.sheet .pp-actions{bottom:calc(-16px - var(--safe-b));padding-bottom:calc(12px + var(--safe-b));margin-bottom:calc(-16px - var(--safe-b))}
 @keyframes ppsheet{from{transform:translateY(40px);opacity:.4}}
-@media(max-width:380px){.pp-form{grid-template-columns:1fr}.pp-status{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.pp-form{grid-template-columns:1fr}}
+@media(max-width:380px){.pp-status{grid-template-columns:1fr 1fr}}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -1407,7 +1408,7 @@ function printCliList(){
   let body=`<!doctype html><html><head><meta charset="utf-8"><title>Vistoria Cliente — Lista</title><style>
     @page{margin:10mm}
     *{box-sizing:border-box}
-    body{font-family:Arial,Helvetica,sans-serif;color:#12241a;margin:0;padding:0}
+    body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;color:#12241a;margin:0;padding:0}
     h1{font-size:14px;margin:0 0 2px}
     .sub{font-size:9.5px;color:#666;margin-bottom:9px}
     table{width:100%;border-collapse:collapse;font-size:10px}
@@ -1517,7 +1518,7 @@ function renderCliPop(){
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
   const showRev=cur==="rv"||cliDraftValue("data_revistoria");
-  const dateField=(field,label)=>`<label class="pp-f pp-full"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${dis}><button type="button" class="pp-mini" data-today="${field}" ${dis}>Hoje</button></span></label>`;
+  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${dis}><button type="button" class="pp-mini" data-today="${field}" ${dis}>Hoje</button></span></label>`;
   pop.innerHTML=`
     <div class="pp-head">
       <div class="pp-title"><small>${kicker}</small><strong>${name}</strong></div>
@@ -1534,7 +1535,7 @@ function renderCliPop(){
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
-        <label class="pp-f pp-full"><span>Horário</span><input type="time" name="horario_vistoria" step="900" value="${val("horario_vistoria")}" ${dis}></label>
+        <label class="pp-f"><span>Horário</span><input type="time" name="horario_vistoria" step="900" value="${val("horario_vistoria")}" ${dis}></label>
         <div class="pp-times pp-full" aria-label="Horários rápidos">${TIME_PRESETS.map(t=>`<button type="button" class="pp-chip${cliDraftValue("horario_vistoria")===t?" sel":""}" data-time="${t}" ${dis}>${t}</button>`).join("")}</div>
         <label class="pp-f pp-full"><span>Responsável pela vistoria</span><input name="responsavel" list="ppRespList" value="${val("responsavel")}" placeholder="Nome do responsável" autocomplete="off" ${dis}><datalist id="ppRespList">${responsaveis.map(r=>`<option value="${esc(r)}"></option>`).join("")}</datalist></label>
         ${showRev?dateField("data_revistoria","Data da revistoria (combinar c/ cliente)"):""}
