@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Gestão de Obras · Vistorias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%}
@@ -18,11 +21,13 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%}
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
   --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
 }
-body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;
+body{font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility;font-kerning:normal;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;
   min-height:100dvh;padding-bottom:calc(64px + var(--safe-b));overflow-x:hidden}
 body.auth-locked{overflow:hidden;padding-bottom:0}
 body.auth-locked>.header,body.auth-locked>.main,body.auth-locked>.botnav,body.auth-locked>.pop,body.auth-locked>.toast{visibility:hidden;pointer-events:none;user-select:none}
 button,input,select,textarea{font-family:inherit}
+/* iOS (iPhone/iPad): fonte nativa do sistema (SF Pro). Desktop e Android usam Inter. */
+@supports (-webkit-touch-callout:none){body{font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif}}
 b,strong{font-weight:700}
 button{cursor:pointer;border:none;background:none}
 ::selection{background:var(--lioness);color:#fff}
@@ -54,7 +59,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── DESKTOP TABS ── */
 .tabs{max-width:1600px;margin:0 auto;padding:8px 16px 0;display:flex;gap:6px}
-.tab{padding:9px 18px;border-radius:8px 8px 0 0;font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+.tab{padding:9px 18px;border-radius:8px 8px 0 0;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
   color:rgba(255,255,255,.55);background:rgba(255,255,255,.06);display:flex;align-items:center;gap:8px;transition:.15s}
 .tab .ti{width:20px;height:20px;background:rgba(163,143,82,.25);border-radius:5px;display:grid;place-items:center;color:var(--lioness)}
 .tab .ti svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
@@ -71,7 +76,7 @@ button{cursor:pointer;border:none;background:none}
 .sec-head{background:var(--moss);color:#fff;padding:8px 14px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sec-head .icn{width:22px;height:22px;background:var(--lioness);border-radius:5px;display:grid;place-items:center;flex-shrink:0}
 .sec-head .icn svg{width:13px;height:13px;stroke:var(--moss);fill:none;stroke-width:2.2}
-.sec-head h2{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.sec-head h2{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .sec-head .sh-flow{font-size:10px;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .sec-head .sh-flow b{color:var(--lioness);font-weight:700}
 .sec-head .sh-flow .arw{color:var(--sunset);font-weight:700}
@@ -81,7 +86,7 @@ button{cursor:pointer;border:none;background:none}
 .kstrip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .kbox{flex:1 1 auto;min-width:96px;background:#fafcf9;border:1px solid var(--border);border-left:3px solid var(--lioness);
   border-radius:6px;padding:7px 11px}
-.kbox .kl{font-size:8.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text-light)}
+.kbox .kl{font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-light)}
 .kbox .kv{font-size:22px;font-weight:700;color:var(--moss);line-height:1.05;margin-top:1px;font-variant-numeric:tabular-nums}
 .kbox .kv small{font-size:11px;color:var(--text-light);font-weight:700}
 .kbox.ok{border-left-color:#2f9e5b} .kbox.ok .kv{color:#2f9e5b}
@@ -102,7 +107,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* bloco selector */
 .blocosel{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
-.blocosel .bl-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--moss);margin-right:2px;
+.blocosel .bl-lbl{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--moss);margin-right:2px;
   display:flex;align-items:center;gap:5px}
 .blocosel .bl-lbl::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--sunset)}
 .chip{padding:5px 12px;border:1.5px solid #d8dfd8;border-radius:20px;font-size:11px;font-weight:700;color:var(--text-light);
@@ -113,7 +118,7 @@ button{cursor:pointer;border:none;background:none}
 /* ── GRID (matrix) ── */
 .gridscroll{overflow-x:auto;border:1px solid var(--border);border-radius:7px;-webkit-overflow-scrolling:touch}
 table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
-.mx th.corner{background:var(--moss);color:var(--lioness);font-size:9px;font-weight:700;letter-spacing:1px;padding:8px 6px;
+.mx th.corner{background:var(--moss);color:var(--lioness);font-size:9px;font-weight:700;letter-spacing:.06em;padding:8px 6px;
   text-align:center;width:52px;position:sticky;left:0;z-index:3}
 .mx th.blkh{background:var(--moss);color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
   padding:8px;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
@@ -123,7 +128,7 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 .apts{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
 .apt{aspect-ratio:1.55/1;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700;letter-spacing:.2px;
   border:1.5px solid var(--border);background:#fff;color:#8a8672;transition:.1s;cursor:pointer;user-select:none}
-.apt:active{transform:scale(.92)}
+.apt:active{filter:brightness(.9)}
 .apt:hover{filter:brightness(.96);box-shadow:0 2px 6px rgba(31,61,56,.14);z-index:1}
 
 /* ── GRID (single block, mobile-friendly) ── */
@@ -143,14 +148,14 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 .clitop{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:720px){.clitop{grid-template-columns:1fr}}
 .cbox{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
-.cbox .ch{background:var(--moss);color:#fff;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 12px}
-.resumo{display:grid;grid-template-columns:repeat(5,1fr)}
+.cbox .ch{background:var(--moss);color:#fff;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:7px 12px}
+.resumo{display:grid;grid-template-columns:repeat(6,1fr)}
 .resumo .rc{padding:9px 11px;border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
-.resumo .rc:nth-child(5n){border-right:none}
+.resumo .rc:nth-child(6n){border-right:none}
 .resumo .rl{display:flex;align-items:center;gap:5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--text-light)}
 .resumo .rl .sw{width:10px;height:10px;border-radius:3px;border:1px solid var(--border)}
 .resumo .rv{font-size:21px;font-weight:700;color:var(--moss);margin-top:2px;font-variant-numeric:tabular-nums}
-.resumo .rc.tot{grid-column:span 5;border-right:none;border-bottom:none;background:#f6f8f4}
+.resumo .rc.tot{grid-column:1/-1;border-right:none;border-bottom:none;background:#f6f8f4}
 .aprov{display:grid;grid-template-columns:1fr 1fr;height:100%}
 .aprov .ac{padding:10px 13px;border-right:1px solid #eef2ea}
 .aprov .ac:last-child{border-right:none}
@@ -169,7 +174,7 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
   box-shadow:0 14px 44px rgba(31,61,56,.28);padding:6px;min-width:190px;max-width:270px;max-height:min(500px,80vh);overflow-y:auto;display:none}
 .pop.open{display:block;animation:pin .12s ease}
 @keyframes pin{from{opacity:0;transform:translateY(-4px)}}
-.pop .pt{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-light);font-weight:700;padding:5px 8px 7px}
+.pop .pt{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-light);font-weight:700;padding:5px 8px 7px}
 .pop .opt{display:flex;align-items:center;gap:9px;width:100%;padding:9px 9px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--text);text-align:left;transition:.1s}
 .pop .opt:hover,.pop .opt:active{background:#f0f4ee}
 .pop .opt .od{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
@@ -208,21 +213,21 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 .mb ol{font-size:12.5px;line-height:1.6;color:var(--text-light);padding-left:18px;margin-bottom:10px}
 .mb code{background:#eef2ec;padding:1px 5px;border-radius:4px;font-size:11.5px;color:var(--moss)}
 .fld{margin:5px 0}
-.fld label{display:block;font-size:9px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;color:var(--text-light);margin-bottom:5px}
+.fld label{display:block;font-size:9px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--text-light);margin-bottom:5px}
 .fld input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;color:var(--text)}
 .fld input:focus{outline:none;border-color:var(--fern);box-shadow:0 0 0 2px rgba(107,128,64,.14)}
 pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-size:11px;line-height:1.5;overflow:auto;max-height:230px;
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;margin:6px 0}
+  font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;margin:6px 0}
 .brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .btn{padding:10px 15px;border-radius:8px;font-weight:700;font-size:12px;letter-spacing:.3px;transition:.14s;display:inline-flex;gap:6px;align-items:center}
 .btn.p{background:var(--moss);color:#fff} .btn.p:hover{background:#163028}
 .btn.g{background:#eef2ec;color:var(--moss)} .btn.g:hover{background:#e0e7de}
 .note{font-size:11px;color:var(--text-light);background:#f3f6f1;border-left:3px solid var(--sunset);padding:8px 12px;border-radius:0 7px 7px 0;margin-top:6px}
 
-.toast{position:fixed;bottom:calc(76px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);background:var(--moss);color:#fff;
+.toast{position:fixed;bottom:calc(76px + var(--safe-b));left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 32px);transform:translateY(16px);background:var(--moss);color:#fff;
   padding:10px 18px;border-radius:10px;font-size:12.5px;font-weight:700;box-shadow:0 12px 28px rgba(0,0,0,.3);opacity:0;transition:.25s;z-index:100;
   pointer-events:none;border:1px solid var(--lioness)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.show{opacity:1;transform:none}
 
 @media(max-width:720px){.resumo{grid-template-columns:repeat(2,1fr)}.resumo .rc.tot{grid-column:span 2}}
 /* RESUMO GERAL */
@@ -274,7 +279,7 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .clif{background:#fafcf9;border:1px solid var(--border);border-radius:9px;padding:9px 10px;margin-bottom:9px}
 .clif-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .clif-row:last-child{margin-bottom:0}
-.clif-lbl{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--moss);white-space:nowrap}
+.clif-lbl{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--moss);white-space:nowrap}
 .clif-chips{display:flex;gap:5px;flex-wrap:wrap}
 .clif-inputs{align-items:flex-end}
 .clif-inputs .fld{margin:0;min-width:118px}
@@ -302,15 +307,15 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .login-logo-engertal-wrap{display:block;flex:0 1 auto;background:transparent;padding:0}
 .login-logo-engertal{display:block;width:min(150px,38vw);max-height:68px;height:auto;object-fit:contain;filter:grayscale(1) brightness(0) invert(1)}
 .login-brand-copy{position:relative;z-index:1;margin:54px 0 36px}
-.login-brand-copy h1{font-size:clamp(30px,4vw,49px);line-height:1.02;letter-spacing:-1.8px;max-width:510px}
+.login-brand-copy h1{font-size:clamp(30px,4vw,49px);line-height:1.02;letter-spacing:-.01em;max-width:510px}
 .login-brand-copy p{font-size:16px;line-height:1.65;color:rgba(255,255,255,.72);max-width:430px;margin-top:18px}
 .login-benefits{position:relative;z-index:1;display:grid;gap:12px}
 .login-benefit{display:flex;align-items:center;gap:11px;color:rgba(255,255,255,.84);font-size:14px;font-weight:600}
 .login-benefit i{width:27px;height:27px;border-radius:8px;background:rgba(183,161,95,.16);border:1px solid rgba(220,203,145,.32);display:grid;place-items:center;color:#dccb91;font-style:normal;flex:0 0 auto}
 .login-form-panel{padding:44px 52px;display:flex;flex-direction:column;justify-content:center;background:#fff}
 .login-form-head{margin-bottom:25px}
-.login-form-head small{display:block;font-size:12px;font-weight:700;letter-spacing:1.15px;text-transform:uppercase;color:var(--fern);margin-bottom:8px}
-.login-form-head h2{font-size:29px;line-height:1.12;color:var(--moss);letter-spacing:-.7px}
+.login-form-head small{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fern);margin-bottom:8px}
+.login-form-head h2{font-size:29px;line-height:1.12;color:var(--moss);letter-spacing:-.01em}
 .login-form-head p{font-size:15px;line-height:1.55;color:var(--text-light);margin-top:9px}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#eef3ef;border-radius:12px;padding:4px;margin-bottom:24px}
 .auth-tab{min-height:43px;border-radius:9px;color:#65766d;font-size:14px;font-weight:700;transition:.18s}
@@ -324,10 +329,10 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .auth-field input::placeholder{color:#92a199}
 .auth-field input:focus{border-color:#53775f;background:#fff;box-shadow:0 0 0 4px rgba(107,128,64,.12)}
 .auth-field input.has-toggle{padding-right:82px}
-.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);height:34px;padding:0 9px;border-radius:7px;color:#526a5f;font-size:12px;font-weight:700}
+.password-toggle{position:absolute;right:8px;top:0;bottom:0;margin:auto 0;height:34px;padding:0 9px;border-radius:7px;color:#526a5f;font-size:12px;font-weight:700}
 .password-toggle:hover{background:#edf2ee;color:var(--moss)}
 .auth-submit{width:100%;min-height:51px;border-radius:11px;background:#1f4a3f;color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:700;letter-spacing:.15px;margin-top:19px;box-shadow:0 10px 22px rgba(31,74,63,.2);transition:.18s}
-.auth-submit:hover{background:#173b32;transform:translateY(-1px);box-shadow:0 13px 25px rgba(31,74,63,.25)}
+.auth-submit:hover{background:#173b32;box-shadow:0 13px 25px rgba(31,74,63,.25)}
 .auth-submit:disabled{opacity:.65;cursor:wait;transform:none}
 .auth-submit .spin{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:authspin .7s linear infinite}
 .auth-submit.loading .spin{display:block}
@@ -353,16 +358,16 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .project-top-logos .login-logo-engertal{width:126px;max-height:54px}
 .project-top-divider{width:1px;height:40px;background:#d7e0da}
 .project-welcome{min-width:0;flex:1}
-.project-welcome small{display:block;color:var(--fern);font-size:12px;font-weight:700;letter-spacing:1.15px;text-transform:uppercase;margin-bottom:5px}
-.project-welcome h2{font-size:28px;color:var(--moss);line-height:1.15;letter-spacing:-.6px}
+.project-welcome small{display:block;color:var(--fern);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.project-welcome h2{font-size:28px;color:var(--moss);line-height:1.15;letter-spacing:-.01em}
 .project-welcome p{font-size:14px;color:#617168;line-height:1.5;margin-top:7px}
 .project-logout{align-self:flex-start;color:#52675d;background:#eef3ef;border:1px solid #d6e0d9;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:700;white-space:nowrap}
 .project-logout:hover{background:#e5ece7;color:var(--moss)}
 .project-body{padding:30px 34px 34px}
-.project-section-title{font-size:13px;font-weight:700;color:#37564a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.project-section-title{font-size:13px;font-weight:700;color:#37564a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
 .project-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .project-card{width:100%;min-height:146px;text-align:left;background:#fff;border:1.5px solid #d7e1da;border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;color:var(--text);transition:.18s;box-shadow:0 6px 18px rgba(31,61,56,.05)}
-.project-card:not(:disabled):hover{transform:translateY(-2px);border-color:#78917b;box-shadow:0 12px 26px rgba(31,61,56,.12)}
+.project-card:not(:disabled):hover{border-color:#78917b;box-shadow:0 12px 26px rgba(31,61,56,.12)}
 .project-card:focus-visible{outline:3px solid rgba(107,128,64,.35);outline-offset:2px}
 .project-card:disabled{cursor:not-allowed;opacity:.62;background:#f1f4f2}
 .project-card-top{display:flex;align-items:flex-start;gap:13px}
@@ -400,7 +405,7 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
   .login-shell{width:100%;min-height:100%;height:auto;border:0;border-radius:0;box-shadow:none;overflow:visible}
   .login-brand-panel{padding:calc(22px + var(--safe-t)) calc(20px + var(--safe-r)) 20px calc(20px + var(--safe-l));min-height:190px}
   .login-logos{gap:11px;flex-wrap:nowrap}.login-logo-alto{width:min(145px,48vw);max-height:58px}.login-logo-divider{height:36px}.login-logo-engertal{width:min(108px,34vw);max-height:46px}
-  .login-brand-copy{margin:22px 0 0}.login-brand-copy h1{font-size:26px;letter-spacing:-.8px}
+  .login-brand-copy{margin:22px 0 0}.login-brand-copy h1{font-size:26px;letter-spacing:-.01em}
   .login-form-panel{padding:26px calc(20px + var(--safe-r)) calc(34px + var(--safe-b)) calc(20px + var(--safe-l));justify-content:flex-start;overflow:visible}
   .login-form-head{margin-bottom:20px}.login-form-head h2{font-size:25px}.login-form-head p{font-size:14px}.auth-field input{font-size:16px}.auth-tabs{margin-bottom:20px}
   .project-ov{height:100dvh;padding:0;align-items:initial;background:#f8faf8}
@@ -443,7 +448,7 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .qapt .qgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;width:100%;height:100%}
 .qapt .qgrid .qd{border:none;padding:0;cursor:pointer;transition:.1s}
 .qapt .qgrid .qd:hover{filter:brightness(.9)}
-.qapt .qgrid .qd:active{transform:scale(.94)}
+.qapt .qgrid .qd:active{filter:brightness(.85)}
 .qapt .qnum{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:700;color:#12241a;pointer-events:none;text-shadow:0 0 3px #fff,0 0 4px #fff}
 .pavrow .pa .qapt{aspect-ratio:1.2/1}
 .quadguide{display:flex;gap:12px;align-items:center;background:#f3f6f1;border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:11px;flex-wrap:wrap}
@@ -493,11 +498,11 @@ pre.code{background:#122820;color:#cfe8dd;padding:13px;border-radius:9px;font-si
 .vg-guide .vgt{font-size:10.5px;color:var(--text-secondary);font-weight:600;line-height:1.4;flex:1;min-width:170px}
 .vg-guide .vgt b{color:var(--moss)}
 .qapt{position:relative;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;aspect-ratio:1.55/1;background:#fff;transition:transform .12s,box-shadow .12s}
-.qapt:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(31,61,56,.24);z-index:5;border-color:var(--moss)}
+.qapt:hover{box-shadow:0 4px 16px rgba(31,61,56,.24);z-index:5;border-color:var(--moss)}
 .qapt .qgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;width:100%;height:100%}
 .qapt .qd{border:none;padding:0;cursor:pointer;transition:.1s}
 .qapt .qd:hover{filter:brightness(.86);box-shadow:inset 0 0 0 2px rgba(255,255,255,.7)}
-.qapt .qd:active{transform:scale(.9)}
+.qapt .qd:active{filter:brightness(.8)}
 .qapt .qnum{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:700;color:#12241a;pointer-events:none;text-shadow:0 0 3px #fff,0 0 4px #fff}
 .pavrow .pa .qapt{aspect-ratio:1.2/1}
 
@@ -510,7 +515,11 @@ body{background:var(--bg)}
 .icon-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:var(--gold);border-radius:9px}
 .icon-btn:hover{background:rgba(255,255,255,.15)}
 .project-switch-btn{border-radius:9px}
-.userchip .ub{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:5px 10px}
+/* UserChip: mesmo padrão visual do botão de troca de obra */
+.userchip{min-height:32px;max-width:240px;padding:5px 10px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;align-items:center;gap:7px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;transition:.15s;cursor:default}
+.userchip:hover{background:rgba(255,255,255,.15);border-color:rgba(220,203,145,.5)}
+.userchip svg{width:15px;height:15px;stroke:var(--lioness);fill:none;stroke-width:2;flex:0 0 auto}
+.userchip .ub{background:none;border:0;padding:0;border-radius:0;color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
 .tabs-strip{background:linear-gradient(145deg,#132f29,#1b4238);box-shadow:0 8px 20px rgba(4,20,16,.18)}
 .tabs{padding:8px 16px 10px;gap:4px}
 .tab{border-radius:10px;padding:9px 16px;text-transform:none;letter-spacing:.1px;font-size:13px;color:rgba(255,255,255,.7);background:transparent}
@@ -525,20 +534,20 @@ body{background:var(--bg)}
 .sec-head{background:#fff;color:var(--ink);padding:18px 22px;border:1px solid var(--border);border-bottom:1px solid #e6ece8;border-radius:20px 20px 0 0;gap:14px}
 .sec-head .icn{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f)}
 .sec-head .icn svg{width:18px;height:18px;stroke:var(--gold)}
-.sec-head h2{font-size:21px;letter-spacing:-.5px;text-transform:none;color:var(--ink)}
+.sec-head h2{font-size:21px;letter-spacing:-.01em;text-transform:none;color:var(--ink)}
 .sec-head .sh-flow{color:var(--muted);font-size:13px;font-weight:600;letter-spacing:0}
 .sec-head .sh-flow b{color:var(--fern)}
 .sec-body{background:#f8faf8;border-color:var(--border);border-radius:0 0 20px 20px;padding:20px 22px;box-shadow:var(--shadow-card)}
 .cbox,.rg-card{border-color:var(--border);border-radius:16px;box-shadow:var(--shadow-card);background:#fff}
-.cbox .ch,.rg-card .rgh{background:#fff;color:#37564a;border-bottom:1px solid #e6ece8;font-size:12px;font-weight:700;letter-spacing:.8px;padding:13px 16px}
+.cbox .ch,.rg-card .rgh{background:#fff;color:#37564a;border-bottom:1px solid #e6ece8;font-size:12px;font-weight:700;letter-spacing:.05em;padding:13px 16px}
 .rg-card .rgh b{color:var(--fern);font-size:15px;letter-spacing:0}
 .kbox{background:#fff;border-color:var(--border);border-radius:14px;padding:11px 14px;box-shadow:var(--shadow-card)}
-.kbox .kl{font-size:10px;letter-spacing:.8px;color:var(--muted)}
+.kbox .kl{font-size:10px;letter-spacing:.05em;color:var(--muted)}
 .kbox .kv{font-size:26px}
 .chip{border-radius:999px;border-color:#d7e1da;background:#fff;padding:7px 14px;font-size:12px;color:#52675d}
 .chip:hover{border-color:#78917b;color:var(--ink)}
 .chip.active{background:var(--ink-2);border-color:var(--ink-2);color:#fff;box-shadow:0 4px 12px rgba(31,74,63,.2)}
-.blocosel .bl-lbl,.clif-lbl{font-size:11px;color:#37564a;letter-spacing:.8px}
+.blocosel .bl-lbl,.clif-lbl{font-size:11px;color:#37564a;letter-spacing:.05em}
 .modetog{background:#e8efea;border-radius:12px;padding:4px;margin-bottom:14px}
 .modetog button{min-height:40px;border-radius:9px;font-size:13px;color:#65766d}
 .modetog button.active{background:#fff;color:var(--ink);box-shadow:0 3px 12px rgba(31,61,56,.1)}
@@ -587,12 +596,12 @@ body{background:var(--bg)}
 .rg-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:26px;padding:18px 20px}
 .rg-layout .rg-col{min-width:0}
 .rg-layout .rg-col+.rg-col{border-left:1px solid #e6ece8;padding-left:26px}
-.rg-layout .rg-sub{margin-top:0;font-size:12px;letter-spacing:.8px;color:#37564a}
+.rg-layout .rg-sub{margin-top:0;font-size:12px;letter-spacing:.05em;color:#37564a}
 .rg-charts{gap:20px}
 .stk-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:4px 0 14px;font-size:12px;font-weight:700;color:var(--muted)}
 .stk-legend span{display:inline-flex;align-items:center;gap:6px}
 .stk-legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
-.stk-ok{background:#2f9e5b}.stk-rev{background:var(--sunset)}.stk-na{background:#c9d1cc}
+.stk-ok{background:#2f9e5b}.stk-fin{background:#2f6fdb}.stk-rev{background:var(--sunset)}.stk-na{background:#c9d1cc}
 .stk-chart{display:grid;gap:11px}
 .stk-row{display:grid;grid-template-columns:62px minmax(0,1fr) 52px;align-items:center;gap:10px}
 .stk-lbl{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
@@ -621,7 +630,7 @@ body{background:var(--bg)}
 
 /* APROVAÇÕES DE ACESSO */
 .apr-list{display:grid;gap:10px}
-.apr-row{display:grid;grid-template-columns:minmax(200px,1.6fr) minmax(120px,1fr) minmax(120px,.9fr) minmax(140px,1fr) minmax(150px,1fr) 236px;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.apr-row{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(210px,1.6fr) minmax(110px,.7fr) minmax(120px,.8fr) minmax(140px,.9fr) 200px;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
 .apr-row[data-status="pending"]{border-color:#efd9a6;background:linear-gradient(90deg,#fffaf0,#fff 40%)}
 .apr-user{display:flex;align-items:center;gap:12px;min-width:0}
 .apr-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f);color:var(--gold);display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
@@ -630,9 +639,20 @@ body{background:var(--bg)}
 .apr-id strong em{font-style:normal;color:var(--fern);font-weight:700;font-size:12px}
 .apr-id span{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .apr-meta{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12.5px;color:var(--text);font-weight:600}
-.apr-k{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.apr-k{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .apr-perm select{height:38px;padding:0 10px;border:1.5px solid #cad6cf;border-radius:10px;background:#fbfcfb;font-size:13px;color:#172c25;width:100%}
 .apr-perm select:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 4px rgba(107,128,64,.12)}
+.apr-projs{display:flex;flex-wrap:wrap;gap:5px}
+.apr-proj{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1.5px solid #d7e1da;background:#fff;color:#52675d;font-size:12px;font-weight:600;cursor:pointer;user-select:none;transition:.12s}
+.apr-proj input{position:absolute;opacity:0;pointer-events:none}
+.apr-proj i{width:12px;height:12px;border-radius:4px;border:1.5px solid var(--ov);background:#fff;flex:0 0 auto}
+.apr-proj.on,.apr-proj:has(input:checked){border-color:var(--ov);background:color-mix(in srgb,var(--ov) 10%,#fff);color:var(--ink)}
+.apr-proj.on i,.apr-proj:has(input:checked) i{background:var(--ov);box-shadow:inset 0 0 0 2px #fff}
+.apr-proj:has(input:not(:checked)){border-color:#d7e1da;background:#fff;color:#52675d}
+.apr-proj:has(input:not(:checked)) i{background:#fff;box-shadow:none}
+.apr-proj:has(input:focus-visible){outline:2px solid rgba(11,111,212,.4);outline-offset:1px}
+.apr-proj:has(input:disabled){cursor:not-allowed;opacity:.7}
+.apr-proj small{font-size:10px;color:#a15c00;font-weight:700}
 .apr-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
 .apr-actions .btn{min-height:38px;padding:0 13px}
 .apr-error{color:var(--red);font-weight:700}
@@ -676,12 +696,12 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .mx.casas td.pavh{font-size:12px;font-weight:700;border-radius:7px;border-right:none;width:54px;min-width:54px}
 .mx.casas td.casa-cell{padding:0}
 .mx.casas td.casa-void{background:transparent}
-.mx.casas .apt{width:30px;min-width:30px;height:28px;aspect-ratio:auto;font-size:10.5px;border-radius:6px;padding:0}
+.mx.casas .apt{width:30px;min-width:30px;height:28px;aspect-ratio:auto;font-size:12px;border-radius:6px;padding:0}
 .mx.casas .apt.pcd::after{top:1px;right:1px;width:5px;height:5px}
 .casa-single{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
 .casa-single-head{font-size:12px;font-weight:700;color:#37564a;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
 .casa-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
-.casa-wrap .apt{aspect-ratio:1/1;font-size:13px;border-radius:9px}
+.casa-wrap .apt{aspect-ratio:1/1;font-size:12px;border-radius:9px}
 .apt{position:relative}
 .apt.pcd::after{content:'';position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:#0b6fd4;box-shadow:0 0 0 1.5px #fff}
 .apt.is-sel,.cstat.is-sel{outline:3px solid #0b6fd4;outline-offset:1px;z-index:6;box-shadow:0 0 0 5px rgba(11,111,212,.18)}
@@ -696,8 +716,8 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .pop.pp.open{display:flex}
 .pp-head{display:flex;align-items:center;gap:10px;padding:14px 14px 12px 18px;background:linear-gradient(145deg,#173a32,#1f4a3f);color:#fff;flex:0 0 auto}
 .pp-title{flex:1;min-width:0}
-.pp-title small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gold)}
-.pp-title strong{display:block;font-size:20px;font-weight:700;letter-spacing:-.3px;line-height:1.2}
+.pp-title small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}
+.pp-title strong{display:block;font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
 .pp-tools{display:flex;gap:6px}
 .pp-icon{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#fff;font-size:20px;line-height:1;display:grid;place-items:center;transition:.15s}
 .pp-icon:hover:not(:disabled){background:rgba(255,255,255,.2)}
@@ -708,11 +728,11 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 .pp-client-txt{min-width:0;display:flex;flex-direction:column;gap:4px}
 .pp-client-txt b{font-size:14px;color:var(--ink);line-height:1.25;overflow-wrap:anywhere}
 .pp-tags{display:flex;gap:5px;flex-wrap:wrap}
-.pp-label{font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.pp-label{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .pp-status{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;margin-bottom:16px}
 .pp-st{display:flex;align-items:center;gap:7px;min-height:40px;padding:0 10px;border-radius:11px;border:1.5px solid #dbe4dd;background:#fff;color:#2c4038;font-size:12.5px;font-weight:700;text-align:left;transition:transform .12s,box-shadow .12s,background .12s}
 .pp-st i{width:12px;height:12px;border-radius:50%;background:var(--st-bg);border:1.5px solid var(--st-bd);flex:0 0 auto}
-.pp-st:hover:not(:disabled){border-color:var(--st-bd);transform:translateY(-1px);box-shadow:0 4px 10px rgba(31,61,56,.1)}
+.pp-st:hover:not(:disabled){border-color:var(--st-bd);box-shadow:0 4px 10px rgba(31,61,56,.1)}
 .pp-st.sel{background:var(--st-bg);border-color:var(--st-bd);color:var(--st-tx);box-shadow:0 4px 12px rgba(31,61,56,.14)}
 .pp-st.sel i{background:#fff;border-color:rgba(0,0,0,.12)}
 .pp-st:disabled{cursor:default}
@@ -751,6 +771,113 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 @keyframes ppsheet{from{transform:translateY(40px);opacity:.4}}
 @media(max-width:640px){.pp-form{grid-template-columns:1fr}}
 @media(max-width:380px){.pp-status{grid-template-columns:1fr 1fr}}
+/* CONFIGURAÇÕES */
+.cfg-tabs{margin-bottom:16px}
+.cfg-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.cond-list{display:grid;gap:10px}
+.cond-row{display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.cond-order{display:flex;align-items:center;gap:6px}
+.cond-pos{min-width:30px;font-size:13px;font-weight:700;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
+.cond-move{background:#eef3ef;border-color:#d6e0d9;color:var(--ink);font-size:16px}
+.cond-move:hover:not(:disabled){background:#e2eae4}
+.cond-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:10px}
+.cond-fields .fld{margin:0}
+.cond-actions{justify-content:flex-end;align-items:center;margin-top:14px}
+.cond-hint{flex:1;font-size:12px;font-weight:600;color:#a15c00}
+.cond-actions .btn[hidden]{display:none}
+@media(max-width:720px){.cfg-tabs button{font-size:11.5px;padding:0 4px}.cond-row{grid-template-columns:auto minmax(0,1fr);gap:10px;padding:12px}.cond-row .project-monogram{display:none}.cond-fields{grid-template-columns:1fr}}
+/* VISÃO GERAL */
+.project-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.project-section-head .project-section-title{margin-bottom:0}
+.project-overview-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #cfdcd3;color:var(--ink);border-radius:10px;padding:8px 13px;font-size:12.5px;font-weight:700;box-shadow:0 4px 12px rgba(31,61,56,.06);transition:.15s}
+.project-overview-btn:hover{border-color:#78917b;box-shadow:0 8px 18px rgba(31,61,56,.12)}
+.project-overview-btn svg{width:16px;height:16px;stroke:var(--fern);fill:none;stroke-width:2}
+.ov-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.ov-card{text-align:left;cursor:pointer;min-width:0;transition:.15s}
+.ov-card:hover{box-shadow:0 8px 18px rgba(31,61,56,.1)}
+.ov-toprow{align-items:center}
+.ov-period{flex:0 1 380px;margin:0}
+.ov-updated{font-size:11.5px;color:var(--muted);font-weight:600}
+.ov-chip{display:inline-flex;align-items:center;gap:6px}
+.ov-chip i{width:9px;height:9px;border-radius:50%;background:var(--ov)}
+.ov-chip.active{background:var(--ov);border-color:var(--ov)}
+.ov-chip.active i{background:#fff}
+.ov-tbl{min-width:1080px}
+.ov-tbl tr.ov-day td{background:#eef3ef;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);position:sticky;left:0}
+.ov-tbl tr.ov-day b{font-size:12px;color:var(--ink);margin-right:10px}
+.ov-tbl tr.ov-day span{font-size:11px;color:var(--muted);font-weight:600}
+.ov-tbl tr.ov-day.is-today td{background:#e3efff}
+.ov-tbl tr.ov-day.is-today b{color:#0b4f9c}
+.ov-row{cursor:pointer;transition:background .12s}
+.ov-row td{padding:7px 8px}
+.ov-row td:first-child{box-shadow:inset 4px 0 0 var(--ov)}
+.ov-row:hover td,.ov-row:focus td{background:#f5f8f6}
+.ov-row:focus{outline:none}
+.ov-row:focus td:first-child{box-shadow:inset 4px 0 0 var(--ov),inset 0 0 0 2px rgba(11,111,212,.35)}
+.ov-proj{text-align:left!important}
+.ov-badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ov);background:color-mix(in srgb,var(--ov) 10%,#fff);border:1px solid color-mix(in srgb,var(--ov) 30%,#fff);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.ov-badge i{width:8px;height:8px;border-radius:50%;background:var(--ov)}
+.ov-status{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+@media(max-width:960px){.ov-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.ov-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-cards .ov-card:last-child{grid-column:1/-1}.ov-period{flex:1 1 100%}}
+@media(max-width:520px){.project-overview-btn{width:100%;justify-content:center}}
+/* Acomp. Técnico */
+.ctbl th.th-acomp,.ctbl td.cacomp{width:1%;white-space:nowrap;text-align:center}
+.ctbl td.cacomp{padding:3px 6px}
+.acomp-sel{height:26px;width:auto;min-width:0;max-width:none;padding:0 4px;border:1.5px solid #cad6cf;border-radius:7px;background:#fbfcfb;font-size:11px;color:#6a7a71;cursor:pointer;text-align:center;text-align-last:center}
+.acomp-sel.set{color:#172c25;border-color:#9fb6a6;background:#fff;font-weight:600;text-align:center;text-align-last:center}
+.acomp-sel:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 3px rgba(107,128,64,.14)}
+.acomp-sel:disabled{opacity:.6;cursor:wait}
+.pp-select{width:100%;height:42px;padding:0 11px;border:1.5px solid #cad6cf;border-radius:11px;background:#fbfcfb;font-size:14px;color:#172c25}
+.pp-select:focus{outline:none;border-color:#53775f;background:#fff;box-shadow:0 0 0 4px rgba(107,128,64,.14)}
+.pp-select:disabled{background:#f1f4f2;color:#6a7a71}
+/* MOBILE · indicadores compactos (Resumo Geral, Percentual de Aprovação, cards) */
+@media(max-width:720px){
+  .sec-head{padding:11px 13px;gap:10px}
+  .sec-head .icn{width:30px;height:30px;border-radius:9px}
+  .sec-head .icn svg{width:15px;height:15px}
+  .sec-head h2{font-size:16px}
+  .sec-head .sh-flow{font-size:11px}
+  .sec-body{padding:11px 10px}
+  .clitop{gap:9px;margin-bottom:10px}
+  .cbox,.rg-card{border-radius:13px}
+  .cbox .ch,.rg-card .rgh{padding:9px 12px;font-size:10.5px;letter-spacing:.6px}
+  .rg-card .rgh b{font-size:13px}
+  .resumo .rc{padding:6px 10px}
+  .resumo .rl{font-size:8px}
+  .resumo .rv{font-size:18px;margin-top:0}
+  .resumo .rc.tot .rv{font-size:18px}
+  .resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .resumo .rc,.resumo .rc:nth-child(6n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
+  .resumo .rc:nth-child(3n){border-right:none}
+  .resumo .rc.tot{grid-column:1/-1;background:#f6f8f4;border-bottom:none}
+  .resumo .rc.tot .rv span{font-size:10px!important}
+  .aprov .ac{padding:8px 10px}
+  .aprov .al{font-size:8.5px}
+  .aprov .av{font-size:22px}
+  .aprov .abar{height:5px;margin-top:5px}
+  .aprov .af,.aprov .af-goal{font-size:9px;margin-top:3px}
+  .kstrip{gap:6px;margin-bottom:10px}
+  .kbox{padding:7px 10px;border-radius:11px}
+  .kbox .kl{font-size:8.5px}
+  .kbox .kv{font-size:20px}
+  .modetog{margin-bottom:10px}
+  .modetog button{min-height:34px;font-size:12px}
+  .rg-layout{padding:11px 12px;gap:12px}
+  .rg-layout .rg-col+.rg-col{padding-top:12px}
+  .rg-charts{gap:10px;margin-bottom:4px}
+  .rg-charts .donut{width:104px;height:104px}
+  .rg-big{gap:6px;margin-bottom:8px}
+  .rg-big .rb{padding:6px 4px;min-width:0}
+  .rg-big .rb .n{font-size:19px}
+  .rg-big .rb .l{font-size:7.8px;margin-top:2px}
+  .pbar{margin-bottom:6px}
+  .rg-mini{margin-top:7px}
+  .stk-legend{font-size:11px;margin:2px 0 9px;gap:5px 12px}
+  .stk-chart{gap:8px}
+  .ov-cards{gap:7px;margin-bottom:10px}
+  .ov-cards .kbox .kv{font-size:20px}
+}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -770,7 +897,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
     <div class="head-actions">
       <button class="icon-btn" id="btnLogin" title="Entrar para editar"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
       <button class="project-switch-btn" id="btnProjectSwitch" type="button" title="Trocar obra ou condomínio"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span id="activeProjectName">Trocar obra</span></button>
-      <span class="userchip" id="userChip" style="display:none"><span class="ub" id="userName">—</span></span>
+      <span class="userchip" id="userChip" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ub" id="userName">—</span></span>
       <button class="icon-btn" id="btnLogout" title="Sair" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
       <span class="sync-dot" id="syncDot" title="Modo local"></span>
     </div>
@@ -823,6 +950,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
           <div class="lg"><span class="sw" style="background:#f2c14e;border-color:#d9a92f"></span>Agendado</div>
           <div class="lg"><span class="sw" style="background:#ff9e57;border-color:#e6863f"></span>Remarcado</div>
           <div class="lg"><span class="sw" style="background:#e8842a;border-color:#c96a1a"></span>Revistoria</div>
+          <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
         </div>
       </div>
@@ -916,14 +1044,58 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="projectLogout" type="button">Sair da conta</button>
-        <button class="project-admin-btn" id="projectAdmin" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Aprovações de Acesso</span><span class="tab-badge" id="aprProjectBadge" hidden></span></button>
+        <button class="project-admin-btn" id="projectAdmin" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Configurações</span><span class="tab-badge" id="aprProjectBadge" hidden></span></button>
       </div>
     </div>
     <div class="project-body">
-      <div class="project-section-title">Obras e condomínios disponíveis</div>
+      <div class="project-section-head">
+        <div class="project-section-title">Obras e condomínios disponíveis</div>
+        <button class="project-overview-btn" id="projectOverview" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h4M7 17h7"/></svg><span>Visão Geral</span></button>
+      </div>
       <div class="project-list" id="projectList"></div>
       <div class="project-feedback" id="projectFeedback" role="alert"></div>
       <p class="project-help">Novos condomínios aparecerão aqui quando forem cadastrados e liberados pelo administrador. Cada empreendimento poderá ter seu próprio fluxo de acompanhamento.</p>
+    </div>
+  </section>
+</div>
+
+<div class="project-ov admin-ov overview-ov" id="overviewOv" aria-hidden="true">
+  <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="overviewTitle">
+    <div class="project-top">
+      <div class="project-top-logos" aria-label="Alto Mangueiral e Engertal">
+        <span class="project-alto-logo-tile"><img class="login-logo-alto" src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"></span>
+        <span class="project-top-divider" aria-hidden="true"></span>
+        <img class="login-logo-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
+      </div>
+      <div class="project-welcome">
+        <small>Todos os condomínios</small>
+        <h2 id="overviewTitle">Visão Geral dos Agendamentos</h2>
+        <p>Vistorias de todos os empreendimentos em uma única lista, por data e horário. Clique em um agendamento para abrir a unidade.</p>
+      </div>
+      <div class="project-actions">
+        <button class="project-logout" id="overviewBack" type="button">← Voltar às obras</button>
+      </div>
+    </div>
+    <div class="project-body admin-body">
+      <div class="ov-cards" id="ovCards"></div>
+      <div class="clif" id="ovFilters">
+        <div class="clif-row ov-toprow">
+          <div class="modetog ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
+          <span class="ov-updated" id="ovUpdated"></span>
+          <span class="clif-count" id="ovCount"></span>
+        </div>
+        <div class="clif-row"><span class="clif-lbl">Condomínio</span><div class="clif-chips" id="ovProjects"></div></div>
+        <div class="clif-row"><span class="clif-lbl">Status</span><div class="clif-chips" id="ovStatus"></div></div>
+        <div class="clif-row clif-inputs">
+          <div class="fld"><label for="ovDtIni">Data de</label><input type="date" id="ovDtIni"></div>
+          <div class="fld"><label for="ovDtFim">Até</label><input type="date" id="ovDtFim"></div>
+          <div class="fld clif-q"><label for="ovQ">Cliente</label><input type="text" id="ovQ" placeholder="Nome do cliente..." autocomplete="off"></div>
+          <div class="fld clif-q"><label for="ovU">Unidade</label><input type="text" id="ovU" placeholder="Ex.: A604 ou B35" autocomplete="off"></div>
+          <button class="btn g" id="ovClear" type="button">Limpar filtros</button>
+          <button class="btn g" id="ovRefresh" type="button">Atualizar</button>
+        </div>
+      </div>
+      <div id="ovList"></div>
     </div>
   </section>
 </div>
@@ -938,14 +1110,20 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       </div>
       <div class="project-welcome">
         <small>Administração</small>
-        <h2 id="adminTitle">Aprovações de Acesso</h2>
-        <p>Aprove, rejeite e ajuste as permissões dos usuários de cada obra ou condomínio.</p>
+        <h2 id="adminTitle">Configurações</h2>
+        <p>Acessos dos usuários, dados dos condomínios e registro de alterações.</p>
       </div>
       <div class="project-actions">
         <button class="project-logout" id="adminBack" type="button">← Voltar às obras</button>
       </div>
     </div>
     <div class="project-body admin-body">
+      <div class="modetog cfg-tabs" id="cfgTabs" role="tablist" aria-label="Configurações">
+        <button type="button" role="tab" data-cfg="apr" class="active">Aprovações de Acesso<span class="tab-badge" id="aprTabBadge" hidden></span></button>
+        <button type="button" role="tab" data-cfg="cond">Configuração de Condomínio</button>
+        <button type="button" role="tab" data-cfg="logs">Logs</button>
+      </div>
+      <div class="cfg-pane" data-pane="apr">
       <div class="kstrip" id="aprKpis"></div>
       <div class="clif" id="aprFilters">
         <div class="clif-row clif-inputs">
@@ -965,28 +1143,20 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
         </div>
       </div>
       <div class="apr-list" id="aprList"></div>
-      <div class="cbox" style="margin:14px 0 12px">
-        <div class="ch">Adicionar ou editar usuário manualmente</div>
-        <div style="padding:12px 13px">
-          <div class="note" style="margin:0 0 4px">Use para criar uma conta sem cadastro prévio ou alterar dados de quem já tem acesso. Escolha a obra ou condomínio em que o acesso será salvo.</div>
-          <div class="acc-form">
-            <div class="fld"><label for="accProject">Obra / Condomínio</label><select id="accProject"></select></div>
-            <div class="fld"><label>E-mail (login)</label><input id="accU" type="email" autocomplete="email"></div>
-            <div class="fld"><label>Senha</label><input id="accP" type="password" autocomplete="new-password" placeholder="só é exigida para conta criada pelo admin"></div>
-            <div class="fld"><label>Nome</label><input id="accNome"></div>
-            <div class="fld"><label>Nível</label><select id="accNiv"><option value="admin">Admin (edita tudo)</option><option value="acab">Nível Acabamento</option><option value="inst">Nível Instalações</option><option value="qual">Nível Qualidade</option><option value="astec">Nível Assist. Técnica</option><option value="visitante">Visitante (só vê)</option></select></div>
-            <div class="fld"><label>Situação</label><select id="accActive"><option value="true">Acesso liberado</option><option value="false">Acesso bloqueado</option></select></div>
-          </div>
-          <div class="brow"><button class="btn p" id="accSave">Salvar e liberar acesso</button></div>
-          <div class="note">As senhas são protegidas pelo Supabase Auth e nunca ficam salvas na planilha nem no navegador. Cada pessoa deve usar um e-mail próprio.</div>
-        </div>
       </div>
+      <div class="cfg-pane" data-pane="cond" hidden>
+        <div class="note" style="margin:0 0 12px">Defina a ordem em que os condomínios aparecem na tela de seleção e o título e a descrição exibidos em cada um. As alterações valem para todos os usuários.</div>
+        <div class="cond-list" id="condList"></div>
+        <div class="brow cond-actions"><span class="cond-hint" id="condHint"></span><button class="btn g" id="condReset" type="button" hidden>Descartar</button><button class="btn p" id="condSave" type="button" disabled>Salvar configurações</button></div>
+      </div>
+      <div class="cfg-pane" data-pane="logs" hidden>
       <div class="cbox">
         <div class="ch">Registro de logs (últimas 100 ações)</div>
         <div style="padding:12px 13px">
           <div class="brow" style="margin-top:0;margin-bottom:10px"><button class="btn g" id="logRefresh">Atualizar logs</button></div>
           <div class="log-list" id="logList"></div>
         </div>
+      </div>
       </div>
     </div>
   </section>
@@ -1030,21 +1200,23 @@ const FRENTES=[
   {key:"qual",step:"Etapa 2",name:"Qualidade",flow:FLOW,done:["lv","rev","fz"]},
   {key:"astec",step:"Etapa 3",name:"Assist. Técnica",flow:FLOW,done:["lv","rev","fz"]},
 ];
-const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",ap:"Aprovado"};
-const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"}};
-const CLI_FLOW=["na","ag","rm","rv","ap"];
+const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado"};
+const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"}};
+const CLI_FLOW=["na","ag","rm","rv","rf","ap"];
 function normCli(t){t=(t||"").toString().trim().toLowerCase();
   if(t.includes("não agend")||t.includes("nao agend"))return"na";
   if(t.includes("aprov"))return"ap";
+  if(t.includes("revist")&&t.includes("finaliz"))return"rf";
   if(t.includes("revist"))return"rv";
   if(t.includes("remarc"))return"rm";
   if(t.includes("agend"))return"ag";
   return"na";}
 function esc(s){return (s==null?"":""+s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const NIVL={admin:"Admin",visitante:"Visitante",acab:"Acabamento",inst:"Instalações",qual:"Qualidade",astec:"Assist. Técnica"};
+const NIVL={admin:"Admin",revistorias:"Revistorias",visitante:"Visitante"};
 const PROJECT_EXPERIENCES={
-  "alto-do-jeriva":{ready:true,code:"AJ",title:"Alto do Jerivá",description:"Acompanhamento da obra e vistorias dos clientes.",layout:"apartamento"},
-  "alto-do-buriti":{ready:true,code:"AB",title:"Alto do Buriti",description:"Vistorias dos clientes · 319 casas nos conjuntos A a R.",layout:"casa"}
+  // Só o tipo de módulo fica no código; título, descrição e ordem vêm de public.projects.
+  "alto-do-jeriva":{ready:true,layout:"apartamento"},
+  "alto-do-buriti":{ready:true,layout:"casa"}
 };
 /* Layout das unidades por condomínio: apartamentos (bloco/pavimento/apto) ou casas (conjunto/número). */
 const BURITI_CONJUNTOS={A:7,B:42,C:10,D:10,E:10,F:10,G:10,H:53,I:49,J:7,K:8,L:47,M:10,N:10,O:10,P:10,Q:10,R:6};
@@ -1083,7 +1255,13 @@ const SEED=[{"bloco": "A", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst":
 
 const SEED_CRON=[["A","6º","","","","","2026-05-12","2026-05-12","",""],["A","5º","","","","","2026-05-18","2026-05-18","2026-06-22",""],["A","4º","","","","","2026-05-26","2026-05-26","2026-06-24",""],["A","3º","","","","","2026-05-28","2026-05-28","2026-06-26",""],["A","2º","","","","","2026-06-02","2026-06-02","2026-06-29",""],["A","1º","","","","","2026-06-05","2026-06-05","2026-07-01",""],["A","T","","","","","2026-06-09","2026-06-09","2026-07-03",""],["B","6º","2026-07-20","","2026-07-20","","2026-07-20","","2026-07-20",""],["B","5º","2026-07-20","","2026-07-20","","2026-07-21","","2026-07-21",""],["B","4º","2026-07-21","","2026-07-21","","2026-07-21","","2026-07-21",""],["B","3º","2026-07-21","","2026-07-21","","2026-07-22","","2026-07-22",""],["B","2º","2026-07-22","","2026-07-22","","2026-07-22","","2026-07-22",""],["B","1º","2026-07-22","","2026-07-22","","2026-07-23","","2026-07-23",""],["B","T","2026-07-23","","2026-07-23","","2026-07-24","","2026-07-24",""],["C","6º","2026-06-11","","2026-06-11","","2026-06-15","2026-07-01","2026-06-15",""],["C","5º","2026-06-12","","2026-06-12","","2026-06-16","","2026-06-16",""],["C","4º","2026-06-15","","2026-06-15","","2026-06-17","","2026-06-17",""],["C","3º","2026-06-16","","2026-06-16","","2026-06-17","","2026-06-17",""],["C","2º","2026-06-17","","2026-06-17","","2026-06-18","","2026-06-18",""],["C","1º","2026-06-18","","2026-06-18","","2026-06-19","","2026-06-19",""],["C","T","2026-06-19","","2026-06-19","","2026-06-22","","2026-06-22",""],["D","6º","2026-07-14","","2026-07-14","","2026-07-14","","2026-07-14",""],["D","5º","2026-07-14","","2026-07-14","","2026-07-15","","2026-07-15",""],["D","4º","2026-07-15","","2026-07-15","","2026-07-15","","2026-07-15",""],["D","3º","2026-07-15","","2026-07-15","","2026-07-16","","2026-07-16",""],["D","2º","2026-07-16","","2026-07-16","","2026-07-16","","2026-07-16",""],["D","1º","2026-07-16","","2026-07-16","","2026-07-17","","2026-07-17",""],["D","T","2026-07-17","","2026-07-17","","2026-07-20","","2026-07-20",""],["E","6º","2026-06-22","","2026-06-22","","2026-06-22","","2026-06-22",""],["E","5º","2026-06-22","","2026-06-22","","2026-06-23","","2026-06-23",""],["E","4º","2026-06-23","","2026-06-23","","2026-06-23","","2026-06-23",""],["E","3º","2026-06-23","","2026-06-23","","2026-06-24","","2026-06-24",""],["E","2º","2026-06-24","","2026-06-24","","2026-06-24","","2026-06-24",""],["E","1º","2026-06-24","","2026-06-24","","2026-06-25","","2026-06-25",""],["E","T","2026-06-25","","2026-06-25","","2026-06-26","","2026-06-26",""],["F","6º","2026-07-08","","2026-07-08","","2026-07-08","","2026-07-08",""],["F","5º","2026-07-08","","2026-07-08","","2026-07-09","","2026-07-09",""],["F","4º","2026-07-09","","2026-07-09","","2026-07-09","","2026-07-09",""],["F","3º","2026-07-09","","2026-07-09","","2026-07-10","","2026-07-10",""],["F","2º","2026-07-10","","2026-07-10","","2026-07-10","","2026-07-10",""],["F","1º","2026-07-10","","2026-07-10","","2026-07-13","","2026-07-13",""],["F","T","2026-07-13","","2026-07-13","","2026-07-14","","2026-07-14",""],["G","6º","2026-06-26","","2026-06-26","","2026-06-26","","2026-06-26",""],["G","5º","2026-06-26","","2026-06-26","","2026-06-29","","2026-06-29",""],["G","4º","2026-06-29","","2026-06-29","","2026-06-29","","2026-06-29",""],["G","3º","2026-06-29","","2026-06-29","","2026-06-30","","2026-06-30",""],["G","2º","2026-06-30","","2026-06-30","","2026-06-30","","2026-06-30",""],["G","1º","2026-06-30","","2026-06-30","","2026-07-01","","2026-07-01",""],["G","T","2026-07-01","","2026-07-01","","2026-07-02","","2026-07-02",""],["H","6º","2026-07-02","","2026-07-02","","2026-07-02","","2026-07-02",""],["H","5º","2026-07-02","","2026-07-02","","2026-07-03","","2026-07-03",""],["H","4º","2026-07-03","","2026-07-03","","2026-07-03","","2026-07-03",""],["H","3º","2026-07-03","","2026-07-03","","2026-07-06","","2026-07-06",""],["H","2º","2026-07-06","","2026-07-06","","2026-07-06","","2026-07-06",""],["H","1º","2026-07-06","","2026-07-06","","2026-07-07","","2026-07-07",""],["H","T","2026-07-07","","2026-07-07","","2026-07-08","","2026-07-08",""]];
 const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{}};
-const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:""});
+const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:"",acomp:""});
+/* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
+const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
+function acompSelect(value,attrs,empty="— Não informado"){
+  return `<select ${attrs}><option value=""${value?"":" selected"}>${empty}</option>`+
+    Object.entries(ACOMP).map(([k,l])=>`<option value="${k}"${value===k?" selected":""}>${l}</option>`).join("")+`</select>`;
+}
 const kPV=(b,p)=>b+"|"+p;
 const dstr=v=>(""+(v||"")).slice(0,10);
 const kO=(b,p,a)=>b+"|"+p+"|"+a, kC=(b,p,a)=>b+"|"+p+"|"+a;
@@ -1173,7 +1351,7 @@ function animateResumo(){
   gsap.from("#resumoGrid .rg-card",{y:16,opacity:0,duration:.5,stagger:.12,ease:"power2.out",clearProps:"all"});
   document.querySelectorAll("#resumoGrid .dprog").forEach(el=>{const off=+el.getAttribute("data-off"),c=+el.getAttribute("data-c");gsap.fromTo(el,{strokeDashoffset:c},{strokeDashoffset:off,duration:1.1,ease:"power2.out"});});
   gsap.from("#resumoGrid .track i",{scaleX:0,transformOrigin:"left center",duration:.9,stagger:.02,ease:"power2.out",clearProps:"transform"});
-  gsap.from("#resumoGrid .stk-bar",{scaleX:0,transformOrigin:"left center",duration:.8,stagger:.05,ease:"power2.out",clearProps:"transform"});
+  gsap.from("#resumoGrid .stk-bar",{opacity:0,duration:.6,stagger:.04,ease:"power2.out",clearProps:"opacity"});
   gsap.from("#resumoGrid .rb .n",{opacity:0,y:8,duration:.5,stagger:.05,delay:.15,clearProps:"all"});
 }
 function animateView(v){
@@ -1193,10 +1371,13 @@ function updateAuthUI(){
   if(inl)document.getElementById("userName").textContent=(currentUser.nome||currentUser.usuario)+" · "+(NIVL[currentUser.nivel]||currentUser.nivel);
 }
 function projectExperience(project){
-  const configured=PROJECT_EXPERIENCES[project?.slug];
-  return configured||{ready:false,code:projectInitials(project?.name),title:project?.name||"Empreendimento",description:"Módulo específico em preparação."};
+  const configured=PROJECT_EXPERIENCES[project?.slug],title=project?.name||"Empreendimento";
+  return {ready:!!configured?.ready,layout:configured?.layout||"apartamento",code:projectInitials(title),title,
+    description:project?.description||(configured?"":"Módulo específico em preparação.")};
 }
-function projectInitials(name){return String(name||"OB").split(/\s+/).filter(Boolean).slice(0,2).map(word=>word[0]).join("").toUpperCase()||"OB";}
+function sortProjects(){availableProjects.sort((x,y)=>((x.sort_order??100)-(y.sort_order??100))||String(x.name).localeCompare(String(y.name),"pt-BR"));}
+const INITIALS_SKIP=new Set(["de","do","da","dos","das","e"]);
+function projectInitials(name){const words=String(name||"").split(/\s+/).filter(w=>w&&!INITIALS_SKIP.has(w.toLowerCase()));return words.slice(0,2).map(w=>w[0]).join("").toUpperCase()||"OB";}
 function updateProjectBrand(){
   const experience=appProject?projectExperience(appProject):null;
   const projectName=experience?.title||"Obra selecionada";
@@ -1282,12 +1463,13 @@ function renderCli(){
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
-  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),ap=n("ap");
-  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f9e5b","#268a4d","Aprovado",ap]];
+  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap");
+  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap]];
   document.getElementById("cliResumo").innerHTML=R.map(([bg,bd,l,val])=>
     `<div class="rc"><div class="rl"><span class="sw" style="background:${bg};border-color:${bd}"></span>${l}</div><div class="rv">${val}</div></div>`).join("")+
     `<div class="rc tot"><div class="rl">Total de unidades</div><div class="rv">${t} <span style="font-size:12px;color:#9aa39a;font-weight:700">${LAYOUT.unitsWord}</span></div></div>`;
-  const vist=ap+rv, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
+  // Revistoria Finalizada conta como unidade vistoriada; a % de revistoria considera só as pendentes.
+  const vist=ap+rv+rf, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
   pct1.textContent=p1+"%"; bar1.style.width=p1+"%"; foot1.textContent=`${ap} de ${vist} vistoriados`;
   const META=0.70; const goalEl=document.getElementById("goal1");
   if(goalEl){
@@ -1302,7 +1484,7 @@ function renderCli(){
       goalEl.className="af-goal";
     }
   }
-  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) p/ revistoria`;
+  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) p/ revistoria`+(rf?` · ${rf} finalizada(s)`:"");
   if(cliMode==="lista"){ ensureCliFilters(); renderCliList(); }
 }
 
@@ -1384,19 +1566,19 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
       <td class="cap">${r.b}</td>
       <td class="cunit" title="${esc(unitTitle(r.b,r.p,r.a))}">${unitCode(r.b,r.p,r.a)}${r.pcd?' <span class="tag pcd">PCD</span>':""}</td>
-      <td class="ccli">${esc(i.cliente)||"—"}${i.sale_stage?` <span class="tag stage${/distrato/i.test(i.sale_stage)?" warn":""}">${esc(i.sale_stage)}</span>`:""}</td>
+      <td class="ccli">${esc(i.cliente)||"—"}</td>
       <td>${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td>
       <td>${esc(i.horario_vistoria)||"—"}</td>
       <td>${esc(i.responsavel)||"—"}</td>
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
-      <td>${r.code==="rv"&&i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
+      <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`,"—"):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
     </tr>`;
   });
   h+='</tbody></table></div>';
@@ -1409,7 +1591,7 @@ function printCliList(){
   let body=`<!doctype html><html><head><meta charset="utf-8"><title>Vistoria Cliente — Lista</title><style>
     @page{margin:10mm}
     *{box-sizing:border-box}
-    body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;color:#12241a;margin:0;padding:0}
+    body{font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#12241a;margin:0;padding:0}
     h1{font-size:14px;margin:0 0 2px}
     .sub{font-size:9.5px;color:#666;margin-bottom:9px}
     table{width:100%;border-collapse:collapse;font-size:10px}
@@ -1421,10 +1603,10 @@ function printCliList(){
   </style></head><body>
     <h1>${esc(projectExperience(appProject).title)} · Vistoria Cliente</h1>
     <div class="sub">Lista filtrada — gerado em ${now} — ${rows.length} unidade(s)</div>
-    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data</th><th class="w-h">Horário</th><th>Responsável</th></tr></thead><tbody>`;
+    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data</th><th class="w-h">Horário</th><th>Responsável</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const i=r.info;
-    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td></tr>`;
+    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
   });
   body+='</tbody></table></body></html>';
   const w=window.open("","_blank");
@@ -1436,7 +1618,7 @@ function printCliList(){
 /* ── POPOVER ── */
 const pop=document.getElementById("pop"); let ctx=null, popAnchor=null;
 const popBackdrop=document.createElement("div");popBackdrop.className="pop-backdrop";document.body.appendChild(popBackdrop);
-const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","obs"];
+const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","obs","acomp"];
 const TIME_PRESETS=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00"];
 const sheetMode=()=>matchMedia("(max-width:720px)").matches;
 const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
@@ -1510,7 +1692,9 @@ function refreshPopActions(){
 }
 function renderCliPop(){
   const key=kC(ctx.b,ctx.p,ctx.a),info=state.cliInfo[key]||emptyCliInfo(),cur=state.cli[key],meta=state.unitMeta[key]||{};
-  const val=f=>esc(cliDraftValue(f)),can=canEditCli(),dis=can?"":"disabled";
+  const val=f=>esc(cliDraftValue(f)),scope=cliEditScope(key),can=!!scope,dis=scope==="all"?"":"disabled";
+  const fdis=f=>(scope==="all"||(scope==="rev"&&REV_FIELDS.includes(f)))?"":"disabled";
+  const stDis=c=>(scope==="all"||(scope==="rev"&&cur==="rv"&&c==="rf"))?"":"disabled";
   const idx=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a);
   const responsaveis=[...new Set(Object.values(state.cliInfo).map(i=>i.responsavel).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
   const kicker=LAYOUT.kind==="casa"?`Conjunto ${ctx.b}`:`Bloco ${ctx.b} · ${PAVL[ctx.p]}`;
@@ -1518,8 +1702,8 @@ function renderCliPop(){
   const cliente=cliDraftValue("cliente");
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
-  const showRev=cur==="rv"||cliDraftValue("data_revistoria");
-  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${dis}><button type="button" class="pp-mini" data-today="${field}" ${dis}>Hoje</button></span></label>`;
+  const showRev=cur==="rv"||cur==="rf"||cliDraftValue("data_revistoria");
+  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
   pop.innerHTML=`
     <div class="pp-head">
       <div class="pp-title"><small>${kicker}</small><strong>${name}</strong></div>
@@ -1532,7 +1716,7 @@ function renderCliPop(){
     <div class="pp-body">
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
-      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${dis} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
@@ -1540,8 +1724,10 @@ function renderCliPop(){
         <div class="pp-times pp-full" aria-label="Horários rápidos">${TIME_PRESETS.map(t=>`<button type="button" class="pp-chip${cliDraftValue("horario_vistoria")===t?" sel":""}" data-time="${t}" ${dis}>${t}</button>`).join("")}</div>
         <label class="pp-f pp-full"><span>Responsável pela vistoria</span><input name="responsavel" list="ppRespList" value="${val("responsavel")}" placeholder="Nome do responsável" autocomplete="off" ${dis}><datalist id="ppRespList">${responsaveis.map(r=>`<option value="${esc(r)}"></option>`).join("")}</datalist></label>
         ${showRev?dateField("data_revistoria","Data da revistoria (combinar c/ cliente)"):""}
-        <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${dis}>${val("obs")}</textarea></label>
-        ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">Somente administradores editam a vistoria do cliente.</div>`}
+        <label class="pp-f pp-full"><span>Acomp. Técnico</span>${acompSelect(cliDraftValue("acomp"),`name="acomp" class="pp-select" ${dis}`)}</label>
+        <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${fdis("obs")}>${val("obs")}</textarea></label>
+        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: finalize a revistoria e ajuste a data da revistoria e as observações.</div>`:""}
+        ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">${currentUser?.nivel==="revistorias"?"Com a permissão Revistorias você altera apenas unidades em Revistoria.":"Somente administradores editam a vistoria do cliente."}</div>`}
       </form>
     </div>`;
   pop.setAttribute("tabindex","-1");pop.setAttribute("role","dialog");pop.setAttribute("aria-label",name+" · "+kicker);
@@ -1556,8 +1742,22 @@ function renderCliPop(){
     else if(a==="discard"){ctx.draft=null;ctx.dirty=false;renderPop();}});
   refreshPopActions();
 }
+async function saveAcomp(select){
+  const {b,p,a}=select.dataset,key=kC(b,p,a),info=state.cliInfo[key];
+  if(!info||!canEditCli()){toast("Somente administrador edita a Vistoria Cliente");return;}
+  const value=select.value,old=info.acomp||"";if(value===old)return;
+  info.acomp=value;select.classList.toggle("set",!!value);select.disabled=true;
+  try{
+    await setCliFields(b,p,a,{acomp:value});
+    toast("Acomp. Técnico: "+(ACOMP[value]||"não informado"));
+    if(ctx&&ctx.k==="cli"&&kC(ctx.b,ctx.p,ctx.a)===key&&!(ctx.draft&&"acomp" in ctx.draft))renderPop();
+  }catch(e){info.acomp=old;select.value=old;select.classList.toggle("set",!!old);toast(syncErrorMessage(e));load(true).catch(()=>{});}
+  finally{select.disabled=false;}
+}
 async function saveCliDraft(){
-  if(!ctx||ctx.k!=="cli"||!canEditCli())return;
+  if(!ctx||ctx.k!=="cli")return;
+  const scope=cliEditScope(kC(ctx.b,ctx.p,ctx.a));if(!scope)return;
+  if(scope==="rev"&&Object.keys(cliChanges()).some(f=>!REV_FIELDS.includes(f))){toast("A permissão Revistorias altera apenas data da revistoria e observações");return;}
   const changes=cliChanges();if(!Object.keys(changes).length){refreshPopActions();return;}
   const key=kC(ctx.b,ctx.p,ctx.a),snapshot=ctx,old={...state.cliInfo[key]};
   const btn=pop.querySelector(".pp-actions [type=submit]");if(btn){btn.disabled=true;btn.textContent="Salvando…";}
@@ -1584,7 +1784,9 @@ async function setStatus(code){
     try{await setCell("obra",ctx.b,ctx.p,ctx.a,ctx.fr,STL[code],detalhe);toast("Status atualizado");}
     catch(e){state.obra[key][ctx.fr]=old;renderObra();renderResumo();renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   } else {
-    if(!canEditCli()){toast("Somente administrador edita a Vistoria Cliente");return;}
+    const scopeKey=kC(ctx.b,ctx.p,ctx.a);
+    if(!canEditCli()&&!(cliEditScope(scopeKey)==="rev"&&state.cli[scopeKey]==="rv"&&code==="rf")){
+      toast(currentUser?.nivel==="revistorias"?"A permissão Revistorias só finaliza revistorias":"Somente administrador edita a Vistoria Cliente");return;}
     const target={...ctx},key=kC(target.b,target.p,target.a);const old=state.cli[key];
     if(old===code)return;
     state.cli[key]=code;
@@ -1715,7 +1917,7 @@ async function setCell(t,b,pav,a,field,value,detalhe){
   throw new Error("Tabela inválida.");
 }
 /* Salva vários campos da vistoria do cliente numa única atualização versionada. */
-const CLI_COLUMNS={cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",obs:"notes"};
+const CLI_COLUMNS={acomp:"technical_escort",cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",obs:"notes"};
 async function setCliFields(b,pav,a,changes){
   if(!SUPABASE_READY||!currentUser||!appProject)throw new Error("Sessão indisponível.");
   const unit=dbIndex.unitByKey.get(kC(b,pav,a));if(!unit)throw new Error("Unidade não encontrada.");
@@ -1749,7 +1951,7 @@ function applyStageRecord(r){
 function applyClientRecord(r){
   dbIndex.clientByUnit.set(r.unit_id,r);const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;
   state.cli[key]=normCli(r.status);
-  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),obs:r.notes||"",sale_stage:r.sale_stage||""};
+  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),obs:r.notes||"",sale_stage:r.sale_stage||"",acomp:r.technical_escort||""};
 }
 function applyScheduleRecord(r){
   const key=kPV(_blk(r.bloco),_pav(r.pav)),mapKey=key+"|"+r.stage;dbIndex.scheduleByKey.set(mapKey,r);
@@ -1799,6 +2001,14 @@ let currentUser=null;
 function isAdmin(){ return !!(currentUser&&currentUser.nivel==="admin"); }
 function canEditFrente(fr){if(!SUPABASE_READY||!currentUser)return false;return currentUser.nivel==="admin"||currentUser.nivel===fr;}
 function canEditCli(){return SUPABASE_READY&&isAdmin();}
+/* Permissão "Revistorias": só unidades em Revistoria / Revistoria Finalizada, status apenas Revistoria → Finalizada,
+   e somente data da revistoria e observações (o banco aplica a mesma regra via RLS + trigger). */
+const REV_FIELDS=["data_revistoria","obs"];
+function cliEditScope(key){
+  if(canEditCli())return "all";
+  if(SUPABASE_READY&&currentUser?.nivel==="revistorias"&&(state.cli[key]==="rv"||state.cli[key]==="rf"))return "rev";
+  return null;
+}
 function canEditPlan(){return SUPABASE_READY&&isAdmin();}
 function setAuthFeedback(id,message,type="error"){
   const el=document.getElementById(id);if(!el)return;
@@ -1821,13 +2031,14 @@ async function loadIdentity(authUser){
   const {data:memberships,error:memberError}=await supabase.from("project_members").select("project_id,role,active").eq("user_id",authUser.id).eq("active",true);
   if(memberError||!memberships?.length)throw new Error(PENDING_MSG);
   const projectIds=[...new Set(memberships.map(item=>item.project_id))];
-  const {data:projects,error:projectError}=await supabase.from("projects").select("id,slug,name").in("id",projectIds).order("name",{ascending:true});
+  const {data:projects,error:projectError}=await supabase.from("projects").select("id,slug,name,description,sort_order").in("id",projectIds).order("sort_order",{ascending:true}).order("name",{ascending:true});
   if(projectError||!projects?.length)throw new Error(PENDING_MSG);
   const {data:profile}=await supabase.from("profiles").select("full_name,email").eq("id",authUser.id).maybeSingle();
   availableProjects=projects.map(project=>{
     const membership=memberships.find(item=>String(item.project_id)===String(project.id));
     return {...project,role:String(membership?.role||"visitante").toLowerCase()};
   });
+  sortProjects();
   appProject=null;
   currentUser={id:authUser.id,usuario:authUser.email||profile?.email||"",nivel:"",nome:profile?.full_name||authUser.email||"Usuário"};
 }
@@ -1853,7 +2064,160 @@ function openAdminArea(){
   if(!adminProjects().length){toast("Acesso restrito a administradores");return;}
   const overlay=document.getElementById("adminOv");
   document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
-  loadUsers();loadLogs();
+  showCfgTab("apr");loadUsers();
+}
+/* ── VISÃO GERAL: agendamentos de todos os condomínios do usuário ──
+   Uma única consulta em client_inspections + units (RLS limita aos condomínios liberados). */
+const OV_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b7950b","#7b241c"];
+let ovRows=[],ovView=[],ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};
+function ovProjects(){return [...availableProjects];}
+function ovColor(projectId){const i=ovProjects().findIndex(p=>String(p.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
+function ovUnit(u){
+  const b=_blk(u.bloco),p=_pav(u.pav),a=_apt(u.apto),casa=u.kind==="casa";
+  const code=casa?String(+a):unitCode_(p,a);
+  return {b,p,a,casa,ucode:code,groupLabel:(casa?"Conj. ":"Bloco ")+b,unitLabel:casa?"Casa "+code:"Apto "+code};
+}
+function openOverview(){
+  const overlay=document.getElementById("overviewOv");
+  document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
+  renderOvFilters();loadOverview();
+}
+function closeOverview(){
+  const overlay=document.getElementById("overviewOv");
+  overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
+  if(!document.getElementById("adminOv").classList.contains("open"))document.body.classList.remove("admin-open");
+}
+async function loadOverview(){
+  const list=document.getElementById("ovList");
+  if(!ovRows.length)list.innerHTML='<div class="clif-empty">Carregando agendamentos…</div>';
+  try{
+    const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)");
+    const projects=new Map(availableProjects.map(p=>[String(p.id),p]));
+    ovRows=rows.map(r=>{
+      const u=r.units||{},project=projects.get(String(u.project_id));if(!project)return null;
+      return {projectId:project.id,projectName:projectExperience(project).title||project.name,...ovUnit(u),pcd:!!u.pcd,code:normCli(r.status),
+        cliente:r.client_name||"",data:dstr(r.inspection_date),hora:(""+(r.inspection_time||"")).slice(0,5),resp:r.responsible||"",
+        rev:dstr(r.reinspection_date),obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||""};
+    }).filter(r=>r&&(r.code!=="na"||r.data));
+    document.getElementById("ovUpdated").textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    renderOvFilters();renderOverview();
+  }catch(e){list.innerHTML='<div class="clif-empty apr-error">Não foi possível carregar os agendamentos. Tente atualizar.</div>';}
+}
+function renderOvFilters(){
+  const projects=ovProjects();
+  document.getElementById("ovProjects").innerHTML=`<button class="chip${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL">Todos</button>`+
+    projects.map(p=>`<button class="chip ov-chip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--ov:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
+  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na"].map(c=>
+    `<button class="chip${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+  document.querySelectorAll("#ovPeriod [data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===ovFilt.period));
+  document.getElementById("ovDtIni").value=ovFilt.dtIni;document.getElementById("ovDtFim").value=ovFilt.dtFim;
+  document.getElementById("ovQ").value=ovFilt.q;document.getElementById("ovU").value=ovFilt.u;
+}
+function renderOverview(){
+  const today=todayISO(),count=f=>ovRows.filter(f).length;
+  const active=new Set(ovRows.filter(r=>r.data&&r.data>=today&&r.code!=="ap").map(r=>r.projectId));
+  const cards=[
+    ["all","Total de agendamentos",ovRows.length,""],
+    ["today","Agendamentos de hoje",count(r=>r.data===today),"blue"],
+    ["ap","Aprovados",count(r=>r.code==="ap"),"ok"],
+    ["pend","Revistorias / Pendentes",count(r=>r.code==="rv"||r.code==="rm"),"warn"],
+    ["active","Condomínios com vistoria ativa",active.size,""]];
+  document.getElementById("ovCards").innerHTML=cards.map(([k,l,v,c])=>`<button type="button" class="kbox ov-card ${c}" data-ovcard="${k}"><div class="kl">${l}</div><div class="kv">${v}</div></button>`).join("");
+  let rows=ovRows.slice();
+  if(ovFilt.period==="today")rows=rows.filter(r=>r.data===today);
+  else if(ovFilt.period==="next")rows=rows.filter(r=>r.data&&r.data>=today);
+  if(ovFilt.projects.length)rows=rows.filter(r=>ovFilt.projects.includes(String(r.projectId)));
+  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
+  if(ovFilt.dtIni)rows=rows.filter(r=>r.data&&r.data>=ovFilt.dtIni);
+  if(ovFilt.dtFim)rows=rows.filter(r=>r.data&&r.data<=ovFilt.dtFim);
+  const q=ovFilt.q.trim().toLowerCase();if(q)rows=rows.filter(r=>r.cliente.toLowerCase().includes(q));
+  const uq=ovFilt.u.trim().toLowerCase().replace(/\s+/g,"");
+  if(uq)rows=rows.filter(r=>{const full=(r.b+r.ucode).toLowerCase();return full.startsWith(uq)||r.ucode.toLowerCase()===uq.replace(/^0+(?=\d)/,"")||(!r.casa&&r.ucode.toLowerCase().includes(uq));});
+  rows.sort((x,y)=>{const dx=x.data||"9999-99-99",dy=y.data||"9999-99-99";if(dx!==dy)return dx<dy?-1:1;
+    const hx=x.hora||"99:99",hy=y.hora||"99:99";if(hx!==hy)return hx<hy?-1:1;
+    return x.projectName.localeCompare(y.projectName,"pt-BR")||x.b.localeCompare(y.b)||x.a.localeCompare(y.a);});
+  ovView=rows;
+  document.getElementById("ovCount").textContent=rows.length+" agendamento(s)";
+  const list=document.getElementById("ovList");
+  if(!rows.length){list.innerHTML='<div class="clif-empty">Nenhum agendamento encontrado com esses filtros.</div>';return;}
+  const dayLabel=d=>{if(!d)return "Sem data definida";const dt=new Date(d+"T12:00:00");const w=dt.toLocaleDateString("pt-BR",{weekday:"long"});
+    return (d===today?"Hoje · ":"")+w.charAt(0).toUpperCase()+w.slice(1)+", "+fmtDate(d);};
+  const perDay={};rows.forEach(r=>{perDay[r.data]=(perDay[r.data]||0)+1;});
+  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let lastDay=null;
+  rows.forEach((r,i)=>{
+    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="10"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
+    const s=CLR_C[r.code]||CLR_C.na,color=ovColor(r.projectId);
+    h+=`<tr class="ov-row" data-ov="${i}" tabindex="0" style="--ov:${color}" title="Abrir ${esc(r.unitLabel)} no ${esc(r.projectName)}">
+      <td class="ov-proj"><span class="ov-badge"><i></i>${esc(r.projectName)}</span></td>
+      <td>${esc(r.groupLabel)}</td>
+      <td class="cunit">${esc(r.ucode)}${r.pcd?' <span class="tag pcd">PCD</span>':""}</td>
+      <td class="ccli">${esc(r.cliente)||"—"}${r.stage?` <span class="tag stage${/distrato/i.test(r.stage)?" warn":""}">${esc(r.stage)}</span>`:""}</td>
+      <td>${r.data?fmtDate(r.data):"—"}</td>
+      <td>${esc(r.hora)||"—"}</td>
+      <td>${esc(r.resp)||"—"}</td>
+      <td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td>
+      <td class="clif-obs" title="${esc(r.obs)}">${r.obs?(esc(r.obs).slice(0,28)+(r.obs.length>28?"…":"")):"—"}</td>
+      <td class="cacomp">${ACOMP[r.acomp]||"—"}</td>
+    </tr>`;
+  });
+  list.innerHTML=h+"</tbody></table></div>";
+}
+async function openOverviewUnit(r){
+  if(!r)return;
+  const project=availableProjects.find(p=>String(p.id)===String(r.projectId));
+  if(!project||!projectExperience(project).ready){toast("O módulo deste condomínio ainda está em preparação.");return;}
+  closeOverview();
+  await selectProject(r.projectId);
+  if(!appProject||String(appProject.id)!==String(r.projectId))return;
+  cliMode="mapa";cliBlk="ALL";switchView("cliente");
+  const el=document.querySelector(`#cliGrid [data-k="cli"][data-b="${CSS.escape(r.b)}"][data-p="${CSS.escape(r.p)}"][data-a="${CSS.escape(r.a)}"]`);
+  if(el){el.scrollIntoView({block:"center",inline:"center"});setTimeout(()=>openPop(el),60);}
+}
+/* ── CONFIGURAÇÕES ── */
+let condDraft=[];
+function showCfgTab(tab){
+  document.querySelectorAll("#cfgTabs [data-cfg]").forEach(b=>{const on=b.dataset.cfg===tab;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on));});
+  document.querySelectorAll("#adminOv [data-pane]").forEach(p=>p.hidden=p.dataset.pane!==tab);
+  if(tab==="cond")resetCondDraft();
+  if(tab==="logs")loadLogs();
+}
+function resetCondDraft(){condDraft=adminProjects().map(p=>({id:p.id,name:p.name||"",description:p.description||"",sort_order:p.sort_order}));renderCondConfig();}
+function condChanged(){
+  const original=adminProjects().map(p=>String(p.id)),order=condDraft.map(p=>String(p.id));
+  return order.join()!==original.join()||condDraft.some(d=>{const p=availableProjects.find(x=>String(x.id)===String(d.id));return !p||p.name!==d.name||(p.description||"")!==d.description;});
+}
+function renderCondConfig(){
+  const list=document.getElementById("condList");if(!list)return;
+  if(!condDraft.length){list.innerHTML='<div class="clif-empty">Nenhum condomínio sob sua administração.</div>';return;}
+  list.innerHTML=condDraft.map((d,i)=>`<article class="cond-row" data-cond-i="${i}">
+    <div class="cond-order"><span class="cond-pos" title="Posição na tela de seleção">${i+1}º</span>
+      <button type="button" class="pp-icon cond-move" data-cond-move="-1" ${i===0?"disabled":""} aria-label="Subir ${esc(d.name)}">↑</button>
+      <button type="button" class="pp-icon cond-move" data-cond-move="1" ${i===condDraft.length-1?"disabled":""} aria-label="Descer ${esc(d.name)}">↓</button></div>
+    <span class="project-monogram">${esc(projectInitials(d.name))}</span>
+    <div class="cond-fields">
+      <div class="fld"><label>Título</label><input data-cond-field="name" value="${esc(d.name)}" maxlength="80" placeholder="Nome do condomínio"></div>
+      <div class="fld"><label>Descrição</label><input data-cond-field="description" value="${esc(d.description)}" maxlength="160" placeholder="Texto exibido no cartão do condomínio"></div>
+    </div></article>`).join("");
+  const changed=condChanged();
+  document.getElementById("condSave").disabled=!changed;document.getElementById("condReset").hidden=!changed;
+  document.getElementById("condHint").textContent=changed?"Alterações não salvas":"";
+}
+async function saveCondConfig(){
+  if(condDraft.some(d=>!d.name.trim())){toast("Informe o título de todos os condomínios");return;}
+  const btn=document.getElementById("condSave");btn.disabled=true;btn.textContent="Salvando…";
+  try{
+    for(const [i,d] of condDraft.entries()){
+      const patch={name:d.name.trim(),description:d.description.trim(),sort_order:(i+1)*10};
+      const p=availableProjects.find(x=>String(x.id)===String(d.id));
+      if(p&&p.name===patch.name&&(p.description||"")===patch.description&&p.sort_order===patch.sort_order)continue;
+      const {data,error}=await supabase.from("projects").update(patch).eq("id",d.id).select("id,name,description,sort_order").maybeSingle();
+      if(error||!data)throw error||new Error("Sem permissão para alterar "+d.name);
+      Object.assign(p,data);
+    }
+    sortProjects();resetCondDraft();renderProjectChooser();updateProjectBrand();toast("Configurações salvas");
+  }catch(e){toast(e?.message||"Não foi possível salvar");}
+  finally{btn.textContent="Salvar configurações";renderCondConfig();}
 }
 function closeAdminArea(){
   const overlay=document.getElementById("adminOv");
@@ -1953,12 +2317,12 @@ async function bootAuth(){
 }
 function clearAuthReturn(){if(AUTH_RETURN&&history.replaceState)history.replaceState(null,"",location.pathname);}
 async function logout(){
-  closeAdminArea();aprRows=[];updateAprBadges();
+  closeAdminArea();aprRows=[];aprUsers=[];updateAprBadges();
   document.body.classList.add("auth-locked");stopRealtime();if(supabase)await supabase.auth.signOut().catch(()=>{});currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
 }
 /* ── APROVAÇÕES DE ACESSO ── */
 const APR_STATUS={pending:{label:"Pendente",cls:"pending"},approved:{label:"Aprovado",cls:"active"},rejected:{label:"Rejeitado / bloqueado",cls:"blocked"}};
-let aprRows=[],aprView=[],aprFilt={project:"",status:"ALL",q:""};
+let aprRows=[],aprUsers=[],aprView=[],aprFilt={project:"",status:"ALL",q:""};
 function adminProjects(){return availableProjects.filter(project=>project.role==="admin");}
 async function adminUsersCall(body){
   const {data,error}=await supabase.functions.invoke("admin-users",{body});
@@ -1973,57 +2337,76 @@ function ensureAprProjects(){
   if(!options.some(o=>o.value===aprFilt.project))aprFilt.project=options[0]?.value||"";
   select.innerHTML=options.map(o=>`<option value="${esc(o.value)}"${o.value===aprFilt.project?" selected":""}>${esc(o.label)}</option>`).join("");
   select.disabled=options.length<2;
-  const accSelect=document.getElementById("accProject");
-  if(accSelect){const current=accSelect.value;accSelect.innerHTML=projects.map(project=>`<option value="${esc(project.id)}">${esc(projectExperience(project).title||project.name)}</option>`).join("");
-    if(projects.some(project=>String(project.id)===current))accSelect.value=current;else if(aprFilt.project!=="ALL")accSelect.value=aprFilt.project;
-    accSelect.disabled=projects.length<2;}
 }
 function updateAprBadges(){
-  const waiting=aprRows.filter(u=>u.status==="pending").length;
-  ["aprProjectBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
+  const waiting=aprUsers.filter(u=>u.status==="pending").length;
+  ["aprProjectBadge","aprTabBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
 }
 async function loadUsers(){
   if(!SUPABASE_READY||!adminProjects().length)return;
   ensureAprProjects();
   const list=document.getElementById("aprList");
-  const projects=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project);
+  // Sempre carrega todos os condomínios administrados: cada usuário aparece uma única vez.
+  const projects=adminProjects();
   if(list&&!aprRows.length)list.innerHTML='<div class="clif-empty">Carregando solicitações…</div>';
-  const results=await Promise.allSettled(projects.map(project=>adminUsersCall({action:"list",projectId:project.id}).then(data=>(data.users||[]).map(user=>({...user,projectId:project.id,projectName:projectExperience(project).title||project.name})))));
+  const results=await Promise.allSettled(projects.map(project=>adminUsersCall({action:"list",projectId:project.id}).then(data=>(data.users||[]).map(user=>({...user,projectId:String(project.id)})))));
   const failed=results.filter(r=>r.status==="rejected");
   aprRows=results.filter(r=>r.status==="fulfilled").flatMap(r=>r.value);
-  updateAprBadges();renderApr();
+  aggregateAprUsers();updateAprBadges();renderApr();
   if(failed.length&&list){
     const msg=failed[0].reason?.message||"Não foi possível carregar os usuários.";
     if(!aprRows.length)list.innerHTML=`<div class="clif-empty apr-error">${esc(msg)}</div>`;else toast(msg);
   }
 }
+const ROLE_RANK={admin:3,revistorias:2,visitante:1};
+function aggregateAprUsers(){
+  const map=new Map();
+  aprRows.forEach(r=>{
+    let u=map.get(r.id);
+    if(!u){u={id:r.id,email:r.email,fullName:r.fullName||"",createdAt:r.createdAt,access:{},roles:{}};map.set(r.id,u);}
+    if(!u.fullName&&r.fullName)u.fullName=r.fullName;
+    if(r.createdAt&&(!u.createdAt||r.createdAt<u.createdAt))u.createdAt=r.createdAt;
+    u.access[r.projectId]=r.status;
+    if(r.status==="approved")u.roles[r.projectId]=NIVL[String(r.role).toLowerCase()]?String(r.role).toLowerCase():"visitante";
+  });
+  map.forEach(u=>{
+    const states=Object.values(u.access);
+    u.status=states.includes("approved")?"approved":states.includes("pending")?"pending":"rejected";
+    u.role=Object.values(u.roles).sort((x,y)=>(ROLE_RANK[y]||0)-(ROLE_RANK[x]||0))[0]||"visitante";
+    u.selected=Object.keys(u.access).filter(pid=>u.access[pid]===(u.status==="approved"?"approved":"pending"));
+  });
+  aprUsers=[...map.values()];
+}
 function renderApr(){
   const list=document.getElementById("aprList");if(!list)return;
-  const count=status=>aprRows.filter(u=>u.status===status).length;
+  const count=status=>aprUsers.filter(u=>u.status===status).length;
   document.getElementById("aprKpis").innerHTML=`
     <div class="kbox warn"><div class="kl">Pendentes</div><div class="kv">${count("pending")}</div></div>
     <div class="kbox ok"><div class="kl">Aprovados</div><div class="kv">${count("approved")}</div></div>
     <div class="kbox"><div class="kl">Rejeitados / bloqueados</div><div class="kv">${count("rejected")}</div></div>
-    <div class="kbox blue"><div class="kl">Total</div><div class="kv">${aprRows.length}</div></div>`;
+    <div class="kbox blue"><div class="kl">Total</div><div class="kv">${aprUsers.length}</div></div>`;
   document.querySelectorAll("[data-apr-status]").forEach(b=>b.classList.toggle("active",b.dataset.aprStatus===aprFilt.status));
-  const q=aprFilt.q.trim().toLowerCase();
-  const order={pending:0,approved:1,rejected:2};
-  aprView=aprRows.filter(u=>(aprFilt.status==="ALL"||u.status===aprFilt.status)&&(!q||(u.fullName||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q)))
+  const q=aprFilt.q.trim().toLowerCase(),order={pending:0,approved:1,rejected:2};
+  aprView=aprUsers.filter(u=>(aprFilt.project==="ALL"||aprFilt.project in u.access)&&(aprFilt.status==="ALL"||u.status===aprFilt.status)&&(!q||u.fullName.toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q)))
     .sort((x,y)=>(order[x.status]-order[y.status])||String(y.createdAt||"").localeCompare(String(x.createdAt||"")));
   document.getElementById("aprCount").textContent=aprView.length+" usuário(s)";
   if(!aprView.length){list.innerHTML='<div class="clif-empty">Nenhum usuário encontrado com esses filtros.</div>';return;}
+  const projects=adminProjects();
   list.innerHTML=aprView.map((u,i)=>{
-    const st=APR_STATUS[u.status]||APR_STATUS.pending,role=String(u.role||"visitante").toLowerCase(),self=currentUser&&u.id===currentUser.id;
+    const st=APR_STATUS[u.status]||APR_STATUS.pending,self=currentUser&&u.id===currentUser.id;
     const when=u.createdAt?new Date(u.createdAt).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"—";
     const initials=String(u.fullName||u.email||"?").split(/[\s@.]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
-    const roleSel=`<select data-apr-role="${i}" aria-label="Permissão de ${esc(u.fullName||u.email)}">${Object.keys(NIVL).map(k=>`<option value="${k}"${k===role?" selected":""}>${esc(NIVL[k])}</option>`).join("")}</select>`;
+    const roleSel=`<select data-apr-role="${i}" aria-label="Permissão de ${esc(u.fullName||u.email)}"${self?" disabled":""}>${Object.keys(NIVL).map(k=>`<option value="${k}"${k===u.role?" selected":""}>${esc(NIVL[k])}</option>`).join("")}</select>`;
+    const chips=projects.map(p=>{const pid=String(p.id),state=u.access[pid],on=u.selected.includes(pid),lock=self&&state==="approved";
+      const hint=state==="approved"?"com acesso":state==="pending"?"solicitado":state==="rejected"?"bloqueado":"sem acesso";
+      return `<label class="apr-proj${on?" on":""}" title="${esc(projectExperience(p).title||p.name)} · ${hint}" style="--ov:${ovColor(pid)}"><input type="checkbox" data-apr-proj="${i}" value="${esc(pid)}"${on?" checked":""}${lock?" disabled":""}><i></i>${esc(projectExperience(p).title||p.name)}${state==="pending"&&u.status!=="pending"?' <small>solicitado</small>':""}</label>`;}).join("");
     let actions="";
     if(u.status==="pending")actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}">Rejeitar</button>`;
-    else if(u.status==="approved")actions=`<button class="btn g" data-apr-act="save" data-apr-i="${i}">Salvar permissão</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}"${self?' disabled title="Você não pode bloquear o próprio acesso"':""}>Bloquear</button>`;
+    else if(u.status==="approved")actions=`<button class="btn g" data-apr-act="save" data-apr-i="${i}"${self?" disabled":""}>Salvar</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}"${self?' disabled title="Você não pode bloquear o próprio acesso"':""}>Bloquear</button>`;
     else actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button>`;
     return `<article class="apr-row" data-status="${esc(u.status)}">
       <div class="apr-user"><span class="apr-avatar">${esc(initials||"?")}</span><div class="apr-id"><strong>${esc(u.fullName||"Sem nome")}${self?' <em>(você)</em>':""}</strong><span>${esc(u.email)}</span></div></div>
-      <div class="apr-meta"><span class="apr-k">Obra / Condomínio</span><span>${esc(u.projectName)}</span></div>
+      <div class="apr-meta apr-projs-wrap"><span class="apr-k">Condomínios com acesso</span><div class="apr-projs" role="group" aria-label="Condomínios de ${esc(u.fullName||u.email)}">${chips}</div></div>
       <div class="apr-meta"><span class="apr-k">Solicitado em</span><span>${esc(when)}</span></div>
       <div class="apr-meta"><span class="apr-k">Situação</span><span><span class="nivpill ${st.cls}">${st.label}</span></span></div>
       <div class="apr-meta apr-perm"><span class="apr-k">Permissão</span>${roleSel}</div>
@@ -2031,31 +2414,32 @@ function renderApr(){
     </article>`;
   }).join("");
 }
+/* Aplica a seleção de condomínios: libera (save) os marcados e bloqueia/rejeita (reject) os desmarcados. */
 async function aprAction(act,index,button){
   const u=aprView[index];if(!u||!adminProjects().length)return;
   const role=document.querySelector(`[data-apr-role="${index}"]`)?.value||u.role||"visitante";
-  if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email}?`))return;
+  const selected=[...document.querySelectorAll(`[data-apr-proj="${index}"]:checked`)].map(c=>c.value);
+  if(act!=="reject"&&!selected.length){toast("Selecione ao menos um condomínio");return;}
+  if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email} em todos os condomínios?`))return;
+  const ops=[];
+  adminProjects().forEach(p=>{
+    const pid=String(p.id),state=u.access[pid],keep=act!=="reject"&&selected.includes(pid);
+    if(keep){if(state!=="approved"||u.roles[pid]!==role)ops.push({action:"save",projectId:p.id,userId:u.id,email:u.email,fullName:u.fullName||"",role,active:true});}
+    else if(state==="approved"||state==="pending")ops.push({action:"reject",projectId:p.id,userId:u.id});
+  });
+  if(!ops.length){toast("Nenhuma alteração para salvar");return;}
   const buttons=button.closest(".apr-actions").querySelectorAll("button");buttons.forEach(b=>b.disabled=true);
   const label=button.textContent;button.textContent="Salvando…";
   try{
-    if(act==="reject")await adminUsersCall({action:"reject",projectId:u.projectId,userId:u.id});
-    else await adminUsersCall({action:"save",projectId:u.projectId,userId:u.id,email:u.email,fullName:u.fullName||"",role,active:true});
-    toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Permissão atualizada");
+    for(const op of ops)await adminUsersCall(op);
+    toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Acessos atualizados");
     await loadUsers();loadLogs();
-  }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;}
-}
-async function saveUser(){
-  const u=document.getElementById("accU").value.trim(),p=document.getElementById("accP").value,nome=document.getElementById("accNome").value.trim(),niv=document.getElementById("accNiv").value,active=document.getElementById("accActive").value==="true";
-  if(!u){toast("Informe o e-mail");return;}const projectId=Number(document.getElementById("accProject").value);if(!adminProjects().some(project=>Number(project.id)===projectId)){toast("Somente administrador");return;}
-  const btn=document.getElementById("accSave");btn.disabled=true;btn.textContent="Salvando…";
-  try{const {data,error}=await supabase.functions.invoke("admin-users",{body:{action:"save",projectId,email:u,password:p,fullName:nome,role:niv,active}});if(error||!data?.ok)throw error||new Error(data?.error||"Erro ao salvar");toast(active?"Acesso liberado":"Acesso bloqueado");document.getElementById("accP").value="";await loadUsers();await loadLogs();}
-  catch(e){toast(e&&e.message?e.message:"Falha ao salvar");}
-  finally{btn.disabled=false;btn.textContent=active?"Salvar e liberar acesso":"Salvar alterações";}
+  }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;loadUsers();}
 }
 function auditValue(v){if(v==null||v==="")return "(vazio)";const text=typeof v==="string"?v:JSON.stringify(v);return text.length>55?text.slice(0,52)+"…":text;}
 function auditDetail(l){
   const tables={unit_stage_status:"Etapa da obra",client_inspections:"Vistoria do cliente",floor_schedule:"Cronograma",project_members:"Acesso"};
-  const fields={status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
+  const fields={technical_escort:"Acomp. Técnico",sale_stage:"Etapa da venda",status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
   const old=l.old_data||{},now=l.new_data||{},ignored=new Set(["version","updated_at","updated_by"]);
   const changed=[...new Set([...Object.keys(old),...Object.keys(now)])].filter(k=>!ignored.has(k)&&JSON.stringify(old[k])!==JSON.stringify(now[k]));
   const parts=changed.slice(0,4).map(k=>(fields[k]||k)+": "+auditValue(old[k])+" → "+auditValue(now[k]));
@@ -2073,29 +2457,31 @@ const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDig
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
-  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),ap=cc("ap");
-  const vist=ap+rv, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
+  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap");
+  const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
   let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
   h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
      `<div class="rb"><div class="n">${ct}</div><div class="l">Unidades</div></div>`+
      `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
      `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
-  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Aprovado",ap]];
+  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
-  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
+  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-fin"></i>Revistorias finalizadas</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
   const groupLabel=b=>`${LAYOUT.groupShort} ${b}`;
   LAYOUT.groups.forEach(block=>{
     const statuses=groupUnits(block).map(u=>state.cli[kC(u.b,u.p,u.a)]);
     const total=statuses.length||1;
     const approved=statuses.filter(status=>status==="ap").length;
     const reviews=statuses.filter(status=>status==="rv").length;
+    const finished=statuses.filter(status=>status==="rf").length;
     const waiting=statuses.filter(status=>status==="ag"||status==="rm").length;
-    const rest=total-approved-reviews;
+    const rest=total-approved-reviews-finished;
     const segs=[
       {cls:"stk-ok",label:"Aprovados",n:approved},
+      {cls:"stk-fin",label:"Revistorias finalizadas",n:finished},
       {cls:"stk-rev",label:"Revistorias / Reprovados",n:reviews},
       {cls:"stk-na",label:"Sem agendamento",n:rest,extra:waiting?` · inclui ${waiting} agendado(s)/remarcado(s) aguardando vistoria`:""}
     ];
@@ -2124,6 +2510,7 @@ addEventListener("scroll",hideTip,true);
 initState();
 renderObra(); renderCli(); renderResumo();
 document.getElementById("obraModeTog")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;obraMode=b.dataset.mode;renderObra();});
+document.getElementById("cliListTbl").addEventListener("change",e=>{const s=e.target.closest("[data-acomp]");if(s)saveAcomp(s);});
 document.getElementById("cliModeTog").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cliMode=b.dataset.mode;renderCli();});
 document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();doLogin();});
 document.getElementById("signupForm").addEventListener("submit",e=>{e.preventDefault();doSignup();});
@@ -2133,15 +2520,36 @@ document.getElementById("btnLogout").onclick=logout;
 document.getElementById("projectLogout").onclick=logout;
 document.getElementById("projectAdmin").onclick=openAdminArea;
 document.getElementById("adminBack").onclick=closeAdminArea;
+document.getElementById("cfgTabs").addEventListener("click",e=>{const b=e.target.closest("[data-cfg]");if(b)showCfgTab(b.dataset.cfg);});
+document.getElementById("condList").addEventListener("input",e=>{const f=e.target.dataset.condField,row=e.target.closest("[data-cond-i]");if(!f||!row)return;
+  condDraft[+row.dataset.condI][f]=e.target.value;if(f==="name")row.querySelector(".project-monogram").textContent=projectInitials(e.target.value);
+  const changed=condChanged();document.getElementById("condSave").disabled=!changed;document.getElementById("condReset").hidden=!changed;document.getElementById("condHint").textContent=changed?"Alterações não salvas":"";});
+document.getElementById("condList").addEventListener("click",e=>{const b=e.target.closest("[data-cond-move]");if(!b)return;const i=+b.closest("[data-cond-i]").dataset.condI,j=i+(+b.dataset.condMove);
+  if(j<0||j>=condDraft.length)return;[condDraft[i],condDraft[j]]=[condDraft[j],condDraft[i]];renderCondConfig();document.querySelector(`[data-cond-i="${j}"] [data-cond-move="${b.dataset.condMove}"]`)?.focus();});
+document.getElementById("condSave").onclick=saveCondConfig;
+document.getElementById("condReset").onclick=resetCondDraft;
+document.getElementById("projectOverview").onclick=openOverview;
+document.getElementById("overviewBack").onclick=closeOverview;
+document.getElementById("ovRefresh").onclick=()=>loadOverview();
+document.getElementById("ovClear").onclick=()=>{ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();};
+document.getElementById("ovPeriod").addEventListener("click",e=>{const b=e.target.closest("[data-period]");if(!b)return;ovFilt.period=b.dataset.period;renderOvFilters();renderOverview();});
+document.getElementById("ovProjects").addEventListener("click",e=>{const b=e.target.closest("[data-ovproj]");if(!b)return;const id=b.dataset.ovproj;
+  if(id==="ALL")ovFilt.projects=[];else{const i=ovFilt.projects.indexOf(id);if(i>=0)ovFilt.projects.splice(i,1);else ovFilt.projects.push(id);}renderOvFilters();renderOverview();});
+document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.target.closest("[data-ovstatus]");if(!b)return;const c=b.dataset.ovstatus;
+  if(c==="ALL")ovFilt.status=[];else{const i=ovFilt.status.indexOf(c);if(i>=0)ovFilt.status.splice(i,1);else ovFilt.status.push(c);}renderOvFilters();renderOverview();});
+[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOverview();}));
+document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
+  ovFilt={period:k==="today"?"today":k==="active"?"next":"ALL",projects:[],status:k==="ap"?["ap"]:k==="pend"?["rv","rm"]:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();});
+document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
+document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
-document.getElementById("accSave").onclick=saveUser;
 document.getElementById("logRefresh").onclick=loadLogs;
-document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();loadLogs();});
+document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;renderApr();loadLogs();});
 document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.value;renderApr();});
 document.getElementById("aprRefresh").onclick=()=>loadUsers();
 document.getElementById("aprStatus").addEventListener("click",e=>{const b=e.target.closest("[data-apr-status]");if(!b)return;aprFilt.status=b.dataset.aprStatus;renderApr();});
 document.getElementById("aprList").addEventListener("click",e=>{const b=e.target.closest("[data-apr-act]");if(b&&!b.disabled)aprAction(b.dataset.aprAct,+b.dataset.aprI,b);});
-if(window.gsap){gsap.from(".header",{y:-38,opacity:0,duration:.5,ease:"power2.out"});gsap.from(".tabs .tab",{y:-8,opacity:0,duration:.4,stagger:.06,delay:.15,clearProps:"all"});}
+if(window.gsap){gsap.from(".header",{y:-38,opacity:0,duration:.5,ease:"power2.out",clearProps:"all"});gsap.from(".tabs .tab",{y:-8,opacity:0,duration:.4,stagger:.06,delay:.15,clearProps:"all"});}
 switchView("resumo");
 setSync("");
 bootAuth();
