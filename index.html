@@ -1221,7 +1221,11 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 /* Data, Condomínio e Local centralizados; a data fica no centro do bloco do dia */
 .ov-sum-wrap .ov-sum thead th:nth-child(-n+3){text-align:center}
 .ov-sum-wrap .ov-sum td.ov-sum-date,.ov-sum-wrap .ov-sum td.ov-sum-proj,.ov-sum-wrap .ov-sum td.ov-sum-local{text-align:center}
-.ov-sum-wrap .ov-sum td.ov-sum-date{vertical-align:middle}
+.ov-sum-wrap .ov-sum td.ov-sum-date,.ov-sum-wrap .ov-sum td.ov-sum-proj{vertical-align:middle;cursor:pointer;transition:background .12s,box-shadow .12s}
+.ov-sum-wrap .ov-sum td.ov-sum-date:hover,.ov-sum-wrap .ov-sum td.ov-sum-date:focus-visible{background:#e6efe9;box-shadow:inset 0 0 0 2px #1f4a3f;outline:none}
+.ov-sum-wrap .ov-sum td.ov-sum-proj:hover,.ov-sum-wrap .ov-sum td.ov-sum-proj:focus-visible{background:#f1f6f3;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ov) 55%,transparent);outline:none}
+.ov-sum-go{display:block;margin-top:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1f6b4f;opacity:.75}
+.ov-sum-date:hover .ov-sum-go,.ov-sum-date:focus-visible .ov-sum-go{opacity:1;text-decoration:underline}
 .ov-sum-wrap .ov-sum-day td:first-child{text-align:center}
 .ov-sum-wrap .ov-sum tfoot td:first-child{text-align:center}
 @media(max-width:720px){
@@ -1802,6 +1806,9 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
 :root[data-theme="dark"] .ov-sum-day td{background:#222722;color:#abbcb4;border-bottom:1px solid #414a43}
 :root[data-theme="dark"] .ov-sum tfoot td{background:#1f4a3f;color:#fff}
 :root[data-theme="dark"] .ov-sum-note{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:focus-visible{background:#1c221e;box-shadow:inset 0 0 0 2px rgba(0,0,0,0.6);outline:none}
+:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:focus-visible{background:#1f2622;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ov) 55%,transparent);outline:none}
+:root[data-theme="dark"] .ov-sum-go{color:#79d8b5}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -3216,8 +3223,8 @@ function renderOvSummary(rows,today){
     groups.forEach((g,i)=>{
       const idx=ovSumView.push(g)-1,color=ovColor(g.projectId);
       h+=`<tr class="ov-sum-row${i===0?" ov-sum-first":""}${d===today?" is-today":""}" data-ovsum="${idx}" tabindex="0" style="--ov:${color}" title="Ver agendamentos de ${esc(g.local)} em ${fmtDate(d)}">`;
-      if(i===0)h+=`<td class="ov-sum-date" rowspan="${groups.length+(groups.length>1?1:0)}">${dayLabel(d)}</td>`;
-      if(g.projectId!==lastProject){lastProject=g.projectId;h+=`<td class="ov-sum-proj" rowspan="${perProject.get(g.projectId)}"><span class="ov-badge"><i></i>${esc(g.projectName)}</span></td>`;}
+      if(i===0)h+=`<td class="ov-sum-date" rowspan="${groups.length+(groups.length>1?1:0)}" data-ovday="${d}" tabindex="0" role="button" title="Ver clientes e horários de ${fmtDate(d)}">${dayLabel(d)}<span class="ov-sum-go">Ver lista</span></td>`;
+      if(g.projectId!==lastProject){lastProject=g.projectId;h+=`<td class="ov-sum-proj" rowspan="${perProject.get(g.projectId)}" data-ovday="${d}" data-ovdayproj="${esc(g.projectId)}" tabindex="0" role="button" title="Ver clientes e horários do ${esc(g.projectName)} em ${fmtDate(d)}"><span class="ov-badge"><i></i>${esc(g.projectName)}</span></td>`;}
       h+=`<td class="ov-sum-local">${esc(g.local)}</td><td class="ov-n">${g.v}</td><td class="ov-n ov-n-rv">${g.rv||"—"}</td><td class="ov-n ov-n-tot">${g.v+g.rv}</td></tr>`;
     });
     if(groups.length>1)h+=`<tr class="ov-sum-day"><td colspan="2">Total do dia</td><td class="ov-n">${dv}</td><td class="ov-n ov-n-rv">${dr||"—"}</td><td class="ov-n ov-n-tot">${dv+dr}</td></tr>`;
@@ -3225,6 +3232,11 @@ function renderOvSummary(rows,today){
   h+=`</tbody><tfoot><tr><td colspan="3">Total geral</td><td class="ov-n">${totV}</td><td class="ov-n">${totR}</td><td class="ov-n">${totV+totR}</td></tr></tfoot></table></div>`;
   if(noDate)h+=`<p class="ov-sum-note">${noDate} agendamento(s) sem data definida não entram no resumo.</p>`;
   list.innerHTML=h+"</div>";
+}
+// Clique na data (ou no condomínio do dia) abre a Lista com clientes, horários e datas daquele dia.
+function openOvSummaryDay(date,projectId){
+  ovMode="lista";ovFilt={...OV_EMPTY(),projects:projectId?[String(projectId)]:ovFilt.projects.slice(),dtIni:date,dtFim:date};ovFiltOpen=true;
+  renderOvFilters();renderOverview();document.getElementById("ovFilters").scrollIntoView({block:"start",behavior:"smooth"});
 }
 function openOvSummaryRow(g){
   if(!g)return;
@@ -4060,8 +4072,8 @@ document.getElementById("ovProjects").addEventListener("click",e=>{const b=e.tar
 document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.target.closest("[data-ovstatus]");if(!b)return;const c=b.dataset.ovstatus;
   if(c==="ALL")ovFilt.status=[];else{const i=ovFilt.status.indexOf(c);if(i>=0)ovFilt.status.splice(i,1);else ovFilt.status.push(c);}renderOvFilters();renderOverview();});
 [["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOvFilters();renderOverview();}));
-document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ovsum]");if(r)openOvSummaryRow(ovSumView[+r.dataset.ovsum]);});
-document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ovsum]");if(r){e.preventDefault();openOvSummaryRow(ovSumView[+r.dataset.ovsum]);}});
+document.getElementById("ovList").addEventListener("click",e=>{const d=e.target.closest("[data-ovday]");if(d){openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r)openOvSummaryRow(ovSumView[+r.dataset.ovsum]);});
+document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const d=e.target.closest("[data-ovday]");if(d){e.preventDefault();openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r&&e.key==="Enter"){e.preventDefault();openOvSummaryRow(ovSumView[+r.dataset.ovsum]);}});
 document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
   ovFilt={...OV_EMPTY(),period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",status:k==="rv"?["rv"]:k==="rf"?["rf"]:[]};if(k==="rv"||k==="rf")ovMode="lista";renderOvFilters();renderOverview();});
 document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
