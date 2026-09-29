@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#102a24">
 <script>try{if(localStorage.getItem("amci-theme")==="dark"){document.documentElement.dataset.theme="dark";document.querySelector('meta[name="theme-color"]').content="#0f201b";}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Vistorias">
@@ -1307,9 +1307,10 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--chrome-top)}
-/* O cabeçalho já cobre a barra de status; nas telas de login/obras (fundo claro no celular) a faixa mantém a cor do topo. */
-.safe-top{display:none;position:fixed;top:0;left:0;right:0;height:var(--safe-t);background:var(--chrome-top);z-index:1000;pointer-events:none}
-body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:block}
+/* iOS 26 ignora o theme-color: a cor da barra de status vem de um elemento FIXO e OPACO encostado no topo.
+   Sem ele (ou com degradê/translúcido), o sistema aplica uma faixa de desfoque. Esta faixa sólida fica sempre
+   por cima, na altura da área da barra de status, com a cor do topo da tela aberta (definida em syncThemeChrome). */
+.safe-top{display:block;position:fixed;top:0;left:0;right:0;height:var(--safe-t);background:var(--status-top,var(--chrome-top));z-index:2147483000}
 @media (display-mode:standalone){html,body{overscroll-behavior-y:none}}
 /* Alternância de tema */
 .theme-ico-sun{display:none}
@@ -1909,7 +1910,7 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
 :root[data-theme="dark"] .auth-link:disabled{color:#8a9690}
 :root[data-theme="dark"] .auth-help{color:#abbcb4}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
-:root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
+:root[data-theme="dark"] .safe-top{background:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
 /* /TEMA ESCURO */
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -2273,24 +2274,28 @@ if(IS_NATIVE){document.documentElement.classList.add("native");const vp=document
 /* Tema claro/escuro: preferência salva no aparelho; a cor do topo (barra de status) acompanha o tema. */
 const THEME_KEY="amci-theme";
 const isDarkTheme=()=>document.documentElement.dataset.theme==="dark";
-/* Barra de status do PWA no iPhone: opaca (o modo translúcido ganha a faixa de desfoque do iOS 26),
-   pintada pelo theme-color com a cor do topo da tela aberta: login, escolha da obra ou cabeçalho do app. */
+/* Barra de status do PWA no iPhone: a faixa .safe-top (fixa e opaca) e o theme-color recebem a cor do topo
+   da tela aberta: login, escolha da obra ou cabeçalho do app. */
 function solidColor(el){
   for(;el&&el.nodeType===1;el=el.parentElement){
     const cs=getComputedStyle(el),m=/rgba?\(([^)]+)\)/.exec(cs.backgroundColor);
     if(m){const v=m[1].split(/[ ,\/]+/).filter(Boolean).map(Number);if(v.length<4||v[3]>=.9)return "#"+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,"0")).join("");}
-    const g=/gradient\([^#r]*(#[0-9a-f]{3,8}|rgba?\([^)]+\))/i.exec(cs.backgroundImage);
-    if(g){if(g[1][0]==="#")return g[1];const v=g[1].replace(/rgba?\(|\)/g,"").split(/[ ,\/]+/).map(Number);return "#"+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,"0")).join("");}
+    // Degradê: usa a cor do meio (a faixa precisa ser sólida; o meio é o tom mais próximo do topo inteiro).
+    const stops=/gradient\(/i.test(cs.backgroundImage)?cs.backgroundImage.match(/rgba?\([^)]+\)/g):null;
+    if(stops&&stops.length){const v=stops[Math.floor((stops.length-1)/2)].replace(/rgba?\(|\)/g,"").split(/[ ,\/]+/).map(Number);return "#"+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,"0")).join("");}
   }
   return "";
 }
 function topChromeColor(){
   const small=matchMedia("(max-width:520px)").matches,open=sel=>document.querySelector(sel+".open");
-  const el=open(".login-ov")?(small?".login-brand-panel":".login-ov"):open(".project-ov")?(small?".project-top":".project-ov"):".header";
-  return solidColor(document.querySelector(el))||getComputedStyle(document.documentElement).getPropertyValue("--chrome-top").trim()||"#102a24";
+  // O texto da barra de status é branco (black-translucent): nas telas de topo claro a faixa fica no verde do topo.
+  const el=open(".login-ov")?(small?".login-brand-panel":".login-ov"):open(".project-ov")?null:".header";
+  const base=getComputedStyle(document.documentElement).getPropertyValue("--chrome-top").trim()||"#102a24";
+  return (el&&solidColor(document.querySelector(el)))||base;
 }
 function syncThemeChrome(){
   const dark=isDarkTheme(),top=topChromeColor();
+  document.documentElement.style.setProperty("--status-top",top);
   document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute("content",top));
   document.querySelectorAll("[data-theme-toggle]").forEach(b=>{
     b.setAttribute("aria-pressed",String(dark));b.title=dark?"Usar tema claro":"Usar tema escuro";
