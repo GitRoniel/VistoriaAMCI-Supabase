@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#102a24">
 <script>try{if(localStorage.getItem("amci-theme")==="dark"){document.documentElement.dataset.theme="dark";document.querySelector('meta[name="theme-color"]').content="#0f201b";}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Vistorias">
@@ -2273,8 +2273,24 @@ if(IS_NATIVE){document.documentElement.classList.add("native");const vp=document
 /* Tema claro/escuro: preferência salva no aparelho; a cor do topo (barra de status) acompanha o tema. */
 const THEME_KEY="amci-theme";
 const isDarkTheme=()=>document.documentElement.dataset.theme==="dark";
+/* Barra de status do PWA no iPhone: opaca (o modo translúcido ganha a faixa de desfoque do iOS 26),
+   pintada pelo theme-color com a cor do topo da tela aberta: login, escolha da obra ou cabeçalho do app. */
+function solidColor(el){
+  for(;el&&el.nodeType===1;el=el.parentElement){
+    const cs=getComputedStyle(el),m=/rgba?\(([^)]+)\)/.exec(cs.backgroundColor);
+    if(m){const v=m[1].split(/[ ,\/]+/).filter(Boolean).map(Number);if(v.length<4||v[3]>=.9)return "#"+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,"0")).join("");}
+    const g=/gradient\([^#r]*(#[0-9a-f]{3,8}|rgba?\([^)]+\))/i.exec(cs.backgroundImage);
+    if(g){if(g[1][0]==="#")return g[1];const v=g[1].replace(/rgba?\(|\)/g,"").split(/[ ,\/]+/).map(Number);return "#"+v.slice(0,3).map(n=>Math.round(n).toString(16).padStart(2,"0")).join("");}
+  }
+  return "";
+}
+function topChromeColor(){
+  const small=matchMedia("(max-width:520px)").matches,open=sel=>document.querySelector(sel+".open");
+  const el=open(".login-ov")?(small?".login-brand-panel":".login-ov"):open(".project-ov")?(small?".project-top":".project-ov"):".header";
+  return solidColor(document.querySelector(el))||getComputedStyle(document.documentElement).getPropertyValue("--chrome-top").trim()||"#102a24";
+}
 function syncThemeChrome(){
-  const dark=isDarkTheme(),top=getComputedStyle(document.documentElement).getPropertyValue("--chrome-top").trim()||"#102a24";
+  const dark=isDarkTheme(),top=topChromeColor();
   document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute("content",top));
   document.querySelectorAll("[data-theme-toggle]").forEach(b=>{
     b.setAttribute("aria-pressed",String(dark));b.title=dark?"Usar tema claro":"Usar tema escuro";
@@ -2288,7 +2304,13 @@ function setTheme(theme){
   syncThemeChrome();
 }
 document.addEventListener("click",e=>{if(e.target.closest("[data-theme-toggle]"))setTheme(isDarkTheme()?"light":"dark");});
-document.addEventListener("DOMContentLoaded",syncThemeChrome);
+document.addEventListener("DOMContentLoaded",()=>{
+  syncThemeChrome();
+  // Troca de tela (login ↔ obras ↔ app) e mudança de largura atualizam a cor da barra de status.
+  const mo=new MutationObserver(()=>syncThemeChrome());
+  document.querySelectorAll(".login-ov,.project-ov").forEach(el=>mo.observe(el,{attributes:true,attributeFilter:["class"]}));
+  matchMedia("(max-width:520px)").addEventListener?.("change",syncThemeChrome);
+});
 const SUPABASE_READY=!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_PUBLISHABLE_KEY&&window.createSupabaseClient);
 const PENDING_MSG="Seu cadastro está aguardando a aprovação de um administrador. Assim que o acesso for liberado, você poderá entrar.";
 // Lido antes do cliente do Supabase processar a URL: indica retorno do link de confirmação de e-mail.
