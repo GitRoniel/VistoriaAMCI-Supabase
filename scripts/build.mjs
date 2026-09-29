@@ -10,7 +10,8 @@ const watch = process.argv.includes("--watch");
 // Variáveis da Vercel continuam tendo prioridade e permitem trocar de ambiente.
 const productionDefaults = {
   SUPABASE_URL: "https://lelverljfukbekitqcjm.supabase.co",
-  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_zvlhpZaRvPuaeYrBgOsndw_2eHO-4zK"
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_zvlhpZaRvPuaeYrBgOsndw_2eHO-4zK",
+  APP_PUBLIC_URL: "https://amci-vistoria.vercel.app"
 };
 
 const config = {
@@ -19,8 +20,8 @@ const config = {
     process.env.SUPABASE_PUBLISHABLE_KEY ?? productionDefaults.SUPABASE_PUBLISHABLE_KEY,
   APP_PROJECT_SLUG: process.env.APP_PROJECT_SLUG ?? "alto-do-jeriva",
   // Endereço público da versão WEB. No app iOS a página roda em capacitor://localhost, então o
-  // link de confirmação de e-mail precisa apontar para cá (vazio = Site URL do Supabase).
-  APP_PUBLIC_URL: process.env.APP_PUBLIC_URL ?? ""
+  // link de confirmação de e-mail precisa apontar para o site publicado.
+  APP_PUBLIC_URL: process.env.APP_PUBLIC_URL ?? productionDefaults.APP_PUBLIC_URL
 };
 
 await mkdir(www, { recursive: true });
