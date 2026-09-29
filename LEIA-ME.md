@@ -37,7 +37,9 @@ pnpm build
 - Novos usuários podem solicitar acesso na tela inicial. O cadastro cria uma solicitação com nível básico (`visitante`), sem liberar dados.
 - Um administrador revisa as solicitações em **Aprovações de Acesso** (botão na tela de seleção de obra, abaixo de "Sair da conta"; filtros por obra/condomínio e status), escolhe o nível e aprova ou rejeita cada conta.
 - Depois do login, o usuário escolhe entre os empreendimentos ativos vinculados à sua conta. A função e as permissões são carregadas separadamente para cada obra.
-- O painel atual está registrado como o módulo do **Alto do Jerivá**. Novos condomínios podem receber módulos próprios, evitando misturar fluxos operacionais diferentes.
+- Condomínios disponíveis: **Alto do Jerivá** (448 apartamentos, blocos/pavimentos) e **Alto do Buriti** (319 casas, conjuntos A a R). Todos usam as mesmas tabelas (`units`, `client_inspections`...), separadas por `project_id`; as consultas e o RLS retornam apenas os dados do condomínio selecionado.
+- A relação de clientes do Alto do Buriti foi importada direto no Supabase a partir da planilha de vendas (sem CPF). Dados pessoais não vão para o Git.
+- Cadastro: o novo usuário fica **pendente** até um administrador aprovar em cada condomínio. Em *Authentication → URL Configuration* do Supabase, o **Site URL** e os **Redirect URLs** precisam apontar para o endereço do site na Vercel (não `localhost`), senão o link de confirmação de e-mail abre uma página inexistente.
 - As regras do banco garantem: administrador edita tudo; cada frente edita sua própria etapa; visitante apenas visualiza; somente administrador edita a vistoria do cliente e a data planejada.
 
 ## Desenvolvimento local
