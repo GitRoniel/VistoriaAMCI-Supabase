@@ -7,6 +7,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vistorias">
+<link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="./assets/icons/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png">
 <title>Gestão de Obras · Vistorias</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -771,6 +777,79 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 @keyframes ppsheet{from{transform:translateY(40px);opacity:.4}}
 @media(max-width:640px){.pp-form{grid-template-columns:1fr}}
 @media(max-width:380px){.pp-status{grid-template-columns:1fr 1fr}}
+/* FILTROS · padrão único (Lista de todos os condomínios, Mapa, Visão Geral, Configurações) */
+.clif{padding:12px 14px;border-radius:14px;margin-bottom:12px}
+.clif-row{gap:8px;margin-bottom:8px}
+.clif .clif-lbl{font-size:10.5px;min-width:0;color:#6a7a71}
+.clif .chip{height:30px;padding:0 11px;display:inline-flex;align-items:center;font-size:12px;font-weight:600;box-shadow:none}
+.clif .fld label{font-size:10px;margin-bottom:4px;color:#6a7a71}
+.clif .fld input,.clif .fld select{height:36px;font-size:13px;border-radius:10px;padding:0 11px}
+.clif .btn{min-height:36px;height:36px;padding:0 13px;border-radius:10px;font-size:12.5px;box-shadow:none}
+.clif .modetog{margin-bottom:0}
+.clif .modetog button{min-height:32px;font-size:12.5px}
+.fx-row{display:flex;align-items:center;gap:8px;min-width:0}
+.fx-row+.fx-row{margin-top:8px}
+.fx-main{flex-wrap:wrap}
+.fx-search{flex:1 1 200px;min-width:0;display:flex;align-items:center;gap:7px;height:36px;padding:0 11px;border:1.5px solid #d3ddd6;border-radius:10px;background:#fbfcfb;cursor:text}
+.fx-search svg,.fx-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex:0 0 auto}
+.fx-search svg{stroke:#7b8d83}
+.fx-search input,.fx-field input{flex:1;min-width:0;border:0;background:transparent;height:100%;font-size:13px;color:#172c25;outline:none;padding:0}
+.fx-search input::-webkit-search-cancel-button{cursor:pointer}
+.fx-adv{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fx-field{display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1.5px solid #d3ddd6;border-radius:10px;background:#fbfcfb;cursor:text}
+.fx-field>span{font-size:11px;font-weight:600;color:#6a7a71;white-space:nowrap}
+.fx-field input[type=date]{width:128px}
+.fx-unit input{width:74px}
+.fx-search:focus-within,.fx-field:focus-within{border-color:#53775f;background:#fff;box-shadow:0 0 0 3px rgba(107,128,64,.12)}
+.fx-search.on,.fx-field.on{border-color:#1f4a3f;background:#fff}
+.fx-field.on>span{color:var(--ink)}
+.fx-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1.5px solid #d3ddd6;background:#fff;color:#2c4038;font-size:12.5px;font-weight:600;white-space:nowrap;transition:border-color .12s,background .12s}
+.fx-btn:hover{border-color:#78917b;color:var(--ink)}
+.fx-clear{color:#9e2f25;border-color:#f0c0ba;background:#fff5f3}
+.fx-clear:hover{border-color:#e29d93;color:#8a261d}
+.fx-clear[hidden],.fx-badge[hidden]{display:none}
+.fx-end{display:flex;align-items:center;gap:8px;margin-left:auto}
+.fx-end .clif-count{margin:0}
+.fx-more{display:none}
+.fx-badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--ink-2);color:#fff;font-size:10.5px;font-weight:700;display:inline-grid;place-items:center}
+.fx-lbl{flex:0 0 auto;min-width:64px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6a7a71}
+.fx-scroll{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.fchip{height:30px;padding:0 11px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;border:1.5px solid #dfe7e1;background:#fff;color:#52675d;white-space:nowrap;flex:0 0 auto;transition:border-color .12s,background .12s}
+.fchip:hover{border-color:#9fb6a6;color:var(--ink)}
+.fchip i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:0 0 auto}
+.fchip.active{background:color-mix(in srgb,var(--c) 13%,#fff);border-color:var(--c);color:var(--ink)}
+.fchip.fx-all.active{background:#eef3ef;border-color:#cfdcd3;color:#37564a}
+.fchip.blk{min-width:32px;padding:0 9px}
+.blocosel{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:nowrap}
+.blocosel .fx-lbl::before{display:none}
+@media(max-width:720px){
+  .clif{padding:10px;border-radius:12px;margin-bottom:10px}
+  .clif-row{gap:6px;margin-bottom:7px}
+  .clif .chip{height:32px;flex:0 0 auto}
+  .clif .clif-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1 1 auto}
+  .clif .clif-chips::-webkit-scrollbar{display:none}
+  .clif .fld input,.clif .fld select{height:38px;font-size:16px}
+  .clif .btn{height:38px;min-height:38px}
+  .clif-inputs .fld,.clif-inputs .btn{flex:1 1 calc(50% - 4px)}
+  .fx-row+.fx-row{margin-top:7px}
+  .fx-main{flex-wrap:wrap;gap:7px}
+  .fx-search{flex:1 1 0;height:38px}
+  .fx-search input,.fx-field input{font-size:16px}
+  .fx-end .clif-count{display:none}
+  .fx-more{display:inline-flex;height:38px;padding:0 11px}
+  .fx-clear{height:38px;width:38px;padding:0;gap:0;font-size:0}
+  .fx-clear svg{width:17px;height:17px}
+  .fx-adv{display:none;order:9;flex:1 1 100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+  .fx.fx-open .fx-adv{display:grid}
+  .fx-field{height:38px;min-width:0}
+  .fx-field input[type=date],.fx-unit input{width:100%}
+  .fx-adv .fx-btn{height:38px}
+  .fx-lbl{min-width:0;font-size:10px}
+  .fx-scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex:1 1 auto}
+  .fx-scroll::-webkit-scrollbar{display:none}
+  .fchip{height:32px;padding:0 10px}
+  .blocosel{margin-bottom:8px}
+}
 /* CONFIGURAÇÕES */
 .cfg-tabs{margin-bottom:16px}
 .cfg-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
@@ -880,6 +959,90 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 }
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
+/* MAPA · grade estável (corrige sobreposição no iOS/Safari).
+   As colunas usavam 1fr (= minmax(auto,1fr)) e os botões tinham aspect-ratio sem min-width:0:
+   no WebKit o tamanho mínimo automático do item vinha da altura esticada da linha e empurrava o
+   botão para fora da célula, cobrindo o bloco vizinho. Colunas minmax(0,1fr) + min-width:0 +
+   align-self:start mantêm cada número dentro da própria célula em qualquer largura. */
+.apts{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pavrow .pa{grid-template-columns:repeat(8,minmax(0,1fr))}
+@media(max-width:420px){.pavrow .pa{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.apts .apt,.pavrow .pa .apt,.casa-wrap .apt{min-width:0;align-self:start}
+.pavrow .pa,.casa-wrap{min-width:0}
+/* A rolagem do mapa vira um contexto de empilhamento próprio: número selecionado/hover não passa
+   por cima da coluna fixa (PAV/CONJ.), do cabeçalho, do filtro nem da barra inferior. */
+.gridscroll{position:relative;isolation:isolate;z-index:0}
+.mx th.corner{z-index:9}
+.mx td.pavh{z-index:8}
+/* Buriti: números de referência das casas no mesmo tamanho dos números das casas. */
+.mx.casas th.casah{font-size:12px}
+
+/* VISTORIA · CLIENTE · cabeçalho compacto */
+#v-cliente .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
+#v-cliente .sec-head .icn{width:30px;height:30px;border-radius:9px}
+#v-cliente .sec-head .icn svg{width:15px;height:15px}
+#v-cliente .sec-head h2{font-size:17px;white-space:nowrap}
+#v-cliente .sec-head .sh-flow{font-size:12px;min-width:0}
+#v-cliente .sec-body{padding:12px 14px}
+#v-cliente .clitop{gap:10px;margin-bottom:10px}
+#v-cliente .cbox .ch{padding:7px 12px;font-size:10.5px}
+#v-cliente .cbox{display:flex;flex-direction:column}
+#v-cliente .cbox>.resumo,#v-cliente .cbox>.aprov{flex:1 1 auto}
+#v-cliente .resumo .rc{padding:6px 10px}
+#v-cliente .resumo .rv{font-size:19px;line-height:1.15;margin-top:1px}
+#v-cliente .resumo .rc.tot{display:flex;align-items:baseline;gap:8px;padding:5px 10px}
+#v-cliente .resumo .rc.tot .rv{margin:0;font-size:17px}
+#v-cliente .aprov .ac{padding:7px 12px}
+#v-cliente .aprov .av{font-size:23px}
+#v-cliente .aprov .abar{margin-top:5px}
+#v-cliente .aprov .af{margin-top:4px}
+/* Alternância Mapa/Lista compacta e integrada */
+#v-cliente .modetog{padding:3px;border-radius:10px;margin-bottom:10px;gap:3px}
+#v-cliente .modetog button{min-height:32px;padding:0 6px;border-radius:8px;font-size:12.5px}
+@media(max-width:720px){
+  #v-cliente .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
+  #v-cliente .sec-head .icn{width:26px;height:26px;border-radius:8px}
+  #v-cliente .sec-head .icn svg{width:13px;height:13px}
+  #v-cliente .sec-head h2{font-size:15px}
+  #v-cliente .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
+  #v-cliente .sec-body{padding:8px}
+  #v-cliente .clitop{gap:7px;margin-bottom:8px}
+  #v-cliente .cbox{border-radius:11px}
+  #v-cliente .cbox .ch{padding:6px 10px;font-size:9.5px}
+  #v-cliente .resumo .rc{padding:4px 8px}
+  #v-cliente .resumo .rl{font-size:8px;gap:4px}
+  #v-cliente .resumo .rl .sw{width:9px;height:9px}
+  #v-cliente .resumo .rv{font-size:16px}
+  #v-cliente .resumo .rc.tot{padding:4px 8px;gap:6px}
+  #v-cliente .resumo .rc.tot .rv{font-size:15px}
+  #v-cliente .aprov .ac{padding:5px 8px}
+  #v-cliente .aprov .av{font-size:19px}
+  #v-cliente .aprov .abar{height:4px;margin-top:4px}
+  #v-cliente .aprov .af,#v-cliente .aprov .af-goal{font-size:9px;margin-top:2px}
+  #v-cliente .modetog{margin-bottom:8px}
+  #v-cliente .modetog button{min-height:36px}
+  #v-cliente .blocosel{margin-bottom:6px}
+  #v-cliente .legend{margin-top:8px;padding:7px 10px;gap:6px 10px}
+}
+
+/* iOS (Safari, tela de início e app Capacitor) */
+@supports (-webkit-touch-callout:none){
+  /* Campos de data/hora nativos do iOS têm largura intrínseca própria e ignoravam o layout,
+     sobrepondo os campos vizinhos. */
+  input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;line-height:normal}
+  input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:1.2em}
+  .fx-field input[type=date]{flex:1 1 auto}
+  /* A rolagem com inércia é nativa desde o iOS 13; a antiga criava camadas que cobriam outros elementos. */
+  .gridscroll{-webkit-overflow-scrolling:auto}
+  /* Em paisagem, o conteúdo não fica sob o notch/Dynamic Island. */
+  @media(orientation:landscape){
+    .main{padding-left:max(11px,var(--safe-l));padding-right:max(11px,var(--safe-r))}
+    .header-inner{padding-left:max(12px,var(--safe-l));padding-right:max(12px,var(--safe-r))}
+  }
+}
+/* App nativo (Capacitor): sem rolagem elástica revelando o fundo e sem seleção acidental ao tocar. */
+html.native,html.native body{overscroll-behavior:none}
+html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style>
 </head>
 <body class="auth-locked">
@@ -1167,6 +1330,9 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 <script src="./supabase-client.js"></script>
 <script>
 const CONFIG=window.APP_CONFIG||{};
+/* App nativo (Capacitor): marca a página e evita o zoom automático do iOS ao focar campos. A versão WEB não muda. */
+const IS_NATIVE=!!window.Capacitor?.isNativePlatform?.();
+if(IS_NATIVE){document.documentElement.classList.add("native");const vp=document.querySelector('meta[name="viewport"]');if(vp&&!/maximum-scale/.test(vp.content))vp.content+=", maximum-scale=1";}
 const SUPABASE_READY=!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_PUBLISHABLE_KEY&&window.createSupabaseClient);
 const PENDING_MSG="Seu cadastro está aguardando a aprovação de um administrador. Assim que o acesso for liberado, você poderá entrar.";
 // Lido antes do cliente do Supabase processar a URL: indica retorno do link de confirmação de e-mail.
@@ -1389,10 +1555,10 @@ function blocoSelector(kind){
   const cur = kind==="obra"?obraBlk:cliBlk;
   const groups = kind==="obra"?BLOCOS:LAYOUT.groups;
   const opts = ["ALL",...groups];
-  return `<span class="bl-lbl">${kind==="obra"?"Bloco":LAYOUT.group}</span>`+opts.map(o=>{
+  return `<span class="fx-lbl">${kind==="obra"?"Bloco":LAYOUT.group}</span><div class="fx-scroll">`+opts.map(o=>{
     const lbl=o==="ALL"?"Todos":o;
-    return `<button class="chip ${cur===o?"active":""}" data-blksel="${kind}" data-blk="${o}">${lbl}</button>`;
-  }).join("");
+    return `<button type="button" class="fchip blk${o==="ALL"?" fx-all":""}${cur===o?" active":""}" data-blksel="${kind}" data-blk="${o}" style="--c:#1f4a3f">${lbl}</button>`;
+  }).join("")+"</div>";
 }
 
 /* ── OBRA render ── */
@@ -1496,30 +1662,36 @@ function bindBlocos(){
 }
 
 /* ── CLIENTE · lista corrida com filtros ── */
+const FX_ICON={search:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  filter:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  print:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 18H4v-7h16v7h-3M7 14h10v7H7z"/></svg>',
+  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'};
+let cliFiltOpen=false;
+function hrSortLabel(){return `${FX_ICON.clock}Horário ${cliFilt.hrSort==="asc"?"↑":"↓"}`;}
 function ensureCliFilters(){
   const el=document.getElementById("cliFilters"); if(!el||el.dataset.built)return;
-  el.dataset.built="1";
+  el.dataset.built="1";el.classList.add("fx");el.classList.toggle("fx-open",cliFiltOpen);
+  const statusChip=c=>`<button type="button" class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(cliFilt.status.length===0?" active":""):(cliFilt.status.includes(c)?" active":"")}" data-fstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`;
   el.innerHTML=`
-    <div class="clif-row">
-      <span class="clif-lbl">Status</span>
-      <div class="clif-chips" id="clifStatus">${["ALL",...CLI_FLOW].map(c=>
-        `<button class="chip ${c==="ALL"?(cliFilt.status.length===0?"active":""):(cliFilt.status.includes(c)?"active":"")}" data-fstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("")}</div>
-      <span class="clif-count" id="clifCount"></span>
+    <div class="fx-row fx-main">
+      <label class="fx-search${cliFilt.q?" on":""}">${FX_ICON.search}<input type="search" id="clifQ" placeholder="Buscar cliente" value="${esc(cliFilt.q)}" autocomplete="off" aria-label="Buscar cliente"></label>
+      <div class="fx-adv" id="clifAdv">
+        <label class="fx-field fx-unit${cliFilt.u?" on":""}"><span>Unid.</span><input type="text" id="clifU" placeholder="${LAYOUT.unitHint.replace("Ex.: ","")}" value="${esc(cliFilt.u)}" autocomplete="off" aria-label="Unidade"></label>
+        <label class="fx-field${cliFilt.dtIni?" on":""}"><span>De</span><input type="date" id="clifDtIni" value="${esc(cliFilt.dtIni)}" aria-label="Vistoria a partir de"></label>
+        <label class="fx-field${cliFilt.dtFim?" on":""}"><span>Até</span><input type="date" id="clifDtFim" value="${esc(cliFilt.dtFim)}" aria-label="Vistoria até"></label>
+        <button class="fx-btn" id="clifHrSort" type="button" aria-label="Ordenar horário">${hrSortLabel()}</button>
+        <button class="fx-btn" id="clifPrint" type="button">${FX_ICON.print}Imprimir</button>
+      </div>
+      <div class="fx-end">
+        <span class="clif-count" id="clifCount"></span>
+        <button class="fx-btn fx-clear" id="clifClear" type="button" title="Limpar filtros" aria-label="Limpar filtros" hidden>${FX_ICON.x}Limpar</button>
+        <button class="fx-btn fx-more" id="clifMore" type="button" aria-expanded="${cliFiltOpen}" aria-controls="clifAdv">${FX_ICON.filter}Filtros<b class="fx-badge" id="clifBadge" hidden></b></button>
+      </div>
     </div>
-    <div class="clif-row">
-      <span class="clif-lbl">${LAYOUT.group}</span>
-      <div class="clif-chips" id="clifBloco">${["ALL",...LAYOUT.groups].map(b=>
-        `<button class="chip ${cliFilt.bloco===b?"active":""}" data-fbloco="${b}">${b==="ALL"?"Todos":b}</button>`).join("")}</div>
-    </div>
-    <div class="clif-row clif-inputs">
-      <div class="fld"><label>Vistoria de</label><input type="date" id="clifDtIni" value="${esc(cliFilt.dtIni)}"></div>
-      <div class="fld"><label>Até</label><input type="date" id="clifDtFim" value="${esc(cliFilt.dtFim)}"></div>
-      <div class="fld clif-q"><label>Buscar cliente</label><input type="text" id="clifQ" placeholder="Nome do cliente..." value="${esc(cliFilt.q)}"></div>
-      <div class="fld clif-q"><label>Unidade</label><input type="text" id="clifU" placeholder="${LAYOUT.unitHint}" value="${esc(cliFilt.u)}"></div>
-      <div class="fld"><label>&nbsp;</label><button class="btn g" id="clifHrSort" type="button">${cliFilt.hrSort==="asc"?"🕑 Horário: cedo → tarde":"🕑 Horário: tarde → cedo"}</button></div>
-      <button class="btn g" id="clifClear" type="button">Limpar filtros</button>
-      <button class="btn" id="clifPrint" type="button">🖨️ Imprimir</button>
-    </div>`;
+    <div class="fx-row"><span class="fx-lbl">Status</span><div class="fx-scroll" id="clifStatus">${["ALL",...CLI_FLOW].map(statusChip).join("")}</div></div>
+    <div class="fx-row"><span class="fx-lbl">${LAYOUT.group}</span><div class="fx-scroll" id="clifBloco">${["ALL",...LAYOUT.groups].map(b=>
+      `<button type="button" class="fchip blk${b==="ALL"?" fx-all":""}${cliFilt.bloco===b?" active":""}" data-fbloco="${b}" style="--c:#1f4a3f">${b==="ALL"?"Todos":b}</button>`).join("")}</div></div>`;
   el.querySelectorAll("[data-fstatus]").forEach(b=>b.onclick=()=>{
     const c=b.dataset.fstatus;
     if(c==="ALL"){ cliFilt.status=[]; }
@@ -1538,12 +1710,23 @@ function ensureCliFilters(){
   el.querySelector("#clifDtFim").oninput=e=>{cliFilt.dtFim=e.target.value;renderCliList();};
   el.querySelector("#clifQ").oninput=e=>{cliFilt.q=e.target.value;renderCliList();};
   el.querySelector("#clifU").oninput=e=>{cliFilt.u=e.target.value;renderCliList();};
-  el.querySelector("#clifHrSort").onclick=e=>{cliFilt.hrSort=cliFilt.hrSort==="asc"?"desc":"asc";e.target.textContent=cliFilt.hrSort==="asc"?"🕑 Horário: cedo → tarde":"🕑 Horário: tarde → cedo";renderCliList();};
+  el.querySelector("#clifHrSort").onclick=e=>{cliFilt.hrSort=cliFilt.hrSort==="asc"?"desc":"asc";e.currentTarget.innerHTML=hrSortLabel();renderCliList();};
   el.querySelector("#clifClear").onclick=()=>{cliFilt={status:[],bloco:"ALL",dtIni:"",dtFim:"",hrSort:"asc",u:"",q:""};el.dataset.built="";ensureCliFilters();renderCliList();};
   el.querySelector("#clifPrint").onclick=printCliList;
+  el.querySelector("#clifMore").onclick=e=>{cliFiltOpen=!cliFiltOpen;el.classList.toggle("fx-open",cliFiltOpen);e.currentTarget.setAttribute("aria-expanded",String(cliFiltOpen));};
+}
+/* Destaca só o que está filtrando e mostra "Limpar" quando há filtro ativo. */
+function syncCliFilterUI(){
+  const el=document.getElementById("cliFilters");if(!el||!el.dataset.built)return;
+  const adv=[cliFilt.u,cliFilt.dtIni,cliFilt.dtFim].filter(Boolean).length;
+  const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.bloco!=="ALL"?1:0);
+  const clear=el.querySelector("#clifClear"),badge=el.querySelector("#clifBadge");
+  if(clear)clear.hidden=!total;if(badge){badge.textContent=adv;badge.hidden=!adv;}
+  [["#clifQ",cliFilt.q],["#clifU",cliFilt.u],["#clifDtIni",cliFilt.dtIni],["#clifDtFim",cliFilt.dtFim]].forEach(([id,v])=>el.querySelector(id)?.closest("label")?.classList.toggle("on",!!v));
 }
 function renderCliList(){
   const wrap=document.getElementById("cliListTbl"); if(!wrap)return;
+  syncCliFilterUI();
   let rows=[];
   LAYOUT.units.forEach(({b,p,a})=>{
     const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd});
@@ -2287,7 +2470,7 @@ async function doSignup(){
   if(password!==confirmation){setAuthFeedback("signupFeedback","As senhas informadas não são iguais.");return;}
   setAuthBusy(btn,true,"Enviando solicitação…");
   try{
-    const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:window.location.origin+window.location.pathname}});
+    const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:IS_NATIVE?(CONFIG.APP_PUBLIC_URL||undefined):window.location.origin+window.location.pathname}});
     if(error)throw error;
     // O cadastro nunca abre o sistema: a sessão criada é encerrada e o acesso depende da aprovação do admin.
     if(data.session)await supabase.auth.signOut();

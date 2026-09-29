@@ -1,23 +1,28 @@
 {
   "appId": "br.com.engertal.vistorias",
-  "appName": "Vistorias Jerivá",
+  "appName": "Vistorias",
   "webDir": "www",
   "backgroundColor": "#1F3D38",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 1200,
+      "launchAutoHide": true,
       "backgroundColor": "#1F3D38",
-      "showSpinner": false
+      "showSpinner": false,
+      "iosSpinnerStyle": "small"
     },
     "StatusBar": {
       "style": "DARK",
+      "overlaysWebView": true,
       "backgroundColor": "#1F3D38"
     }
   },
   "android": { "allowMixedContent": false },
   "ios": {
     "contentInset": "never",
+    "backgroundColor": "#1F3D38",
     "scrollEnabled": true,
-    "preferredContentMode": "mobile"
+    "preferredContentMode": "mobile",
+    "limitsNavigationsToAppBoundDomains": false
   }
 }

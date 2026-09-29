@@ -17,11 +17,16 @@ const config = {
   SUPABASE_URL: process.env.SUPABASE_URL ?? productionDefaults.SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY:
     process.env.SUPABASE_PUBLISHABLE_KEY ?? productionDefaults.SUPABASE_PUBLISHABLE_KEY,
-  APP_PROJECT_SLUG: process.env.APP_PROJECT_SLUG ?? "alto-do-jeriva"
+  APP_PROJECT_SLUG: process.env.APP_PROJECT_SLUG ?? "alto-do-jeriva",
+  // Endereço público da versão WEB. No app iOS a página roda em capacitor://localhost, então o
+  // link de confirmação de e-mail precisa apontar para cá (vazio = Site URL do Supabase).
+  APP_PUBLIC_URL: process.env.APP_PUBLIC_URL ?? ""
 };
 
 await mkdir(www, { recursive: true });
 await cp(resolve(root, "assets"), resolve(www, "assets"), { recursive: true });
+// Navegadores pedem /favicon.ico automaticamente.
+await copyFile(resolve(root, "assets/icons/favicon.ico"), resolve(www, "favicon.ico"));
 await writeFile(
   resolve(www, "config.js"),
   `window.APP_CONFIG = Object.freeze(${JSON.stringify(config)});\n`,

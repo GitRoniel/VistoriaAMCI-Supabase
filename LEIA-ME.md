@@ -54,3 +54,22 @@ npx serve www
 ```
 
 O build da Vercel gera `www/config.js` e `www/supabase-client.js` automaticamente.
+
+## App iPhone (Capacitor)
+
+A mesma página `www/` roda como app iOS; a versão WEB continua igual.
+
+- Configuração em `capacitor.config.json` (`appId` `br.com.engertal.vistorias`, `appName` Vistorias, `webDir` `www`).
+- Projeto nativo em `ios/` (Xcode). Ícones em `ios/App/App/Assets.xcassets/AppIcon.appiconset` e tela de abertura em `Splash.imageset`, gerados a partir da logo Alto Mangueiral.
+- Ícones da WEB (favicon, apple-touch-icon e ícones do manifest) ficam em `assets/icons/`.
+
+Em um Mac com Xcode e CocoaPods:
+
+```bash
+pnpm install
+pnpm cap:sync:ios   # build da WEB + cópia para o iOS + pod install
+pnpm ios:open       # abre no Xcode (escolha o Team em Signing & Capabilities e rode no iPhone)
+```
+
+Sempre que alterar `www/index.html`, rode `pnpm cap:sync:ios` antes de gerar o app.
+No app o endereço interno é `capacitor://localhost`; para o link do e-mail de confirmação abrir o site, defina `APP_PUBLIC_URL` (endereço da Vercel) no `.env` antes do build — sem ele o Supabase usa o **Site URL**.
