@@ -751,6 +751,50 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 @keyframes ppsheet{from{transform:translateY(40px);opacity:.4}}
 @media(max-width:640px){.pp-form{grid-template-columns:1fr}}
 @media(max-width:380px){.pp-status{grid-template-columns:1fr 1fr}}
+/* VISÃO GERAL */
+.project-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.project-section-head .project-section-title{margin-bottom:0}
+.project-overview-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #cfdcd3;color:var(--ink);border-radius:10px;padding:8px 13px;font-size:12.5px;font-weight:700;box-shadow:0 4px 12px rgba(31,61,56,.06);transition:.15s}
+.project-overview-btn:hover{border-color:#78917b;box-shadow:0 8px 18px rgba(31,61,56,.12);transform:translateY(-1px)}
+.project-overview-btn svg{width:16px;height:16px;stroke:var(--fern);fill:none;stroke-width:2}
+.ov-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.ov-card{text-align:left;cursor:pointer;min-width:0;transition:.15s}
+.ov-card:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(31,61,56,.1)}
+.ov-toprow{align-items:center}
+.ov-period{flex:0 1 380px;margin:0}
+.ov-updated{font-size:11.5px;color:var(--muted);font-weight:600}
+.ov-chip{display:inline-flex;align-items:center;gap:6px}
+.ov-chip i{width:9px;height:9px;border-radius:50%;background:var(--ov)}
+.ov-chip.active{background:var(--ov);border-color:var(--ov)}
+.ov-chip.active i{background:#fff}
+.ov-tbl{min-width:1080px}
+.ov-tbl tr.ov-day td{background:#eef3ef;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);position:sticky;left:0}
+.ov-tbl tr.ov-day b{font-size:12px;color:var(--ink);margin-right:10px}
+.ov-tbl tr.ov-day span{font-size:11px;color:var(--muted);font-weight:600}
+.ov-tbl tr.ov-day.is-today td{background:#e3efff}
+.ov-tbl tr.ov-day.is-today b{color:#0b4f9c}
+.ov-row{cursor:pointer;transition:background .12s}
+.ov-row td{padding:7px 8px}
+.ov-row td:first-child{box-shadow:inset 4px 0 0 var(--ov)}
+.ov-row:hover td,.ov-row:focus td{background:#f5f8f6}
+.ov-row:focus{outline:none}
+.ov-row:focus td:first-child{box-shadow:inset 4px 0 0 var(--ov),inset 0 0 0 2px rgba(11,111,212,.35)}
+.ov-proj{text-align:left!important}
+.ov-badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ov);background:color-mix(in srgb,var(--ov) 10%,#fff);border:1px solid color-mix(in srgb,var(--ov) 30%,#fff);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.ov-badge i{width:8px;height:8px;border-radius:50%;background:var(--ov)}
+.ov-status{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+@media(max-width:960px){.ov-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.ov-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-cards .ov-card:last-child{grid-column:1/-1}.ov-period{flex:1 1 100%}}
+@media(max-width:520px){.project-overview-btn{width:100%;justify-content:center}}
+/* Acomp. Técnico */
+.ctbl td.cacomp{padding:4px 8px;text-align:left}
+.acomp-sel{height:30px;min-width:150px;padding:0 8px;border:1.5px solid #cad6cf;border-radius:8px;background:#fbfcfb;font-size:12px;color:#6a7a71;cursor:pointer}
+.acomp-sel.set{color:#172c25;border-color:#9fb6a6;background:#fff;font-weight:600}
+.acomp-sel:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 3px rgba(107,128,64,.14)}
+.acomp-sel:disabled{opacity:.6;cursor:wait}
+.pp-select{width:100%;height:42px;padding:0 11px;border:1.5px solid #cad6cf;border-radius:11px;background:#fbfcfb;font-size:14px;color:#172c25}
+.pp-select:focus{outline:none;border-color:#53775f;background:#fff;box-shadow:0 0 0 4px rgba(107,128,64,.14)}
+.pp-select:disabled{background:#f1f4f2;color:#6a7a71}
 .tab-admin,.nav-admin{display:none!important}
 body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 </style>
@@ -920,10 +964,54 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
       </div>
     </div>
     <div class="project-body">
-      <div class="project-section-title">Obras e condomínios disponíveis</div>
+      <div class="project-section-head">
+        <div class="project-section-title">Obras e condomínios disponíveis</div>
+        <button class="project-overview-btn" id="projectOverview" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h4M7 17h7"/></svg><span>Visão Geral</span></button>
+      </div>
       <div class="project-list" id="projectList"></div>
       <div class="project-feedback" id="projectFeedback" role="alert"></div>
       <p class="project-help">Novos condomínios aparecerão aqui quando forem cadastrados e liberados pelo administrador. Cada empreendimento poderá ter seu próprio fluxo de acompanhamento.</p>
+    </div>
+  </section>
+</div>
+
+<div class="project-ov admin-ov overview-ov" id="overviewOv" aria-hidden="true">
+  <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="overviewTitle">
+    <div class="project-top">
+      <div class="project-top-logos" aria-label="Alto Mangueiral e Engertal">
+        <span class="project-alto-logo-tile"><img class="login-logo-alto" src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"></span>
+        <span class="project-top-divider" aria-hidden="true"></span>
+        <img class="login-logo-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
+      </div>
+      <div class="project-welcome">
+        <small>Todos os condomínios</small>
+        <h2 id="overviewTitle">Visão Geral dos Agendamentos</h2>
+        <p>Vistorias de todos os empreendimentos em uma única lista, por data e horário. Clique em um agendamento para abrir a unidade.</p>
+      </div>
+      <div class="project-actions">
+        <button class="project-logout" id="overviewBack" type="button">← Voltar às obras</button>
+      </div>
+    </div>
+    <div class="project-body admin-body">
+      <div class="ov-cards" id="ovCards"></div>
+      <div class="clif" id="ovFilters">
+        <div class="clif-row ov-toprow">
+          <div class="modetog ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
+          <span class="ov-updated" id="ovUpdated"></span>
+          <span class="clif-count" id="ovCount"></span>
+        </div>
+        <div class="clif-row"><span class="clif-lbl">Condomínio</span><div class="clif-chips" id="ovProjects"></div></div>
+        <div class="clif-row"><span class="clif-lbl">Status</span><div class="clif-chips" id="ovStatus"></div></div>
+        <div class="clif-row clif-inputs">
+          <div class="fld"><label for="ovDtIni">Data de</label><input type="date" id="ovDtIni"></div>
+          <div class="fld"><label for="ovDtFim">Até</label><input type="date" id="ovDtFim"></div>
+          <div class="fld clif-q"><label for="ovQ">Cliente</label><input type="text" id="ovQ" placeholder="Nome do cliente..." autocomplete="off"></div>
+          <div class="fld clif-q"><label for="ovU">Unidade</label><input type="text" id="ovU" placeholder="Ex.: A604 ou B35" autocomplete="off"></div>
+          <button class="btn g" id="ovClear" type="button">Limpar filtros</button>
+          <button class="btn g" id="ovRefresh" type="button">Atualizar</button>
+        </div>
+      </div>
+      <div id="ovList"></div>
     </div>
   </section>
 </div>
@@ -1083,7 +1171,13 @@ const SEED=[{"bloco": "A", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst":
 
 const SEED_CRON=[["A","6º","","","","","2026-05-12","2026-05-12","",""],["A","5º","","","","","2026-05-18","2026-05-18","2026-06-22",""],["A","4º","","","","","2026-05-26","2026-05-26","2026-06-24",""],["A","3º","","","","","2026-05-28","2026-05-28","2026-06-26",""],["A","2º","","","","","2026-06-02","2026-06-02","2026-06-29",""],["A","1º","","","","","2026-06-05","2026-06-05","2026-07-01",""],["A","T","","","","","2026-06-09","2026-06-09","2026-07-03",""],["B","6º","2026-07-20","","2026-07-20","","2026-07-20","","2026-07-20",""],["B","5º","2026-07-20","","2026-07-20","","2026-07-21","","2026-07-21",""],["B","4º","2026-07-21","","2026-07-21","","2026-07-21","","2026-07-21",""],["B","3º","2026-07-21","","2026-07-21","","2026-07-22","","2026-07-22",""],["B","2º","2026-07-22","","2026-07-22","","2026-07-22","","2026-07-22",""],["B","1º","2026-07-22","","2026-07-22","","2026-07-23","","2026-07-23",""],["B","T","2026-07-23","","2026-07-23","","2026-07-24","","2026-07-24",""],["C","6º","2026-06-11","","2026-06-11","","2026-06-15","2026-07-01","2026-06-15",""],["C","5º","2026-06-12","","2026-06-12","","2026-06-16","","2026-06-16",""],["C","4º","2026-06-15","","2026-06-15","","2026-06-17","","2026-06-17",""],["C","3º","2026-06-16","","2026-06-16","","2026-06-17","","2026-06-17",""],["C","2º","2026-06-17","","2026-06-17","","2026-06-18","","2026-06-18",""],["C","1º","2026-06-18","","2026-06-18","","2026-06-19","","2026-06-19",""],["C","T","2026-06-19","","2026-06-19","","2026-06-22","","2026-06-22",""],["D","6º","2026-07-14","","2026-07-14","","2026-07-14","","2026-07-14",""],["D","5º","2026-07-14","","2026-07-14","","2026-07-15","","2026-07-15",""],["D","4º","2026-07-15","","2026-07-15","","2026-07-15","","2026-07-15",""],["D","3º","2026-07-15","","2026-07-15","","2026-07-16","","2026-07-16",""],["D","2º","2026-07-16","","2026-07-16","","2026-07-16","","2026-07-16",""],["D","1º","2026-07-16","","2026-07-16","","2026-07-17","","2026-07-17",""],["D","T","2026-07-17","","2026-07-17","","2026-07-20","","2026-07-20",""],["E","6º","2026-06-22","","2026-06-22","","2026-06-22","","2026-06-22",""],["E","5º","2026-06-22","","2026-06-22","","2026-06-23","","2026-06-23",""],["E","4º","2026-06-23","","2026-06-23","","2026-06-23","","2026-06-23",""],["E","3º","2026-06-23","","2026-06-23","","2026-06-24","","2026-06-24",""],["E","2º","2026-06-24","","2026-06-24","","2026-06-24","","2026-06-24",""],["E","1º","2026-06-24","","2026-06-24","","2026-06-25","","2026-06-25",""],["E","T","2026-06-25","","2026-06-25","","2026-06-26","","2026-06-26",""],["F","6º","2026-07-08","","2026-07-08","","2026-07-08","","2026-07-08",""],["F","5º","2026-07-08","","2026-07-08","","2026-07-09","","2026-07-09",""],["F","4º","2026-07-09","","2026-07-09","","2026-07-09","","2026-07-09",""],["F","3º","2026-07-09","","2026-07-09","","2026-07-10","","2026-07-10",""],["F","2º","2026-07-10","","2026-07-10","","2026-07-10","","2026-07-10",""],["F","1º","2026-07-10","","2026-07-10","","2026-07-13","","2026-07-13",""],["F","T","2026-07-13","","2026-07-13","","2026-07-14","","2026-07-14",""],["G","6º","2026-06-26","","2026-06-26","","2026-06-26","","2026-06-26",""],["G","5º","2026-06-26","","2026-06-26","","2026-06-29","","2026-06-29",""],["G","4º","2026-06-29","","2026-06-29","","2026-06-29","","2026-06-29",""],["G","3º","2026-06-29","","2026-06-29","","2026-06-30","","2026-06-30",""],["G","2º","2026-06-30","","2026-06-30","","2026-06-30","","2026-06-30",""],["G","1º","2026-06-30","","2026-06-30","","2026-07-01","","2026-07-01",""],["G","T","2026-07-01","","2026-07-01","","2026-07-02","","2026-07-02",""],["H","6º","2026-07-02","","2026-07-02","","2026-07-02","","2026-07-02",""],["H","5º","2026-07-02","","2026-07-02","","2026-07-03","","2026-07-03",""],["H","4º","2026-07-03","","2026-07-03","","2026-07-03","","2026-07-03",""],["H","3º","2026-07-03","","2026-07-03","","2026-07-06","","2026-07-06",""],["H","2º","2026-07-06","","2026-07-06","","2026-07-06","","2026-07-06",""],["H","1º","2026-07-06","","2026-07-06","","2026-07-07","","2026-07-07",""],["H","T","2026-07-07","","2026-07-07","","2026-07-08","","2026-07-08",""]];
 const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{}};
-const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:""});
+const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:"",acomp:""});
+/* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
+const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
+function acompSelect(value,attrs){
+  return `<select ${attrs}><option value=""${value?"":" selected"}>— Não informado</option>`+
+    Object.entries(ACOMP).map(([k,l])=>`<option value="${k}"${value===k?" selected":""}>${l}</option>`).join("")+`</select>`;
+}
 const kPV=(b,p)=>b+"|"+p;
 const dstr=v=>(""+(v||"")).slice(0,10);
 const kO=(b,p,a)=>b+"|"+p+"|"+a, kC=(b,p,a)=>b+"|"+p+"|"+a;
@@ -1384,7 +1478,7 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
@@ -1397,6 +1491,7 @@ function renderCliList(){
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
       <td>${r.code==="rv"&&i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
+      <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
     </tr>`;
   });
   h+='</tbody></table></div>';
@@ -1421,10 +1516,10 @@ function printCliList(){
   </style></head><body>
     <h1>${esc(projectExperience(appProject).title)} · Vistoria Cliente</h1>
     <div class="sub">Lista filtrada — gerado em ${now} — ${rows.length} unidade(s)</div>
-    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data</th><th class="w-h">Horário</th><th>Responsável</th></tr></thead><tbody>`;
+    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data</th><th class="w-h">Horário</th><th>Responsável</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const i=r.info;
-    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td></tr>`;
+    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
   });
   body+='</tbody></table></body></html>';
   const w=window.open("","_blank");
@@ -1436,7 +1531,7 @@ function printCliList(){
 /* ── POPOVER ── */
 const pop=document.getElementById("pop"); let ctx=null, popAnchor=null;
 const popBackdrop=document.createElement("div");popBackdrop.className="pop-backdrop";document.body.appendChild(popBackdrop);
-const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","obs"];
+const CLI_FIELDS=["cliente","responsavel","data_vistoria","horario_vistoria","data_revistoria","obs","acomp"];
 const TIME_PRESETS=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00"];
 const sheetMode=()=>matchMedia("(max-width:720px)").matches;
 const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
@@ -1540,6 +1635,7 @@ function renderCliPop(){
         <div class="pp-times pp-full" aria-label="Horários rápidos">${TIME_PRESETS.map(t=>`<button type="button" class="pp-chip${cliDraftValue("horario_vistoria")===t?" sel":""}" data-time="${t}" ${dis}>${t}</button>`).join("")}</div>
         <label class="pp-f pp-full"><span>Responsável pela vistoria</span><input name="responsavel" list="ppRespList" value="${val("responsavel")}" placeholder="Nome do responsável" autocomplete="off" ${dis}><datalist id="ppRespList">${responsaveis.map(r=>`<option value="${esc(r)}"></option>`).join("")}</datalist></label>
         ${showRev?dateField("data_revistoria","Data da revistoria (combinar c/ cliente)"):""}
+        <label class="pp-f pp-full"><span>Acomp. Técnico</span>${acompSelect(cliDraftValue("acomp"),`name="acomp" class="pp-select" ${dis}`)}</label>
         <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${dis}>${val("obs")}</textarea></label>
         ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">Somente administradores editam a vistoria do cliente.</div>`}
       </form>
@@ -1555,6 +1651,18 @@ function renderCliPop(){
     if(a==="prev")gotoUnit(-1);else if(a==="next")gotoUnit(1);else if(a==="close")requestClosePop();
     else if(a==="discard"){ctx.draft=null;ctx.dirty=false;renderPop();}});
   refreshPopActions();
+}
+async function saveAcomp(select){
+  const {b,p,a}=select.dataset,key=kC(b,p,a),info=state.cliInfo[key];
+  if(!info||!canEditCli()){toast("Somente administrador edita a Vistoria Cliente");return;}
+  const value=select.value,old=info.acomp||"";if(value===old)return;
+  info.acomp=value;select.classList.toggle("set",!!value);select.disabled=true;
+  try{
+    await setCliFields(b,p,a,{acomp:value});
+    toast("Acomp. Técnico: "+(ACOMP[value]||"não informado"));
+    if(ctx&&ctx.k==="cli"&&kC(ctx.b,ctx.p,ctx.a)===key&&!(ctx.draft&&"acomp" in ctx.draft))renderPop();
+  }catch(e){info.acomp=old;select.value=old;select.classList.toggle("set",!!old);toast(syncErrorMessage(e));load(true).catch(()=>{});}
+  finally{select.disabled=false;}
 }
 async function saveCliDraft(){
   if(!ctx||ctx.k!=="cli"||!canEditCli())return;
@@ -1715,7 +1823,7 @@ async function setCell(t,b,pav,a,field,value,detalhe){
   throw new Error("Tabela inválida.");
 }
 /* Salva vários campos da vistoria do cliente numa única atualização versionada. */
-const CLI_COLUMNS={cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",obs:"notes"};
+const CLI_COLUMNS={acomp:"technical_escort",cliente:"client_name",data_vistoria:"inspection_date",horario_vistoria:"inspection_time",responsavel:"responsible",data_revistoria:"reinspection_date",obs:"notes"};
 async function setCliFields(b,pav,a,changes){
   if(!SUPABASE_READY||!currentUser||!appProject)throw new Error("Sessão indisponível.");
   const unit=dbIndex.unitByKey.get(kC(b,pav,a));if(!unit)throw new Error("Unidade não encontrada.");
@@ -1749,7 +1857,7 @@ function applyStageRecord(r){
 function applyClientRecord(r){
   dbIndex.clientByUnit.set(r.unit_id,r);const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;
   state.cli[key]=normCli(r.status);
-  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),obs:r.notes||"",sale_stage:r.sale_stage||""};
+  state.cliInfo[key]={cliente:r.client_name||"",data_vistoria:dstr(r.inspection_date),horario_vistoria:(""+(r.inspection_time||"")).slice(0,5),responsavel:r.responsible||"",data_revistoria:dstr(r.reinspection_date),obs:r.notes||"",sale_stage:r.sale_stage||"",acomp:r.technical_escort||""};
 }
 function applyScheduleRecord(r){
   const key=kPV(_blk(r.bloco),_pav(r.pav)),mapKey=key+"|"+r.stage;dbIndex.scheduleByKey.set(mapKey,r);
@@ -1854,6 +1962,115 @@ function openAdminArea(){
   const overlay=document.getElementById("adminOv");
   document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
   loadUsers();loadLogs();
+}
+/* ── VISÃO GERAL: agendamentos de todos os condomínios do usuário ──
+   Uma única consulta em client_inspections + units (RLS limita aos condomínios liberados). */
+const OV_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b7950b","#7b241c"];
+let ovRows=[],ovView=[],ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};
+function ovProjects(){return [...availableProjects].sort((x,y)=>String(projectExperience(x).title).localeCompare(String(projectExperience(y).title),"pt-BR"));}
+function ovColor(projectId){const i=ovProjects().findIndex(p=>String(p.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
+function ovUnit(u){
+  const b=_blk(u.bloco),p=_pav(u.pav),a=_apt(u.apto),casa=u.kind==="casa";
+  const code=casa?String(+a):unitCode_(p,a);
+  return {b,p,a,casa,ucode:code,groupLabel:(casa?"Conj. ":"Bloco ")+b,unitLabel:casa?"Casa "+code:"Apto "+code};
+}
+function openOverview(){
+  const overlay=document.getElementById("overviewOv");
+  document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
+  renderOvFilters();loadOverview();
+}
+function closeOverview(){
+  const overlay=document.getElementById("overviewOv");
+  overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");
+  if(!document.getElementById("adminOv").classList.contains("open"))document.body.classList.remove("admin-open");
+}
+async function loadOverview(){
+  const list=document.getElementById("ovList");
+  if(!ovRows.length)list.innerHTML='<div class="clif-empty">Carregando agendamentos…</div>';
+  try{
+    const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)");
+    const projects=new Map(availableProjects.map(p=>[String(p.id),p]));
+    ovRows=rows.map(r=>{
+      const u=r.units||{},project=projects.get(String(u.project_id));if(!project)return null;
+      return {projectId:project.id,projectName:projectExperience(project).title||project.name,...ovUnit(u),pcd:!!u.pcd,code:normCli(r.status),
+        cliente:r.client_name||"",data:dstr(r.inspection_date),hora:(""+(r.inspection_time||"")).slice(0,5),resp:r.responsible||"",
+        rev:dstr(r.reinspection_date),obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||""};
+    }).filter(r=>r&&(r.code!=="na"||r.data));
+    document.getElementById("ovUpdated").textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    renderOvFilters();renderOverview();
+  }catch(e){list.innerHTML='<div class="clif-empty apr-error">Não foi possível carregar os agendamentos. Tente atualizar.</div>';}
+}
+function renderOvFilters(){
+  const projects=ovProjects();
+  document.getElementById("ovProjects").innerHTML=`<button class="chip${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL">Todos</button>`+
+    projects.map(p=>`<button class="chip ov-chip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--ov:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
+  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","ap","na"].map(c=>
+    `<button class="chip${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+  document.querySelectorAll("#ovPeriod [data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===ovFilt.period));
+  document.getElementById("ovDtIni").value=ovFilt.dtIni;document.getElementById("ovDtFim").value=ovFilt.dtFim;
+  document.getElementById("ovQ").value=ovFilt.q;document.getElementById("ovU").value=ovFilt.u;
+}
+function renderOverview(){
+  const today=todayISO(),count=f=>ovRows.filter(f).length;
+  const active=new Set(ovRows.filter(r=>r.data&&r.data>=today&&r.code!=="ap").map(r=>r.projectId));
+  const cards=[
+    ["all","Total de agendamentos",ovRows.length,""],
+    ["today","Agendamentos de hoje",count(r=>r.data===today),"blue"],
+    ["ap","Aprovados",count(r=>r.code==="ap"),"ok"],
+    ["pend","Revistorias / Pendentes",count(r=>r.code==="rv"||r.code==="rm"),"warn"],
+    ["active","Condomínios com vistoria ativa",active.size,""]];
+  document.getElementById("ovCards").innerHTML=cards.map(([k,l,v,c])=>`<button type="button" class="kbox ov-card ${c}" data-ovcard="${k}"><div class="kl">${l}</div><div class="kv">${v}</div></button>`).join("");
+  let rows=ovRows.slice();
+  if(ovFilt.period==="today")rows=rows.filter(r=>r.data===today);
+  else if(ovFilt.period==="next")rows=rows.filter(r=>r.data&&r.data>=today);
+  if(ovFilt.projects.length)rows=rows.filter(r=>ovFilt.projects.includes(String(r.projectId)));
+  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
+  if(ovFilt.dtIni)rows=rows.filter(r=>r.data&&r.data>=ovFilt.dtIni);
+  if(ovFilt.dtFim)rows=rows.filter(r=>r.data&&r.data<=ovFilt.dtFim);
+  const q=ovFilt.q.trim().toLowerCase();if(q)rows=rows.filter(r=>r.cliente.toLowerCase().includes(q));
+  const uq=ovFilt.u.trim().toLowerCase().replace(/\s+/g,"");
+  if(uq)rows=rows.filter(r=>{const full=(r.b+r.ucode).toLowerCase();return full.startsWith(uq)||r.ucode.toLowerCase()===uq.replace(/^0+(?=\d)/,"")||(!r.casa&&r.ucode.toLowerCase().includes(uq));});
+  rows.sort((x,y)=>{const dx=x.data||"9999-99-99",dy=y.data||"9999-99-99";if(dx!==dy)return dx<dy?-1:1;
+    const hx=x.hora||"99:99",hy=y.hora||"99:99";if(hx!==hy)return hx<hy?-1:1;
+    return x.projectName.localeCompare(y.projectName,"pt-BR")||x.b.localeCompare(y.b)||x.a.localeCompare(y.a);});
+  ovView=rows;
+  document.getElementById("ovCount").textContent=rows.length+" agendamento(s)";
+  const list=document.getElementById("ovList");
+  if(!rows.length){list.innerHTML='<div class="clif-empty">Nenhum agendamento encontrado com esses filtros.</div>';return;}
+  const dayLabel=d=>{if(!d)return "Sem data definida";const dt=new Date(d+"T12:00:00");const w=dt.toLocaleDateString("pt-BR",{weekday:"long"});
+    return (d===today?"Hoje · ":"")+w.charAt(0).toUpperCase()+w.slice(1)+", "+fmtDate(d);};
+  const perDay={};rows.forEach(r=>{perDay[r.data]=(perDay[r.data]||0)+1;});
+  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th>Acomp. Técnico</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th></tr></thead><tbody>';
+  let lastDay=null;
+  rows.forEach((r,i)=>{
+    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="11"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
+    const s=CLR_C[r.code]||CLR_C.na,color=ovColor(r.projectId);
+    h+=`<tr class="ov-row" data-ov="${i}" tabindex="0" style="--ov:${color}" title="Abrir ${esc(r.unitLabel)} no ${esc(r.projectName)}">
+      <td class="ov-proj"><span class="ov-badge"><i></i>${esc(r.projectName)}</span></td>
+      <td>${esc(r.groupLabel)}</td>
+      <td class="cunit">${esc(r.ucode)}${r.pcd?' <span class="tag pcd">PCD</span>':""}</td>
+      <td class="ccli">${esc(r.cliente)||"—"}${r.stage?` <span class="tag stage${/distrato/i.test(r.stage)?" warn":""}">${esc(r.stage)}</span>`:""}</td>
+      <td>${r.data?fmtDate(r.data):"—"}</td>
+      <td>${esc(r.hora)||"—"}</td>
+      <td>${esc(r.resp)||"—"}</td>
+      <td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td>
+      <td>${ACOMP[r.acomp]||"—"}</td>
+      <td>${r.code==="rv"&&r.rev?fmtDate(r.rev):"—"}</td>
+      <td class="clif-obs" title="${esc(r.obs)}">${r.obs?(esc(r.obs).slice(0,28)+(r.obs.length>28?"…":"")):"—"}</td>
+    </tr>`;
+  });
+  list.innerHTML=h+"</tbody></table></div>";
+}
+async function openOverviewUnit(r){
+  if(!r)return;
+  const project=availableProjects.find(p=>String(p.id)===String(r.projectId));
+  if(!project||!projectExperience(project).ready){toast("O módulo deste condomínio ainda está em preparação.");return;}
+  closeOverview();
+  await selectProject(r.projectId);
+  if(!appProject||String(appProject.id)!==String(r.projectId))return;
+  cliMode="mapa";cliBlk="ALL";switchView("cliente");
+  const el=document.querySelector(`#cliGrid [data-k="cli"][data-b="${CSS.escape(r.b)}"][data-p="${CSS.escape(r.p)}"][data-a="${CSS.escape(r.a)}"]`);
+  if(el){el.scrollIntoView({block:"center",inline:"center"});setTimeout(()=>openPop(el),60);}
 }
 function closeAdminArea(){
   const overlay=document.getElementById("adminOv");
@@ -2055,7 +2272,7 @@ async function saveUser(){
 function auditValue(v){if(v==null||v==="")return "(vazio)";const text=typeof v==="string"?v:JSON.stringify(v);return text.length>55?text.slice(0,52)+"…":text;}
 function auditDetail(l){
   const tables={unit_stage_status:"Etapa da obra",client_inspections:"Vistoria do cliente",floor_schedule:"Cronograma",project_members:"Acesso"};
-  const fields={status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
+  const fields={technical_escort:"Acomp. Técnico",sale_stage:"Etapa da venda",status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
   const old=l.old_data||{},now=l.new_data||{},ignored=new Set(["version","updated_at","updated_by"]);
   const changed=[...new Set([...Object.keys(old),...Object.keys(now)])].filter(k=>!ignored.has(k)&&JSON.stringify(old[k])!==JSON.stringify(now[k]));
   const parts=changed.slice(0,4).map(k=>(fields[k]||k)+": "+auditValue(old[k])+" → "+auditValue(now[k]));
@@ -2124,6 +2341,7 @@ addEventListener("scroll",hideTip,true);
 initState();
 renderObra(); renderCli(); renderResumo();
 document.getElementById("obraModeTog")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;obraMode=b.dataset.mode;renderObra();});
+document.getElementById("cliListTbl").addEventListener("change",e=>{const s=e.target.closest("[data-acomp]");if(s)saveAcomp(s);});
 document.getElementById("cliModeTog").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cliMode=b.dataset.mode;renderCli();});
 document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();doLogin();});
 document.getElementById("signupForm").addEventListener("submit",e=>{e.preventDefault();doSignup();});
@@ -2133,6 +2351,20 @@ document.getElementById("btnLogout").onclick=logout;
 document.getElementById("projectLogout").onclick=logout;
 document.getElementById("projectAdmin").onclick=openAdminArea;
 document.getElementById("adminBack").onclick=closeAdminArea;
+document.getElementById("projectOverview").onclick=openOverview;
+document.getElementById("overviewBack").onclick=closeOverview;
+document.getElementById("ovRefresh").onclick=()=>loadOverview();
+document.getElementById("ovClear").onclick=()=>{ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();};
+document.getElementById("ovPeriod").addEventListener("click",e=>{const b=e.target.closest("[data-period]");if(!b)return;ovFilt.period=b.dataset.period;renderOvFilters();renderOverview();});
+document.getElementById("ovProjects").addEventListener("click",e=>{const b=e.target.closest("[data-ovproj]");if(!b)return;const id=b.dataset.ovproj;
+  if(id==="ALL")ovFilt.projects=[];else{const i=ovFilt.projects.indexOf(id);if(i>=0)ovFilt.projects.splice(i,1);else ovFilt.projects.push(id);}renderOvFilters();renderOverview();});
+document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.target.closest("[data-ovstatus]");if(!b)return;const c=b.dataset.ovstatus;
+  if(c==="ALL")ovFilt.status=[];else{const i=ovFilt.status.indexOf(c);if(i>=0)ovFilt.status.splice(i,1);else ovFilt.status.push(c);}renderOvFilters();renderOverview();});
+[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOverview();}));
+document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
+  ovFilt={period:k==="today"?"today":k==="active"?"next":"ALL",projects:[],status:k==="ap"?["ap"]:k==="pend"?["rv","rm"]:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();});
+document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
+document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
 document.getElementById("accSave").onclick=saveUser;
 document.getElementById("logRefresh").onclick=loadLogs;
