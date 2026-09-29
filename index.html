@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#102a24">
 <script>try{if(localStorage.getItem("amci-theme")==="dark"){document.documentElement.dataset.theme="dark";document.querySelector('meta[name="theme-color"]').content="#0f201b";}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Vistorias">
@@ -1306,11 +1306,12 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 #resetForm [data-reset-step][hidden],#resetCodeField[hidden]{display:none}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
-html{background-color:var(--chrome-top)}
-/* iOS 26 ignora o theme-color: a cor da barra de status vem de um elemento FIXO e OPACO encostado no topo.
-   Sem ele (ou com degradê/translúcido), o sistema aplica uma faixa de desfoque. Esta faixa sólida fica sempre
-   por cima, na altura da área da barra de status, com a cor do topo da tela aberta (definida em syncThemeChrome). */
-.safe-top{display:block;position:fixed;top:0;left:0;right:0;height:var(--safe-t);background:var(--status-top,var(--chrome-top));z-index:2147483000}
+html{background-color:var(--status-top,var(--chrome-top))}
+/* iOS 26: a barra de status é opaca (modo "default"; o translúcido sempre ganha a faixa de desfoque) e o sistema
+   a pinta com a cor de um elemento FIXO e OPACO encostado no topo da página, ignorando o theme-color.
+   Esta faixa sólida (pelo menos 4px, invisível por ter a mesma cor do topo) recebe a cor do topo da tela aberta
+   em syncThemeChrome; o fundo do html e o theme-color recebem a mesma cor. */
+.safe-top{display:block;position:fixed;top:0;left:0;right:0;height:max(var(--safe-t),4px);background:var(--status-top,var(--chrome-top));z-index:2147483000}
 @media (display-mode:standalone){html,body{overscroll-behavior-y:none}}
 /* Alternância de tema */
 .theme-ico-sun{display:none}
@@ -1909,7 +1910,7 @@ html{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .auth-link:hover{color:#cbd6d4}
 :root[data-theme="dark"] .auth-link:disabled{color:#8a9690}
 :root[data-theme="dark"] .auth-help{color:#abbcb4}
-html[data-theme="dark"]{background-color:var(--chrome-top)}
+html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .safe-top{background:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
 /* /TEMA ESCURO */
@@ -2288,10 +2289,11 @@ function solidColor(el){
 }
 function topChromeColor(){
   const small=matchMedia("(max-width:520px)").matches,open=sel=>document.querySelector(sel+".open");
-  // O texto da barra de status é branco (black-translucent): nas telas de topo claro a faixa fica no verde do topo.
-  const el=open(".login-ov")?(small?".login-brand-panel":".login-ov"):open(".project-ov")?null:".header";
+  // A barra opaca escolhe sozinha o texto claro ou escuro, então a cor segue o topo real de cada tela.
+  const lo=open(".login-ov"),po=[...document.querySelectorAll(".project-ov.open")].pop();
+  const el=lo?(small?lo.querySelector(".login-brand-panel"):lo):po?(small?(po.querySelector(".project-top")||po.firstElementChild):po):document.querySelector(".header");
   const base=getComputedStyle(document.documentElement).getPropertyValue("--chrome-top").trim()||"#102a24";
-  return (el&&solidColor(document.querySelector(el)))||base;
+  return solidColor(el)||base;
 }
 function syncThemeChrome(){
   const dark=isDarkTheme(),top=topChromeColor();
