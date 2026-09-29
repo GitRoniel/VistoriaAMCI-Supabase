@@ -25,7 +25,9 @@ assert.ok(html.includes("Acompanhamento da obra, vistorias dos clientes e manten
 assert.ok(!html.includes('<span class="login-kicker">Alto do Jerivá Residencial</span>'), "O empreendimento ainda aparece indevidamente no login.");
 assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do Alto Mangueiral não encontrada no login.");
 assert.ok(html.includes("Aprovações e Revistorias por ${LAYOUT.group}"), "Progresso por bloco/conjunto não encontrado no resumo.");
-assert.ok(html.includes("alto-do-buriti") && html.includes("houseLayout"), "Módulo do Alto do Buriti não encontrado.");
+assert.ok(html.includes("houseLayout") && html.includes('project?.kind==="casas"'), "Tipo do condomínio (casas/apartamentos) precisa vir do banco.");
+assert.ok(!html.includes("PROJECT_EXPERIENCES") && !html.includes("BURITI_CONJUNTOS"), "Condomínios não podem ficar fixos no código.");
+assert.ok(html.includes('supabase.rpc("criar_condominio"') && html.includes('supabase.rpc("atualizar_estrutura_condominio"'), "Cadastro/estrutura de condomínios devem usar as funções do banco.");
 assert.ok(html.includes("units!inner(project_id)"), "Consultas precisam ficar restritas ao condomínio selecionado.");
 assert.ok(html.includes('id="projectOverview"') && html.includes('id="overviewOv"'), "Visão Geral não encontrada na seleção de obra.");
 assert.ok(html.includes("technical_escort") && html.includes("Acomp. Técnico"), "Campo Acomp. Técnico não encontrado.");
@@ -131,6 +133,11 @@ assert.match(html, /data-ovmode="lista"[^>]*>Lista<\/button><button[^>]*data-ovm
 const ovSummary = html.slice(html.indexOf("function renderOvSummary"), html.indexOf("function openOvSummaryRow"));
 assert.doesNotMatch(ovSummary, /\.cliente|\.hora\b|\.resp\b/, "O Resumo não pode exibir cliente, horário ou responsável.");
 assert.match(ovSummary, /r\.code==="rv"/);
+const condMigration = await readFile(resolve(root, "supabase/migrations/20260929042923_cadastro_condominios.sql"), "utf8");
+assert.match(condMigration, /create or replace function public\.criar_condominio\(/);
+assert.match(condMigration, /private\.is_any_admin\(\)/, "Só administradores cadastram condomínios.");
+assert.match(condMigration, /Não é possível remover casas com dados cadastrados/, "Remoção de casas com dados precisa ser bloqueada.");
+assert.match(condMigration, /revoke all on function public\.criar_condominio\(text, text, text, jsonb, text\) from public, anon;/);
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 
