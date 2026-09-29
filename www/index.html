@@ -144,13 +144,13 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 @media(max-width:720px){.clitop{grid-template-columns:1fr}}
 .cbox{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
 .cbox .ch{background:var(--moss);color:#fff;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 12px}
-.resumo{display:grid;grid-template-columns:repeat(5,1fr)}
+.resumo{display:grid;grid-template-columns:repeat(6,1fr)}
 .resumo .rc{padding:9px 11px;border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
-.resumo .rc:nth-child(5n){border-right:none}
+.resumo .rc:nth-child(6n){border-right:none}
 .resumo .rl{display:flex;align-items:center;gap:5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--text-light)}
 .resumo .rl .sw{width:10px;height:10px;border-radius:3px;border:1px solid var(--border)}
 .resumo .rv{font-size:21px;font-weight:700;color:var(--moss);margin-top:2px;font-variant-numeric:tabular-nums}
-.resumo .rc.tot{grid-column:span 5;border-right:none;border-bottom:none;background:#f6f8f4}
+.resumo .rc.tot{grid-column:1/-1;border-right:none;border-bottom:none;background:#f6f8f4}
 .aprov{display:grid;grid-template-columns:1fr 1fr;height:100%}
 .aprov .ac{padding:10px 13px;border-right:1px solid #eef2ea}
 .aprov .ac:last-child{border-right:none}
@@ -596,7 +596,7 @@ body{background:var(--bg)}
 .stk-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:4px 0 14px;font-size:12px;font-weight:700;color:var(--muted)}
 .stk-legend span{display:inline-flex;align-items:center;gap:6px}
 .stk-legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
-.stk-ok{background:#2f9e5b}.stk-rev{background:var(--sunset)}.stk-na{background:#c9d1cc}
+.stk-ok{background:#2f9e5b}.stk-fin{background:#2f6fdb}.stk-rev{background:var(--sunset)}.stk-na{background:#c9d1cc}
 .stk-chart{display:grid;gap:11px}
 .stk-row{display:grid;grid-template-columns:62px minmax(0,1fr) 52px;align-items:center;gap:10px}
 .stk-lbl{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
@@ -625,7 +625,7 @@ body{background:var(--bg)}
 
 /* APROVAÇÕES DE ACESSO */
 .apr-list{display:grid;gap:10px}
-.apr-row{display:grid;grid-template-columns:minmax(200px,1.6fr) minmax(120px,1fr) minmax(120px,.9fr) minmax(140px,1fr) minmax(150px,1fr) 236px;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.apr-row{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(210px,1.6fr) minmax(110px,.7fr) minmax(120px,.8fr) minmax(140px,.9fr) 200px;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
 .apr-row[data-status="pending"]{border-color:#efd9a6;background:linear-gradient(90deg,#fffaf0,#fff 40%)}
 .apr-user{display:flex;align-items:center;gap:12px;min-width:0}
 .apr-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f);color:var(--gold);display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
@@ -637,6 +637,17 @@ body{background:var(--bg)}
 .apr-k{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
 .apr-perm select{height:38px;padding:0 10px;border:1.5px solid #cad6cf;border-radius:10px;background:#fbfcfb;font-size:13px;color:#172c25;width:100%}
 .apr-perm select:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 4px rgba(107,128,64,.12)}
+.apr-projs{display:flex;flex-wrap:wrap;gap:5px}
+.apr-proj{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1.5px solid #d7e1da;background:#fff;color:#52675d;font-size:12px;font-weight:600;cursor:pointer;user-select:none;transition:.12s}
+.apr-proj input{position:absolute;opacity:0;pointer-events:none}
+.apr-proj i{width:12px;height:12px;border-radius:4px;border:1.5px solid var(--ov);background:#fff;flex:0 0 auto}
+.apr-proj.on,.apr-proj:has(input:checked){border-color:var(--ov);background:color-mix(in srgb,var(--ov) 10%,#fff);color:var(--ink)}
+.apr-proj.on i,.apr-proj:has(input:checked) i{background:var(--ov);box-shadow:inset 0 0 0 2px #fff}
+.apr-proj:has(input:not(:checked)){border-color:#d7e1da;background:#fff;color:#52675d}
+.apr-proj:has(input:not(:checked)) i{background:#fff;box-shadow:none}
+.apr-proj:has(input:focus-visible){outline:2px solid rgba(11,111,212,.4);outline-offset:1px}
+.apr-proj:has(input:disabled){cursor:not-allowed;opacity:.7}
+.apr-proj small{font-size:10px;color:#a15c00;font-weight:700}
 .apr-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
 .apr-actions .btn{min-height:38px;padding:0 13px}
 .apr-error{color:var(--red);font-weight:700}
@@ -791,9 +802,10 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
 @media(max-width:720px){.ov-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-cards .ov-card:last-child{grid-column:1/-1}.ov-period{flex:1 1 100%}}
 @media(max-width:520px){.project-overview-btn{width:100%;justify-content:center}}
 /* Acomp. Técnico */
-.ctbl td.cacomp{padding:4px 8px;text-align:left}
-.acomp-sel{height:30px;min-width:150px;padding:0 8px;border:1.5px solid #cad6cf;border-radius:8px;background:#fbfcfb;font-size:12px;color:#6a7a71;cursor:pointer}
-.acomp-sel.set{color:#172c25;border-color:#9fb6a6;background:#fff;font-weight:600}
+.ctbl th.th-acomp,.ctbl td.cacomp{width:1%;white-space:nowrap;text-align:center}
+.ctbl td.cacomp{padding:3px 6px}
+.acomp-sel{height:26px;width:auto;min-width:0;max-width:none;padding:0 4px;border:1.5px solid #cad6cf;border-radius:7px;background:#fbfcfb;font-size:11px;color:#6a7a71;cursor:pointer;text-align:center;text-align-last:center}
+.acomp-sel.set{color:#172c25;border-color:#9fb6a6;background:#fff;font-weight:600;text-align:center;text-align-last:center}
 .acomp-sel:focus{outline:none;border-color:#53775f;box-shadow:0 0 0 3px rgba(107,128,64,.14)}
 .acomp-sel:disabled{opacity:.6;cursor:wait}
 .pp-select{width:100%;height:42px;padding:0 11px;border:1.5px solid #cad6cf;border-radius:11px;background:#fbfcfb;font-size:14px;color:#172c25}
@@ -816,11 +828,10 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
   .resumo .rv{font-size:18px;margin-top:0}
   .resumo .rc.tot .rv{font-size:18px}
   .resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .resumo .rc,.resumo .rc:nth-child(5n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
+  .resumo .rc,.resumo .rc:nth-child(6n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
   .resumo .rc:nth-child(3n){border-right:none}
-  .resumo .rc:nth-child(n+4){border-bottom:none}
-  .resumo .rc.tot{grid-column:auto;background:#f6f8f4}
-  .resumo .rc.tot .rv span{display:block;font-size:10px!important;line-height:1.1}
+  .resumo .rc.tot{grid-column:1/-1;background:#f6f8f4;border-bottom:none}
+  .resumo .rc.tot .rv span{font-size:10px!important}
   .aprov .ac{padding:8px 10px}
   .aprov .al{font-size:8.5px}
   .aprov .av{font-size:22px}
@@ -919,6 +930,7 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
           <div class="lg"><span class="sw" style="background:#f2c14e;border-color:#d9a92f"></span>Agendado</div>
           <div class="lg"><span class="sw" style="background:#ff9e57;border-color:#e6863f"></span>Remarcado</div>
           <div class="lg"><span class="sw" style="background:#e8842a;border-color:#c96a1a"></span>Revistoria</div>
+          <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
         </div>
       </div>
@@ -1155,18 +1167,19 @@ const FRENTES=[
   {key:"qual",step:"Etapa 2",name:"Qualidade",flow:FLOW,done:["lv","rev","fz"]},
   {key:"astec",step:"Etapa 3",name:"Assist. Técnica",flow:FLOW,done:["lv","rev","fz"]},
 ];
-const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",ap:"Aprovado"};
-const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"}};
-const CLI_FLOW=["na","ag","rm","rv","ap"];
+const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado"};
+const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"}};
+const CLI_FLOW=["na","ag","rm","rv","rf","ap"];
 function normCli(t){t=(t||"").toString().trim().toLowerCase();
   if(t.includes("não agend")||t.includes("nao agend"))return"na";
   if(t.includes("aprov"))return"ap";
+  if(t.includes("revist")&&t.includes("finaliz"))return"rf";
   if(t.includes("revist"))return"rv";
   if(t.includes("remarc"))return"rm";
   if(t.includes("agend"))return"ag";
   return"na";}
 function esc(s){return (s==null?"":""+s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const NIVL={admin:"Admin",visitante:"Visitante",acab:"Acabamento",inst:"Instalações",qual:"Qualidade",astec:"Assist. Técnica"};
+const NIVL={admin:"Admin",revistorias:"Revistorias",visitante:"Visitante"};
 const PROJECT_EXPERIENCES={
   "alto-do-jeriva":{ready:true,code:"AJ",title:"Alto do Jerivá",description:"Acompanhamento da obra e vistorias dos clientes.",layout:"apartamento"},
   "alto-do-buriti":{ready:true,code:"AB",title:"Alto do Buriti",description:"Vistorias dos clientes · 319 casas nos conjuntos A a R.",layout:"casa"}
@@ -1211,8 +1224,8 @@ const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{}};
 const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",obs:"",sale_stage:"",acomp:""});
 /* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
 const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
-function acompSelect(value,attrs){
-  return `<select ${attrs}><option value=""${value?"":" selected"}>— Não informado</option>`+
+function acompSelect(value,attrs,empty="— Não informado"){
+  return `<select ${attrs}><option value=""${value?"":" selected"}>${empty}</option>`+
     Object.entries(ACOMP).map(([k,l])=>`<option value="${k}"${value===k?" selected":""}>${l}</option>`).join("")+`</select>`;
 }
 const kPV=(b,p)=>b+"|"+p;
@@ -1413,12 +1426,13 @@ function renderCli(){
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
-  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),ap=n("ap");
-  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f9e5b","#268a4d","Aprovado",ap]];
+  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap");
+  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap]];
   document.getElementById("cliResumo").innerHTML=R.map(([bg,bd,l,val])=>
     `<div class="rc"><div class="rl"><span class="sw" style="background:${bg};border-color:${bd}"></span>${l}</div><div class="rv">${val}</div></div>`).join("")+
     `<div class="rc tot"><div class="rl">Total de unidades</div><div class="rv">${t} <span style="font-size:12px;color:#9aa39a;font-weight:700">${LAYOUT.unitsWord}</span></div></div>`;
-  const vist=ap+rv, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
+  // Revistoria Finalizada conta como unidade vistoriada; a % de revistoria considera só as pendentes.
+  const vist=ap+rv+rf, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
   pct1.textContent=p1+"%"; bar1.style.width=p1+"%"; foot1.textContent=`${ap} de ${vist} vistoriados`;
   const META=0.70; const goalEl=document.getElementById("goal1");
   if(goalEl){
@@ -1433,7 +1447,7 @@ function renderCli(){
       goalEl.className="af-goal";
     }
   }
-  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) p/ revistoria`;
+  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) p/ revistoria`+(rf?` · ${rf} finalizada(s)`:"");
   if(cliMode==="lista"){ ensureCliFilters(); renderCliList(); }
 }
 
@@ -1515,7 +1529,7 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
@@ -1526,9 +1540,8 @@ function renderCliList(){
       <td>${esc(i.horario_vistoria)||"—"}</td>
       <td>${esc(i.responsavel)||"—"}</td>
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
-      <td>${r.code==="rv"&&i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
-      <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
+      <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`,"—"):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
     </tr>`;
   });
   h+='</tbody></table></div>';
@@ -1642,7 +1655,9 @@ function refreshPopActions(){
 }
 function renderCliPop(){
   const key=kC(ctx.b,ctx.p,ctx.a),info=state.cliInfo[key]||emptyCliInfo(),cur=state.cli[key],meta=state.unitMeta[key]||{};
-  const val=f=>esc(cliDraftValue(f)),can=canEditCli(),dis=can?"":"disabled";
+  const val=f=>esc(cliDraftValue(f)),scope=cliEditScope(key),can=!!scope,dis=scope==="all"?"":"disabled";
+  const fdis=f=>(scope==="all"||(scope==="rev"&&REV_FIELDS.includes(f)))?"":"disabled";
+  const stDis=c=>(scope==="all"||(scope==="rev"&&cur==="rv"&&c==="rf"))?"":"disabled";
   const idx=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a);
   const responsaveis=[...new Set(Object.values(state.cliInfo).map(i=>i.responsavel).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
   const kicker=LAYOUT.kind==="casa"?`Conjunto ${ctx.b}`:`Bloco ${ctx.b} · ${PAVL[ctx.p]}`;
@@ -1650,8 +1665,8 @@ function renderCliPop(){
   const cliente=cliDraftValue("cliente");
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
-  const showRev=cur==="rv"||cliDraftValue("data_revistoria");
-  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${dis}><button type="button" class="pp-mini" data-today="${field}" ${dis}>Hoje</button></span></label>`;
+  const showRev=cur==="rv"||cur==="rf"||cliDraftValue("data_revistoria");
+  const dateField=(field,label)=>`<label class="pp-f${field==="data_revistoria"?" pp-full":""}"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
   pop.innerHTML=`
     <div class="pp-head">
       <div class="pp-title"><small>${kicker}</small><strong>${name}</strong></div>
@@ -1664,7 +1679,7 @@ function renderCliPop(){
     <div class="pp-body">
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
-      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${dis} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
@@ -1673,8 +1688,9 @@ function renderCliPop(){
         <label class="pp-f pp-full"><span>Responsável pela vistoria</span><input name="responsavel" list="ppRespList" value="${val("responsavel")}" placeholder="Nome do responsável" autocomplete="off" ${dis}><datalist id="ppRespList">${responsaveis.map(r=>`<option value="${esc(r)}"></option>`).join("")}</datalist></label>
         ${showRev?dateField("data_revistoria","Data da revistoria (combinar c/ cliente)"):""}
         <label class="pp-f pp-full"><span>Acomp. Técnico</span>${acompSelect(cliDraftValue("acomp"),`name="acomp" class="pp-select" ${dis}`)}</label>
-        <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${dis}>${val("obs")}</textarea></label>
-        ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">Somente administradores editam a vistoria do cliente.</div>`}
+        <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${fdis("obs")}>${val("obs")}</textarea></label>
+        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: finalize a revistoria e ajuste a data da revistoria e as observações.</div>`:""}
+        ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">${currentUser?.nivel==="revistorias"?"Com a permissão Revistorias você altera apenas unidades em Revistoria.":"Somente administradores editam a vistoria do cliente."}</div>`}
       </form>
     </div>`;
   pop.setAttribute("tabindex","-1");pop.setAttribute("role","dialog");pop.setAttribute("aria-label",name+" · "+kicker);
@@ -1702,7 +1718,9 @@ async function saveAcomp(select){
   finally{select.disabled=false;}
 }
 async function saveCliDraft(){
-  if(!ctx||ctx.k!=="cli"||!canEditCli())return;
+  if(!ctx||ctx.k!=="cli")return;
+  const scope=cliEditScope(kC(ctx.b,ctx.p,ctx.a));if(!scope)return;
+  if(scope==="rev"&&Object.keys(cliChanges()).some(f=>!REV_FIELDS.includes(f))){toast("A permissão Revistorias altera apenas data da revistoria e observações");return;}
   const changes=cliChanges();if(!Object.keys(changes).length){refreshPopActions();return;}
   const key=kC(ctx.b,ctx.p,ctx.a),snapshot=ctx,old={...state.cliInfo[key]};
   const btn=pop.querySelector(".pp-actions [type=submit]");if(btn){btn.disabled=true;btn.textContent="Salvando…";}
@@ -1729,7 +1747,9 @@ async function setStatus(code){
     try{await setCell("obra",ctx.b,ctx.p,ctx.a,ctx.fr,STL[code],detalhe);toast("Status atualizado");}
     catch(e){state.obra[key][ctx.fr]=old;renderObra();renderResumo();renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   } else {
-    if(!canEditCli()){toast("Somente administrador edita a Vistoria Cliente");return;}
+    const scopeKey=kC(ctx.b,ctx.p,ctx.a);
+    if(!canEditCli()&&!(cliEditScope(scopeKey)==="rev"&&state.cli[scopeKey]==="rv"&&code==="rf")){
+      toast(currentUser?.nivel==="revistorias"?"A permissão Revistorias só finaliza revistorias":"Somente administrador edita a Vistoria Cliente");return;}
     const target={...ctx},key=kC(target.b,target.p,target.a);const old=state.cli[key];
     if(old===code)return;
     state.cli[key]=code;
@@ -1944,6 +1964,14 @@ let currentUser=null;
 function isAdmin(){ return !!(currentUser&&currentUser.nivel==="admin"); }
 function canEditFrente(fr){if(!SUPABASE_READY||!currentUser)return false;return currentUser.nivel==="admin"||currentUser.nivel===fr;}
 function canEditCli(){return SUPABASE_READY&&isAdmin();}
+/* Permissão "Revistorias": só unidades em Revistoria / Revistoria Finalizada, status apenas Revistoria → Finalizada,
+   e somente data da revistoria e observações (o banco aplica a mesma regra via RLS + trigger). */
+const REV_FIELDS=["data_revistoria","obs"];
+function cliEditScope(key){
+  if(canEditCli())return "all";
+  if(SUPABASE_READY&&currentUser?.nivel==="revistorias"&&(state.cli[key]==="rv"||state.cli[key]==="rf"))return "rev";
+  return null;
+}
 function canEditPlan(){return SUPABASE_READY&&isAdmin();}
 function setAuthFeedback(id,message,type="error"){
   const el=document.getElementById(id);if(!el)return;
@@ -2041,7 +2069,7 @@ function renderOvFilters(){
   const projects=ovProjects();
   document.getElementById("ovProjects").innerHTML=`<button class="chip${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL">Todos</button>`+
     projects.map(p=>`<button class="chip ov-chip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--ov:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
-  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","ap","na"].map(c=>
+  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na"].map(c=>
     `<button class="chip${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
   document.querySelectorAll("#ovPeriod [data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===ovFilt.period));
   document.getElementById("ovDtIni").value=ovFilt.dtIni;document.getElementById("ovDtFim").value=ovFilt.dtFim;
@@ -2077,10 +2105,10 @@ function renderOverview(){
   const dayLabel=d=>{if(!d)return "Sem data definida";const dt=new Date(d+"T12:00:00");const w=dt.toLocaleDateString("pt-BR",{weekday:"long"});
     return (d===today?"Hoje · ":"")+w.charAt(0).toUpperCase()+w.slice(1)+", "+fmtDate(d);};
   const perDay={};rows.forEach(r=>{perDay[r.data]=(perDay[r.data]||0)+1;});
-  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th>Acomp. Técnico</th><th class="cw-d">Rev.</th><th class="th-obs">Obs.</th></tr></thead><tbody>';
+  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   let lastDay=null;
   rows.forEach((r,i)=>{
-    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="11"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
+    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="10"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
     const s=CLR_C[r.code]||CLR_C.na,color=ovColor(r.projectId);
     h+=`<tr class="ov-row" data-ov="${i}" tabindex="0" style="--ov:${color}" title="Abrir ${esc(r.unitLabel)} no ${esc(r.projectName)}">
       <td class="ov-proj"><span class="ov-badge"><i></i>${esc(r.projectName)}</span></td>
@@ -2091,9 +2119,8 @@ function renderOverview(){
       <td>${esc(r.hora)||"—"}</td>
       <td>${esc(r.resp)||"—"}</td>
       <td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td>
-      <td>${ACOMP[r.acomp]||"—"}</td>
-      <td>${r.code==="rv"&&r.rev?fmtDate(r.rev):"—"}</td>
       <td class="clif-obs" title="${esc(r.obs)}">${r.obs?(esc(r.obs).slice(0,28)+(r.obs.length>28?"…":"")):"—"}</td>
+      <td class="cacomp">${ACOMP[r.acomp]||"—"}</td>
     </tr>`;
   });
   list.innerHTML=h+"</tbody></table></div>";
@@ -2207,12 +2234,12 @@ async function bootAuth(){
 }
 function clearAuthReturn(){if(AUTH_RETURN&&history.replaceState)history.replaceState(null,"",location.pathname);}
 async function logout(){
-  closeAdminArea();aprRows=[];updateAprBadges();
+  closeAdminArea();aprRows=[];aprUsers=[];updateAprBadges();
   document.body.classList.add("auth-locked");stopRealtime();if(supabase)await supabase.auth.signOut().catch(()=>{});currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
 }
 /* ── APROVAÇÕES DE ACESSO ── */
 const APR_STATUS={pending:{label:"Pendente",cls:"pending"},approved:{label:"Aprovado",cls:"active"},rejected:{label:"Rejeitado / bloqueado",cls:"blocked"}};
-let aprRows=[],aprView=[],aprFilt={project:"",status:"ALL",q:""};
+let aprRows=[],aprUsers=[],aprView=[],aprFilt={project:"",status:"ALL",q:""};
 function adminProjects(){return availableProjects.filter(project=>project.role==="admin");}
 async function adminUsersCall(body){
   const {data,error}=await supabase.functions.invoke("admin-users",{body});
@@ -2229,51 +2256,74 @@ function ensureAprProjects(){
   select.disabled=options.length<2;
 }
 function updateAprBadges(){
-  const waiting=aprRows.filter(u=>u.status==="pending").length;
+  const waiting=aprUsers.filter(u=>u.status==="pending").length;
   ["aprProjectBadge"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=waiting;el.hidden=!waiting;});
 }
 async function loadUsers(){
   if(!SUPABASE_READY||!adminProjects().length)return;
   ensureAprProjects();
   const list=document.getElementById("aprList");
-  const projects=adminProjects().filter(project=>aprFilt.project==="ALL"||String(project.id)===aprFilt.project);
+  // Sempre carrega todos os condomínios administrados: cada usuário aparece uma única vez.
+  const projects=adminProjects();
   if(list&&!aprRows.length)list.innerHTML='<div class="clif-empty">Carregando solicitações…</div>';
-  const results=await Promise.allSettled(projects.map(project=>adminUsersCall({action:"list",projectId:project.id}).then(data=>(data.users||[]).map(user=>({...user,projectId:project.id,projectName:projectExperience(project).title||project.name})))));
+  const results=await Promise.allSettled(projects.map(project=>adminUsersCall({action:"list",projectId:project.id}).then(data=>(data.users||[]).map(user=>({...user,projectId:String(project.id)})))));
   const failed=results.filter(r=>r.status==="rejected");
   aprRows=results.filter(r=>r.status==="fulfilled").flatMap(r=>r.value);
-  updateAprBadges();renderApr();
+  aggregateAprUsers();updateAprBadges();renderApr();
   if(failed.length&&list){
     const msg=failed[0].reason?.message||"Não foi possível carregar os usuários.";
     if(!aprRows.length)list.innerHTML=`<div class="clif-empty apr-error">${esc(msg)}</div>`;else toast(msg);
   }
 }
+const ROLE_RANK={admin:3,revistorias:2,visitante:1};
+function aggregateAprUsers(){
+  const map=new Map();
+  aprRows.forEach(r=>{
+    let u=map.get(r.id);
+    if(!u){u={id:r.id,email:r.email,fullName:r.fullName||"",createdAt:r.createdAt,access:{},roles:{}};map.set(r.id,u);}
+    if(!u.fullName&&r.fullName)u.fullName=r.fullName;
+    if(r.createdAt&&(!u.createdAt||r.createdAt<u.createdAt))u.createdAt=r.createdAt;
+    u.access[r.projectId]=r.status;
+    if(r.status==="approved")u.roles[r.projectId]=NIVL[String(r.role).toLowerCase()]?String(r.role).toLowerCase():"visitante";
+  });
+  map.forEach(u=>{
+    const states=Object.values(u.access);
+    u.status=states.includes("approved")?"approved":states.includes("pending")?"pending":"rejected";
+    u.role=Object.values(u.roles).sort((x,y)=>(ROLE_RANK[y]||0)-(ROLE_RANK[x]||0))[0]||"visitante";
+    u.selected=Object.keys(u.access).filter(pid=>u.access[pid]===(u.status==="approved"?"approved":"pending"));
+  });
+  aprUsers=[...map.values()];
+}
 function renderApr(){
   const list=document.getElementById("aprList");if(!list)return;
-  const count=status=>aprRows.filter(u=>u.status===status).length;
+  const count=status=>aprUsers.filter(u=>u.status===status).length;
   document.getElementById("aprKpis").innerHTML=`
     <div class="kbox warn"><div class="kl">Pendentes</div><div class="kv">${count("pending")}</div></div>
     <div class="kbox ok"><div class="kl">Aprovados</div><div class="kv">${count("approved")}</div></div>
     <div class="kbox"><div class="kl">Rejeitados / bloqueados</div><div class="kv">${count("rejected")}</div></div>
-    <div class="kbox blue"><div class="kl">Total</div><div class="kv">${aprRows.length}</div></div>`;
+    <div class="kbox blue"><div class="kl">Total</div><div class="kv">${aprUsers.length}</div></div>`;
   document.querySelectorAll("[data-apr-status]").forEach(b=>b.classList.toggle("active",b.dataset.aprStatus===aprFilt.status));
-  const q=aprFilt.q.trim().toLowerCase();
-  const order={pending:0,approved:1,rejected:2};
-  aprView=aprRows.filter(u=>(aprFilt.status==="ALL"||u.status===aprFilt.status)&&(!q||(u.fullName||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q)))
+  const q=aprFilt.q.trim().toLowerCase(),order={pending:0,approved:1,rejected:2};
+  aprView=aprUsers.filter(u=>(aprFilt.project==="ALL"||aprFilt.project in u.access)&&(aprFilt.status==="ALL"||u.status===aprFilt.status)&&(!q||u.fullName.toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q)))
     .sort((x,y)=>(order[x.status]-order[y.status])||String(y.createdAt||"").localeCompare(String(x.createdAt||"")));
   document.getElementById("aprCount").textContent=aprView.length+" usuário(s)";
   if(!aprView.length){list.innerHTML='<div class="clif-empty">Nenhum usuário encontrado com esses filtros.</div>';return;}
+  const projects=adminProjects();
   list.innerHTML=aprView.map((u,i)=>{
-    const st=APR_STATUS[u.status]||APR_STATUS.pending,role=String(u.role||"visitante").toLowerCase(),self=currentUser&&u.id===currentUser.id;
+    const st=APR_STATUS[u.status]||APR_STATUS.pending,self=currentUser&&u.id===currentUser.id;
     const when=u.createdAt?new Date(u.createdAt).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"—";
     const initials=String(u.fullName||u.email||"?").split(/[\s@.]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
-    const roleSel=`<select data-apr-role="${i}" aria-label="Permissão de ${esc(u.fullName||u.email)}">${Object.keys(NIVL).map(k=>`<option value="${k}"${k===role?" selected":""}>${esc(NIVL[k])}</option>`).join("")}</select>`;
+    const roleSel=`<select data-apr-role="${i}" aria-label="Permissão de ${esc(u.fullName||u.email)}"${self?" disabled":""}>${Object.keys(NIVL).map(k=>`<option value="${k}"${k===u.role?" selected":""}>${esc(NIVL[k])}</option>`).join("")}</select>`;
+    const chips=projects.map(p=>{const pid=String(p.id),state=u.access[pid],on=u.selected.includes(pid),lock=self&&state==="approved";
+      const hint=state==="approved"?"com acesso":state==="pending"?"solicitado":state==="rejected"?"bloqueado":"sem acesso";
+      return `<label class="apr-proj${on?" on":""}" title="${esc(projectExperience(p).title||p.name)} · ${hint}" style="--ov:${ovColor(pid)}"><input type="checkbox" data-apr-proj="${i}" value="${esc(pid)}"${on?" checked":""}${lock?" disabled":""}><i></i>${esc(projectExperience(p).title||p.name)}${state==="pending"&&u.status!=="pending"?' <small>solicitado</small>':""}</label>`;}).join("");
     let actions="";
     if(u.status==="pending")actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}">Rejeitar</button>`;
-    else if(u.status==="approved")actions=`<button class="btn g" data-apr-act="save" data-apr-i="${i}">Salvar permissão</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}"${self?' disabled title="Você não pode bloquear o próprio acesso"':""}>Bloquear</button>`;
+    else if(u.status==="approved")actions=`<button class="btn g" data-apr-act="save" data-apr-i="${i}"${self?" disabled":""}>Salvar</button><button class="btn danger" data-apr-act="reject" data-apr-i="${i}"${self?' disabled title="Você não pode bloquear o próprio acesso"':""}>Bloquear</button>`;
     else actions=`<button class="btn p" data-apr-act="approve" data-apr-i="${i}">Aprovar</button>`;
     return `<article class="apr-row" data-status="${esc(u.status)}">
       <div class="apr-user"><span class="apr-avatar">${esc(initials||"?")}</span><div class="apr-id"><strong>${esc(u.fullName||"Sem nome")}${self?' <em>(você)</em>':""}</strong><span>${esc(u.email)}</span></div></div>
-      <div class="apr-meta"><span class="apr-k">Obra / Condomínio</span><span>${esc(u.projectName)}</span></div>
+      <div class="apr-meta apr-projs-wrap"><span class="apr-k">Condomínios com acesso</span><div class="apr-projs" role="group" aria-label="Condomínios de ${esc(u.fullName||u.email)}">${chips}</div></div>
       <div class="apr-meta"><span class="apr-k">Solicitado em</span><span>${esc(when)}</span></div>
       <div class="apr-meta"><span class="apr-k">Situação</span><span><span class="nivpill ${st.cls}">${st.label}</span></span></div>
       <div class="apr-meta apr-perm"><span class="apr-k">Permissão</span>${roleSel}</div>
@@ -2281,18 +2331,27 @@ function renderApr(){
     </article>`;
   }).join("");
 }
+/* Aplica a seleção de condomínios: libera (save) os marcados e bloqueia/rejeita (reject) os desmarcados. */
 async function aprAction(act,index,button){
   const u=aprView[index];if(!u||!adminProjects().length)return;
   const role=document.querySelector(`[data-apr-role="${index}"]`)?.value||u.role||"visitante";
-  if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email}?`))return;
+  const selected=[...document.querySelectorAll(`[data-apr-proj="${index}"]:checked`)].map(c=>c.value);
+  if(act!=="reject"&&!selected.length){toast("Selecione ao menos um condomínio");return;}
+  if(act==="reject"&&!confirm(`${u.status==="pending"?"Rejeitar a solicitação de":"Bloquear o acesso de"} ${u.fullName||u.email} em todos os condomínios?`))return;
+  const ops=[];
+  adminProjects().forEach(p=>{
+    const pid=String(p.id),state=u.access[pid],keep=act!=="reject"&&selected.includes(pid);
+    if(keep){if(state!=="approved"||u.roles[pid]!==role)ops.push({action:"save",projectId:p.id,userId:u.id,email:u.email,fullName:u.fullName||"",role,active:true});}
+    else if(state==="approved"||state==="pending")ops.push({action:"reject",projectId:p.id,userId:u.id});
+  });
+  if(!ops.length){toast("Nenhuma alteração para salvar");return;}
   const buttons=button.closest(".apr-actions").querySelectorAll("button");buttons.forEach(b=>b.disabled=true);
   const label=button.textContent;button.textContent="Salvando…";
   try{
-    if(act==="reject")await adminUsersCall({action:"reject",projectId:u.projectId,userId:u.id});
-    else await adminUsersCall({action:"save",projectId:u.projectId,userId:u.id,email:u.email,fullName:u.fullName||"",role,active:true});
-    toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Permissão atualizada");
+    for(const op of ops)await adminUsersCall(op);
+    toast(act==="reject"?(u.status==="pending"?"Solicitação rejeitada":"Acesso bloqueado"):act==="approve"?"Acesso aprovado":"Acessos atualizados");
     await loadUsers();loadLogs();
-  }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;}
+  }catch(e){toast(e?.message||"Falha ao salvar");buttons.forEach(b=>b.disabled=false);button.textContent=label;loadUsers();}
 }
 function auditValue(v){if(v==null||v==="")return "(vazio)";const text=typeof v==="string"?v:JSON.stringify(v);return text.length>55?text.slice(0,52)+"…":text;}
 function auditDetail(l){
@@ -2315,29 +2374,31 @@ const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDig
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
-  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),ap=cc("ap");
-  const vist=ap+rv, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
+  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap");
+  const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
   let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
   h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
      `<div class="rb"><div class="n">${ct}</div><div class="l">Unidades</div></div>`+
      `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
      `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
-  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Aprovado",ap]];
+  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
-  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
+  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-fin"></i>Revistorias finalizadas</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
   const groupLabel=b=>`${LAYOUT.groupShort} ${b}`;
   LAYOUT.groups.forEach(block=>{
     const statuses=groupUnits(block).map(u=>state.cli[kC(u.b,u.p,u.a)]);
     const total=statuses.length||1;
     const approved=statuses.filter(status=>status==="ap").length;
     const reviews=statuses.filter(status=>status==="rv").length;
+    const finished=statuses.filter(status=>status==="rf").length;
     const waiting=statuses.filter(status=>status==="ag"||status==="rm").length;
-    const rest=total-approved-reviews;
+    const rest=total-approved-reviews-finished;
     const segs=[
       {cls:"stk-ok",label:"Aprovados",n:approved},
+      {cls:"stk-fin",label:"Revistorias finalizadas",n:finished},
       {cls:"stk-rev",label:"Revistorias / Reprovados",n:reviews},
       {cls:"stk-na",label:"Sem agendamento",n:rest,extra:waiting?` · inclui ${waiting} agendado(s)/remarcado(s) aguardando vistoria`:""}
     ];
@@ -2392,7 +2453,7 @@ document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
 document.getElementById("logRefresh").onclick=loadLogs;
-document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;aprRows=[];loadUsers();loadLogs();});
+document.getElementById("aprProject").addEventListener("change",e=>{aprFilt.project=e.target.value;renderApr();loadLogs();});
 document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.value;renderApr();});
 document.getElementById("aprRefresh").onclick=()=>loadUsers();
 document.getElementById("aprStatus").addEventListener("click",e=>{const b=e.target.closest("[data-apr-status]");if(!b)return;aprFilt.status=b.dataset.aprStatus;renderApr();});

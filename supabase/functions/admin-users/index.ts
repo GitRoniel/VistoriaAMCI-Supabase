@@ -1,7 +1,7 @@
 import { withSupabase } from 'npm:@supabase/server@1.5.3'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2.115.0/cors'
 
-const ROLES = new Set(['admin', 'acab', 'inst', 'qual', 'astec', 'visitante'])
+const ROLES = new Set(['admin', 'revistorias', 'visitante'])
 
 type RequestBody = {
   action?: 'list' | 'save' | 'reject'
