@@ -80,3 +80,14 @@ No app o endereço interno é `capacitor://localhost`; o link do e-mail de confi
 - O Modo Escuro é gerado automaticamente a partir do CSS do Modo Claro por `scripts/theme-dark.mjs` (roda no `pnpm build`; o `pnpm check` falha se estiver desatualizado). Ajustes manuais ficam logo após o bloco gerado em `www/index.html`.
 - As cores de status (Não agendado, Agendado, Remarcado, Revistoria, Revistoria Finalizada, Aprovado) são iguais nos dois temas.
 - A área da barra de status no iPhone (tela cheia/app) usa `--chrome-top`, que acompanha o tema.
+
+## Importação de agendamentos (Excel)
+
+Na **Visão Geral**, administradores veem **📥 Atualizar Agendamentos** e **Histórico de importações**.
+
+1. **Selecionar** o .xlsx (ou .xls exportado como HTML/XML; o .xls binário antigo pede "Salvar como .xlsx").
+2. **Analisar**: a planilha é lida no navegador; nada é gravado. As colunas são encontradas pelo **nome do cabeçalho** (`IMPORT_COLUMNS` em `www/index.html`; para outro padrão, acrescente o nome em `aliases`). Faltando coluna obrigatória, a importação para e informa qual.
+3. **Revisar**: unidade identificada por condomínio + bloco/conjunto + número (nunca pelo nome do cliente). Campo vazio no sistema é preenchido; valor igual fica "sem alteração"; valor diferente vira **conflito** (Manter sistema / Usar planilha, individual ou por campo); planilha vazia nunca apaga; unidade ausente na planilha nunca é alterada. Unidade, bloco ou condomínio inexistente, data/horário/status inválidos, linhas duplicadas e cliente diferente são sinalizados.
+4. **Confirmar** e **Atualizar**: `public.aplicar_importacao_agendamentos` aplica tudo em uma transação, só para administradores dos condomínios, e pula campos alterados no sistema depois da prévia.
+
+Origem de cada campo em `client_inspections.field_sources` / `updated_source` (MANUAL, PLANILHA, SISTEMA). Histórico em `importacoes_agendamentos` e `importacoes_agendamentos_itens`.

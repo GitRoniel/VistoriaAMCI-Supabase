@@ -103,6 +103,20 @@ assert.match(html, /html\{background-color:var\(--chrome-top\)\}/);
 assert.match(html, /localStorage\.getItem\("amci-theme"\)/);
 assert.match(html, /data-theme-toggle/);
 assert.match(html, /const showRev=cur==="rf";/);
+// Importação de agendamentos: nada gravado sem confirmação, sem apagar valores, histórico e RPC segura.
+const importMigration = await readFile(resolve(root, "supabase/migrations/20260929031353_importacao_agendamentos.sql"), "utf8");
+assert.match(importMigration, /create table if not exists public\.importacoes_agendamentos \(/);
+assert.match(importMigration, /create table if not exists public\.importacoes_agendamentos_itens \(/);
+assert.match(importMigration, /alter table public\.importacoes_agendamentos enable row level security/);
+assert.match(importMigration, /private\.is_project_admin\(p\.id\)/, "RPC precisa exigir administrador de todos os condomínios.");
+assert.match(importMigration, /coalesce\(c ->> 'new', ''\) = ''/, "A importação não pode apagar valores.");
+assert.match(importMigration, /alterado_no_sistema/, "Campo alterado depois da prévia não pode ser sobrescrito.");
+assert.match(importMigration, /revoke all on function public\.aplicar_importacao_agendamentos\(text, jsonb, jsonb, jsonb\) from public, anon;/);
+assert.match(html, /id="ovImport"[^>]*>📥 Atualizar Agendamentos</);
+assert.match(html, /const IMPORT_COLUMNS=\[/);
+assert.match(html, /supabase\.rpc\("aplicar_importacao_agendamentos"/);
+assert.doesNotMatch(html.slice(html.indexOf("async function onImportFile"), html.indexOf("function impRows")), /supabase\.(rpc|from)\(/, "Selecionar o arquivo não pode gravar no banco.");
+await readFile(resolve(root, "src/xlsx-entry.js"), "utf8");
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 
