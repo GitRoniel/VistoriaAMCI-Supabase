@@ -24,12 +24,13 @@
     "ios:open": "pnpm cap:sync:ios && npx cap open ios"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.115.0",
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
     "@capacitor/splash-screen": "^6.0.2",
-    "@capacitor/status-bar": "^6.0.1"
+    "@capacitor/status-bar": "^6.0.1",
+    "@supabase/supabase-js": "2.115.0",
+    "fflate": "0.8.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",

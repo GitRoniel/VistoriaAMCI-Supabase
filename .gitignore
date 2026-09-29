@@ -6,6 +6,7 @@ node_modules/
 # Gerados por `pnpm build`.
 www/config.js
 www/supabase-client.js
+www/xlsx-reader.js
 www/assets/
 www/favicon.ico
 supabase/.temp/

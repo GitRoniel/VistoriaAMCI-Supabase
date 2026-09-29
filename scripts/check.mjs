@@ -103,6 +103,34 @@ assert.match(html, /html\{background-color:var\(--chrome-top\)\}/);
 assert.match(html, /localStorage\.getItem\("amci-theme"\)/);
 assert.match(html, /data-theme-toggle/);
 assert.match(html, /const showRev=cur==="rf";/);
+// Importação de agendamentos: nada gravado sem confirmação, sem apagar valores, histórico e RPC segura.
+const importMigration = await readFile(resolve(root, "supabase/migrations/20260929031353_importacao_agendamentos.sql"), "utf8");
+assert.match(importMigration, /create table if not exists public\.importacoes_agendamentos \(/);
+assert.match(importMigration, /create table if not exists public\.importacoes_agendamentos_itens \(/);
+assert.match(importMigration, /alter table public\.importacoes_agendamentos enable row level security/);
+assert.match(importMigration, /private\.is_project_admin\(p\.id\)/, "RPC precisa exigir administrador de todos os condomínios.");
+assert.match(importMigration, /coalesce\(c ->> 'new', ''\) = ''/, "A importação não pode apagar valores.");
+assert.match(importMigration, /alterado_no_sistema/, "Campo alterado depois da prévia não pode ser sobrescrito.");
+assert.match(importMigration, /revoke all on function public\.aplicar_importacao_agendamentos\(text, jsonb, jsonb, jsonb\) from public, anon;/);
+assert.match(html, /id="ovImport"[^>]*>Atualizar Agendamentos</);
+const importUi = html.slice(html.indexOf("/* ── IMPORTAÇÃO DE AGENDAMENTOS"), html.indexOf("/* ── CONFIGURAÇÕES ── */"));
+assert.doesNotMatch(importUi, /[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u, "Sem emojis na importação.");
+const importFieldsUi = importUi.slice(importUi.indexOf("const IMPORT_COLUMNS"), importUi.indexOf("const IMP_ACTION"));
+assert.doesNotMatch(importFieldsUi, /db:"(responsible|notes|sale_stage)"|key:"(responsavel|obs|etapa)"/, "Responsável, Observação e Etapa da planilha não podem ser importados.");
+assert.doesNotMatch(importUi, /text\("(responsavel|obs|etapa)"/, "Responsável, Observação e Etapa da planilha não podem ser comparados/importados.");
+const importFields = await readFile(resolve(root, "supabase/migrations/20260929033637_importacao_campos_atendimento.sql"), "utf8");
+assert.match(importFields, /allowed text\[\] := array\['client_name', 'inspection_date', 'inspection_time', 'status'\];/);
+assert.doesNotMatch(importFields, /(responsible|notes|sale_stage) = v_rec/, "A função não pode gravar responsável, observação ou etapa.");
+assert.ok((html.match(/data-theme-toggle/g) || []).length >= 6, "Botão de tema em todas as telas.");
+assert.match(html, /const IMPORT_COLUMNS=\[/);
+assert.match(html, /supabase\.rpc\("aplicar_importacao_agendamentos"/);
+assert.doesNotMatch(html.slice(html.indexOf("async function onImportFile"), html.indexOf("function impRows")), /supabase\.(rpc|from)\(/, "Selecionar o arquivo não pode gravar no banco.");
+await readFile(resolve(root, "src/xlsx-entry.js"), "utf8");
+// Visão Geral: modos Lista/Resumo, resumo por Data + Condomínio + Local sem dados individuais.
+assert.match(html, /data-ovmode="lista"[^>]*>Lista<\/button><button[^>]*data-ovmode="resumo"/);
+const ovSummary = html.slice(html.indexOf("function renderOvSummary"), html.indexOf("function openOvSummaryRow"));
+assert.doesNotMatch(ovSummary, /\.cliente|\.hora\b|\.resp\b/, "O Resumo não pode exibir cliente, horário ou responsável.");
+assert.match(ovSummary, /r\.code==="rv"/);
 JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 

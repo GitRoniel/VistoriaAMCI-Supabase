@@ -52,13 +52,18 @@ const buildOptions = {
   target: ["es2022"]
 };
 
+// Leitor de Excel da importação de agendamentos: carregado só quando o usuário importa.
+const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], outfile: "www/xlsx-reader.js" };
+
 if (watch) {
   const { context } = await import("esbuild");
   const ctx = await context(buildOptions);
   await ctx.watch();
+  await (await context(xlsxOptions)).watch();
   console.log("Build em observação. Pressione Ctrl+C para encerrar.");
 } else {
   await build(buildOptions);
+  await build(xlsxOptions);
   // Mantém o index da raiz sincronizado para quem abrir o projeto localmente.
   await copyFile(resolve(www, "index.html"), resolve(root, "index.html"));
   console.log("Build concluído em www/.");

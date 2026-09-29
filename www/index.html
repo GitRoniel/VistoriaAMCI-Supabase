@@ -1044,6 +1044,195 @@ body.is-admin .tab-admin,body.is-admin .nav-admin{display:flex!important}
 /* App nativo (Capacitor): sem rolagem elástica revelando o fundo e sem seleção acidental ao tocar. */
 html.native,html.native body{overscroll-behavior:none}
 html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* IMPORTAÇÃO DE AGENDAMENTOS */
+.ov-cards{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:960px){.ov-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.ov-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-cards .ov-card:last-child{grid-column:auto}}
+.kbox.fin{border-left-color:#2f6fdb}.kbox.fin .kv{color:#2f6fdb}
+.imp-launch{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.imp-launch[hidden]{display:none}
+.imp-launch>span{margin-right:auto;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6a7a71}
+.imp-launch .btn{min-height:38px;height:38px;font-size:13px}
+.import-ov{z-index:196}
+.imp-busy,.imp-error,.imp-done{display:grid;justify-items:center;gap:10px;text-align:center;padding:36px 16px}
+.imp-busy small,.imp-error p{color:#6a7a71;font-size:13px;max-width:640px;line-height:1.5}
+.imp-error b{font-size:16px;color:#9e2f25}
+.imp-spin{width:30px;height:30px;border-radius:50%;border:3px solid #dfe7e1;border-top-color:var(--ink-2);animation:impspin .8s linear infinite}
+@keyframes impspin{to{transform:rotate(360deg)}}
+.imp-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.imp-head{display:grid;grid-template-columns:minmax(200px,1fr) auto;gap:12px;align-items:center;margin-bottom:12px}
+.imp-file{display:grid;gap:2px;min-width:0}
+.imp-file span{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6a7a71}
+.imp-file b{font-size:15px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imp-file small{font-size:12px;color:#6a7a71}
+.imp-kpis{display:grid;grid-template-columns:repeat(5,minmax(96px,auto));gap:8px}
+.imp-kpi{background:#fff;border:1.5px solid var(--border);border-left-width:4px;border-radius:12px;padding:8px 11px;display:grid;gap:1px}
+.imp-kpi b{font-size:20px;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.imp-kpi span{font-size:11px;font-weight:600;color:#52675d;white-space:nowrap}
+.imp-kpi.g{border-left-color:#2f9e5b}.imp-kpi.y{border-left-color:#e0b43a}.imp-kpi.b{border-left-color:#2f6fdb}.imp-kpi.r{border-left-color:#d64535}.imp-kpi.n{border-left-color:#9aa39a}
+.imp-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.imp-tabs{margin:0;flex:0 1 auto;overflow-x:auto;scrollbar-width:none}
+.imp-tabs::-webkit-scrollbar{display:none}
+.imp-tabs button{min-height:32px;padding:0 11px;font-size:12.5px;white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;gap:6px}
+.imp-tabs button small{font-size:10.5px;font-weight:700;background:rgba(31,61,56,.08);border-radius:999px;padding:1px 6px}
+.imp-q{flex:1 1 200px;max-width:340px}
+.imp-field{height:36px;padding:0 10px;border:1.5px solid #d3ddd6;border-radius:10px;background:#fbfcfb;font-size:13px;color:#172c25}
+.imp-bulk{display:flex;gap:6px;margin-left:auto}
+.imp-bulk .btn,.imp-mini{min-height:32px;height:32px;padding:0 11px;font-size:12px}
+.imp-note{font-size:12.5px;color:#6a7a71;margin:0 0 10px}
+.imp-tbl{min-width:900px}
+.imp-tbl td{vertical-align:middle;font-size:12.5px}
+.imp-tbl thead th{text-align:left}
+.imp-tbl td{white-space:normal;text-align:left;line-height:1.35}
+.imp-tbl td.cunit{white-space:nowrap}
+.imp-tbl td.ccli{min-width:180px;max-width:260px}
+.imp-tbl td:nth-child(5),.imp-tbl td:nth-child(6){min-width:120px;max-width:240px;overflow-wrap:anywhere}
+.imp-tbl td.imp-act{min-width:210px}
+.imp-tbl td.cunit small,.imp-msg{display:block;font-size:10.5px;color:#8a9690;font-weight:500}
+.imp-tbl tr.k-conflict td,.imp-tbl tr.imp-conflict td{background:#fff7f5}
+.imp-tbl tr.imp-missing td{background:#fbfaf6}
+.imp-empty{color:#9aa39a;font-style:italic}
+.imp-src{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:#eef3ef;color:#52675d;vertical-align:middle}
+.imp-warn{font-size:11px;color:#a15c00;margin-top:3px;font-weight:600;line-height:1.35}
+.imp-tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;background:#eef3ef;color:#52675d}
+.imp-tag.g{background:#e3f4ea;color:#1d6b3e}.imp-tag.y{background:#fdf3d8;color:#7a5600}.imp-tag.b{background:#e3ecfd;color:#1f4fa8}.imp-tag.r{background:#fde8e5;color:#9e2f25;white-space:normal}.imp-tag.n{background:#eef1ef;color:#5f6d66}
+.imp-dec{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
+.imp-dec small{flex-basis:100%;font-size:10.5px;color:#a15c00;font-weight:600}
+.imp-dec button{height:30px;padding:0 10px;border-radius:8px;border:1.5px solid #d3ddd6;background:#fff;font-size:12px;font-weight:600;color:#2c4038;white-space:nowrap}
+.imp-dec button:hover{border-color:#78917b}
+.imp-dec button.on{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+.imp-more{display:block;margin:10px auto 0}
+.imp-foot{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px -4px 0;padding:10px 12px calc(10px + var(--safe-b));background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 -6px 18px rgba(31,61,56,.08)}
+.imp-foot-txt{margin-right:auto;font-size:12.5px;color:#37564a}
+.imp-pend{color:#a15c00;font-weight:600}
+.imp-foot .btn{min-height:38px;height:38px}
+.imp-confirm{position:fixed;inset:0;z-index:240;display:grid;place-items:center;padding:16px;background:rgba(9,24,18,.55)}
+.imp-confirm[hidden]{display:none}
+.imp-cf-box{width:min(460px,100%);background:#fff;border-radius:16px;padding:20px;display:grid;gap:10px;box-shadow:0 24px 60px rgba(9,24,18,.35)}
+.imp-cf-box b{font-size:16px;color:var(--ink)}
+.imp-cf-box p{font-size:13.5px;line-height:1.55;color:#37564a}
+.imp-cf-box .imp-actions{justify-content:flex-end}
+.imp-done-ico{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#e3f4ea;color:#1d6b3e;font-size:24px;font-weight:700}
+.imp-done-ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.imp-done p{font-size:13.5px;color:#37564a}
+.imp-done .imp-kpis{margin:6px 0}
+@media(max-width:960px){.imp-head{grid-template-columns:1fr}.imp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){
+  .imp-launch>span{flex-basis:100%}
+  .imp-launch .btn{flex:1 1 0;padding:0 8px;font-size:12.5px}
+  .imp-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .imp-kpi{padding:6px 9px}.imp-kpi b{font-size:17px}.imp-kpi span{font-size:10.5px;white-space:normal}
+  .imp-q{max-width:none;flex:1 1 0}
+  .imp-field{height:38px;font-size:16px;flex:0 1 44%}
+  .imp-tabs{flex-basis:100%}
+  .imp-bulk{margin-left:0;flex-basis:100%}.imp-bulk .btn{flex:1 1 0}
+  .imp-foot{margin:10px 0 0}.imp-foot-txt{flex-basis:100%}.imp-foot .btn{flex:1 1 0}
+  .imp-busy,.imp-error,.imp-done{padding:24px 8px}
+}
+.login-theme{position:absolute;top:calc(14px + var(--safe-t));right:calc(14px + var(--safe-r));z-index:5;width:36px;height:36px}
+@media(max-width:720px){.login-theme{position:fixed;top:calc(10px + var(--safe-t));right:calc(10px + var(--safe-r));background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold);backdrop-filter:blur(6px)}}
+/* VISÃO GERAL · filtros compactos e modos Lista/Resumo */
+.ov-fx{padding:10px 12px;margin-bottom:8px}
+.ov-bar{gap:8px}
+.ov-seg{margin:0;flex:0 0 auto;padding:3px;border-radius:10px;gap:2px}
+.ov-seg button{min-height:30px;padding:0 12px;font-size:12.5px;border-radius:8px;flex:0 0 auto}
+.ov-fx .fx-search{flex:1 1 170px;max-width:280px}
+.ov-fx .fx-unit input{width:86px}
+.ov-chips{flex-wrap:wrap;gap:6px 18px}
+.ov-grp{display:flex;align-items:center;gap:8px;min-width:0}
+.ov-fx .fx-lbl{min-width:0}
+.ov-fx.ov-resumo .ov-only-lista{display:none!important}
+.ov-meta{display:flex;align-items:center;gap:10px;margin:0 2px 8px;font-size:11.5px}
+.ov-meta .clif-count{margin:0;font-size:12px;color:var(--ink)}
+.ov-meta .ov-updated{margin-left:auto}
+.ov-refresh{height:30px;width:30px;padding:0}
+.ov-sum-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.ov-sum-k{background:#fff;border:1px solid var(--border);border-left:4px solid #2f9e5b;border-radius:12px;padding:8px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
+.ov-sum-k span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6a7a71}
+.ov-sum-k b{font-size:22px;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.ov-sum-k.rv{border-left-color:#e8842a}.ov-sum-k.rv b{color:#c96a1a}
+.ov-sum-k.tot{border-left-color:#1f4a3f}
+.ov-sum{min-width:560px}
+.ov-sum td.ov-sum-date,.ov-sum td.ov-sum-proj,.ov-sum thead th:nth-child(-n+2){width:1%;white-space:nowrap}
+.ov-sum td.ov-sum-proj{padding-right:18px}
+.ov-pre{font-style:normal}.ov-s{display:none}
+.ov-sum thead th:nth-child(n+4){text-align:right;padding-right:14px}
+.ov-sum td{padding:6px 10px;font-size:12.5px;text-align:left}
+.ov-sum td.ov-n{text-align:right;font-variant-numeric:tabular-nums;width:1%;padding-right:14px}
+.ov-sum-date{vertical-align:top;background:#f4f7f5;border-right:1px solid var(--border);min-width:96px}
+.ov-sum-date b{display:block;font-size:13px;color:var(--ink)}
+.ov-sum-date small{display:block;font-size:11px;color:#6a7a71;font-weight:600}
+.ov-sum-row.is-today .ov-sum-date{background:#e3efff}
+.ov-sum-proj{vertical-align:top}
+.ov-sum-row{cursor:pointer}
+.ov-sum-row:hover td:not(.ov-sum-date):not(.ov-sum-proj),.ov-sum-row:focus td:not(.ov-sum-date):not(.ov-sum-proj){background:#f5f8f6}
+.ov-sum-row:focus{outline:none}
+.ov-sum-local{font-weight:700;color:var(--ink)}
+.ov-n-rv{color:#c96a1a}
+.ov-n-tot{font-weight:700;color:var(--ink)}
+.ov-sum-first td{border-top:2px solid var(--border)}
+.ov-sum-day td{background:#f7f9f7;font-size:11.5px;font-weight:700;color:#52675d;border-bottom:1px solid var(--border)}
+.ov-sum tfoot td{background:#1f4a3f;color:#fff;font-weight:700;padding:8px 10px;font-size:12.5px}
+.ov-sum tfoot td.ov-n{text-align:right;padding-right:14px}
+.ov-sum-note{font-size:12px;color:#6a7a71;margin-top:8px}
+@media(max-width:720px){
+  .ov-fx{padding:8px}
+  .ov-bar{gap:6px}
+  .ov-mode{flex:1 1 38%}.ov-period{flex:1 1 56%}
+  .ov-seg button{flex:1 1 0;padding:0 6px;min-height:32px;font-size:12px}
+  .ov-fx .fx-search{max-width:none;flex:1 1 0}
+  .ov-fx .fx-end{margin-left:auto}
+  .ov-fx .fx-unit input{width:100%}
+  .ov-chips{gap:6px}
+  .ov-grp{flex:1 1 100%}
+  .ov-grp .fx-scroll{flex:1 1 auto}
+  .ov-meta{margin-bottom:6px}
+  .ov-sum-kpis{gap:6px}
+  .ov-sum-k{flex-direction:column;align-items:flex-start;gap:0;padding:6px 9px}
+  .ov-sum-k span{font-size:9.5px;white-space:nowrap}.ov-sum-k b{font-size:18px}
+  .ov-pre,.ov-l{display:none}.ov-s{display:inline}
+  .ov-fx.ov-resumo .fx-adv{display:grid}
+  .ov-fx.ov-resumo .fx-more{display:none}
+  .ov-sum td.ov-sum-proj{padding-right:6px;white-space:normal}
+  .ov-sum{min-width:0}
+  .ov-sum td{padding:5px 6px;font-size:12px}
+  .ov-sum td.ov-n,.ov-sum tfoot td.ov-n{padding-right:8px}
+  .ov-sum thead th{padding:6px;font-size:9px}
+  .ov-sum-date{min-width:74px}
+  .ov-sum .ov-badge{font-size:10.5px;padding:2px 6px;white-space:normal}
+}
+/* Resumo mais junto e centralizado */
+.ov-sum-wrap{max-width:660px;margin:0 auto}
+.ov-sum-wrap .ov-sum-kpis{gap:8px;margin-bottom:8px}
+.ov-sum-wrap .ov-sum-k{padding:6px 12px;border-radius:10px}
+.ov-sum-wrap .ov-sum-k b{font-size:20px}
+.ov-sum-wrap .ov-sum{min-width:0;width:100%}
+.ov-sum-wrap .ov-sum thead th{padding:6px 10px}
+.ov-sum-wrap .ov-sum td{padding:4px 10px;font-size:12.5px;line-height:1.3}
+.ov-sum-wrap .ov-sum td.ov-n,.ov-sum-wrap .ov-sum thead th:nth-child(n+4){text-align:center;width:84px;padding:4px 6px}
+.ov-sum-wrap .ov-sum tfoot td{padding:6px 10px}
+.ov-sum-wrap .ov-sum tfoot td.ov-n{text-align:center;padding:6px}
+.ov-sum-wrap .ov-sum-date{min-width:0;padding:6px 12px 6px 10px}
+.ov-sum-wrap .ov-sum-date b{font-size:12.5px}
+.ov-sum-wrap .ov-sum-proj{padding-right:10px}
+.ov-sum-wrap .ov-sum .ov-badge{font-size:11px;padding:2px 8px}
+.ov-sum-wrap .ov-sum-day td{padding:3px 10px;font-size:11px}
+.ov-sum-wrap .ov-sum-note{text-align:center}
+/* Data, Condomínio e Local centralizados; a data fica no centro do bloco do dia */
+.ov-sum-wrap .ov-sum thead th:nth-child(-n+3){text-align:center}
+.ov-sum-wrap .ov-sum td.ov-sum-date,.ov-sum-wrap .ov-sum td.ov-sum-proj,.ov-sum-wrap .ov-sum td.ov-sum-local{text-align:center}
+.ov-sum-wrap .ov-sum td.ov-sum-date,.ov-sum-wrap .ov-sum td.ov-sum-proj{vertical-align:middle;cursor:pointer;transition:background .12s,box-shadow .12s}
+.ov-sum-wrap .ov-sum td.ov-sum-date:hover,.ov-sum-wrap .ov-sum td.ov-sum-date:focus-visible{background:#e6efe9;box-shadow:inset 0 0 0 2px #1f4a3f;outline:none}
+.ov-sum-wrap .ov-sum td.ov-sum-proj:hover,.ov-sum-wrap .ov-sum td.ov-sum-proj:focus-visible{background:#f1f6f3;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ov) 55%,transparent);outline:none}
+.ov-sum-go{display:block;margin-top:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1f6b4f;opacity:.75}
+.ov-sum-date:hover .ov-sum-go,.ov-sum-date:focus-visible .ov-sum-go{opacity:1;text-decoration:underline}
+.ov-sum-wrap .ov-sum-day td:first-child{text-align:center}
+.ov-sum-wrap .ov-sum tfoot td:first-child{text-align:center}
+@media(max-width:720px){
+  .ov-sum-wrap .ov-sum td{padding:4px 6px;font-size:12px}
+  .ov-sum-wrap .ov-sum td.ov-n,.ov-sum-wrap .ov-sum thead th:nth-child(n+4){width:auto;min-width:42px;padding:4px}
+  .ov-sum-wrap .ov-sum-date{padding:5px 6px}
+}
 /* TOPO · área da barra de status (iPhone em tela cheia, PWA e app) acompanha a cor do cabeçalho */
 :root{--chrome-top:#102a24}
 html{background-color:var(--chrome-top)}
@@ -1548,6 +1737,78 @@ body:has(.login-ov.open) .safe-top,body:has(.project-ov.open) .safe-top{display:
   :root[data-theme="dark"] .resumo .rc:nth-child(3n){border-right:none}
   :root[data-theme="dark"] .resumo .rc.tot{background:#242720;border-bottom:none}
 }
+:root[data-theme="dark"] .kbox.fin{border-left-color:#2f6fdb}
+:root[data-theme="dark"] .kbox.fin .kv{color:#2f6fdb}
+:root[data-theme="dark"] .imp-launch>span{color:#a0ada6}
+:root[data-theme="dark"] .imp-busy small,:root[data-theme="dark"] .imp-error p{color:#a0ada6}
+:root[data-theme="dark"] .imp-error b{color:#de7b73}
+:root[data-theme="dark"] .imp-spin{border:3px solid #404942;border-top-color:var(--ink-2)}
+:root[data-theme="dark"] .imp-file span{color:#a0ada6}
+:root[data-theme="dark"] .imp-file b{color:#cfd9d7}
+:root[data-theme="dark"] .imp-file small{color:#a0ada6}
+:root[data-theme="dark"] .imp-kpi{background:#282828;border:1.5px solid #414a43}
+:root[data-theme="dark"] .imp-kpi b{color:#cfd9d7}
+:root[data-theme="dark"] .imp-kpi span{color:#abbcb4}
+:root[data-theme="dark"] .imp-kpi.g{border-left-color:#2f9e5b}
+:root[data-theme="dark"] .imp-kpi.y{border-left-color:#e0b43a}
+:root[data-theme="dark"] .imp-kpi.b{border-left-color:#2f6fdb}
+:root[data-theme="dark"] .imp-kpi.r{border-left-color:#d64535}
+:root[data-theme="dark"] .imp-kpi.n{border-left-color:#555955}
+:root[data-theme="dark"] .imp-tabs button small{background:rgba(31,61,56,.08)}
+:root[data-theme="dark"] .imp-field{border:1.5px solid #444c47;background:#242924;color:#d4ddda}
+:root[data-theme="dark"] .imp-note{color:#a0ada6}
+:root[data-theme="dark"] .imp-tbl td.cunit small,:root[data-theme="dark"] .imp-msg{color:#8a9690}
+:root[data-theme="dark"] .imp-tbl tr.k-conflict td,:root[data-theme="dark"] .imp-tbl tr.imp-conflict td{background:#2e201d}
+:root[data-theme="dark"] .imp-tbl tr.imp-missing td{background:#2b291e}
+:root[data-theme="dark"] .imp-empty{color:#9aa39a}
+:root[data-theme="dark"] .imp-src{background:#1f2420;color:#abbcb4}
+:root[data-theme="dark"] .imp-warn{color:#ffb552}
+:root[data-theme="dark"] .imp-tag{background:#1f2420;color:#abbcb4}
+:root[data-theme="dark"] .imp-tag.g{background:#19251e;color:#77daa1}
+:root[data-theme="dark"] .imp-tag.y{background:#262218;color:#ffcc52}
+:root[data-theme="dark"] .imp-tag.b{background:#1a1f29;color:#6d96e4}
+:root[data-theme="dark"] .imp-tag.r{background:#291c1a;color:#de7b73}
+:root[data-theme="dark"] .imp-tag.n{background:#202221;color:#a8b3ae}
+:root[data-theme="dark"] .imp-dec small{color:#ffb552}
+:root[data-theme="dark"] .imp-dec button{border:1.5px solid #444c47;background:#282828;color:#c6d2cd}
+:root[data-theme="dark"] .imp-dec button:hover{border-color:#78917b}
+:root[data-theme="dark"] .imp-dec button.on{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+:root[data-theme="dark"] .imp-foot{background:#282828;border:1px solid #414a43;box-shadow:0 -6px 18px rgba(0,0,0,0.144)}
+:root[data-theme="dark"] .imp-foot-txt{color:#bac9c3}
+:root[data-theme="dark"] .imp-pend{color:#ffb552}
+:root[data-theme="dark"] .imp-confirm{background:rgba(9,24,18,.55)}
+:root[data-theme="dark"] .imp-cf-box{background:#282828;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .imp-cf-box b{color:#cfd9d7}
+:root[data-theme="dark"] .imp-cf-box p{color:#bac9c3}
+:root[data-theme="dark"] .imp-done-ico{background:#19251e;color:#77daa1}
+:root[data-theme="dark"] .imp-done-ico svg{fill:none;stroke:currentColor}
+:root[data-theme="dark"] .imp-done p{color:#bac9c3}
+@media(max-width:720px){
+  :root[data-theme="dark"] .login-theme{background:rgba(16,42,36,.72);border-color:rgba(255,255,255,.22);color:var(--gold)}
+}
+:root[data-theme="dark"] .ov-meta .clif-count{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-k{background:#282828;border:1px solid #414a43;border-left:4px solid #2f9e5b}
+:root[data-theme="dark"] .ov-sum-k span{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-k b{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-k.rv{border-left-color:#e8842a}
+:root[data-theme="dark"] .ov-sum-k.rv b{color:#c96a1a}
+:root[data-theme="dark"] .ov-sum-k.tot{border-left-color:#1f4a3f}
+:root[data-theme="dark"] .ov-sum-date{background:#212623;border-right:1px solid #414a43}
+:root[data-theme="dark"] .ov-sum-date b{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-date small{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-row.is-today .ov-sum-date{background:#1a2129}
+:root[data-theme="dark"] .ov-sum-row:hover td:not(.ov-sum-date):not(.ov-sum-proj),:root[data-theme="dark"] .ov-sum-row:focus td:not(.ov-sum-date):not(.ov-sum-proj){background:#212723}
+:root[data-theme="dark"] .ov-sum-row:focus{outline:none}
+:root[data-theme="dark"] .ov-sum-local{color:#cfd9d7}
+:root[data-theme="dark"] .ov-n-rv{color:#c96a1a}
+:root[data-theme="dark"] .ov-n-tot{color:#cfd9d7}
+:root[data-theme="dark"] .ov-sum-first td{border-top:2px solid #414a43}
+:root[data-theme="dark"] .ov-sum-day td{background:#222722;color:#abbcb4;border-bottom:1px solid #414a43}
+:root[data-theme="dark"] .ov-sum tfoot td{background:#1f4a3f;color:#fff}
+:root[data-theme="dark"] .ov-sum-note{color:#a0ada6}
+:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-date:focus-visible{background:#1c221e;box-shadow:inset 0 0 0 2px rgba(0,0,0,0.6);outline:none}
+:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:hover,:root[data-theme="dark"] .ov-sum-wrap .ov-sum td.ov-sum-proj:focus-visible{background:#1f2622;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ov) 55%,transparent);outline:none}
+:root[data-theme="dark"] .ov-sum-go{color:#79d8b5}
 html[data-theme="dark"]{background-color:var(--chrome-top)}
 :root[data-theme="dark"] .safe-top{background:var(--chrome-top)}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
@@ -1658,6 +1919,7 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
 <div class="toast" id="toast"></div>
 
 <div class="login-ov open" id="loginOv" aria-live="polite">
+  <button class="icon-btn login-theme" id="loginTheme" type="button" data-theme-toggle title="Usar tema escuro" aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
   <div class="login-shell">
     <section class="login-brand-panel" aria-label="Alto Mangueiral e Engertal">
       <div class="login-logos">
@@ -1755,31 +2017,67 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="overviewBack" type="button">← Voltar às obras</button>
+        <button class="project-logout project-theme" id="overviewTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
       </div>
     </div>
     <div class="project-body admin-body">
+      <div class="imp-launch" id="ovImportBar" hidden><span>Agendamentos do Atendimento</span><button class="btn g" id="ovHistory" type="button">Histórico de importações</button><button class="btn p" id="ovImport" type="button">Atualizar Agendamentos</button></div>
       <div class="ov-cards" id="ovCards"></div>
-      <div class="clif" id="ovFilters">
-        <div class="clif-row ov-toprow">
-          <div class="modetog ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
-          <span class="ov-updated" id="ovUpdated"></span>
-          <span class="clif-count" id="ovCount"></span>
+      <div class="clif fx ov-fx" id="ovFilters">
+        <div class="fx-row fx-main ov-bar">
+          <div class="modetog ov-seg ov-mode" id="ovMode" role="tablist" aria-label="Visualização"><button type="button" role="tab" data-ovmode="lista" class="active">Lista</button><button type="button" role="tab" data-ovmode="resumo">Resumo</button></div>
+          <div class="modetog ov-seg ov-period" id="ovPeriod" role="tablist" aria-label="Período"><button type="button" data-period="ALL" class="active">Todos</button><button type="button" data-period="today">Hoje</button><button type="button" data-period="next">Próximos</button></div>
+          <label class="fx-search ov-only-lista" id="ovQWrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="ovQ" placeholder="Buscar cliente" autocomplete="off" aria-label="Buscar cliente"></label>
+          <div class="fx-adv" id="ovAdv">
+            <label class="fx-field"><span>De</span><input type="date" id="ovDtIni" aria-label="Data inicial"></label>
+            <label class="fx-field"><span>Até</span><input type="date" id="ovDtFim" aria-label="Data final"></label>
+            <label class="fx-field fx-unit ov-only-lista"><span>Unid.</span><input type="text" id="ovU" placeholder="A604 ou B35" autocomplete="off" aria-label="Unidade"></label>
+          </div>
+          <div class="fx-end">
+            <button class="fx-btn fx-clear" id="ovClear" type="button" title="Limpar filtros" aria-label="Limpar filtros" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Limpar</button>
+            <button class="fx-btn fx-more" id="ovMore" type="button" aria-expanded="false" aria-controls="ovAdv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>Datas<b class="fx-badge" id="ovBadge" hidden></b></button>
+          </div>
         </div>
-        <div class="clif-row"><span class="clif-lbl">Condomínio</span><div class="clif-chips" id="ovProjects"></div></div>
-        <div class="clif-row"><span class="clif-lbl">Status</span><div class="clif-chips" id="ovStatus"></div></div>
-        <div class="clif-row clif-inputs">
-          <div class="fld"><label for="ovDtIni">Data de</label><input type="date" id="ovDtIni"></div>
-          <div class="fld"><label for="ovDtFim">Até</label><input type="date" id="ovDtFim"></div>
-          <div class="fld clif-q"><label for="ovQ">Cliente</label><input type="text" id="ovQ" placeholder="Nome do cliente..." autocomplete="off"></div>
-          <div class="fld clif-q"><label for="ovU">Unidade</label><input type="text" id="ovU" placeholder="Ex.: A604 ou B35" autocomplete="off"></div>
-          <button class="btn g" id="ovClear" type="button">Limpar filtros</button>
-          <button class="btn g" id="ovRefresh" type="button">Atualizar</button>
+        <div class="fx-row ov-chips">
+          <div class="ov-grp"><span class="fx-lbl">Condomínio</span><div class="fx-scroll" id="ovProjects"></div></div>
+          <div class="ov-grp ov-only-lista"><span class="fx-lbl">Status</span><div class="fx-scroll" id="ovStatus"></div></div>
         </div>
       </div>
+      <div class="ov-meta"><span class="clif-count" id="ovCount"></span><span class="ov-updated" id="ovUpdated"></span><button class="fx-btn ov-refresh" id="ovRefresh" type="button" title="Atualizar dados" aria-label="Atualizar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
       <div id="ovList"></div>
     </div>
   </section>
 </div>
+
+<div class="project-ov admin-ov import-ov" id="importOv" aria-hidden="true">
+  <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+    <div class="project-top">
+      <div class="project-top-logos" aria-label="Alto Mangueiral e Engertal">
+        <span class="project-alto-logo-tile"><img class="login-logo-alto" src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"></span>
+        <span class="project-top-divider" aria-hidden="true"></span>
+        <img class="login-logo-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
+      </div>
+      <div class="project-welcome">
+        <small id="impKicker">Atualizar agendamentos</small>
+        <h2 id="impTitle">Importação</h2>
+        <p>Selecionar Excel → Analisar → Revisar → Confirmar → Atualizar. Nada é alterado antes da sua confirmação.</p>
+      </div>
+      <div class="project-actions">
+        <button class="project-logout" id="importBack" type="button">← Voltar à Visão Geral</button>
+        <button class="project-logout project-theme" id="importTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
+      </div>
+    </div>
+    <div class="project-body admin-body" id="impBody"></div>
+    <div class="imp-confirm" id="impConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="impCfTitle">
+      <div class="imp-cf-box">
+        <b id="impCfTitle">Confirmar atualização</b>
+        <p class="imp-cf-txt"></p>
+        <div class="imp-actions"><button type="button" class="btn g" data-imp="cancel-apply">Cancelar</button><button type="button" class="btn p" data-imp="apply">Aplicar</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+<input type="file" id="impFile" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden>
 
 <div class="project-ov admin-ov" id="adminOv" aria-hidden="true">
   <section class="project-shell" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
@@ -1796,6 +2094,7 @@ html[data-theme="dark"]{background-color:var(--chrome-top)}
       </div>
       <div class="project-actions">
         <button class="project-logout" id="adminBack" type="button">← Voltar às obras</button>
+        <button class="project-logout project-theme" id="adminTheme" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="theme-lbl">Tema escuro</span></button>
       </div>
     </div>
     <div class="project-body admin-body">
@@ -2790,7 +3089,8 @@ function openAdminArea(){
 /* ── VISÃO GERAL: agendamentos de todos os condomínios do usuário ──
    Uma única consulta em client_inspections + units (RLS limita aos condomínios liberados). */
 const OV_COLORS=["#0b6fd4","#8e44ad","#c0392b","#138d75","#d35400","#2e4053","#b7950b","#7b241c"];
-let ovRows=[],ovView=[],ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};
+const OV_EMPTY=()=>({period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""});
+let ovRows=[],ovView=[],ovMode="lista",ovFiltOpen=false,ovFilt=OV_EMPTY();
 function ovProjects(){return [...availableProjects];}
 function ovColor(projectId){const i=ovProjects().findIndex(p=>String(p.id)===String(projectId));return OV_COLORS[Math.max(0,i)%OV_COLORS.length];}
 function ovUnit(u){
@@ -2801,6 +3101,7 @@ function ovUnit(u){
 function openOverview(){
   const overlay=document.getElementById("overviewOv");
   document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
+  document.getElementById("ovImportBar").hidden=!adminProjects().length;
   renderOvFilters();loadOverview();
 }
 function closeOverview(){
@@ -2826,13 +3127,19 @@ async function loadOverview(){
 }
 function renderOvFilters(){
   const projects=ovProjects();
-  document.getElementById("ovProjects").innerHTML=`<button class="chip${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL">Todos</button>`+
-    projects.map(p=>`<button class="chip ov-chip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--ov:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
+  document.getElementById("ovProjects").innerHTML=`<button class="fchip fx-all${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL" style="--c:#1f4a3f">Todos</button>`+
+    projects.map(p=>`<button class="fchip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--c:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
   document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na"].map(c=>
-    `<button class="chip${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}">${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+    `<button class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
+  const fx=document.getElementById("ovFilters");fx.classList.toggle("ov-resumo",ovMode==="resumo");fx.classList.toggle("fx-open",ovFiltOpen);
+  document.querySelectorAll("#ovMode [data-ovmode]").forEach(b=>{const on=b.dataset.ovmode===ovMode;b.classList.toggle("active",on);b.setAttribute("aria-selected",on);});
+  const adv=[ovFilt.dtIni,ovFilt.dtFim,ovMode==="lista"&&ovFilt.u].filter(Boolean).length;
+  const active=adv+(ovFilt.period!=="ALL")+(ovFilt.projects.length>0)+(ovMode==="lista"&&(!!ovFilt.q||ovFilt.status.length>0));
+  document.getElementById("ovClear").hidden=!active;const badge=document.getElementById("ovBadge");badge.textContent=adv;badge.hidden=!adv;
+  document.getElementById("ovMore").setAttribute("aria-expanded",String(ovFiltOpen));
+  [["ovQ",ovFilt.q],["ovU",ovFilt.u],["ovDtIni",ovFilt.dtIni],["ovDtFim",ovFilt.dtFim]].forEach(([id,v])=>document.getElementById(id).closest("label").classList.toggle("on",!!v));
   document.querySelectorAll("#ovPeriod [data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===ovFilt.period));
-  document.getElementById("ovDtIni").value=ovFilt.dtIni;document.getElementById("ovDtFim").value=ovFilt.dtFim;
-  document.getElementById("ovQ").value=ovFilt.q;document.getElementById("ovU").value=ovFilt.u;
+  [["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el.value!==ovFilt[k])el.value=ovFilt[k];});
 }
 function renderOverview(){
   const today=todayISO(),count=f=>ovRows.filter(f).length;
@@ -2840,17 +3147,20 @@ function renderOverview(){
   const cards=[
     ["all","Total de agendamentos",ovRows.length,""],
     ["today","Agendamentos de hoje",count(r=>r.data===today),"blue"],
-    ["ap","Aprovados",count(r=>r.code==="ap"),"ok"],
-    ["pend","Revistorias / Pendentes",count(r=>r.code==="rv"||r.code==="rm"),"warn"],
-    ["active","Condomínios com vistoria ativa",active.size,""]];
+    ["next","Próximos",count(r=>r.data&&r.data>=today),""],
+    ["rv","Revistorias",count(r=>r.code==="rv"),"warn"],
+    ["rf","Revistorias finalizadas",count(r=>r.code==="rf"),"fin"],
+    ["active","Condomínios ativos",active.size,""]];
   document.getElementById("ovCards").innerHTML=cards.map(([k,l,v,c])=>`<button type="button" class="kbox ov-card ${c}" data-ovcard="${k}"><div class="kl">${l}</div><div class="kv">${v}</div></button>`).join("");
+  // Período, condomínio e datas valem para os dois modos; status, cliente e unidade só para a Lista.
   let rows=ovRows.slice();
   if(ovFilt.period==="today")rows=rows.filter(r=>r.data===today);
   else if(ovFilt.period==="next")rows=rows.filter(r=>r.data&&r.data>=today);
   if(ovFilt.projects.length)rows=rows.filter(r=>ovFilt.projects.includes(String(r.projectId)));
-  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
   if(ovFilt.dtIni)rows=rows.filter(r=>r.data&&r.data>=ovFilt.dtIni);
   if(ovFilt.dtFim)rows=rows.filter(r=>r.data&&r.data<=ovFilt.dtFim);
+  if(ovMode==="resumo"){renderOvSummary(rows,today);return;}
+  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
   const q=ovFilt.q.trim().toLowerCase();if(q)rows=rows.filter(r=>r.cliente.toLowerCase().includes(q));
   const uq=ovFilt.u.trim().toLowerCase().replace(/\s+/g,"");
   if(uq)rows=rows.filter(r=>{const full=(r.b+r.ucode).toLowerCase();return full.startsWith(uq)||r.ucode.toLowerCase()===uq.replace(/^0+(?=\d)/,"")||(!r.casa&&r.ucode.toLowerCase().includes(uq));});
@@ -2884,6 +3194,55 @@ function renderOverview(){
   });
   list.innerHTML=h+"</tbody></table></div>";
 }
+/* Resumo: quantitativo por Data + Condomínio + Local (bloco ou conjunto), sem dados individuais.
+   Revistorias = unidades com status "Revistoria"; Vistorias = demais agendamentos do dia. */
+let ovSumView=[];
+function renderOvSummary(rows,today){
+  const dated=rows.filter(r=>r.data),noDate=rows.length-dated.length;
+  const days=new Map();
+  for(const r of dated){
+    if(!days.has(r.data))days.set(r.data,new Map());
+    const k=r.projectId+"|"+r.b,m=days.get(r.data);
+    if(!m.has(k))m.set(k,{date:r.data,projectId:r.projectId,projectName:r.projectName,local:r.groupLabel,b:r.b,v:0,rv:0});
+    const g=m.get(k);if(r.code==="rv")g.rv++;else g.v++;
+  }
+  const order=[...days.keys()].sort();
+  const totV=dated.filter(r=>r.code!=="rv").length,totR=dated.length-totV;
+  document.getElementById("ovCount").textContent=`${order.length} dia(s) · ${[...days.values()].reduce((n,m)=>n+m.size,0)} local(is)`;
+  const list=document.getElementById("ovList");
+  let h=`<div class="ov-sum-wrap"><div class="ov-sum-kpis"><div class="ov-sum-k"><span><i class="ov-pre">Total de </i>vistorias</span><b>${totV}</b></div><div class="ov-sum-k rv"><span><i class="ov-pre">Total de </i>revistorias</span><b>${totR}</b></div><div class="ov-sum-k tot"><span>Total geral</span><b>${totV+totR}</b></div></div>`;
+  if(!order.length){list.innerHTML=h+'<div class="clif-empty">Nenhuma vistoria com data nesse período.</div></div>';ovSumView=[];return;}
+  const dayLabel=d=>{const w=new Date(d+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","");return `<b>${fmtDate(d)}</b><small>${d===today?"Hoje":w.charAt(0).toUpperCase()+w.slice(1)}</small>`;};
+  ovSumView=[];
+  h+='<div class="gridscroll"><table class="ctbl ov-sum"><thead><tr><th class="th-cli">Data</th><th class="th-cli">Condomínio</th><th class="th-cli">Local</th><th><span class="ov-l">Vistorias</span><span class="ov-s">Vist.</span></th><th><span class="ov-l">Revistorias</span><span class="ov-s">Rev.</span></th><th>Total</th></tr></thead><tbody>';
+  for(const d of order){
+    const groups=[...days.get(d).values()].sort((x,y)=>x.projectName.localeCompare(y.projectName,"pt-BR")||x.b.localeCompare(y.b,"pt-BR",{numeric:true}));
+    const dv=groups.reduce((n,g)=>n+g.v,0),dr=groups.reduce((n,g)=>n+g.rv,0);
+    const perProject=new Map();groups.forEach(g=>perProject.set(g.projectId,(perProject.get(g.projectId)||0)+1));
+    let lastProject=null;
+    groups.forEach((g,i)=>{
+      const idx=ovSumView.push(g)-1,color=ovColor(g.projectId);
+      h+=`<tr class="ov-sum-row${i===0?" ov-sum-first":""}${d===today?" is-today":""}" data-ovsum="${idx}" tabindex="0" style="--ov:${color}" title="Ver agendamentos de ${esc(g.local)} em ${fmtDate(d)}">`;
+      if(i===0)h+=`<td class="ov-sum-date" rowspan="${groups.length+(groups.length>1?1:0)}" data-ovday="${d}" tabindex="0" role="button" title="Ver clientes e horários de ${fmtDate(d)}">${dayLabel(d)}<span class="ov-sum-go">Ver lista</span></td>`;
+      if(g.projectId!==lastProject){lastProject=g.projectId;h+=`<td class="ov-sum-proj" rowspan="${perProject.get(g.projectId)}" data-ovday="${d}" data-ovdayproj="${esc(g.projectId)}" tabindex="0" role="button" title="Ver clientes e horários do ${esc(g.projectName)} em ${fmtDate(d)}"><span class="ov-badge"><i></i>${esc(g.projectName)}</span></td>`;}
+      h+=`<td class="ov-sum-local">${esc(g.local)}</td><td class="ov-n">${g.v}</td><td class="ov-n ov-n-rv">${g.rv||"—"}</td><td class="ov-n ov-n-tot">${g.v+g.rv}</td></tr>`;
+    });
+    if(groups.length>1)h+=`<tr class="ov-sum-day"><td colspan="2">Total do dia</td><td class="ov-n">${dv}</td><td class="ov-n ov-n-rv">${dr||"—"}</td><td class="ov-n ov-n-tot">${dv+dr}</td></tr>`;
+  }
+  h+=`</tbody><tfoot><tr><td colspan="3">Total geral</td><td class="ov-n">${totV}</td><td class="ov-n">${totR}</td><td class="ov-n">${totV+totR}</td></tr></tfoot></table></div>`;
+  if(noDate)h+=`<p class="ov-sum-note">${noDate} agendamento(s) sem data definida não entram no resumo.</p>`;
+  list.innerHTML=h+"</div>";
+}
+// Clique na data (ou no condomínio do dia) abre a Lista com clientes, horários e datas daquele dia.
+function openOvSummaryDay(date,projectId){
+  ovMode="lista";ovFilt={...OV_EMPTY(),projects:projectId?[String(projectId)]:ovFilt.projects.slice(),dtIni:date,dtFim:date};ovFiltOpen=true;
+  renderOvFilters();renderOverview();document.getElementById("ovFilters").scrollIntoView({block:"start",behavior:"smooth"});
+}
+function openOvSummaryRow(g){
+  if(!g)return;
+  ovMode="lista";ovFilt={...OV_EMPTY(),projects:[String(g.projectId)],dtIni:g.date,dtFim:g.date,u:g.b};ovFiltOpen=true;
+  renderOvFilters();renderOverview();document.getElementById("ovFilters").scrollIntoView({block:"start",behavior:"smooth"});
+}
 async function openOverviewUnit(r){
   if(!r)return;
   const project=availableProjects.find(p=>String(p.id)===String(r.projectId));
@@ -2895,6 +3254,458 @@ async function openOverviewUnit(r){
   const el=document.querySelector(`#cliGrid [data-k="cli"][data-b="${CSS.escape(r.b)}"][data-p="${CSS.escape(r.p)}"][data-a="${CSS.escape(r.a)}"]`);
   if(el){el.scrollIntoView({block:"center",inline:"center"});setTimeout(()=>openPop(el),60);}
 }
+/* ── IMPORTAÇÃO DE AGENDAMENTOS (Excel → análise → revisão → confirmação → Supabase) ──
+   Nada é gravado ao escolher o arquivo: a planilha é lida no navegador, comparada com o banco e
+   só o que o usuário confirma vai para public.aplicar_importacao_agendamentos (uma transação).
+   Regras: só preenche campos vazios; valor diferente vira conflito para decisão individual;
+   planilha vazia nunca apaga; unidade ausente na planilha nunca é alterada. */
+
+// Camada de mapeamento: colunas encontradas pelo NOME do cabeçalho (sem acento/maiúsculas).
+// Para outro padrão de planilha, basta acrescentar o nome da coluna em "aliases".
+const IMPORT_COLUMNS=[
+  {key:"condominio",label:"Condomínio",required:true,aliases:["ds empreendimento","empreendimento","condominio","obra","residencial"]},
+  {key:"unidade",label:"Unidade (apto/casa)",required:true,aliases:["ds produto","produto","unidade","apartamento","apto","casa","imovel"]},
+  {key:"bloco",label:"Bloco/Conjunto",required:false,aliases:["bloco","conjunto","quadra","torre"]},
+  {key:"cliente",label:"Cliente",required:true,aliases:["ds nome cliente","nome cliente","nome do cliente","cliente","proprietario"]},
+  {key:"data",label:"Data da vistoria",required:true,aliases:["data da vistoria","data vistoria","dt vistoria","data do agendamento","data"]},
+  {key:"hora",label:"Horário",required:true,aliases:["horario do agendamento","horario da vistoria","horario","hora"]},
+  {key:"status",label:"Status da vistoria",required:false,aliases:["status da vistoria","status do agendamento","status","situacao"]}];
+// Colunas do Atendimento ao Cliente que NUNCA alimentam o sistema (nem são lidas):
+// Responsável pelo agendamento, Observação e Etapa de Categoria Atendimento.
+// O responsável pela vistoria e as observações continuam sendo definidos só no site.
+// Campos do agendamento que a planilha pode preencher ("agenda" = data + horário juntos).
+const IMPORT_FIELDS=[
+  {key:"cliente",label:"Cliente",db:"client_name"},
+  {key:"agenda",label:"Data/horário"},
+  {key:"status",label:"Status",db:"status"}];
+const IMP_DB_LABEL={client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",status:"Status"};
+const IMP_ACTION={preenchido:"Preenchido",usado_planilha:"Usado da planilha",mantido_sistema:"Mantido do sistema",conflito_pendente:"Conflito não resolvido",nao_encontrado:"Não encontrado",ignorado:"Ignorado",alterado_no_sistema:"Alterado no sistema (pulado)"};
+const IMP_TABS=[["all","Todos"],["update","Atualizações"],["same","Sem alterações"],["new","Novos dados"],["conflict","Conflitos"],["missing","Não encontrados"]];
+
+const impNorm=s=>String(s??"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[_\s]+/g," ").trim();
+const impCmp=s=>impNorm(s).replace(/[.,;:!]+$/,"").replace(/\s+/g," ");
+const impClean=s=>String(s??"").replace(/\s+/g," ").trim();
+const impFmtAgenda=(d,h)=>[d?fmtDate(d):"",h].filter(Boolean).join(" — ");
+let impState=null,impReaderPromise=null;
+
+function impStatusCode(raw){
+  const t=impNorm(raw);if(!t)return "";
+  if(/n[ao]o agend/.test(t)||t==="nao agendada")return "";
+  if(/finaliz/.test(t))return "rf";
+  if(/aprov/.test(t))return "ap";
+  if(/reprov|revist/.test(t))return "rv";
+  if(/remarc/.test(t))return "rm";
+  if(/agend/.test(t))return "ag";
+  return null; // valor desconhecido → ignorado com aviso
+}
+function impSerialDate(n){const d=new Date(Date.UTC(1899,11,30)+Math.floor(n)*86400000);return d.toISOString().slice(0,10);}
+function impParseDate(v){
+  if(v==null||v==="")return {value:""};
+  let iso="";
+  if(typeof v==="object"&&"serial" in v)iso=impSerialDate(v.serial);
+  else if(typeof v==="number")iso=v>20000&&v<80000?impSerialDate(v):"";
+  else{const s=impClean(v);if(!s)return {value:""};
+    let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+    if(m)iso=`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+    else if((m=/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2}|\d{4})\b/.exec(s)))iso=`${m[3].length===2?"20"+m[3]:m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+    if(!iso)return {invalid:s};}
+  const [y,mo,d]=iso.split("-").map(Number),dt=new Date(Date.UTC(y,mo-1,d));
+  if(!(y>=2000&&y<=2100)||dt.getUTCMonth()!==mo-1||dt.getUTCDate()!==d)return {invalid:typeof v==="object"?iso:impClean(v)};
+  return {value:iso};
+}
+function impParseTime(v){
+  if(v==null||v==="")return {value:""};
+  let h,m;
+  if((typeof v==="object"&&"serial" in v)||typeof v==="number"){const n=typeof v==="number"?v:v.serial,mins=Math.round((n-Math.floor(n))*1440)%1440;h=Math.floor(mins/60);m=mins%60;}
+  else{const s=impNorm(v);if(!s)return {value:""};
+    const r=/^(\d{1,2})\s*(?:[:h]\s*(\d{2}))?(?::\d{2})?\s*(am|pm|h)?$/.exec(s.replace(/\s*hs?$/,"h"));
+    if(!r)return {invalid:impClean(v)};
+    h=+r[1];m=+(r[2]||0);if(r[3]==="pm"&&h<12)h+=12;if(r[3]==="am"&&h===12)h=0;}
+  if(!(h>=0&&h<=23&&m>=0&&m<=59))return {invalid:impClean(typeof v==="object"?"":v)};
+  return {value:String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")};
+}
+function impCell(v){if(v==null)return "";if(typeof v==="object"&&"serial" in v)return String(v.serial);return impClean(v);}
+
+/* 1) Estrutura: acha o cabeçalho por nome e confere as colunas obrigatórias. */
+function impFindColumns(sheets){
+  let best=null;
+  for(const sheet of sheets){
+    for(let r=0;r<Math.min(sheet.rows.length,15);r++){
+      const cells=sheet.rows[r]||[],map={},used=new Set();
+      for(const col of IMPORT_COLUMNS){
+        for(const alias of col.aliases){
+          const i=cells.findIndex((c,idx)=>!used.has(idx)&&typeof c==="string"&&(impNorm(c)===alias||(alias.length>=6&&impNorm(c).startsWith(alias+" "))));
+          if(i>=0){map[col.key]=i;used.add(i);break;}
+        }
+      }
+      const score=Object.keys(map).length;
+      if(!best||score>best.score)best={sheet,row:r,map,score};
+    }
+  }
+  if(!best||best.score<2)return {error:"Não encontrei o cabeçalho da planilha. A primeira linha deve ter os nomes das colunas (Condomínio, Unidade, Cliente, Data da vistoria, Horário…)."};
+  const missing=IMPORT_COLUMNS.filter(c=>c.required&&best.map[c.key]==null);
+  if(missing.length)return {error:"Coluna obrigatória não encontrada: "+missing.map(c=>`"${c.label}" (nomes aceitos: ${c.aliases.map(a=>a.toUpperCase()).join(", ")})`).join("; ")+".",missing};
+  return best;
+}
+
+/* 2) Identificação: condomínio pelo nome, unidade pela chave condomínio + bloco/conjunto + número. */
+function impProjectMatcher(){
+  const clean=s=>impNorm(s).replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+  const list=availableProjects.map(p=>({p,keys:[p.name,projectExperience(p).title,String(p.slug||"").replace(/-/g," ")].map(clean).filter(Boolean)}));
+  return raw=>{const n=clean(raw);if(!n)return null;let best=null,len=0;
+    for(const {p,keys} of list)for(const k of keys)if((n===k||n.startsWith(k+" "))&&k.length>len){best=p;len=k.length;}
+    return best;};
+}
+function impParseUnit(raw,blocoRaw){
+  const s=impNorm(raw).toUpperCase();
+  const blk=/\b(?:BLOCO|BLC|BL|CONJUNTO|CONJ|CJ|QUADRA|QD|TORRE)\s*[-:.]?\s*([A-Z0-9]{1,3})\b/.exec(s);
+  const un=/\b(?:APARTAMENTO|APTO|APT|AP|UNIDADE|UNID|UN|CASA|LOTE|LT)\s*[-:.ºª°]?\s*(T?\d{1,5})\b/.exec(s);
+  const bloco=blk?blk[1]:impNorm(blocoRaw).toUpperCase().replace(/^(BLOCO|BL|CONJUNTO|CONJ|CJ|QUADRA|QD|TORRE)\s*[-:.]?\s*/,"").trim();
+  let num=un?un[1]:(/(\d{1,5})\s*$/.exec(s)||[])[1];
+  if(!num)return null;
+  return {bloco,code:String(Number(num.replace(/^T/,"0")))};
+}
+// Código da unidade como aparece na planilha: aptos = pavimento + número (T/Térreo = 0), casas = número.
+function impUnitCode(u){
+  const apto=String(u.apto||"").trim(),pav=String(u.pav||"").trim();
+  if(!pav)return /^\d+$/.test(apto)?String(Number(apto)):apto.toUpperCase();
+  const p=_pav(pav),pn=p==="T"?"0":((/\d+/.exec(p)||[""])[0]);
+  return /^\d+$/.test(pn+apto)?String(Number(pn+apto)):(pn+apto).toUpperCase();
+}
+
+async function impLoadSystem(projectIds){
+  const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,field_sources,units!inner(id,project_id,bloco,pav,apto,kind)",q=>q.in("units.project_id",projectIds));
+  const byKey=new Map(),blocks=new Map(),byUnit=new Map();
+  for(const r of rows){const u=r.units||{};if(!u.project_id)continue;
+    const pid=String(u.project_id),bloco=_blk(u.bloco);
+    byKey.set(pid+"|"+bloco+"|"+impUnitCode(u),r);byUnit.set(r.unit_id,r);
+    if(!blocks.has(pid))blocks.set(pid,new Set());blocks.get(pid).add(bloco);}
+  return {byKey,blocks,byUnit};
+}
+
+/* 3) Comparação campo a campo (nada é gravado aqui). */
+function impCompare(sys,sheet){
+  const items=[],src=sys.field_sources||{};
+  const text=(key,label,db,sheetVal)=>{
+    const cur=impClean(sys[db]),next=impClean(sheetVal);if(!next)return;
+    if(!cur)items.push({key,label,kind:"fill",cur:"",next,changes:[{field:db,old:sys[db]||"",new:next}]});
+    else if(impCmp(cur)===impCmp(next))items.push({key,label,kind:"same",cur,next});
+    else items.push({key,label,kind:"conflict",cur,next,source:src[db]||"SISTEMA",changes:[{field:db,old:sys[db]||"",new:next}]});
+  };
+  text("cliente","Cliente","client_name",sheet.cliente);
+  // Data + horário: comparados juntos para mostrar "Sistema: 05/10/2026 — 14:00 · Planilha: 06/10/2026 — 15:00".
+  if(sheet.dataInvalid||sheet.horaInvalid)items.push({key:"agenda",label:"Data/horário",kind:"invalid",cur:impFmtAgenda(dstr(sys.inspection_date),(sys.inspection_time||"").slice(0,5)),next:[sheet.dataInvalid,sheet.horaInvalid].filter(Boolean).join(" — "),
+    message:sheet.dataInvalid&&sheet.horaInvalid?"Data e horário inválidos":sheet.dataInvalid?"Data inválida":"Horário inválido"});
+  else{
+    const sd=dstr(sys.inspection_date),sh=(sys.inspection_time||"").slice(0,5),pd=sheet.data,ph=sheet.hora;
+    if(pd||ph){
+      const parts=[["inspection_date",sd,pd],["inspection_time",sh,ph]];
+      const diff=parts.some(([,s,p])=>p&&s&&s!==p),fills=parts.filter(([,s,p])=>p&&!s);
+      const cur=impFmtAgenda(sd,sh),next=impFmtAgenda(pd||sd,ph||sh);
+      if(diff)items.push({key:"agenda",label:"Data/horário",kind:"conflict",cur,next,source:src.inspection_date||src.inspection_time||"SISTEMA",
+        changes:parts.filter(([,s,p])=>p&&p!==s).map(([f,s,p])=>({field:f,old:s,new:p}))});
+      else if(fills.length)items.push({key:"agenda",label:"Data/horário",kind:"fill",cur,next,changes:fills.map(([f,s,p])=>({field:f,old:s,new:p}))});
+      else items.push({key:"agenda",label:"Data/horário",kind:"same",cur,next});
+    }
+  }
+  if(sheet.statusInvalid)items.push({key:"status",label:"Status",kind:"invalid",cur:sys.status,next:sheet.statusInvalid,message:"Status desconhecido"});
+  else if(sheet.status){
+    const curCode=normCli(sys.status),next=CLL[sheet.status];
+    if(curCode==="na")items.push({key:"status",label:"Status",kind:"fill",cur:"",next,changes:[{field:"status",old:sys.status||"Não agendado",new:next}]});
+    else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur:sys.status,next});
+    else items.push({key:"status",label:"Status",kind:"conflict",cur:sys.status,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:next}]});
+  }
+  return items;
+}
+
+async function impAnalyze(file,sheets){
+  const cols=impFindColumns(sheets);if(cols.error)throw new Error(cols.error);
+  const admins=new Set(adminProjects().map(p=>String(p.id)));
+  if(!admins.size)throw new Error("Somente administradores podem importar agendamentos.");
+  const matchProject=impProjectMatcher(),get=(row,k)=>cols.map[k]==null?null:row[cols.map[k]];
+  // Linhas → registros com condomínio identificado (ainda sem banco).
+  const records=[];
+  cols.sheet.rows.slice(cols.row+1).forEach((row,i)=>{
+    if(!row||!row.some(v=>v!=null&&impCell(v)!==""))return;
+    const rowNum=cols.row+i+2,rawProj=impCell(get(row,"condominio")),rawUnit=impCell(get(row,"unidade"));
+    if(!rawProj&&!rawUnit)return;
+    const d=impParseDate(get(row,"data")),h=impParseTime(get(row,"hora")),st=impStatusCode(get(row,"status"));
+    const sheet={cliente:impClean(get(row,"cliente")),data:d.value||"",dataInvalid:d.invalid||"",hora:h.value||"",horaInvalid:h.invalid||"",
+      status:st||"",statusInvalid:st===null?impCell(get(row,"status")):""};
+    const rec={row:rowNum,rawProj,rawUnit,sheet,cliente:sheet.cliente,items:[],warnings:[]};
+    const project=matchProject(rawProj);
+    if(!rawProj){rec.cls="missing";rec.error="Condomínio não informado na planilha";}
+    else if(!project){rec.cls="missing";rec.error="Condomínio não encontrado no sistema";}
+    else if(!admins.has(String(project.id))){rec.cls="missing";rec.error="Sem permissão de administrador neste condomínio";rec.project=project;}
+    else rec.project=project;
+    records.push(rec);
+  });
+  const projectIds=[...new Set(records.filter(r=>r.project&&!r.error).map(r=>String(r.project.id)))];
+  const sys=projectIds.length?await impLoadSystem(projectIds):{byKey:new Map(),blocks:new Map(),byUnit:new Map()};
+  // Unidade: condomínio + bloco/conjunto + número. Nunca pelo nome do cliente.
+  for(const rec of records){
+    if(rec.error)continue;
+    const pid=String(rec.project.id),parsed=impParseUnit(rec.rawUnit,get(cols.sheet.rows[rec.row-1]||[],"bloco"));
+    rec.projectName=projectExperience(rec.project).title||rec.project.name;
+    const blocks=sys.blocks.get(pid)||new Set();
+    if(!parsed){rec.cls="missing";rec.error="Unidade em formato não reconhecido";continue;}
+    let bloco=parsed.bloco;if(!bloco&&blocks.size===1)bloco=[...blocks][0];
+    if(!bloco||!blocks.has(bloco)){rec.cls="missing";rec.error=bloco?`Bloco/Conjunto ${bloco} inexistente`:"Bloco/Conjunto não informado";continue;}
+    const current=sys.byKey.get(pid+"|"+bloco+"|"+parsed.code);
+    if(!current){rec.cls="missing";rec.error="Unidade não encontrada";continue;}
+    rec.current=current;rec.unitId=current.unit_id;const ou=ovUnit(current.units);rec.label=`${ou.groupLabel} · ${ou.unitLabel}`;
+  }
+  // Duplicidade: a mesma unidade em mais de uma linha.
+  const byUnit=new Map();records.filter(r=>r.unitId).forEach(r=>{if(!byUnit.has(r.unitId))byUnit.set(r.unitId,[]);byUnit.get(r.unitId).push(r);});
+  for(const list of byUnit.values()){
+    if(list.length<2)continue;
+    const sig=r=>JSON.stringify(Object.fromEntries(Object.entries(r.sheet).map(([k,v])=>[k,impCmp(v)])));
+    const lines=list.map(r=>r.row).join(", ");
+    if(list.every(r=>sig(r)===sig(list[0])))list.slice(1).forEach(r=>{r.cls="same";r.dup=true;r.warnings.push(`Linha repetida (idêntica à linha ${list[0].row})`);});
+    else list.forEach(r=>{r.cls="conflict";r.blocked=`Unidade repetida na planilha com dados diferentes (linhas ${lines}). Corrija a planilha; nada desta unidade será aplicado.`;});
+  }
+  // Comparação com o banco.
+  for(const rec of records){
+    if(rec.error||rec.dup||rec.blocked)continue;
+    const cur=rec.current;rec.items=impCompare(cur,rec.sheet);
+    const clientConflict=rec.items.some(it=>it.key==="cliente"&&it.kind==="conflict");
+    if(clientConflict){ // cliente incompatível: nada desta unidade é preenchido sem decisão.
+      rec.warnings.push("Cliente diferente do cadastrado: confira se a linha é desta unidade.");
+      rec.items.forEach(it=>{if(it.kind==="fill"){it.kind="conflict";it.source="—";it.note="Aguardando confirmação do cliente";}});
+    }
+    const hadData=!!(cur.inspection_date||cur.inspection_time||impClean(cur.responsible)||normCli(cur.status)!=="na");
+    rec.cls=rec.items.some(it=>it.kind==="conflict")?"conflict":rec.items.some(it=>it.kind==="fill")?(hadData?"update":"new"):"same";
+  }
+  // Conflito de agenda: mesmo responsável em duas unidades na mesma data/horário (aviso).
+  const slots=new Map();
+  for(const rec of records){if(!rec.unitId||rec.error)continue;
+    const c=rec.current,d=rec.sheet.data||dstr(c.inspection_date),h=rec.sheet.hora||(c.inspection_time||"").slice(0,5),resp=impCmp(c.responsible);
+    if(!d||!h||!resp)continue;const k=d+"|"+h+"|"+resp;if(!slots.has(k))slots.set(k,[]);slots.get(k).push(rec);}
+  for(const list of slots.values())if(list.length>1)list.forEach(r=>r.warnings.push(`Mesmo responsável em ${list.length} vistorias no mesmo dia e horário (${list.filter(x=>x!==r).map(x=>x.label).join(", ")})`));
+  // Unidades do sistema ausentes na planilha: só informadas, nunca alteradas.
+  const inSheet=new Set(records.filter(r=>r.unitId).map(r=>r.unitId));
+  const notInSheet=[...sys.byUnit.values()].filter(r=>!inSheet.has(r.unit_id)).map(r=>{const u=r.units,ou=ovUnit(u),p=availableProjects.find(x=>String(x.id)===String(u.project_id));
+    return {cls:"notinsheet",unitId:r.unit_id,project:p,projectName:p?(projectExperience(p).title||p.name):"",label:`${ou.groupLabel} · ${ou.unitLabel}`,cliente:r.client_name||"",items:[],warnings:[]};});
+  return {file:file.name,records,notInSheet,projectIds,decisions:new Map()};
+}
+
+/* Resumo e montagem do que será enviado. */
+function impDecisionKey(rec,idx){return rec.row+":"+idx;}
+function impSummary(st){
+  const rs=st.records,cnt=c=>rs.filter(r=>r.cls===c).length;
+  let conflicts=0,resolved=0,filled=0;
+  rs.forEach(r=>{if(r.blocked){conflicts++;return;}r.items.forEach((it,i)=>{if(it.kind==="fill")filled++;if(it.kind==="conflict"){conflicts++;if(st.decisions.has(impDecisionKey(r,i)))resolved++;}});});
+  return {total:rs.length,updated:cnt("update"),unchanged:cnt("same"),new:cnt("new"),conflictRecords:cnt("conflict"),conflicts,resolved,pending:conflicts-resolved,filled,notFound:cnt("missing"),notInSheet:st.notInSheet.length};
+}
+function impBuildPayload(st){
+  const changes=[],items=[],units=new Set();let fromConflicts=0;
+  const base=r=>({row:r.row,label:r.label||r.rawUnit,client:r.cliente||r.current?.client_name||"",unit_id:r.unitId||null,project_id:r.project?Number(r.project.id):null});
+  for(const r of st.records){
+    if(r.error){items.push({...base(r),action:"nao_encontrado",message:r.error,new:r.rawProj+" · "+r.rawUnit});continue;}
+    if(r.blocked){items.push({...base(r),action:"ignorado",message:r.blocked});continue;}
+    r.items.forEach((it,i)=>{
+      const dec=st.decisions.get(impDecisionKey(r,i));
+      if(it.kind==="fill"||(it.kind==="conflict"&&dec==="sheet")){
+        it.changes.forEach(c=>changes.push({...base(r),field:c.field,old:c.old,new:c.new,action:it.kind==="fill"?"preenchido":"usado_planilha"}));
+        units.add(r.unitId);if(it.kind==="conflict")fromConflicts++;
+      }else if(it.kind==="conflict")items.push({...base(r),field:it.label,old:it.cur,new:it.next,action:dec==="keep"?"mantido_sistema":"conflito_pendente",message:it.note||""});
+      else if(it.kind==="invalid")items.push({...base(r),field:it.label,old:it.cur,new:it.next,action:"ignorado",message:it.message});
+    });
+  }
+  return {changes,items,records:units.size,fromConflicts};
+}
+
+/* ── Interface ── */
+function impOverlay(){return document.getElementById("importOv");}
+function impOpen(){const ov=impOverlay();document.body.classList.add("admin-open");ov.classList.add("open");ov.setAttribute("aria-hidden","false");ov.scrollTop=0;}
+function impClose(){const ov=impOverlay();ov.classList.remove("open");ov.setAttribute("aria-hidden","true");
+  if(!["adminOv","overviewOv"].some(id=>document.getElementById(id).classList.contains("open")))document.body.classList.remove("admin-open");}
+function impSetTitle(small,title){document.getElementById("impKicker").textContent=small;document.getElementById("impTitle").textContent=title;}
+function impBody(html){const b=document.getElementById("impBody");b.innerHTML=html;return b;}
+function loadImportReader(){
+  if(window.readSpreadsheet)return Promise.resolve();
+  return impReaderPromise||(impReaderPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src="./xlsx-reader.js";s.onload=()=>res();s.onerror=()=>{impReaderPromise=null;rej(new Error("Não foi possível carregar o leitor de planilhas. Verifique a conexão."));};document.head.appendChild(s);}));
+}
+function startImport(){
+  if(!adminProjects().length){toast("Somente administradores podem importar agendamentos");return;}
+  const input=document.getElementById("impFile");input.value="";input.click();
+}
+async function onImportFile(file){
+  if(!file)return;
+  impState=null;impOpen();impSetTitle("Atualizar agendamentos","Analisando planilha");
+  impBody(`<div class="imp-busy"><span class="imp-spin"></span><b>Lendo ${esc(file.name)}…</b><small>Nada será alterado no sistema até você confirmar.</small></div>`);
+  try{
+    if(!/\.(xlsx|xls)$/i.test(file.name))throw new Error("Envie um arquivo .xlsx ou .xls.");
+    await loadImportReader();
+    const sheets=window.readSpreadsheet(await file.arrayBuffer());
+    impState=await impAnalyze(file,sheets);impState.tab="all";impState.q="";impState.field="";impState.limit=300;
+    renderImportPreview();
+  }catch(e){
+    impSetTitle("Atualizar agendamentos","Não foi possível importar");
+    impBody(`<div class="imp-error"><b>Importação interrompida</b><p>${esc(e.message||String(e))}</p><div class="imp-actions"><button type="button" class="btn g" data-imp="close">Fechar</button><button type="button" class="btn p" data-imp="pick">Escolher outro arquivo</button></div></div>`);
+  }
+}
+function impRows(st){
+  const out=[],push=(r,it,i)=>out.push({r,it,i});
+  for(const r of st.records){
+    if(r.error||r.blocked||r.dup||!r.items.length){push(r,null,-1);continue;}
+    const shown=r.items.map((it,i)=>[it,i]).filter(([it])=>st.tab==="all"||st.tab==="same"||it.kind!=="same");
+    (shown.length?shown:[[null,-1]]).forEach(([it,i])=>push(r,it,i));
+  }
+  st.notInSheet.forEach(r=>push(r,null,-1));
+  const tabOf=({r})=>r.cls==="notinsheet"?"missing":r.cls;
+  let rows=st.tab==="all"?out.filter(x=>x.r.cls!=="notinsheet"):out.filter(x=>tabOf(x)===st.tab);
+  const q=impNorm(st.q);if(q)rows=rows.filter(({r})=>impNorm([r.projectName,r.label,r.rawUnit,r.cliente].join(" ")).includes(q));
+  if(st.field)rows=rows.filter(({it})=>it&&it.key===st.field);
+  return rows;
+}
+function impActionCell(st,r,it,i){
+  if(r.cls==="notinsheet")return '<span class="imp-tag y">Não encontrada na planilha</span>';
+  if(r.error)return `<span class="imp-tag r">${esc(r.error)}</span>`;
+  if(r.blocked)return `<span class="imp-tag r">${esc(r.blocked)}</span>`;
+  if(r.dup||!it)return '<span class="imp-tag y">Sem alteração</span>';
+  if(it.kind==="same")return '<span class="imp-tag y">Sem alteração</span>';
+  if(it.kind==="fill")return `<span class="imp-tag ${r.cls==="new"?"b":"g"}">${r.cls==="new"?"Novo dado":"Preencher"}</span>`;
+  if(it.kind==="invalid")return `<span class="imp-tag n">Ignorado · ${esc(it.message)}</span>`;
+  const k=impDecisionKey(r,i),d=st.decisions.get(k);
+  return `<div class="imp-dec" role="radiogroup" aria-label="Decisão do conflito">${it.note?`<small>${esc(it.note)}</small>`:""}<button type="button" class="${d==="keep"?"on":""}" data-dec="${k}" data-v="keep" aria-pressed="${d==="keep"}">Manter sistema</button><button type="button" class="${d==="sheet"?"on":""}" data-dec="${k}" data-v="sheet" aria-pressed="${d==="sheet"}">Usar planilha</button></div>`;
+}
+function renderImportPreview(){
+  const st=impState,s=impSummary(st),rows=impRows(st),shown=rows.slice(0,st.limit);
+  impSetTitle("Atualizar agendamentos","Resultado da importação");
+  const tabCount={all:s.total,update:s.updated,same:s.unchanged,new:s.new,conflict:s.conflictRecords,missing:s.notFound+s.notInSheet};
+  const projNames=st.projectIds.map(id=>{const p=availableProjects.find(x=>String(x.id)===id);return p?(projectExperience(p).title||p.name):"";}).filter(Boolean).join(", ");
+  const payload=impBuildPayload(st);
+  let h=`<div class="imp-head">
+    <div class="imp-file"><span>Arquivo</span><b>${esc(st.file)}</b><small>${esc(projNames||"Nenhum condomínio identificado")} · ${s.total} linha(s) analisada(s)</small></div>
+    <div class="imp-kpis">
+      <div class="imp-kpi g"><b>${s.updated}</b><span>Atualizações</span></div>
+      <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alterações</span></div>
+      <div class="imp-kpi b"><b>${s.new}</b><span>Novos dados</span></div>
+      <div class="imp-kpi r"><b>${s.conflictRecords}</b><span>Conflitos${s.conflicts?` · ${s.resolved}/${s.conflicts} campo(s) decidido(s)`:""}</span></div>
+      <div class="imp-kpi n"><b>${s.notFound}</b><span>Não encontrados</span></div>
+    </div></div>
+  <div class="imp-bar">
+    <div class="modetog imp-tabs" role="tablist">${IMP_TABS.map(([k,l])=>`<button type="button" role="tab" data-imptab="${k}" class="${st.tab===k?"active":""}" aria-selected="${st.tab===k}">${l}<small>${tabCount[k]}</small></button>`).join("")}</div>
+    <select class="imp-field" id="impField" aria-label="Filtrar por campo"><option value="">Todos os campos</option>${IMPORT_FIELDS.map(f=>`<option value="${f.key}"${st.field===f.key?" selected":""}>${f.label}</option>`).join("")}</select>
+    <label class="fx-search imp-q">${FX_ICON.search}<input type="search" id="impQ" placeholder="Buscar unidade ou cliente" value="${esc(st.q)}" autocomplete="off" aria-label="Buscar unidade ou cliente"></label>
+    ${st.tab==="conflict"&&s.conflicts?`<div class="imp-bulk"><button type="button" class="btn g" data-bulk="keep">Manter sistema${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button><button type="button" class="btn g" data-bulk="sheet">Usar planilha${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button></div>`:""}
+  </div>`;
+  if(st.tab==="missing"&&s.notInSheet)h+=`<p class="imp-note">${s.notInSheet} unidade(s) do sistema não aparecem na planilha. Elas não serão excluídas nem alteradas.</p>`;
+  if(!rows.length)h+='<div class="clif-empty">Nenhum registro nesta aba.</div>';
+  else{
+    h+='<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Condomínio</th><th>Unidade</th><th class="th-cli">Cliente</th><th>Campo</th><th>Atual</th><th>Planilha</th><th>Ação</th></tr></thead><tbody>';
+    shown.forEach(({r,it,i})=>{
+      const warn=r.warnings.length?`<div class="imp-warn">${r.warnings.map(w=>"<span>"+esc(w)+"</span>").join("")}</div>`:"";
+      const cur=it?(it.cur?esc(it.cur):'<span class="imp-empty">vazio</span>')+(it.kind==="conflict"&&it.source&&it.source!=="—"?` <span class="imp-src" title="Origem do valor no sistema">${esc(it.source)}</span>`:""):"—";
+      h+=`<tr class="imp-${r.cls}${it?" k-"+it.kind:""}">
+        <td>${esc(r.projectName||r.rawProj||"—")}</td>
+        <td class="cunit">${esc(r.label||r.rawUnit||"—")}<small>linha ${r.row||"—"}</small></td>
+        <td class="ccli">${esc(r.cliente||"—")}${warn}</td>
+        <td>${it?esc(it.label):"—"}</td>
+        <td>${cur}</td>
+        <td>${it?esc(it.next):(r.rawUnit&&r.error?esc(r.rawProj+" · "+r.rawUnit):"—")}</td>
+        <td class="imp-act">${impActionCell(st,r,it,i)}</td></tr>`;
+    });
+    h+="</tbody></table></div>";
+    if(rows.length>shown.length)h+=`<button type="button" class="btn g imp-more" data-imp="more">Mostrar mais (${rows.length-shown.length})</button>`;
+  }
+  h+=`<div class="imp-foot"><div class="imp-foot-txt">${payload.changes.length?`<b>${payload.records}</b> unidade(s) · <b>${payload.changes.length}</b> campo(s) serão atualizados.`:"Nada a atualizar ainda."}${s.pending?` <span class="imp-pend">${s.pending} campo(s) em conflito sem decisão não serão aplicados.</span>`:""}</div>
+    <button type="button" class="btn g" data-imp="close">Cancelar</button>
+    <button type="button" class="btn p" data-imp="confirm" ${payload.changes.length?"":"disabled"}>Aplicar atualização</button></div>`;
+  const body=impBody(h);
+  body.querySelector("#impField").onchange=e=>{st.field=e.target.value;st.limit=300;renderImportPreview();};
+  const qi=body.querySelector("#impQ");if(qi){qi.oninput=e=>{st.q=e.target.value;st.limit=300;const pos=e.target.selectionStart;renderImportPreview();const n=document.getElementById("impQ");n.focus();n.setSelectionRange(pos,pos);};}
+}
+function impConfirm(){
+  const st=impState,s=impSummary(st),p=impBuildPayload(st);
+  const box=document.getElementById("impConfirm");
+  box.querySelector(".imp-cf-txt").innerHTML=`Você está prestes a atualizar <b>${p.records}</b> registro(s) (${p.changes.length} campo(s)). <b>${s.resolved}</b> conflito(s) foram resolvidos.`+
+    (s.pending?`<br><span class="imp-pend">${s.pending} conflito(s) sem resolução não serão aplicados (continuam como estão no sistema).</span>`:"")+"<br>Deseja continuar?";
+  box.hidden=false;box.querySelector("[data-imp=apply]").focus();
+}
+async function impApply(){
+  const st=impState;if(!st||st.applying)return;st.applying=true;
+  const s=impSummary(st),p=impBuildPayload(st),box=document.getElementById("impConfirm");
+  const btn=box.querySelector("[data-imp=apply]");btn.disabled=true;btn.textContent="Aplicando…";
+  try{
+    const clean=o=>{const x={...o};if(x.unit_id==null)delete x.unit_id;if(x.project_id==null)delete x.project_id;return x;};
+    const {data,error}=await supabase.rpc("aplicar_importacao_agendamentos",{p_file:st.file,p_summary:{...s,conflicts:s.conflicts,records:p.records},p_changes:p.changes.map(clean),p_items:p.items.map(clean)});
+    if(error)throw error;
+    box.hidden=true;st.result={...data,summary:s,payload:p};
+    renderImportReport();
+    loadOverview();if(appProject)load(true).catch(()=>{});
+  }catch(e){
+    btn.disabled=false;btn.textContent="Aplicar";st.applying=false;
+    toast(/administrador/i.test(e?.message||"")?"Somente administradores podem importar":"Falha ao aplicar a importação. Nada foi alterado.");
+  }
+}
+function renderImportReport(){
+  const {summary:s,applied,skipped,records,import_id}=impState.result;
+  impSetTitle("Atualizar agendamentos","Importação concluída");
+  impBody(`<div class="imp-done">
+    <div class="imp-done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <p><b>${s.total}</b> registros analisados · arquivo <b>${esc(impState.file)}</b></p>
+    <div class="imp-kpis">
+      <div class="imp-kpi g"><b>${records}</b><span>Unidades atualizadas</span></div>
+      <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alteração</span></div>
+      <div class="imp-kpi b"><b>${applied}</b><span>Campos preenchidos</span></div>
+      <div class="imp-kpi r"><b>${s.resolved}</b><span>Conflitos resolvidos${s.pending?` · ${s.pending} pendente(s)`:""}</span></div>
+      <div class="imp-kpi n"><b>${s.notFound}</b><span>Unidades não encontradas</span></div>
+    </div>
+    ${skipped?`<p class="imp-pend">${skipped} campo(s) foram alterados no sistema durante a revisão e não foram sobrescritos.</p>`:""}
+    <div class="imp-actions"><button type="button" class="btn g" data-imp="details" data-id="${import_id}">Ver detalhes da importação</button><button type="button" class="btn p" data-imp="close">Concluir</button></div>
+  </div>`);
+}
+async function openImportHistory(){
+  if(!adminProjects().length){toast("Acesso restrito a administradores");return;}
+  impOpen();impSetTitle("Atualizar agendamentos","Histórico de importações");
+  impBody('<div class="clif-empty">Carregando histórico…</div>');
+  const {data,error}=await supabase.from("importacoes_agendamentos").select("*").order("created_at",{ascending:false}).limit(50);
+  if(error){impBody('<div class="clif-empty apr-error">Não foi possível carregar o histórico.</div>');return;}
+  const pname=id=>{const p=availableProjects.find(x=>String(x.id)===String(id));return p?(projectExperience(p).title||p.name):"#"+id;};
+  const RES={concluida:"Concluída",parcial:"Parcial",sem_alteracoes:"Sem alterações"};
+  impBody(!data?.length?'<div class="clif-empty">Nenhuma importação realizada ainda.</div>':
+    `<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Data/hora</th><th>Usuário</th><th class="th-cli">Arquivo</th><th>Condomínios</th><th>Total</th><th>Atualizados</th><th>Sem alteração</th><th>Conflitos</th><th>Não encontrados</th><th>Resultado</th><th></th></tr></thead><tbody>`+
+    data.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}</td><td>${esc(r.user_email||"—")}</td><td class="ccli">${esc(r.file_name)}</td>
+      <td>${esc((r.project_ids||[]).map(pname).join(", ")||"—")}</td><td>${r.total_rows}</td><td>${r.summary?.records_updated??r.updated_count} un. · ${r.applied_changes} campos</td><td>${r.unchanged_count}</td>
+      <td>${r.conflicts_resolved}/${r.conflicts_count}${r.conflicts_pending?` <span class="imp-pend">(${r.conflicts_pending} pend.)</span>`:""}</td><td>${r.not_found_count}</td>
+      <td><span class="imp-tag ${r.result==="concluida"?"g":r.result==="parcial"?"y":"n"}">${RES[r.result]||r.result}</span></td>
+      <td><button type="button" class="btn g imp-mini" data-imp="details" data-id="${r.id}">Detalhes</button></td></tr>`).join("")+"</tbody></table></div>");
+}
+async function openImportDetails(id){
+  impOpen();impSetTitle("Histórico de importações","Detalhes da importação #"+id);
+  impBody('<div class="clif-empty">Carregando…</div>');
+  const {data,error}=await supabase.from("importacoes_agendamentos_itens").select("*").eq("import_id",id).order("id",{ascending:true}).limit(5000);
+  if(error){impBody('<div class="clif-empty apr-error">Não foi possível carregar os detalhes.</div>');return;}
+  const pname=pid=>{const p=availableProjects.find(x=>String(x.id)===String(pid));return p?(projectExperience(p).title||p.name):"—";};
+  impBody(`<div class="imp-bar"><button type="button" class="btn g" data-imp="history">← Histórico</button></div>`+(!data?.length?'<div class="clif-empty">Esta importação não registrou alterações.</div>':
+    `<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Condomínio</th><th>Unidade</th><th class="th-cli">Cliente</th><th>Campo</th><th>Anterior</th><th>Novo</th><th>Ação</th></tr></thead><tbody>`+
+    data.map(r=>`<tr><td>${esc(pname(r.project_id))}</td><td class="cunit">${esc(r.unit_label||"—")}${r.row_number?`<small>linha ${r.row_number}</small>`:""}</td><td class="ccli">${esc(r.client_name||"—")}</td>
+      <td>${esc(IMP_DB_LABEL[r.field]||r.field||"—")}</td><td>${esc(r.old_value)||'<span class="imp-empty">vazio</span>'}</td><td>${esc(r.new_value)||"—"}</td>
+      <td><span class="imp-tag ${/preenchido|usado/.test(r.action)?"g":/mantido/.test(r.action)?"y":/pendente|nao_enc|alterado/.test(r.action)?"r":"n"}">${IMP_ACTION[r.action]||r.action}</span>${r.message?`<small class="imp-msg">${esc(r.message)}</small>`:""}</td></tr>`).join("")+"</tbody></table></div>"));
+}
+document.getElementById("impFile").addEventListener("change",e=>onImportFile(e.target.files?.[0]));
+document.getElementById("ovImport").onclick=startImport;
+document.getElementById("ovHistory").onclick=openImportHistory;
+document.getElementById("importBack").onclick=()=>{document.getElementById("impConfirm").hidden=true;impClose();};
+document.getElementById("importOv").addEventListener("click",e=>{
+  const st=impState,t=e.target;
+  const dec=t.closest("[data-dec]");if(dec&&st){const cur=st.decisions.get(dec.dataset.dec);if(cur===dec.dataset.v)st.decisions.delete(dec.dataset.dec);else st.decisions.set(dec.dataset.dec,dec.dataset.v);renderImportPreview();return;}
+  const tab=t.closest("[data-imptab]");if(tab&&st){st.tab=tab.dataset.imptab;st.limit=300;renderImportPreview();return;}
+  const bulk=t.closest("[data-bulk]");if(bulk&&st){impRows(st).forEach(({r,it,i})=>{if(it&&it.kind==="conflict")st.decisions.set(impDecisionKey(r,i),bulk.dataset.bulk);});renderImportPreview();return;}
+  const a=t.closest("[data-imp]");if(!a)return;
+  const act=a.dataset.imp;
+  if(act==="close"){document.getElementById("impConfirm").hidden=true;impClose();}
+  else if(act==="pick")startImport();
+  else if(act==="more"&&st){st.limit+=300;renderImportPreview();}
+  else if(act==="confirm"&&st)impConfirm();
+  else if(act==="cancel-apply")document.getElementById("impConfirm").hidden=true;
+  else if(act==="apply")impApply();
+  else if(act==="details")openImportDetails(+a.dataset.id);
+  else if(act==="history")openImportHistory();
+});
+
 /* ── CONFIGURAÇÕES ── */
 let condDraft=[];
 function showCfgTab(tab){
@@ -3252,15 +4063,19 @@ document.getElementById("condReset").onclick=resetCondDraft;
 document.getElementById("projectOverview").onclick=openOverview;
 document.getElementById("overviewBack").onclick=closeOverview;
 document.getElementById("ovRefresh").onclick=()=>loadOverview();
-document.getElementById("ovClear").onclick=()=>{ovFilt={period:"ALL",projects:[],status:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();};
+document.getElementById("ovClear").onclick=()=>{ovFilt=OV_EMPTY();renderOvFilters();renderOverview();};
+document.getElementById("ovMode").addEventListener("click",e=>{const b=e.target.closest("[data-ovmode]");if(!b||b.dataset.ovmode===ovMode)return;ovMode=b.dataset.ovmode;renderOvFilters();renderOverview();});
+document.getElementById("ovMore").onclick=()=>{ovFiltOpen=!ovFiltOpen;renderOvFilters();};
 document.getElementById("ovPeriod").addEventListener("click",e=>{const b=e.target.closest("[data-period]");if(!b)return;ovFilt.period=b.dataset.period;renderOvFilters();renderOverview();});
 document.getElementById("ovProjects").addEventListener("click",e=>{const b=e.target.closest("[data-ovproj]");if(!b)return;const id=b.dataset.ovproj;
   if(id==="ALL")ovFilt.projects=[];else{const i=ovFilt.projects.indexOf(id);if(i>=0)ovFilt.projects.splice(i,1);else ovFilt.projects.push(id);}renderOvFilters();renderOverview();});
 document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.target.closest("[data-ovstatus]");if(!b)return;const c=b.dataset.ovstatus;
   if(c==="ALL")ovFilt.status=[];else{const i=ovFilt.status.indexOf(c);if(i>=0)ovFilt.status.splice(i,1);else ovFilt.status.push(c);}renderOvFilters();renderOverview();});
-[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOverview();}));
+[["ovDtIni","dtIni"],["ovDtFim","dtFim"],["ovQ","q"],["ovU","u"]].forEach(([id,key])=>document.getElementById(id).addEventListener("input",e=>{ovFilt[key]=e.target.value;renderOvFilters();renderOverview();}));
+document.getElementById("ovList").addEventListener("click",e=>{const d=e.target.closest("[data-ovday]");if(d){openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r)openOvSummaryRow(ovSumView[+r.dataset.ovsum]);});
+document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const d=e.target.closest("[data-ovday]");if(d){e.preventDefault();openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r&&e.key==="Enter"){e.preventDefault();openOvSummaryRow(ovSumView[+r.dataset.ovsum]);}});
 document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
-  ovFilt={period:k==="today"?"today":k==="active"?"next":"ALL",projects:[],status:k==="ap"?["ap"]:k==="pend"?["rv","rm"]:[],dtIni:"",dtFim:"",q:"",u:""};renderOvFilters();renderOverview();});
+  ovFilt={...OV_EMPTY(),period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",status:k==="rv"?["rv"]:k==="rf"?["rf"]:[]};if(k==="rv"||k==="rf")ovMode="lista";renderOvFilters();renderOverview();});
 document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 document.getElementById("btnProjectSwitch").onclick=chooseAnotherProject;
