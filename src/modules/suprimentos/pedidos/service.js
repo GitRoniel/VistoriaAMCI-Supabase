@@ -1,0 +1,38 @@
+// Acesso ao Supabase do Relatório de Pedidos.
+//
+// Fonte: tabela public.pedidos_registros_1187 (relatório 1187 do ERP, gravado pelo robô).
+// Cada execução do robô grava uma "foto" completa; a view public.pedidos_registros_atual
+// devolve só as linhas da última execução com sucesso (evita duplicar pedidos entre execuções).
+// A leitura exige acesso ao módulo Suprimentos (RLS: private.has_module('suprimentos')).
+import { getSupabase, fetchAllPages } from "../../../platform/core/supabase.js";
+
+export const SOURCE_VIEW = "pedidos_registros_atual";
+export const SOURCE_TABLE = "pedidos_registros_1187";
+export const REPORT_ID = 1187;
+
+// Somente as colunas usadas pela tela (CPF/CNPJ, valores e demais campos não são baixados).
+const COLUMNS = [
+  "id", "obra", "pedido", "ordem_compra", "cod_insumo", "insumo", "unidade",
+  "qtde_entregue", "qtde_descartada", "qtde_restante",
+  "dt_pedido", "quem", "dt_prevista_entrega", "data_entrega",
+  "fornecedor", "nome_fantasia", "observacao_pedido"
+].join(",");
+
+/** Linhas (itens) de todos os pedidos da última execução do relatório. */
+export async function fetchPedidoRows() {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Configuração do Supabase indisponível.");
+  return fetchAllPages(() => supabase.from(SOURCE_VIEW).select(COLUMNS).order("id", { ascending: true }));
+}
+
+/** Última execução com sucesso do relatório (data de atualização e período coberto). */
+export async function fetchUltimaExecucao() {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase.from("pedidos_execucoes")
+    .select("id,finalizado_em,periodo_inicio,periodo_fim,linhas")
+    .eq("relatorio", REPORT_ID).eq("status", "sucesso")
+    .order("iniciado_em", { ascending: false }).limit(1).maybeSingle();
+  if (error) return null;
+  return data;
+}

@@ -23,3 +23,10 @@ exports/*.csv
 android/
 dist/
 *.log
+
+# Gerados por `pnpm build` (plataforma e módulos).
+www/platform/
+www/suprimentos/*.js
+www/suprimentos/*.css
+www/relatorios.js
+www/relatorios.css

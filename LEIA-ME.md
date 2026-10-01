@@ -129,3 +129,13 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 - Em Configurações › Configuração de Condomínio, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
+
+## Plataforma: Relatórios (Suprimentos e Contratos)
+
+- Página única `/relatorios`, com uma aba por módulo:
+  - **Suprimentos:** o antigo "Relatório de Controle de Pedidos" (que lia a planilha do Google), agora lendo o Supabase (`pedidos_registros_1187`, pela view `pedidos_registros_atual`). O endereço antigo `/suprimentos/pedidos` abre esta aba.
+  - **Contratos:** contratos, medições e saldos por obra, lendo `contratos_registros_549` (view `contratos_registros_atual`). Hierarquia Obra → Contrato → itens/serviços (expansível).
+- Layout no mesmo padrão do site de Vistorias, com tema claro/escuro, celular e impressão.
+- Acesso por módulo: cada usuário vê só as abas (e os cards no seletor de obras) dos módulos liberados, e só consegue ler esses dados (RLS). Os administradores do módulo liberam acessos em Configurações › Módulos.
+- Arquitetura, segurança e como criar novos relatórios: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
+- Regras e mapeamentos: [Pedidos](docs/suprimentos-pedidos-mapeamento.md) · [Contratos](docs/contratos-mapeamento.md).
