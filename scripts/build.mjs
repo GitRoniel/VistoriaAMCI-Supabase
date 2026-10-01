@@ -58,7 +58,8 @@ const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], out
 // Plataforma: estilos compartilhados e páginas dos módulos (src/platform + src/modules).
 // Para uma página nova, acrescente { js, css, out } aqui e o HTML em www/<modulo>/<pagina>.html.
 const PLATFORM_PAGES = [
-  { js: "./src/modules/suprimentos/pedidos/index.js", css: "./src/modules/suprimentos/pedidos/pedidos.css", out: "www/suprimentos/pedidos" }
+  // Relatórios: abas Suprimentos (pedidos) e Contratos. /suprimentos/pedidos redireciona para cá.
+  { js: "./src/modules/relatorios/index.js", css: "./src/modules/relatorios/relatorios.css", out: "www/relatorios" }
 ];
 const platformBuilds = [
   { ...buildOptions, entryPoints: ["./src/platform/styles/platform.css"], outfile: "www/platform/platform.css", format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] },

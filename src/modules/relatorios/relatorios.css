@@ -1,0 +1,14 @@
+/* Página Relatórios: abas + estilos de cada relatório */
+@import "../suprimentos/pedidos/pedidos.css";
+@import "../contratos/contratos/contratos.css";
+
+.pf-tabs{display:inline-flex;gap:4px;padding:4px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-card)}
+.pf-tab{min-width:132px;height:36px;padding:0 18px;border-radius:10px;font-size:13px;font-weight:700;color:var(--text-2);transition:background .12s,color .12s}
+.pf-tab:hover{color:var(--ink);background:var(--surface-3)}
+.pf-tab[aria-selected="true"]{background:var(--ink-2);color:#fff;box-shadow:0 6px 14px rgba(31,74,63,.18)}
+.pf-tab:focus-visible{outline:2px solid var(--fern);outline-offset:2px}
+@media(max-width:720px){
+  .pf-tabs{display:flex;width:100%}
+  .pf-tab{flex:1;min-width:0}
+}
+@media print{.pf-tabs{display:none!important}}

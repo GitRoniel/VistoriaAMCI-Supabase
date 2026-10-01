@@ -3355,7 +3355,7 @@ function showAuthView(view){
 }
 /* Plataforma: páginas de outros módulos (Suprimentos, futuramente Contratos).
    Espelha src/platform/modules.js; o acesso real é conferido no banco (module_members + RLS). */
-const PLATFORM_PAGES=[{module:"suprimentos",moduleName:"Suprimentos",code:"SP",color:"#A38F52",name:"Relatório de Pedidos",description:"Pedidos, ordens de compra e entregas de materiais por obra.",href:"/suprimentos/pedidos"}];
+const PLATFORM_PAGES=[{module:"suprimentos",moduleName:"Suprimentos",code:"SP",color:"#A38F52",name:"Relatório de Pedidos",description:"Pedidos, ordens de compra e entregas de materiais por obra.",href:"/relatorios#suprimentos"},{module:"contratos",moduleName:"Contratos",code:"CT",color:"#2c6a57",name:"Relatório de Contratos",description:"Contratos, medições e saldos por obra e fornecedor.",href:"/relatorios#contratos"}];
 const MODULE_ROLE_LABEL={admin:"Administrador",leitor:"Leitor"};
 let moduleAccess=new Map();
 async function loadModuleAccess(userId){
@@ -3397,7 +3397,7 @@ function renderProjectChooser(){
   // Outros módulos da plataforma liberados para o usuário (links para as páginas dos módulos).
   const pages=modulePages();
   document.getElementById("projectModules").hidden=!pages.length;
-  document.getElementById("moduleList").innerHTML=pages.map(p=>`<a class="project-card module-card" href="${esc(IS_NATIVE?p.href+".html":p.href)}" style="--pc:${p.color}">
+  document.getElementById("moduleList").innerHTML=pages.map(p=>`<a class="project-card module-card" href="${esc(IS_NATIVE?p.href.replace(/(#|$)/,".html$1"):p.href)}" style="--pc:${p.color}">
       <span class="project-card-top"><span class="project-monogram" style="--pc:${p.color}">${esc(p.code)}</span><span class="project-card-copy"><strong>${esc(p.name)}</strong><span>${esc(p.description)}</span></span></span>
       <span class="project-card-foot"><span class="project-role">${esc(p.moduleName)} · ${esc(MODULE_ROLE_LABEL[moduleAccess.get(p.module)]||"")}</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>`).join("");

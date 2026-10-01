@@ -159,11 +159,13 @@ JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 JSON.parse(await readFile(resolve(root, "vercel.json"), "utf8"));
 
 // Plataforma: módulos protegidos por RLS, sem chave de serviço no navegador, regras do Relatório de Pedidos testadas.
-const platformJs = await readFile(resolve(root, "www/suprimentos/pedidos.js"), "utf8").catch(() => "");
+const platformJs = await readFile(resolve(root, "www/relatorios.js"), "utf8").catch(() => "");
 assert.ok(platformJs.includes("pedidos_registros_atual") && !/service_role/i.test(platformJs), "Relatório de Pedidos deve ler a view protegida e nunca usar a chave de serviço.");
+assert.ok(platformJs.includes("contratos_registros_atual"), "Relatório de Contratos deve ler a view protegida (última execução).");
 const rlsErp = await readFile(resolve(root, "supabase/migrations/20261001150432_plataforma_modulos_rls_erp.sql"), "utf8");
 assert.match(rlsErp, /private\.has_module\('suprimentos'\)/);
 assert.match(rlsErp, /private\.has_module\('contratos'\)/);
 await import("./test-pedidos.mjs");
+await import("./test-contratos.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

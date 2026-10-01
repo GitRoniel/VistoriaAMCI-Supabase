@@ -25,6 +25,12 @@ const NUM = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 3 });
 /** Número em formato brasileiro, sem casas desnecessárias. */
 export const fmtNum = (n) => (n == null || Number.isNaN(Number(n)) ? "—" : NUM.format(Number(n)));
 
+const BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const BRL_SHORT = new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 });
+/** Valor em reais (R$ 1.234,56). Com short=true: R$ 1,2 mi (para indicadores). */
+export const fmtMoney = (n, short = false) => (n == null || Number.isNaN(Number(n)) ? "—"
+  : short ? "R$ " + BRL_SHORT.format(Number(n)) : BRL.format(Number(n)));
+
 /** Executa fn após `ms` sem novas chamadas. */
 export function debounce(fn, ms) {
   let t;

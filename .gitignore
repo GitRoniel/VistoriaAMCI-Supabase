@@ -28,3 +28,5 @@ dist/
 www/platform/
 www/suprimentos/*.js
 www/suprimentos/*.css
+www/relatorios.js
+www/relatorios.css

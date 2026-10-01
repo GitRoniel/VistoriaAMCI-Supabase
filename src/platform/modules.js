@@ -2,8 +2,8 @@
 //
 //   Plataforma
 //   ├── Vistorias      (página inicial: login, seletor de obras, mapa/lista dos clientes)
-//   ├── Suprimentos    (Relatório de Pedidos — migrado da planilha do Google)
-//   ├── Contratos      (reservado: ainda sem telas)
+//   ├── Suprimentos    (Relatório de Pedidos — aba da página Relatórios)
+//   ├── Contratos      (Relatório de Contratos — aba da página Relatórios)
 //   └── Configurações  (dentro de Vistorias: acessos, condomínios, logs)
 //
 // Para adicionar um módulo no futuro:
@@ -28,11 +28,23 @@ export const MODULES = Object.freeze([
         id: "pedidos",
         name: "Relatório de Pedidos",
         description: "Pedidos, ordens de compra e entregas de materiais por obra.",
-        href: "/suprimentos/pedidos"
+        href: "/relatorios#suprimentos"
       }
     ]
   },
-  { id: "contratos", name: "Contratos", access: "module", pages: [], reserved: true },
+  {
+    id: "contratos",
+    name: "Contratos",
+    access: "module",
+    pages: [
+      {
+        id: "contratos",
+        name: "Relatório de Contratos",
+        description: "Contratos, medições e saldos por obra e fornecedor.",
+        href: "/relatorios#contratos"
+      }
+    ]
+  },
   { id: "configuracoes", name: "Configurações", access: "admin", pages: [], embedded: "vistorias" }
 ]);
 
