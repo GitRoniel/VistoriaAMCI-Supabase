@@ -11,13 +11,11 @@ const SOL_PALETTE = ["#1F3D38", "#6B8040", "#A38F52", "#ED7A12", "#2980b9", "#8e
 const COMPACT_KEY = "amCompact";
 const SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
 const CHEV = '<span class="pd-chev" aria-hidden="true"><svg viewBox="0 0 16 16"><polyline points="6,3 10,8 6,13"/></svg></span>';
-const HOUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1L1 6v9h5v-5h4v5h5V6z"/></svg>';
 
 const statusBadge = (s) => s === DELIVERY.TOTAL ? '<span class="pf-badge b-ok">Entregue</span>'
   : s === DELIVERY.PARTIAL ? '<span class="pf-badge b-partial">Parcial</span>'
   : s === DELIVERY.PENDING ? '<span class="pf-badge b-danger">Pendente</span>'
   : '<span class="pf-badge b-muted">Cancelado</span>';
-const ocBadge = (s) => s === OC.DONE ? '<span class="pf-badge b-ok">OC gerada</span>' : '<span class="pf-badge b-warn">OC pendente</span>';
 const pctColor = (p) => (p >= 100 ? "#27ae60" : p >= 50 ? "#f39c12" : "#e74c3c");
 const bar = (p) => `<div class="pf-bar"><div><i style="width:${p}%;background:${pctColor(p)}"></i></div><b style="color:${pctColor(p)}">${p}%</b></div>`;
 const matPill = (m) => m.status === "ok" ? '<span class="pf-badge b-ok">OK</span>'
@@ -192,19 +190,30 @@ export function mountPedidos(root, { pedidos }) {
   }
 
   /* ── Tabela agrupada por obra ── */
+  // Material: no celular cada linha vira um cartão (rótulos em data-l).
   function materialsHTML(p, words) {
     return `<div class="pd-exp-in">
-      <div class="pd-exp-h"><span>Descrição: <b>${esc(p.descricao)}</b></span>${p.fornecedor ? `<span>Fornecedor(es): <b>${esc(p.fornecedor)}</b></span>` : ""}${p.oc ? `<span>OC: <b>${esc(p.oc)}</b></span>` : ""}</div>
-      <div class="pf-table-wrap"><table class="pf-tbl pd-mat-tbl"><thead><tr>
-        <th class="l">Material</th><th>Ordem de compra</th><th>Qtd. solicitada</th><th>Qtd. entregue</th><th>Descartada</th><th>Saldo</th><th>% Entrega</th><th>Status</th>
+      <table class="pd-mat-tbl"><thead><tr>
+        <th class="l">Material</th><th class="l">Ordem de compra</th><th class="r">Solicitada</th><th class="r">Entregue</th><th class="r">Descartada</th><th class="r">Saldo</th><th class="l">% Entrega</th><th>Status</th>
       </tr></thead><tbody>${p.materiais.map((m) => {
-        const oc = m.oc === "Pendente" ? '<span class="pd-oc-pend">Pendente</span>' : m.oc ? `<span class="pd-oc-tag">${esc(m.oc)}</span>` : "—";
+        const oc = m.oc === "Pendente" ? '<span class="pd-oc-pend">Pendente</span>' : m.oc ? `<span class="pd-oc-tag">${esc(m.oc)}</span>` : '<span class="pd-nil">—</span>';
         const qty = (n) => `<span class="pd-qty">${fmtNum(n)}${m.unidade ? `<small>${esc(m.unidade)}</small>` : ""}</span>`;
         return `<tr class="${materialHit(m, words) ? "hit" : ""}">
-          <td class="pd-mat">${highlight(m.nome, words)}${m.codigo ? `<small>${esc(m.codigo)}${m.fornecedor ? " · " + esc(m.fornecedor) : ""}</small>` : ""}</td>
-          <td>${oc}</td><td>${qty(m.sol)}</td><td>${qty(m.ent)}</td><td>${m.desc ? qty(m.desc) : "—"}</td><td>${m.saldo ? qty(m.saldo) : "—"}</td>
-          <td>${bar(m.pct)}</td><td>${matPill(m)}</td></tr>`;
-      }).join("")}</tbody></table></div></div>`;
+          <td class="m-nome l">${highlight(m.nome, words)}${m.codigo ? `<small>${esc(m.codigo)}${m.fornecedor ? " · " + esc(m.fornecedor) : ""}</small>` : ""}</td>
+          <td class="m-oc l" data-l="OC">${oc}</td>
+          <td class="m-q r" data-l="Solicitada">${qty(m.sol)}</td><td class="m-q r" data-l="Entregue">${qty(m.ent)}</td>
+          <td class="m-q r" data-l="Descartada">${m.desc ? qty(m.desc) : '<span class="pd-nil">—</span>'}</td><td class="m-q r m-saldo" data-l="Saldo">${m.saldo ? qty(m.saldo) : '<span class="pd-nil">—</span>'}</td>
+          <td class="m-pct l">${bar(m.pct)}</td><td class="m-st">${matPill(m)}</td></tr>`;
+      }).join("")}</tbody></table></div>`;
+  }
+
+  // Totais da obra no cabeçalho do grupo (contagens dos pedidos exibidos).
+  function obraTotals(rows) {
+    const n = (s) => rows.filter((p) => p.delivery_status === s).length;
+    const semOC = rows.filter((p) => p.oc_status !== OC.DONE).length;
+    const chip = (cls, label, v, always = true) => (always || v) ? `<span class="pd-st ${cls}${v ? "" : " zero"}"><i></i>${label}<b>${v}</b></span>` : "";
+    return chip("r", "Pendentes", n(DELIVERY.PENDING)) + chip("b", "Parciais", n(DELIVERY.PARTIAL)) + chip("g", "Entregues", n(DELIVERY.TOTAL)) +
+      chip("m", "Cancelados", n(DELIVERY.CANCELLED), false) + chip("o", "Sem OC", semOC);
   }
 
   function renderList() {
@@ -216,30 +225,29 @@ export function mountPedidos(root, { pedidos }) {
     let html = "";
     [...byObra.keys()].sort((a, b) => a.localeCompare(b, "pt-BR")).forEach((obra) => {
       const rows = byObra.get(obra);
-      const n = (s) => rows.filter((p) => p.delivery_status === s).length;
+      const itens = rows.reduce((t, p) => t + p.n_itens, 0);
       html += `<section class="pf-card pd-obra" aria-label="Obra ${esc(obra)}">
-        <div class="pd-obra-h"><h2><span>${HOUSE}</span>${esc(obra)}</h2><small>${rows.length} pedido(s)</small></div>
-        <div class="pf-table-wrap"><table class="pf-tbl pd-tbl"><thead><tr>
-          <th style="width:30px"></th><th>Pedido</th><th>Solicitante</th><th class="l">Descrição do pedido</th><th>Itens</th><th>OC</th><th>Status OC</th><th>Status entrega</th><th>% Entrega</th><th>Dt. pedido</th><th>Prev. entrega</th><th class="l">Fornecedor</th>
-        </tr></thead><tbody>${rows.map((p) => {
+        <header class="pd-obra-h">
+          <div class="pd-obra-t"><span class="pd-obra-k">Obra</span><h2>${esc(obra)}</h2><span class="pd-obra-m">${rows.length} pedido(s) · ${itens} ${itens === 1 ? "item" : "itens"}</span></div>
+          <div class="pd-obra-s">${obraTotals(rows)}</div>
+        </header>
+        <div class="pf-table-wrap"><table class="pd-tbl"><colgroup><col class="w-chev"><col class="w-ped"><col><col class="w-itens"><col class="w-oc"><col class="w-ent"><col class="w-dt"><col class="w-dt"></colgroup><thead><tr>
+          <th aria-label="Expandir"></th><th class="l">Pedido</th><th class="l">Descrição · fornecedor</th><th class="r">Itens</th><th class="l">Ordem de compra</th><th class="l">Entrega</th><th class="r">Dt. pedido</th><th class="r">Prev. entrega</th>
+        </tr></thead><tbody>${rows.map((p, i) => {
           const open = expanded.has(p.key);
           const c = solColor.get(p.solicitante) || "#6B8040";
-          return `<tr class="pd-row${open ? " open" : ""}${p.oc_status !== OC.DONE ? " no-oc" : ""}" data-key="${esc(p.key)}" tabindex="0" aria-expanded="${open}">
-            <td>${CHEV}</td>
-            <td class="pd-ped">${p.pedido}</td>
-            <td><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
-            <td class="pd-desc"><span class="pd-desc-b" title="${esc(p.descricao)}">${esc(p.descricao)}</span></td>
-            <td>${p.n_itens}</td>
-            <td>${p.oc ? `<span class="pd-oc" title="${esc(p.oc)}">${esc(p.oc)}</span>` : "—"}</td>
-            <td>${ocBadge(p.oc_status)}</td>
-            <td>${statusBadge(p.delivery_status)}</td>
-            <td>${bar(p.pct)}</td>
-            <td>${fmtDateShort(p.dt_pedido)}</td>
-            <td>${fmtDateShort(p.dt_prev)}</td>
-            <td class="l">${p.fornecedor ? `<span class="pd-forn" title="${esc(p.fornecedor)}">${esc(p.fornecedor)}</span>` : "—"}</td>
-          </tr>${open ? `<tr class="pd-exp" data-exp="${esc(p.key)}"><td colspan="12">${materialsHTML(p, words)}</td></tr>` : ""}`;
+          const ocDone = p.oc_status === OC.DONE;
+          return `<tr class="pd-row${i % 2 ? " z" : ""}${open ? " open" : ""}${ocDone ? "" : " no-oc"}" data-key="${esc(p.key)}" tabindex="0" aria-expanded="${open}">
+            <td class="c-chev">${CHEV}</td>
+            <td class="c-ped l"><b class="pd-ped">#${p.pedido}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
+            <td class="c-desc l"><span class="pd-desc-t" title="${esc(p.descricao)}">${esc(p.descricao)}</span><span class="pd-forn-t"${p.fornecedor ? ` title="${esc(p.fornecedor)}"` : ""}>${p.fornecedor ? esc(p.fornecedor) : "Sem fornecedor"}</span></td>
+            <td class="c-itens r" data-l="Itens">${p.n_itens}</td>
+            <td class="c-oc l" data-l="Ordem de compra"><span class="pd-oc"${p.oc ? ` title="${esc(p.oc)}"` : ""}>${p.oc ? esc(p.oc) : "—"}</span><span class="pd-ocst ${ocDone ? "ok" : "pend"}">${ocDone ? "OC gerada" : "OC pendente"}</span></td>
+            <td class="c-ent l">${statusBadge(p.delivery_status)}${bar(p.pct)}</td>
+            <td class="c-dt r" data-l="Dt. pedido">${fmtDateShort(p.dt_pedido)}</td>
+            <td class="c-dt r" data-l="Prev. entrega">${fmtDateShort(p.dt_prev)}</td>
+          </tr>${open ? `<tr class="pd-exp" data-exp="${esc(p.key)}"><td colspan="8">${materialsHTML(p, words)}</td></tr>` : ""}`;
         }).join("")}</tbody></table></div>
-        <div class="pd-sum"><span class="g">Entregues: <b>${n(DELIVERY.TOTAL)}</b></span><span class="b">Parciais: <b>${n(DELIVERY.PARTIAL)}</b></span><span class="r">Pendentes: <b>${n(DELIVERY.PENDING)}</b></span><span>Total: <b>${rows.length}</b></span></div>
       </section>`;
     });
     list.innerHTML = html;
