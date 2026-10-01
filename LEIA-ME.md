@@ -129,3 +129,10 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 - Em Configurações › Configuração de Condomínio, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
+
+## Plataforma: Suprimentos › Relatório de Pedidos
+
+- O antigo "Relatório de Controle de Pedidos" (que lia a planilha do Google) agora faz parte da plataforma, em `/suprimentos/pedidos`, e lê o Supabase (`pedidos_registros_1187`, pela view `pedidos_registros_atual`). Layout no mesmo padrão do site de Vistorias, com tema claro/escuro, celular e impressão.
+- Acesso por módulo: só quem tem permissão em Suprimentos vê o card no seletor de obras e consegue ler os dados (RLS). Os administradores do módulo liberam acessos em Configurações › Módulos.
+- Arquitetura, segurança e como criar novos módulos: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
+- Mapeamento planilha → HTML → Supabase e regras de cálculo: [docs/suprimentos-pedidos-mapeamento.md](docs/suprimentos-pedidos-mapeamento.md).

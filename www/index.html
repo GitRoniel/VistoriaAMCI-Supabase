@@ -1304,6 +1304,22 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .auth-help{font-size:13.5px;line-height:1.55;color:#52675d;margin:0 0 14px}
 .auth-code{letter-spacing:.45em;font-size:20px!important;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
 #resetForm [data-reset-step][hidden],#resetCodeField[hidden]{display:none}
+/* Plataforma: cards de outros módulos no seletor e aba Configurações › Módulos */
+.project-modules{margin-top:22px}
+a.project-card{text-decoration:none;color:inherit}
+#cfgTabs [hidden]{display:none!important}
+.mods-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mods-bar .fx-search{flex:1 1 240px}
+.mods-sel{height:36px;border:1.5px solid #d3ddd6;border-radius:10px;padding:0 10px;background:#fbfcfb;font-weight:600;color:var(--ink)}
+.mods-list{display:grid;gap:6px;margin-bottom:14px}
+.mods-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:9px 12px}
+.mods-row.on{border-left:3px solid #6B8040}
+.mods-who{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.mods-who b{font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mods-who small{font-size:11.5px;color:#6a7a71;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mods-role{height:34px;border:1.5px solid #d3ddd6;border-radius:9px;padding:0 8px;background:#fbfcfb;font-weight:600;color:var(--ink);flex:0 0 auto}
+.mods-row.on .mods-role{border-color:#6B8040}
+@media(max-width:720px){.mods-role{font-size:16px;max-width:46%}.mods-row{padding:9px 10px;gap:8px}}
 /* Revistoria: data e responsável próprios (lista, filtros e popup) */
 .fx-sel select{flex:1;min-width:0;border:0;background:transparent;height:100%;font-size:13px;font-weight:600;color:#172c25;outline:none;padding:0;cursor:pointer}
 .ctbl td.crev{color:#2459b5;font-weight:600}
@@ -1943,6 +1959,14 @@ html{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .auth-link:hover{color:#cbd6d4}
 :root[data-theme="dark"] .auth-link:disabled{color:#8a9690}
 :root[data-theme="dark"] .auth-help{color:#abbcb4}
+:root[data-theme="dark"] a.project-card{color:inherit}
+:root[data-theme="dark"] .mods-sel{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
+:root[data-theme="dark"] .mods-row{background:#282828;border:1px solid #414a43}
+:root[data-theme="dark"] .mods-row.on{border-left:3px solid #6B8040}
+:root[data-theme="dark"] .mods-who b{color:#cfd9d7}
+:root[data-theme="dark"] .mods-who small{color:#a0ada6}
+:root[data-theme="dark"] .mods-role{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
+:root[data-theme="dark"] .mods-row.on .mods-role{border-color:#6B8040}
 :root[data-theme="dark"] .fx-sel select{border:0;background:transparent;color:#d4ddda;outline:none}
 :root[data-theme="dark"] .ctbl td.crev{color:#2459b5}
 :root[data-theme="dark"] .pp-rev{border:1.5px solid #394253;background:#1d232e}
@@ -2164,11 +2188,17 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       </div>
     </div>
     <div class="project-body">
+      <div id="projectObrasSection">
       <div class="project-section-head">
         <div class="project-section-title">Obras e condomínios disponíveis</div>
         <button class="project-overview-btn" id="projectOverview" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h4M7 17h7"/></svg><span>Visão Geral</span></button>
       </div>
       <div class="project-list" id="projectList"></div>
+      </div>
+      <div class="project-modules" id="projectModules" hidden>
+        <div class="project-section-title">Outros módulos da plataforma</div>
+        <div class="project-list" id="moduleList"></div>
+      </div>
       <div class="project-feedback" id="projectFeedback" role="alert"></div>
       <p class="project-help">Novos condomínios aparecerão aqui quando forem cadastrados e liberados pelo administrador. Cada empreendimento poderá ter seu próprio fluxo de acompanhamento.</p>
     </div>
@@ -2275,6 +2305,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
         <button type="button" role="tab" data-cfg="apr" class="active">Aprovações de Acesso<span class="tab-badge" id="aprTabBadge" hidden></span></button>
         <button type="button" role="tab" data-cfg="cond">Configuração de Condomínio</button>
         <button type="button" role="tab" data-cfg="logs">Logs</button>
+        <button type="button" role="tab" data-cfg="mods" hidden>Módulos</button>
       </div>
       <div class="cfg-pane" data-pane="apr">
       <div class="kstrip" id="aprKpis"></div>
@@ -2303,6 +2334,12 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
         <div class="cond-list" id="condList"></div>
         <div class="brow cond-actions"><span class="cond-hint" id="condHint"></span><button class="btn g" id="condReset" type="button" hidden>Descartar</button><button class="btn p" id="condSave" type="button" disabled>Salvar configurações</button></div>
         <div class="cond-archived" id="condArchived" hidden></div>
+      </div>
+      <div class="cfg-pane" data-pane="mods" hidden>
+        <div class="note">Libere o acesso aos outros módulos da plataforma. <b>Leitor</b> consulta os relatórios; <b>Administrador</b> também libera acessos do módulo. Os dados continuam protegidos no banco: sem acesso, nada é carregado.</div>
+        <div class="clif mods-bar"><select id="modsModule" class="mods-sel" aria-label="Módulo"></select><label class="fx-search"><input type="search" id="modsQ" placeholder="Buscar usuário por nome ou e-mail" aria-label="Buscar usuário"></label><span class="clif-count" id="modsCount"></span></div>
+        <div class="mods-list" id="modsList"></div>
+        <div class="cbox mods-log"><div class="ch">Últimas alterações de acesso</div><div class="log-list" id="modsLog"></div></div>
       </div>
       <div class="cfg-pane" data-pane="logs" hidden>
       <div class="cbox">
@@ -3316,12 +3353,29 @@ function showAuthView(view){
   setAuthFeedback("loginErr","");setAuthFeedback("signupFeedback","");setAuthFeedback("resetFeedback","");
   requestAnimationFrame(()=>document.getElementById(reset?"resetEmail":signup?"signupName":"loginU")?.focus());
 }
+/* Plataforma: páginas de outros módulos (Suprimentos, futuramente Contratos).
+   Espelha src/platform/modules.js; o acesso real é conferido no banco (module_members + RLS). */
+const PLATFORM_PAGES=[{module:"suprimentos",moduleName:"Suprimentos",code:"SP",color:"#A38F52",name:"Relatório de Pedidos",description:"Pedidos, ordens de compra e entregas de materiais por obra.",href:"/suprimentos/pedidos"}];
+const MODULE_ROLE_LABEL={admin:"Administrador",leitor:"Leitor"};
+let moduleAccess=new Map();
+async function loadModuleAccess(userId){
+  moduleAccess=new Map();
+  const {data,error}=await supabase.from("module_members").select("module,role").eq("user_id",userId).eq("active",true);
+  if(!error)(data||[]).forEach(m=>moduleAccess.set(m.module,m.role));
+}
+const modulePages=()=>PLATFORM_PAGES.filter(p=>moduleAccess.has(p.module));
 async function loadIdentity(authUser){
-  const {data:memberships,error:memberError}=await supabase.from("project_members").select("project_id,role,active").eq("user_id",authUser.id).eq("active",true);
-  if(memberError||!memberships?.length)throw new Error(PENDING_MSG);
-  const projectIds=[...new Set(memberships.map(item=>item.project_id))];
-  const {data:projects,error:projectError}=await supabase.from("projects").select("id,slug,name,description,sort_order,kind,color,import_aliases").in("id",projectIds).order("sort_order",{ascending:true}).order("name",{ascending:true});
-  if(projectError||!projects?.length)throw new Error(PENDING_MSG);
+  const [{data:memberships,error:memberError}]=await Promise.all([
+    supabase.from("project_members").select("project_id,role,active").eq("user_id",authUser.id).eq("active",true),
+    loadModuleAccess(authUser.id)
+  ]);
+  // Sem condomínio liberado, mas com algum módulo (ex.: só Suprimentos): entra direto no seletor de módulos.
+  if(memberError||(!memberships?.length&&!moduleAccess.size))throw new Error(PENDING_MSG);
+  const projectIds=[...new Set((memberships||[]).map(item=>item.project_id))];
+  const {data:projects,error:projectError}=projectIds.length
+    ?await supabase.from("projects").select("id,slug,name,description,sort_order,kind,color,import_aliases").in("id",projectIds).order("sort_order",{ascending:true}).order("name",{ascending:true})
+    :{data:[],error:null};
+  if(projectError||(!projects?.length&&!moduleAccess.size))throw new Error(PENDING_MSG);
   const {data:profile}=await supabase.from("profiles").select("full_name,email").eq("id",authUser.id).maybeSingle();
   availableProjects=projects.map(project=>{
     const membership=memberships.find(item=>String(item.project_id)===String(project.id));
@@ -3338,7 +3392,15 @@ function renderProjectChooser(){
   const name=currentUser?.nome||currentUser?.usuario||"Usuário";
   document.getElementById("projectUserGreeting").textContent="Olá, "+name;
   const count=availableProjects.length;
-  document.getElementById("projectSubtitle").textContent=count===1?"Selecione o empreendimento liberado para o seu usuário.":"Você tem acesso a "+count+" empreendimentos. Escolha qual deseja abrir.";
+  document.getElementById("projectSubtitle").textContent=!count?"Escolha o módulo da plataforma que deseja abrir.":count===1?"Selecione o empreendimento liberado para o seu usuário.":"Você tem acesso a "+count+" empreendimentos. Escolha qual deseja abrir.";
+  document.getElementById("projectObrasSection").hidden=!count;
+  // Outros módulos da plataforma liberados para o usuário (links para as páginas dos módulos).
+  const pages=modulePages();
+  document.getElementById("projectModules").hidden=!pages.length;
+  document.getElementById("moduleList").innerHTML=pages.map(p=>`<a class="project-card module-card" href="${esc(IS_NATIVE?p.href+".html":p.href)}" style="--pc:${p.color}">
+      <span class="project-card-top"><span class="project-monogram" style="--pc:${p.color}">${esc(p.code)}</span><span class="project-card-copy"><strong>${esc(p.name)}</strong><span>${esc(p.description)}</span></span></span>
+      <span class="project-card-foot"><span class="project-role">${esc(p.moduleName)} · ${esc(MODULE_ROLE_LABEL[moduleAccess.get(p.module)]||"")}</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>`).join("");
   const list=document.getElementById("projectList");
   list.innerHTML=availableProjects.map(project=>{
     const experience=projectExperience(project),ready=experience.ready;
@@ -3349,11 +3411,16 @@ function renderProjectChooser(){
   }).join("");
   list.querySelectorAll("[data-project-id]:not(:disabled)").forEach(button=>button.addEventListener("click",()=>selectProject(button.dataset.projectId)));
 }
+const moduleAdminOf=()=>PLATFORM_PAGES.map(p=>p.module).filter((m,i,a)=>a.indexOf(m)===i&&moduleAccess.get(m)==="admin");
 function openAdminArea(){
-  if(!adminProjects().length){toast("Acesso restrito a administradores");return;}
+  const vist=adminProjects().length>0,mods=moduleAdminOf().length>0;
+  if(!vist&&!mods){toast("Acesso restrito a administradores");return;}
   const overlay=document.getElementById("adminOv");
+  // Abas de Vistorias só para administradores de condomínio; "Módulos" só para administradores de módulo.
+  document.querySelectorAll('#cfgTabs [data-cfg="apr"],#cfgTabs [data-cfg="cond"],#cfgTabs [data-cfg="logs"]').forEach(b=>b.hidden=!vist);
+  document.querySelector('#cfgTabs [data-cfg="mods"]').hidden=!mods;
   document.body.classList.add("admin-open");overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.scrollTop=0;
-  showCfgTab("apr");loadUsers();
+  if(vist){showCfgTab("apr");loadUsers();}else showCfgTab("mods");
 }
 /* ── VISÃO GERAL: agendamentos de todos os condomínios do usuário ──
    Uma única consulta em client_inspections + units (RLS limita aos condomínios liberados). */
@@ -3984,6 +4051,7 @@ function showCfgTab(tab){
   document.querySelectorAll("#adminOv [data-pane]").forEach(p=>p.hidden=p.dataset.pane!==tab);
   if(tab==="cond"){resetCondDraft();condPanel=null;renderCondPanel();loadCondArchived();}
   if(tab==="logs")loadLogs();
+  if(tab==="mods")loadModuleAccessList();
 }
 const condAliasText=p=>(p?.import_aliases||[]).join(", ");
 const condAliasList=t=>[...new Set(String(t||"").split(/[,;\n]/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean))].slice(0,20);
@@ -4040,7 +4108,7 @@ function showProjectChooser(){
   document.getElementById("loginOv").classList.remove("open");
   const overlay=document.getElementById("projectOv");
   renderProjectChooser();setProjectFeedback("");
-  const adminButton=document.getElementById("projectAdmin");adminButton.hidden=!adminProjects().length;
+  const adminButton=document.getElementById("projectAdmin");adminButton.hidden=!adminProjects().length&&!moduleAdminOf().length;
   if(adminProjects().length)loadUsers();
   overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");
   requestAnimationFrame(()=>document.querySelector("#projectList .project-card:not(:disabled)")?.focus());
@@ -4272,6 +4340,49 @@ async function loadLogs(){
     el.innerHTML=(data||[]).length?data.map(l=>`<div class="log-item"><span class="lt">${esc(new Date(l.created_at).toLocaleString("pt-BR"))}</span><span class="lu">${esc(l.actor_email||"Sistema")}</span><span class="ld">${esc(auditDetail(l))}</span></div>`).join(""):`<div class="log-item"><span class="ld" style="color:var(--text-light)">Sem registros.</span></div>`;
   }catch(e){el.innerHTML=`<div class="log-item"><span class="ld" style="color:var(--red)">Não foi possível carregar os registros.</span></div>`;}
 }
+/* ── CONFIGURAÇÕES › MÓDULOS: acesso aos outros módulos da plataforma ──
+   Lista e grava pelas funções listar_acessos_modulo / definir_acesso_modulo (só administradores do módulo). */
+let modsRows=[],modsModule="";
+async function loadModuleAccessList(){
+  const mods=moduleAdminOf();if(!mods.length)return;
+  const sel=document.getElementById("modsModule");
+  if(!modsModule||!mods.includes(modsModule))modsModule=mods[0];
+  sel.innerHTML=mods.map(m=>{const p=PLATFORM_PAGES.find(x=>x.module===m);return `<option value="${esc(m)}"${m===modsModule?" selected":""}>${esc(p.moduleName)} · ${esc(p.name)}</option>`;}).join("");
+  sel.hidden=mods.length<2;
+  const list=document.getElementById("modsList");list.innerHTML='<div class="clif-empty">Carregando usuários…</div>';
+  const [{data,error},{data:log}]=await Promise.all([
+    supabase.rpc("listar_acessos_modulo",{p_module:modsModule}),
+    supabase.from("module_access_log").select("created_at,actor_email,target_email,action,role").eq("module",modsModule).order("created_at",{ascending:false}).limit(30)
+  ]);
+  if(error){list.innerHTML=`<div class="clif-empty apr-error">${esc(error.message||"Não foi possível carregar os acessos.")}</div>`;return;}
+  modsRows=data||[];renderModuleAccessList();
+  const acts={conceder:"liberou",alterar:"alterou",retirar:"retirou o acesso de"};
+  document.getElementById("modsLog").innerHTML=(log||[]).length?log.map(l=>`<div class="log-item"><span class="lt">${esc(new Date(l.created_at).toLocaleString("pt-BR"))}</span><span class="lu">${esc(l.actor_email||"")}</span><span class="ld">${esc(acts[l.action]||l.action)} ${esc(l.target_email)}${l.role?" · "+esc(MODULE_ROLE_LABEL[l.role]||l.role):""}</span></div>`).join(""):'<div class="log-item"><span class="ld" style="color:var(--text-light)">Sem alterações registradas.</span></div>';
+}
+function renderModuleAccessList(){
+  const q=(document.getElementById("modsQ").value||"").trim().toLowerCase();
+  const rows=modsRows.filter(r=>!q||(r.full_name||"").toLowerCase().includes(q)||(r.email||"").toLowerCase().includes(q));
+  const ativos=modsRows.filter(r=>r.active).length;
+  document.getElementById("modsCount").textContent=`${ativos} com acesso · ${modsRows.length} usuário(s)`;
+  document.getElementById("modsList").innerHTML=rows.length?rows.map(r=>{const v=r.active?r.role:"";const me=r.user_id===currentUser?.id;
+    return `<div class="mods-row${r.active?" on":""}"><span class="mods-who"><b>${esc(r.full_name||r.email)}</b><small>${esc(r.email)}</small></span>
+      <select class="mods-role" data-mods-user="${esc(r.user_id)}" aria-label="Acesso de ${esc(r.full_name||r.email)}"${me?' disabled title="Você não pode alterar o seu próprio acesso"':""}>
+        <option value=""${!v?" selected":""}>Sem acesso</option><option value="leitor"${v==="leitor"?" selected":""}>Leitor</option><option value="admin"${v==="admin"?" selected":""}>Administrador</option>
+      </select></div>`;}).join(""):'<div class="clif-empty">Nenhum usuário encontrado.</div>';
+}
+document.getElementById("modsQ").addEventListener("input",renderModuleAccessList);
+document.getElementById("modsModule").addEventListener("change",e=>{modsModule=e.target.value;loadModuleAccessList();});
+document.getElementById("modsList").addEventListener("change",async e=>{
+  const s=e.target.closest("[data-mods-user]");if(!s)return;
+  const row=modsRows.find(r=>r.user_id===s.dataset.modsUser);const prev=row?.active?row.role:"";
+  const label=row?.full_name||row?.email||"usuário";
+  if(!s.value&&!confirm(`Retirar o acesso de ${label} ao módulo?`)){s.value=prev;return;}
+  s.disabled=true;
+  const {error}=await supabase.rpc("definir_acesso_modulo",{p_user:s.dataset.modsUser,p_module:modsModule,p_role:s.value||null});
+  if(error){toast(error.message||"Não foi possível salvar");s.value=prev;s.disabled=false;return;}
+  toast(s.value?`Acesso de ${label}: ${MODULE_ROLE_LABEL[s.value]}`:`Acesso de ${label} retirado`);
+  loadModuleAccessList();
+});
 const BARCLR=p=>p>=80?"#2f9e5b":p>=40?"#6B8040":"#ED7A12";
 const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
 function renderResumo(){

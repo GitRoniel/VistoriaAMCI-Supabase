@@ -55,15 +55,30 @@ const buildOptions = {
 // Leitor de Excel da importação de agendamentos: carregado só quando o usuário importa.
 const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], outfile: "www/xlsx-reader.js" };
 
+// Plataforma: estilos compartilhados e páginas dos módulos (src/platform + src/modules).
+// Para uma página nova, acrescente { js, css, out } aqui e o HTML em www/<modulo>/<pagina>.html.
+const PLATFORM_PAGES = [
+  { js: "./src/modules/suprimentos/pedidos/index.js", css: "./src/modules/suprimentos/pedidos/pedidos.css", out: "www/suprimentos/pedidos" }
+];
+const platformBuilds = [
+  { ...buildOptions, entryPoints: ["./src/platform/styles/platform.css"], outfile: "www/platform/platform.css", format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] },
+  ...PLATFORM_PAGES.flatMap((p) => [
+    { ...buildOptions, entryPoints: [p.js], outfile: `${p.out}.js` },
+    { ...buildOptions, entryPoints: [p.css], outfile: `${p.out}.css`, format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] }
+  ])
+];
+
 if (watch) {
   const { context } = await import("esbuild");
   const ctx = await context(buildOptions);
   await ctx.watch();
   await (await context(xlsxOptions)).watch();
+  for (const options of platformBuilds) await (await context(options)).watch();
   console.log("Build em observação. Pressione Ctrl+C para encerrar.");
 } else {
   await build(buildOptions);
   await build(xlsxOptions);
+  await Promise.all(platformBuilds.map((options) => build(options)));
   // Mantém o index da raiz sincronizado para quem abrir o projeto localmente.
   await copyFile(resolve(www, "index.html"), resolve(root, "index.html"));
   console.log("Build concluído em www/.");
