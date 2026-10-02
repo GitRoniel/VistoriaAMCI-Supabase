@@ -5,7 +5,7 @@ Plataforma
 ├── Vistorias      página inicial (www/index.html): login, seletor de obras, mapa/lista, Visão Geral
 ├── Suprimentos    www/relatorios.html#suprimentos → Relatório de Pedidos (migrado da planilha do Google)
 ├── Contratos      www/relatorios.html#contratos   → Relatório de Contratos (relatório 549 do ERP)
-└── Configurações  dentro de Vistorias: acessos, condomínios, logs e aba "Módulos"
+└── Administração  menu do usuário: Liberações (usuários + módulos), Configuração de Condomínios, Logs
 ```
 
 ## Estrutura do código
@@ -60,7 +60,7 @@ Mapeamentos: [Pedidos](suprimentos-pedidos-mapeamento.md) · [Contratos](contrat
 - A sessão é a mesma do login de Vistorias (mesmo domínio e armazenamento).
 - **Acesso por módulo:** tabela `module_members` (`leitor` ou `admin`) e funções `private.has_module` e `private.is_module_admin`.
 - **Dados do ERP** (`pedidos_*`, `contratos_*`): leitura só com acesso ao módulo (RLS). O navegador não pode gravar nessas tabelas. O robô grava pelas funções `pedidos_robo` e `contratos_robo` (security definer, com token).
-- **Gestão de acessos:** Configurações › Módulos, pelas funções `listar_acessos_modulo` e `definir_acesso_modulo`. Só administradores do módulo podem usá-las. Cada alteração fica em `module_access_log`.
+- **Gestão de acessos:** Liberações › Acesso aos módulos, pelas funções `listar_acessos_modulo` e `definir_acesso_modulo`. Só administradores do módulo podem usá-las. Cada alteração fica em `module_access_log`.
 
 ## Como adicionar um relatório (nova aba)
 
@@ -73,4 +73,4 @@ Mapeamentos: [Pedidos](suprimentos-pedidos-mapeamento.md) · [Contratos](contrat
 1. **Migration:** o identificador já está no check de `module_members.module`. Para um módulo novo, acrescente-o ali e crie as políticas `using (private.has_module('<modulo>'))` nas tabelas dele.
 2. **Código:** crie `src/modules/<modulo>/<pagina>/` com `service.js`, `model.js`, `view.js` e `index.js`, reaproveitando `src/platform`.
 3. **Página:** crie `www/<modulo>/<pagina>.html` (copie `www/suprimentos/pedidos.html`) e registre em `PLATFORM_PAGES` no `scripts/build.mjs`.
-4. **Registro:** inclua a página em `src/platform/modules.js` e em `PLATFORM_PAGES` no `www/index.html`. É isso que mostra o card no seletor e a opção em Configurações › Módulos.
+4. **Registro:** inclua a página em `src/platform/modules.js` e em `PLATFORM_PAGES` no `www/index.html`. É isso que mostra o card no seletor e a opção em Liberações › Acesso aos módulos.

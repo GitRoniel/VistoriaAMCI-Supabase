@@ -37,11 +37,11 @@ assert.ok(html.includes("technical_escort") && html.includes("Acomp. Técnico"),
 assert.ok(!html.includes("fonts.googleapis.com/css2?family=Geist"), "A fonte do projeto deve ser a do sistema (SF Pro).");
 assert.ok(html.includes("family=Inter") && html.includes("-webkit-touch-callout:none"), "Inter no desktop/Android e fonte nativa no iOS.");
 assert.ok(!/transform:scale\(/.test(html), "Não usar scale() em elementos com texto.");
-assert.ok(html.includes('data-cfg="cond"') && html.includes("sort_order"), "Configuração de Condomínio não encontrada.");
+assert.ok(html.includes('data-admin-page="condominios"') && html.includes('data-pane="cond"') && html.includes("sort_order"), "Configuração de Condomínios não encontrada.");
 assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");
 assert.ok(!html.includes('data-view="obra"'), "A aba Vistoria · Obra ainda aparece no painel.");
-assert.ok(html.includes("Aprovações de Acesso"), "Página de aprovações de acesso não encontrada.");
-assert.ok(html.includes('id="projectAdmin"') && html.includes('id="adminOv"'), "Aprovações de acesso precisam ficar na seleção de obra.");
+assert.ok(html.includes("Acesso de usuários") && html.includes("Acesso aos módulos") && html.includes('data-pane="apr"') && html.includes('data-pane="mods"'), "Página Liberações (acesso de usuários e módulos) não encontrada.");
+assert.ok(!html.includes('id="projectAdmin"') && html.includes('id="hmAdminMenu"') && ['liberacoes','condominios','logs'].every((p) => html.includes(`data-admin-page="${p}"`)) && html.includes('id="adminOv"'), "Liberações, Configuração de Condomínios e Logs ficam no menu do usuário.");
 assert.ok(!html.includes('data-view="acessos"'), "Aprovações de acesso não devem aparecer como aba do condomínio.");
 assert.ok(!html.includes('id="headProjectName"'), "Nome da obra duplicado no cabeçalho.");
 assert.ok(html.includes("touch-action:pan-y"), "Rolagem tátil das telas de autenticação não encontrada.");

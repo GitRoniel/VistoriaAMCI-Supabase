@@ -35,7 +35,7 @@ pnpm build
 - Senhas antigas da aba `ACESSOS` não são importadas. Recrie os usuários com senhas novas de pelo menos 8 caracteres.
 - O painel permanece totalmente bloqueado até existir uma sessão válida e um vínculo ativo em `project_members`.
 - Novos usuários podem solicitar acesso na tela inicial. O cadastro cria uma solicitação com nível básico (`visitante`), sem liberar dados.
-- Um administrador revisa as solicitações em **Aprovações de Acesso** (botão na tela de seleção de obra, abaixo de "Sair da conta"; filtros por obra/condomínio e status), escolhe o nível e aprova ou rejeita cada conta.
+- Um administrador revisa as solicitações em **Liberações › Acesso de usuários** (menu do usuário na tela inicial; filtros por obra/condomínio e status), escolhe o nível e aprova ou rejeita cada conta.
 - Depois do login, o usuário escolhe entre os empreendimentos ativos vinculados à sua conta. A função e as permissões são carregadas separadamente para cada obra.
 - Condomínios disponíveis: **Alto do Jerivá** (448 apartamentos, blocos/pavimentos) e **Alto do Buriti** (319 casas, conjuntos A a R). Todos usam as mesmas tabelas (`units`, `client_inspections`...), separadas por `project_id`; as consultas e o RLS retornam apenas os dados do condomínio selecionado.
 - **Visão Geral** (botão na seleção de obra): agendamentos de todos os condomínios liberados ao usuário numa só lista, com filtros, resumo e atalho para abrir a unidade. Usa as mesmas tabelas (`client_inspections` + `units`), sem cópia de dados.
@@ -76,7 +76,7 @@ No app o endereço interno é `capacitor://localhost`; o link do e-mail de confi
 
 ## Tema claro/escuro
 
-- Botão de sol/lua no login, no cabeçalho, na escolha de obra, na Visão Geral, na importação e em Configurações; a escolha fica salva no aparelho (`localStorage`, chave `amci-theme`).
+- Botão de sol/lua no login, no cabeçalho, na escolha de obra, na Visão Geral, na importação e nas páginas de administração; a escolha fica salva no aparelho (`localStorage`, chave `amci-theme`).
 - O Modo Escuro é gerado automaticamente a partir do CSS do Modo Claro por `scripts/theme-dark.mjs` (roda no `pnpm build`; o `pnpm check` falha se estiver desatualizado). Ajustes manuais ficam logo após o bloco gerado em `www/index.html`.
 - As cores de status (Não agendado, Agendado, Remarcado, Revistoria, Revistoria Finalizada, Aprovado) são iguais nos dois temas.
 - A área da barra de status no iPhone (tela cheia/app) usa `--chrome-top`, que acompanha o tema.
@@ -96,7 +96,7 @@ Origem de cada campo em `client_inspections.field_sources` / `updated_source` (M
 
 ## Cadastro de condomínios
 
-Em **Configurações › Configuração de Condomínio** (administradores):
+Em **Configuração de Condomínios** (menu do usuário, administradores):
 
 - **+ Novo condomínio:** nome, tipo, cor de destaque e descrição (opcional; se vazia, é gerada).
   - **Apartamentos:** gera automaticamente 448 unidades, no mesmo modelo do Alto do Jerivá (blocos A–H × Térreo e 1º ao 6º × aptos 01–08).
@@ -127,12 +127,13 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 ## Excluir obra
 
-- Em Configurações › Configuração de Condomínio, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
+- Em Configuração de Condomínios, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
 
 ## Tela inicial (central de acesso)
 
-- Barra verde (igual às páginas internas) com busca, tema, Configurações (com o número de acessos pendentes) e o menu do usuário (Sair da conta).
+- Barra verde (igual às páginas internas) com busca, tema e o menu do usuário. O botão do usuário mostra o número de acessos pendentes.
+- **Menu do usuário › Administração** (só para administradores): **Liberações** (abas *Acesso de usuários* e *Acesso aos módulos*), **Configuração de Condomínios** e **Logs**. Cada uma abre uma página própria, com o mesmo cabeçalho da tela inicial (Início, tema e menu do usuário) e endereço próprio (`#liberacoes`, `#condominios`, `#logs`); o Voltar do navegador retorna à tela inicial. Quem vê cada página segue as mesmas regras de antes: administradores de condomínio veem as três; administradores de módulo veem Liberações › Acesso aos módulos.
 - Saudação com a data e o menu em dois grupos: **Vistorias · Condomínios** (um card por condomínio + Visão Geral) e **Relatórios** (Suprimentos e Contratos, com a data da última atualização do ERP).
 - Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).
 - A busca filtra os cards de condomínios e relatórios, sem acento.
@@ -143,7 +144,7 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
   - **Suprimentos:** o antigo "Relatório de Controle de Pedidos" (que lia a planilha do Google), agora lendo o Supabase (`pedidos_registros_1187`, pela view `pedidos_registros_atual`). O endereço antigo `/suprimentos/pedidos` abre esta aba.
   - **Contratos:** contratos, medições e saldos por obra, lendo `contratos_registros_549` (view `contratos_registros_atual`). Hierarquia Obra → Contrato → itens/serviços (expansível).
 - Layout no mesmo padrão do site de Vistorias, com tema claro/escuro, celular e impressão.
-- Acesso por módulo: cada usuário vê só as abas (e os cards no seletor de obras) dos módulos liberados, e só consegue ler esses dados (RLS). Os administradores do módulo liberam acessos em Configurações › Módulos.
+- Acesso por módulo: cada usuário vê só as abas (e os cards no seletor de obras) dos módulos liberados, e só consegue ler esses dados (RLS). Os administradores do módulo liberam acessos em Liberações › Acesso aos módulos.
 - Arquitetura, segurança e como criar novos relatórios: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
 - Regras e mapeamentos: [Pedidos](docs/suprimentos-pedidos-mapeamento.md) · [Contratos](docs/contratos-mapeamento.md).
 - Situação da automação UAU-Sync (GitHub Actions) no topo de cada relatório, lida de `pedidos_execucoes`: se a última execução deu certo (ou o motivo da falha), data e horário dos dados exibidos, o que mudou desde a atualização anterior (pedidos novos, contratos e itens novos, diferença de linhas) e o histórico das últimas execuções. A página confere a cada minuto e avisa quando chegam dados novos.
