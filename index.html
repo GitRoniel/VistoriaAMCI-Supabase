@@ -1314,7 +1314,7 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .auth-link[hidden]{display:none}
 .auth-help{font-size:13.5px;line-height:1.55;color:#52675d;margin:0 0 14px}
 .auth-code{letter-spacing:.45em;font-size:20px!important;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
-#resetForm [data-reset-step][hidden],#resetCodeField[hidden]{display:none}
+#resetForm [data-reset-step][hidden]{display:none}
 /* Plataforma: cards de outros módulos no seletor e aba Configurações › Módulos */
 .project-modules{margin-top:22px}
 a.project-card{text-decoration:none;color:inherit}
@@ -2335,19 +2335,21 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       </form>
       <form class="auth-view" id="resetForm" data-auth-panel="reset" novalidate>
         <div data-reset-step="email">
-          <p class="auth-help">Informe o e-mail cadastrado. Enviaremos um código de 6 dígitos para você criar uma nova senha.</p>
+          <p class="auth-help">Informe o e-mail cadastrado. Enviaremos um link para você criar uma nova senha.</p>
           <div class="auth-fields"><div class="auth-field"><label for="resetEmail">E-mail cadastrado</label><div class="auth-input-wrap"><input id="resetEmail" type="email" autocomplete="email" inputmode="email" placeholder="nome@empresa.com.br"></div></div></div>
-          <button class="auth-submit" id="resetSendBtn" type="submit"><span class="spin" aria-hidden="true"></span><span class="auth-submit-label">Enviar código</span></button>
+          <button class="auth-submit" id="resetSendBtn" type="submit"><span class="spin" aria-hidden="true"></span><span class="auth-submit-label">Enviar link</span></button>
         </div>
-        <div data-reset-step="code" hidden>
+        <div data-reset-step="sent" hidden>
+          <p class="auth-help" id="resetSentInfo"></p>
+          <div class="auth-row auth-row-center"><button type="button" class="auth-link" id="resetResend">Reenviar link</button></div>
+        </div>
+        <div data-reset-step="pass" hidden>
           <p class="auth-help" id="resetInfo"></p>
           <div class="auth-fields">
-            <div class="auth-field" id="resetCodeField"><label for="resetCode">Código recebido por e-mail</label><div class="auth-input-wrap"><input id="resetCode" class="auth-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="000000"></div></div>
             <div class="auth-field"><label for="resetPass">Nova senha</label><div class="auth-input-wrap"><input class="has-toggle" id="resetPass" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres"><button class="password-toggle" type="button" data-password-target="resetPass" aria-label="Mostrar senha">Mostrar</button></div></div>
             <div class="auth-field"><label for="resetPass2">Confirme a nova senha</label><div class="auth-input-wrap"><input class="has-toggle" id="resetPass2" type="password" autocomplete="new-password" placeholder="Repita a nova senha"><button class="password-toggle" type="button" data-password-target="resetPass2" aria-label="Mostrar senha">Mostrar</button></div></div>
           </div>
           <button class="auth-submit" id="resetSaveBtn" type="submit"><span class="spin" aria-hidden="true"></span><span class="auth-submit-label">Salvar nova senha</span></button>
-          <div class="auth-row auth-row-center"><button type="button" class="auth-link" id="resetResend">Reenviar código</button></div>
         </div>
         <div class="auth-feedback" id="resetFeedback" role="alert"></div>
         <div class="auth-row auth-row-center"><button type="button" class="auth-link" id="resetBack">← Voltar para o login</button></div>
@@ -3562,7 +3564,7 @@ function showAuthView(view){
   document.querySelectorAll("[data-auth-panel]").forEach(panel=>panel.classList.toggle("active",panel.dataset.authPanel===view));
   const reset=view==="reset";
   document.getElementById("authTitle").textContent=reset?"Redefinir senha":signup?"Solicite seu acesso":"Acesse sua conta";
-  document.getElementById("authSubtitle").textContent=reset?"Receba um código por e-mail e crie uma nova senha.":signup?"Crie seu login. O administrador fará a liberação antes do primeiro acesso.":"Informe seu e-mail e senha para entrar no controle de vistorias.";
+  document.getElementById("authSubtitle").textContent=reset?"Receba um link por e-mail e crie uma nova senha.":signup?"Crie seu login. O administrador fará a liberação antes do primeiro acesso.":"Informe seu e-mail e senha para entrar no controle de vistorias.";
   setAuthFeedback("loginErr","");setAuthFeedback("signupFeedback","");setAuthFeedback("resetFeedback","");
   requestAnimationFrame(()=>document.getElementById(reset?"resetEmail":signup?"signupName":"loginU")?.focus());
 }
@@ -4767,76 +4769,71 @@ renderObra(); renderCli(); renderResumo();
 document.getElementById("obraModeTog")?.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;obraMode=b.dataset.mode;renderObra();});
 document.getElementById("cliListTbl").addEventListener("change",e=>{const s=e.target.closest("[data-acomp]");if(s)saveAcomp(s);});
 document.getElementById("cliModeTog").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cliMode=b.dataset.mode;renderCli();});
-/* ── ESQUECI MINHA SENHA (código de 6 dígitos do Supabase Auth) ──
-   A resposta é sempre a mesma, exista ou não o e-mail. O código vale uma única vez; depois de
-   trocar a senha, todas as sessões do usuário são encerradas em todos os aparelhos. */
-const RESET_MSG="Se o e-mail estiver cadastrado, você receberá um código de 6 dígitos. Confira também a caixa de spam.";
+/* ── ESQUECI MINHA SENHA (link enviado pelo Supabase Auth) ──
+   O e-mail traz um link de uso único; ao abri-lo, o app volta com a sessão de recuperação e pede a
+   nova senha. A resposta é sempre a mesma, exista ou não o e-mail. Depois de trocar a senha, todas
+   as sessões do usuário são encerradas em todos os aparelhos. */
+const RESET_MSG="Se o e-mail estiver cadastrado, você receberá um link para criar uma nova senha. Confira também a caixa de spam.";
 let resetEmailAddr="",resetViaLink=false,resetCooldownTimer=null;
 function showResetStep(step){document.querySelectorAll("[data-reset-step]").forEach(el=>el.hidden=el.dataset.resetStep!==step);}
 function openReset(){
   resetViaLink=false;showAuthView("reset");showResetStep("email");
   const email=document.getElementById("loginU").value.trim();if(email)document.getElementById("resetEmail").value=email;
-  ["resetCode","resetPass","resetPass2"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("resetCodeField").hidden=false;
+  ["resetPass","resetPass2"].forEach(id=>document.getElementById(id).value="");
 }
 function openResetNewPassword(email){
   // Chegou pelo link do e-mail (sessão de recuperação já validada): só falta a nova senha.
   document.body.classList.add("auth-locked");document.getElementById("loginOv").classList.add("open");
-  resetViaLink=true;resetEmailAddr=email||"";showAuthView("reset");showResetStep("code");
-  document.getElementById("resetCodeField").hidden=true;document.getElementById("resetResend").hidden=true;
+  resetViaLink=true;resetEmailAddr=email||"";showAuthView("reset");showResetStep("pass");
   document.getElementById("resetInfo").textContent="Crie uma nova senha para "+(email||"sua conta")+".";
   requestAnimationFrame(()=>document.getElementById("resetPass").focus());
 }
 function startResendCooldown(){
-  const b=document.getElementById("resetResend");let left=60;b.disabled=true;b.hidden=false;
-  clearInterval(resetCooldownTimer);b.textContent=`Reenviar código (${left}s)`;
-  resetCooldownTimer=setInterval(()=>{left--;if(left<=0){clearInterval(resetCooldownTimer);b.disabled=false;b.textContent="Reenviar código";}else b.textContent=`Reenviar código (${left}s)`;},1000);
+  const b=document.getElementById("resetResend");let left=60;b.disabled=true;
+  clearInterval(resetCooldownTimer);b.textContent=`Reenviar link (${left}s)`;
+  resetCooldownTimer=setInterval(()=>{left--;if(left<=0){clearInterval(resetCooldownTimer);b.disabled=false;b.textContent="Reenviar link";}else b.textContent=`Reenviar link (${left}s)`;},1000);
 }
-async function sendResetCode(resend){
+async function sendResetLink(resend){
   const email=(resend?resetEmailAddr:document.getElementById("resetEmail").value).trim().toLowerCase();
   if(!/^\S+@\S+\.\S+$/.test(email)){setAuthFeedback("resetFeedback","Informe um e-mail válido.");return;}
   if(!SUPABASE_READY){setAuthFeedback("resetFeedback","A conexão segura ainda não está disponível. Tente novamente em instantes.");return;}
   const btn=document.getElementById("resetSendBtn");if(!resend)setAuthBusy(btn,true,"Enviando…");
+  // O link volta para esta página (no app iOS, para o endereço público, que abre no navegador).
+  const redirectTo=IS_NATIVE?(CONFIG.APP_PUBLIC_URL||undefined):window.location.origin+window.location.pathname;
   // Erros (inclusive excesso de tentativas) não são exibidos, para não revelar quais e-mails existem.
-  try{await supabase.auth.resetPasswordForEmail(email);}catch(e){}
-  if(!resend)setAuthBusy(btn,false,"Enviar código");
-  resetEmailAddr=email;showResetStep("code");document.getElementById("resetCodeField").hidden=false;
-  document.getElementById("resetInfo").textContent=`Digite o código enviado para ${email}, a nova senha e a confirmação. O código vale por 30 minutos e só pode ser usado uma vez.`;
+  try{await supabase.auth.resetPasswordForEmail(email,{redirectTo});}catch(e){}
+  if(!resend)setAuthBusy(btn,false,"Enviar link");
+  resetEmailAddr=email;showResetStep("sent");
+  document.getElementById("resetSentInfo").textContent=`Enviamos um link para ${email}. Abra o e-mail e toque no link para criar a nova senha. O link só pode ser usado uma vez.`;
   setAuthFeedback("resetFeedback",RESET_MSG,"info");startResendCooldown();
-  requestAnimationFrame(()=>document.getElementById("resetCode").focus());
 }
 async function saveNewPassword(){
-  const code=document.getElementById("resetCode").value.replace(/\s+/g,""),pass=document.getElementById("resetPass").value,pass2=document.getElementById("resetPass2").value;
-  if(!resetViaLink&&!/^\d{6,10}$/.test(code)){setAuthFeedback("resetFeedback","Digite o código de 6 dígitos recebido por e-mail.");return;}
+  const pass=document.getElementById("resetPass").value,pass2=document.getElementById("resetPass2").value;
+  if(!resetViaLink){showResetStep("email");return;}
   if(pass.length<8){setAuthFeedback("resetFeedback","A nova senha precisa ter pelo menos 8 caracteres.");return;}
   if(pass!==pass2){setAuthFeedback("resetFeedback","As senhas informadas não são iguais.");return;}
   const btn=document.getElementById("resetSaveBtn");setAuthBusy(btn,true,"Salvando…");setAuthFeedback("resetFeedback","");
   try{
-    if(!resetViaLink){
-      const {error}=await supabase.auth.verifyOtp({email:resetEmailAddr,token:code,type:"recovery"});
-      if(error){setAuthFeedback("resetFeedback","Código inválido ou expirado. Confira o código ou solicite um novo.");return;}
-    }
     const {error:updateError}=await supabase.auth.updateUser({password:pass});
     if(updateError){
       const m=String(updateError.message||"");
-      setAuthFeedback("resetFeedback",/different|same/i.test(m)?"A nova senha precisa ser diferente da anterior.":/weak|short|characters/i.test(m)?"Escolha uma senha mais forte (mínimo de 8 caracteres).":"Não foi possível salvar a nova senha. Solicite um novo código e tente novamente.");
+      setAuthFeedback("resetFeedback",/different|same/i.test(m)?"A nova senha precisa ser diferente da anterior.":/weak|short|characters/i.test(m)?"Escolha uma senha mais forte (mínimo de 8 caracteres).":"Não foi possível salvar a nova senha. O link pode ter expirado: solicite um novo e tente novamente.");
       return;
     }
     // Encerra as sessões do usuário em todos os aparelhos; o próximo acesso usa a nova senha.
     await supabase.auth.signOut({scope:"global"}).catch(()=>{});
     try{localStorage.removeItem(LOGIN_AT_KEY);}catch(e){}
-    ["resetCode","resetPass","resetPass2","loginP"].forEach(id=>document.getElementById(id).value="");
-    clearInterval(resetCooldownTimer);document.getElementById("resetResend").hidden=false;
+    ["resetPass","resetPass2","loginP"].forEach(id=>document.getElementById(id).value="");
+    clearInterval(resetCooldownTimer);resetViaLink=false;
     showAuthView("login");document.getElementById("loginU").value=resetEmailAddr;
     setAuthFeedback("loginErr","Senha alterada com sucesso. Por segurança, as sessões abertas em outros aparelhos foram encerradas. Entre com a nova senha.","success");
     requestAnimationFrame(()=>document.getElementById("loginP").focus());
   }finally{setAuthBusy(btn,false,"Salvar nova senha");}
 }
 document.getElementById("forgotLink").onclick=openReset;
-document.getElementById("resetBack").onclick=async()=>{if(resetViaLink){await supabase?.auth.signOut({scope:"local"}).catch(()=>{});resetViaLink=false;document.getElementById("resetCodeField").hidden=false;document.getElementById("resetResend").hidden=false;}showAuthView("login");};
-document.getElementById("resetResend").onclick=()=>sendResetCode(true);
-document.getElementById("resetForm").addEventListener("submit",e=>{e.preventDefault();if(document.querySelector('[data-reset-step="email"]').hidden)saveNewPassword();else sendResetCode(false);});
-document.getElementById("resetCode").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D+/g,"").slice(0,10);});
+document.getElementById("resetBack").onclick=async()=>{if(resetViaLink){await supabase?.auth.signOut({scope:"local"}).catch(()=>{});resetViaLink=false;}showAuthView("login");};
+document.getElementById("resetResend").onclick=()=>sendResetLink(true);
+document.getElementById("resetForm").addEventListener("submit",e=>{e.preventDefault();const step=document.querySelector("#resetForm [data-reset-step]:not([hidden])")?.dataset.resetStep;if(step==="pass")saveNewPassword();else if(step==="email")sendResetLink(false);});
 // Sessão "manter conectado": encerra ao completar 30 dias, mesmo com o site aberto.
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&currentUser&&rememberExpired()){logout().then(()=>setAuthFeedback("loginErr","Sua sessão expirou após 30 dias. Entre novamente.","info"));}});
 document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();doLogin();});

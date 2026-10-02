@@ -27,7 +27,7 @@ assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do
 assert.ok(html.includes("Aprovações e Revistorias por ${LAYOUT.group}"), "Progresso por bloco/conjunto não encontrado no resumo.");
 assert.ok(html.includes("houseLayout") && html.includes('project?.kind==="casas"'), "Tipo do condomínio (casas/apartamentos) precisa vir do banco.");
 assert.ok(!html.includes("PROJECT_EXPERIENCES") && !html.includes("BURITI_CONJUNTOS"), "Condomínios não podem ficar fixos no código.");
-assert.ok(html.includes("resetPasswordForEmail") && html.includes('type:"recovery"') && html.includes("updateUser({password"), "Esqueci minha senha precisa usar o código de recuperação do Supabase Auth.");
+assert.ok(html.includes("resetPasswordForEmail(email,{redirectTo})") && html.includes('type==="recovery"') && html.includes("openResetNewPassword(") && html.includes("updateUser({password"), "Esqueci minha senha precisa usar o link de recuperação do Supabase Auth.");
 assert.ok(/id="loginRemember"[^>]*checked/.test(html) && html.includes("storage:authStorage"), "Manter conectado precisa vir marcado e controlar onde a sessão fica salva.");
 assert.ok(html.includes('scope:"global"') && html.includes('scope:"local"'), "Troca de senha encerra todas as sessões; Sair encerra só a do aparelho.");
 assert.ok(html.includes('supabase.rpc("criar_condominio"') && html.includes('supabase.rpc("atualizar_estrutura_condominio"'), "Cadastro/estrutura de condomínios devem usar as funções do banco.");
