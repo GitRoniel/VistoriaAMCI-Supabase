@@ -130,6 +130,13 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Em Configurações › Configuração de Condomínio, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
 
+## Tela inicial (central de acesso)
+
+- Barra verde (igual às páginas internas) com busca, tema, Configurações (com o número de acessos pendentes) e o menu do usuário (Sair da conta).
+- Saudação com a data e o menu em dois grupos: **Vistorias · Condomínios** (um card por condomínio + Visão Geral) e **Relatórios** (Suprimentos e Contratos, com a data da última atualização do ERP).
+- Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).
+- A busca filtra os cards de condomínios e relatórios, sem acento.
+
 ## Plataforma: Relatórios (Suprimentos e Contratos)
 
 - Página única `/relatorios`, com uma aba por módulo:
