@@ -32,11 +32,10 @@ export function appHeaderHTML({ title, user = null, actions = "", tabs = [], act
         <div class="head-spacer"></div>
         <div class="head-title"><strong>${esc(title)}</strong></div>
         <div class="head-actions">
-          <a class="project-switch-btn" href="${HOME_URL}" title="Voltar para a seleção de obras e módulos">${ICON.home}<span>Início</span></a>
           ${user ? `<span class="userchip" title="${esc(user.name)}">${ICON.user}<span class="ub">${esc(user.name)}</span></span>` : ""}
           ${actions}
+          <a class="project-switch-btn" href="${HOME_URL}" title="Voltar para a seleção de obras e módulos">${ICON.home}<span>Início</span></a>
           <button class="icon-btn" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro" title="Alternar tema">${ICON.moon}${ICON.sun}</button>
-          <button class="icon-btn" type="button" data-pf-logout aria-label="Sair" title="Sair">${ICON.logout}</button>
         </div>
       </div>
     </div>
