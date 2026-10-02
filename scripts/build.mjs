@@ -12,7 +12,7 @@ const watch = process.argv.includes("--watch");
 const productionDefaults = {
   SUPABASE_URL: "https://lelverljfukbekitqcjm.supabase.co",
   SUPABASE_PUBLISHABLE_KEY: "sb_publishable_zvlhpZaRvPuaeYrBgOsndw_2eHO-4zK",
-  APP_PUBLIC_URL: "https://amci-vistoria.vercel.app"
+  APP_PUBLIC_URL: "https://www.amci.com.br"
 };
 
 const config = {
