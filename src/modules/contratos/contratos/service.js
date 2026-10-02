@@ -37,3 +37,10 @@ export async function fetchUltimaExecucao() {
   if (error) return null;
   return data;
 }
+
+/** Contratos e itens gravados numa execução anterior: para contar o que é novo na última atualização. */
+export async function fetchContratoKeys(execucaoId) {
+  const supabase = getSupabase();
+  if (!supabase || !execucaoId) return null;
+  return fetchAllPages(() => supabase.from(SOURCE_TABLE).select("empresa,obra,contrato,item,chave_contrato").eq("execucao_id", execucaoId).order("id", { ascending: true }));
+}

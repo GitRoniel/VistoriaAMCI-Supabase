@@ -8,6 +8,7 @@ import { esc } from "../../platform/core/utils.js";
 import { appHeaderHTML, secHeadHTML, stateHTML, ICON } from "../../platform/ui/shell.js";
 import { suprimentosTab } from "../suprimentos/pedidos/tab.js";
 import { contratosTab } from "../contratos/contratos/tab.js";
+import { mountSync } from "./sync.js";
 
 const TABS = [suprimentosTab, contratosTab];
 const TAB_ICON = {
@@ -63,14 +64,17 @@ function mountTabs(tabs, user) {
     sub.innerHTML = st.subtitle || "&nbsp;";
     if (st.loaded || st.loading) return;
     const pane = document.getElementById("pane-" + tab.id);
-    pane.innerHTML = stateHTML({ title: tab.loading, text: "Buscando os dados mais recentes do ERP.", spinner: true });
-    st.loading = tab.load(pane).then((subtitle) => {
+    pane.innerHTML = `<section class="pf-sync" data-sync aria-label="Atualização dos dados"></section><div data-body>${stateHTML({ title: tab.loading, text: "Buscando os dados mais recentes do ERP.", spinner: true })}</div>`;
+    const body = pane.querySelector("[data-body]");
+    st.loading = tab.load(body).then((subtitle) => {
       st.loaded = true; st.subtitle = subtitle;
       if (!pane.hidden) sub.innerHTML = subtitle;
     }).catch((err) => {
       console.error(err);
-      pane.innerHTML = stateHTML({ title: "Erro ao carregar os dados", text: "Verifique sua conexão e tente novamente.", action: retry });
+      body.innerHTML = stateHTML({ title: "Erro ao carregar os dados", text: "Verifique sua conexão e tente novamente.", action: retry });
     }).finally(() => { st.loading = null; });
+    // Situação da automação (UAU-Sync): última execução, horário, o que mudou e histórico.
+    mountSync(pane.querySelector("[data-sync]"), tab, { isVisible: () => !pane.hidden, ready: st.loading });
   }
 
   page.addEventListener("click", (e) => {
