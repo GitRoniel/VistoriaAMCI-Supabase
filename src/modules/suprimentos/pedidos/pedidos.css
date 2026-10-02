@@ -17,7 +17,7 @@
 /* ── Grupo por obra ──
    Cabeçalho forte (nome da obra + totais) e tabela leve: a cor fica só para status e agrupamento. */
 .pd-obra{margin-bottom:16px;overflow:clip;border-left:4px solid var(--ink-2)}
-.pd-obra-h{position:sticky;top:max(var(--safe-t),4px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+.pd-obra-h{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
 .pd-obra-t{display:flex;align-items:baseline;gap:10px;min-width:0}
 .pd-obra-k{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fern)}
 .pd-obra-h h2{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:.01em;line-height:1.2}

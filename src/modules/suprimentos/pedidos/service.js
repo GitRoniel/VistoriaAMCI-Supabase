@@ -36,3 +36,11 @@ export async function fetchUltimaExecucao() {
   if (error) return null;
   return data;
 }
+
+/** Pedidos (obra + nº) gravados numa execução anterior: para contar o que é novo na última atualização. */
+export async function fetchPedidoKeys(execucaoId) {
+  const supabase = getSupabase();
+  if (!supabase || !execucaoId) return null;
+  const rows = await fetchAllPages(() => supabase.from(SOURCE_TABLE).select("obra,pedido").eq("execucao_id", execucaoId).order("id", { ascending: true }));
+  return new Set(rows.map((r) => `${r.obra}-${r.pedido}`));
+}

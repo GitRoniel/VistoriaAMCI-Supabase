@@ -7,7 +7,7 @@
 
 /* ── Grupo por obra ── */
 .ct-obra{margin-bottom:16px;overflow:clip;border-left:4px solid var(--ink-2)}
-.ct-obra-h{position:sticky;top:max(var(--safe-t),4px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+.ct-obra-h{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
 .ct-obra-t{display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap}
 .ct-obra-k{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fern)}
 .ct-obra-h h2{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:.01em;line-height:1.2}

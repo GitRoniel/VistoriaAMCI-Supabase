@@ -139,3 +139,4 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Acesso por módulo: cada usuário vê só as abas (e os cards no seletor de obras) dos módulos liberados, e só consegue ler esses dados (RLS). Os administradores do módulo liberam acessos em Configurações › Módulos.
 - Arquitetura, segurança e como criar novos relatórios: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
 - Regras e mapeamentos: [Pedidos](docs/suprimentos-pedidos-mapeamento.md) · [Contratos](docs/contratos-mapeamento.md).
+- Situação da automação UAU-Sync (GitHub Actions) no topo de cada relatório, lida de `pedidos_execucoes`: se a última execução deu certo (ou o motivo da falha), data e horário dos dados exibidos, o que mudou desde a atualização anterior (pedidos novos, contratos e itens novos, diferença de linhas) e o histórico das últimas execuções. A página confere a cada minuto e avisa quando chegam dados novos.
