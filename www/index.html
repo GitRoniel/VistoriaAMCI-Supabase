@@ -1391,20 +1391,22 @@ a.hm-tile{color:#172c25}
 .hm-bar3{display:flex;gap:2px;height:6px;margin-top:9px}
 .hm-bar3 i{display:block;min-width:0}
 .hm-bar3 i:first-child{border-radius:3px 0 0 3px}.hm-bar3 i:last-child{border-radius:0 3px 3px 0}
-.hm-bar3 .r{background:#2f9e5b}.hm-bar3 .a{background:#0b6fd4}.hm-bar3 .p{background:#c77c12}
+.hm-bar3 .r{background:#2f9e5b}.hm-bar3 .a{background:#ED7A12}.hm-bar3 .p{background:#b4bdb7}
 .hm-bar3.loading{background:#e6ece8;border-radius:3px}
-.hm-nums{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:11px;color:#617168}
+.hm-nums{display:flex;gap:10px;flex-wrap:nowrap;margin-top:6px;font-size:11px;color:#617168;white-space:nowrap;min-width:0}
 .hm-nums span{display:inline-flex;align-items:center;gap:4px}
 .hm-nums i{width:7px;height:7px;border-radius:2px}
-.hm-txt .hm-nums b{color:#173a32;font-size:11.5px;font-weight:800;white-space:normal}
-.hm-nums .r i{background:#2f9e5b}.hm-nums .a i{background:#0b6fd4}.hm-nums .p i{background:#c77c12}
+.hm-txt .hm-nums b{color:#173a32;font-size:11.5px;font-weight:800}
+.hm-nums .r i{background:#2f9e5b}.hm-nums .a i{background:#ED7A12}.hm-nums .p i{background:#b4bdb7}
 .hm-upd{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font-size:11.5px;font-weight:600;color:#617168}
 .hm-upd i{width:7px;height:7px;border-radius:50%;background:#2f9e5b}
 .hm-upd.err i{background:#c77c12}
 .hm-empty{margin:0;padding:24px;text-align:center;font-size:13px;font-weight:600;color:#617168;background:#ffffff;border:1px dashed #cfdcd3;border-radius:14px}
 .hm-foot{margin-top:auto;font-size:11.5px;color:#6a7a71}
 #projectOv .project-feedback:empty{display:none}
-@media(max-width:1000px){.hm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hm-cond .hm-go{display:none}
+@media(max-width:1100px){.hm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:380px){.hm-tile.hm-cond{gap:10px;padding-right:10px}.hm-cond .hm-ic{width:36px;height:36px;font-size:12.5px;border-radius:10px}.hm-nums{gap:7px;font-size:10px}.hm-nums span{gap:3px}.hm-nums i{display:none}.hm-txt .hm-nums b{font-size:10.5px}}
 @media(max-width:720px){
   .hm-bar{box-shadow:none}
   .hm-bar-in{padding:12px calc(14px + var(--safe-r)) 6px calc(14px + var(--safe-l));gap:8px}
@@ -1429,6 +1431,8 @@ a.hm-tile{color:#172c25}
   .hm-ic{width:42px;height:42px;border-radius:12px;font-size:14px}
   .hm-txt>b{font-size:15px}
   .hm-txt>span{font-size:12px}
+  .hm-nums{gap:8px;font-size:10.5px}
+  .hm-txt .hm-nums b{font-size:11px}
   #moduleList{grid-template-columns:repeat(2,minmax(0,1fr))}
   #moduleList .hm-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:14px}
   #moduleList .hm-go{display:none}
@@ -2130,14 +2134,14 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .hm-txt>span{color:#a6b2ab}
 :root[data-theme="dark"] .hm-go{stroke:#a0ada6;fill:none}
 :root[data-theme="dark"] .hm-bar3 .r{background:#2f9e5b}
-:root[data-theme="dark"] .hm-bar3 .a{background:#0b6fd4}
-:root[data-theme="dark"] .hm-bar3 .p{background:#c77c12}
+:root[data-theme="dark"] .hm-bar3 .a{background:#ED7A12}
+:root[data-theme="dark"] .hm-bar3 .p{background:#494e4b}
 :root[data-theme="dark"] .hm-bar3.loading{background:#1c201e}
 :root[data-theme="dark"] .hm-nums{color:#a6b2ab}
 :root[data-theme="dark"] .hm-txt .hm-nums b{color:#cfd9d7}
 :root[data-theme="dark"] .hm-nums .r i{background:#2f9e5b}
-:root[data-theme="dark"] .hm-nums .a i{background:#0b6fd4}
-:root[data-theme="dark"] .hm-nums .p i{background:#c77c12}
+:root[data-theme="dark"] .hm-nums .a i{background:#ED7A12}
+:root[data-theme="dark"] .hm-nums .p i{background:#494e4b}
 :root[data-theme="dark"] .hm-upd{color:#a6b2ab}
 :root[data-theme="dark"] .hm-upd i{background:#2f9e5b}
 :root[data-theme="dark"] .hm-upd.err i{background:#c77c12}
@@ -2181,6 +2185,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .safe-top{background:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .project-theme svg{stroke:currentColor;fill:none}
 /* /TEMA ESCURO */
+:root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 :root[data-theme="dark"] .hm-avatar{color:#173a32}
 @media(max-width:720px){:root[data-theme="dark"] .hm-user-btn .hm-avatar{color:#dccb91}}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
