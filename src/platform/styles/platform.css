@@ -37,8 +37,56 @@ svg{flex:0 0 auto}
 /* ── Faixa da barra de status (iPhone em tela cheia) ── */
 .pf-safe-top{position:fixed;top:0;left:0;right:0;height:max(var(--safe-t),4px);background:var(--chrome-top);z-index:2147483000}
 
-/* ── Cabeçalho do módulo (mesmo padrão da Visão Geral) ── */
-.pf-page{max-width:1500px;margin:0 auto;padding:calc(18px + var(--safe-t)) calc(18px + var(--safe-r)) calc(28px + var(--safe-b)) calc(18px + var(--safe-l))}
+/* ── Cabeçalho do app: cópia do cabeçalho das páginas dos condomínios (Vistorias) ──
+   Faixa verde com logos, título e botões; abaixo, a faixa de abas. No celular, abas na barra inferior. */
+.pf-appbar{position:sticky;top:0;z-index:60}
+.header{background:linear-gradient(145deg,#102a24 0%,#173a32 52%,#1f493e 100%);box-shadow:0 10px 30px rgba(4,20,16,.28);padding-top:var(--safe-t)}
+.header-inner{max-width:1600px;margin:0 auto;padding:9px 16px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0;text-decoration:none}
+.brand-logo-img{height:38px;width:auto;display:block;flex-shrink:0}
+.brand-vsep{width:1px;height:30px;background:rgba(255,255,255,.22);flex-shrink:0}
+.engertal-badge{width:94px;height:29px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.engertal-badge img{display:block;width:100%;height:100%;object-fit:contain;filter:grayscale(1) brightness(0) invert(1)}
+.head-spacer{flex:1}
+.head-title{color:rgba(255,255,255,.9);font-size:10px;font-weight:500;letter-spacing:.4px;text-align:right;line-height:1.3}
+.head-title strong{color:var(--gold);font-weight:700;font-size:15px;display:block}
+.head-actions{display:flex;gap:6px;align-items:center}
+.project-switch-btn,.userchip{min-height:32px;padding:5px 10px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;transition:.15s;text-decoration:none}
+.project-switch-btn{max-width:210px}
+.userchip{max-width:240px;cursor:default}
+.project-switch-btn:hover,.userchip:hover{background:rgba(255,255,255,.15);border-color:rgba(220,203,145,.5)}
+.project-switch-btn svg,.userchip svg{width:15px;height:15px;stroke:var(--lioness);fill:none;stroke-width:2;flex:0 0 auto}
+.project-switch-btn span,.userchip .ub{overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);display:grid;place-items:center;color:var(--gold);transition:.15s}
+.icon-btn:hover{background:rgba(255,255,255,.15)}
+.icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.tabs-strip{background:linear-gradient(145deg,#132f29,#1b4238);box-shadow:0 8px 20px rgba(4,20,16,.18)}
+.tabs{max-width:1600px;margin:0 auto;padding:8px 16px 10px;display:flex;gap:4px}
+.tab{padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:.1px;color:rgba(255,255,255,.7);background:transparent;display:flex;align-items:center;gap:8px;transition:.15s}
+.tab:hover{color:#fff;background:rgba(255,255,255,.07)}
+.tab .ti{width:20px;height:20px;background:rgba(220,203,145,.14);border-radius:7px;display:grid;place-items:center;color:var(--gold)}
+.tab .ti svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.tab.active{background:#fff;color:var(--ink);box-shadow:0 3px 12px rgba(4,20,16,.22)}
+.tab.active .ti{background:linear-gradient(145deg,#244e42,#17362f);color:var(--gold)}
+.tab:focus-visible,.navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.botnav{display:none}
+.sec-head{background:var(--surface);color:var(--ink);padding:18px 22px;border:1px solid var(--border);border-radius:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:var(--shadow-card);margin-bottom:12px}
+.sec-head .icn{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#244e42,#17362f);display:grid;place-items:center;flex-shrink:0}
+.sec-head .icn svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:2.2}
+.sec-head h2{font-size:21px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.sec-head .sh-flow{color:var(--muted);font-size:13px;font-weight:600;line-height:1.45}
+.sec-head .sh-flow b{color:var(--fern)}
+:root[data-theme="dark"] .header{box-shadow:0 10px 30px rgba(0,0,0,.5)}
+:root[data-theme="dark"] .tabs-strip{box-shadow:0 8px 20px rgba(0,0,0,.32)}
+:root[data-theme="dark"] .tab.active{background:#282828;color:#cfd9d7;box-shadow:0 3px 12px rgba(0,0,0,.4)}
+:root[data-theme="dark"] .sec-head{background:#282828;color:#cfd9d7;border-color:#414a43}
+:root[data-theme="dark"] .sec-head h2{color:#cfd9d7}
+:root[data-theme="dark"] .sec-head .sh-flow{color:#a6b2ab}
+:root[data-theme="dark"] .sec-head .sh-flow b{color:#b5bba8}
+
+/* ── Conteúdo da página ── */
+.pf-page{max-width:1600px;margin:0 auto;padding:18px calc(16px + var(--safe-r)) calc(28px + var(--safe-b)) calc(16px + var(--safe-l))}
+/* Cabeçalho antigo dos módulos (telas de estado sem o app) */
 .pf-top{display:flex;align-items:center;gap:22px;background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:20px 24px;box-shadow:var(--shadow-card);margin-bottom:14px}
 .pf-logos{display:flex;align-items:center;gap:12px;flex:0 0 auto;background:#173a32;border-radius:12px;padding:8px 11px}
 .pf-logos .pf-alto{width:120px;height:46px;object-fit:contain}
@@ -178,7 +226,30 @@ mark.kw{background:#ffe2b8;color:#7d4e00;padding:0 2px;border-radius:3px}
 /* ── Responsivo ── */
 @media(max-width:1100px){.pf-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:720px){
-  .pf-page{padding:calc(10px + var(--safe-t)) calc(10px + var(--safe-r)) calc(24px + var(--safe-b)) calc(10px + var(--safe-l))}
+  .head-title{display:none}
+  .brand-vsep,.engertal-badge{display:none}
+  .brand-logo-img{height:31px}
+  .header-inner{gap:6px;padding:8px calc(10px + var(--safe-r)) 8px calc(10px + var(--safe-l))}
+  .head-actions{gap:4px;min-width:0}
+  .project-switch-btn{max-width:min(132px,35vw);min-width:0;padding:5px 7px}
+  .icon-btn{width:30px;height:30px}
+  .tabs-strip{display:none}
+  .botnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;background:#fff;border-top:1px solid var(--border);border-radius:18px 18px 0 0;box-shadow:0 -3px 16px rgba(31,61,56,.12);padding-bottom:var(--safe-b)}
+  .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px 8px;color:var(--muted);position:relative}
+  .navbtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2}
+  .navbtn span{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+  .navbtn.active{color:var(--ink-2)}
+  .navbtn.active::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:34px;height:3px;background:var(--fern);border-radius:0 0 3px 3px}
+  :root[data-theme="dark"] .botnav{background:#282828;border-top-color:#414a43;box-shadow:0 -3px 16px rgba(0,0,0,.22)}
+  :root[data-theme="dark"] .navbtn{color:#b1c1b1}
+  :root[data-theme="dark"] .navbtn.active{color:#c7d3d0}
+  body.has-botnav .pf-page{padding-bottom:calc(84px + var(--safe-b))}
+  .sec-head{padding:11px 13px;gap:10px;border-radius:16px}
+  .sec-head .icn{width:30px;height:30px;border-radius:9px}
+  .sec-head .icn svg{width:15px;height:15px}
+  .sec-head h2{font-size:16px}
+  .sec-head .sh-flow{font-size:11px;flex-basis:100%}
+  .pf-page{padding:12px calc(10px + var(--safe-r)) calc(24px + var(--safe-b)) calc(10px + var(--safe-l))}
   .pf-top{flex-wrap:wrap;gap:12px;padding:14px;border-radius:16px}
   .pf-logos{padding:6px 9px}.pf-logos .pf-alto{width:92px;height:36px}.pf-logos .pf-engertal{width:80px;height:32px}
   .pf-title{flex:1 1 100%;order:3}.pf-title h1{font-size:20px}.pf-title p{font-size:12.5px}
@@ -196,9 +267,11 @@ mark.kw{background:#ffe2b8;color:#7d4e00;padding:0 2px;border-radius:3px}
   .fx-more{display:inline-flex}
   .fx-lbl{min-width:0;flex:1 1 100%}
 }
+@media(max-width:520px){.userchip{display:none!important}.project-switch-btn{max-width:min(112px,36vw)}}
 @media print{
   html,body{background:#fff}
-  .pf-safe-top,.pf-actions,.fx,.pf-toast,.no-print{display:none!important}
+  .pf-safe-top,.pf-actions,.fx,.pf-toast,.no-print,.pf-appbar,.botnav{display:none!important}
+  .sec-head{box-shadow:none;padding:0 0 8px;border:0}
   .pf-page{padding:0;max-width:none}
   .pf-top,.pf-card,.pf-kpi{box-shadow:none}
 }
