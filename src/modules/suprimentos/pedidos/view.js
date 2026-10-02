@@ -43,30 +43,26 @@ export function mountPedidos(root, { pedidos }) {
   root.innerHTML = `
     <section class="pf-kpis" id="pdKpis" aria-label="Indicadores"></section>
     <section class="fx pd-filters" id="pdFilters" aria-label="Filtros">
-      <div class="fx-row">
-        <label class="fx-search" id="pdOcWrap">${SEARCH}<input type="search" id="pdOc" placeholder="Ordem de compra" aria-label="Buscar ordem de compra"></label>
-        <label class="fx-search pd-mat" id="pdMatWrap">${SEARCH}<input type="search" id="pdMat" placeholder="Material (palavras-chave): cabo flexível, tinta…" aria-label="Buscar material"></label>
-        <label class="fx-search" id="pdFornWrap">${SEARCH}<input type="search" id="pdForn" placeholder="Fornecedor" aria-label="Buscar fornecedor"></label>
-        <div class="fx-end">
-          <span class="fx-count" id="pdCount"></span>
-          <button class="pf-btn" id="pdClear" type="button">Limpar</button>
-          <button class="pf-btn fx-more" id="pdMore" type="button" aria-expanded="false">Filtros <b class="fx-badge" id="pdBadge" hidden></b></button>
-        </div>
-      </div>
-      <div class="fx-row pd-adv fx-adv" id="pdAdv">
+      <label class="fx-search" id="pdOcWrap">${SEARCH}<input type="search" id="pdOc" placeholder="Ordem de compra" aria-label="Buscar ordem de compra"></label>
+      <label class="fx-search pd-mat" id="pdMatWrap">${SEARCH}<input type="search" id="pdMat" placeholder="Material (palavras-chave): cabo flexível, tinta…" aria-label="Buscar material"></label>
+      <label class="fx-search" id="pdFornWrap">${SEARCH}<input type="search" id="pdForn" placeholder="Fornecedor" aria-label="Buscar fornecedor"></label>
+      <div class="pd-adv fx-adv" id="pdAdv">
         <label class="fx-field" id="pdIniWrap"><span>De</span><input type="date" id="pdIni" aria-label="Data do pedido a partir de"></label>
         <label class="fx-field" id="pdFimWrap"><span>Até</span><input type="date" id="pdFim" aria-label="Data do pedido até"></label>
         <div class="ms" id="pdObras"><button type="button" class="fx-field ms-btn"><span>Todas as obras</span></button></div>
         <label class="fx-field pd-status" id="pdStatusWrap"><span>Entrega</span><select id="pdStatus" aria-label="Status de entrega">${STATUS_OPTIONS.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
         <div class="ms" id="pdPeds"><button type="button" class="fx-field ms-btn"><span>Todos os pedidos</span></button></div>
       </div>
-      <div class="fx-row pd-sol"><span class="fx-lbl">Solicitantes</span><div class="fx-scroll" id="pdSol"></div></div>
-      <div class="fx-row fx-toggles pd-toggles">
-        <div class="fx-toggles">
-          <label class="pf-switch"><input type="checkbox" id="pdHide" checked><b></b>Ocultar pedidos totalmente entregues</label>
-          <label class="pf-switch"><input type="checkbox" id="pdCompact"${compact ? " checked" : ""}><b></b>Modo compacto</label>
-          <label class="pf-switch"><input type="checkbox" id="pdShowCharts"><b></b>Mostrar gráficos</label>
-        </div>
+      <div class="pd-sol"><span class="fx-lbl">Solicitantes</span><div class="fx-scroll" id="pdSol"></div></div>
+      <div class="pd-tg fx-toggles">
+        <label class="pf-switch"><input type="checkbox" id="pdHide" checked><b></b>Ocultar pedidos totalmente entregues</label>
+        <label class="pf-switch"><input type="checkbox" id="pdCompact"${compact ? " checked" : ""}><b></b>Modo compacto</label>
+        <label class="pf-switch"><input type="checkbox" id="pdShowCharts"><b></b>Mostrar gráficos</label>
+      </div>
+      <div class="pd-acts">
+        <span class="fx-count" id="pdCount"></span>
+        <button class="pf-btn" id="pdClear" type="button">Limpar</button>
+        <button class="pf-btn fx-more" id="pdMore" type="button" aria-expanded="false">Filtros <b class="fx-badge" id="pdBadge" hidden></b></button>
         <button class="pf-btn pd-expand-all" id="pdExpandAll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span>Expandir todos</span></button>
       </div>
       <div class="pf-active" id="pdActive"></div>

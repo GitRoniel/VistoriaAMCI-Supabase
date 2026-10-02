@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#102a24">
 <script>try{if(localStorage.getItem("amci-theme")==="dark"){document.documentElement.dataset.theme="dark";document.querySelector('meta[name="theme-color"]').content="#0f201b";}}catch(e){}</script>
-<script>/* Sessão salva no aparelho ("Manter conectado"): mostra "Entrando…" em vez do formulário de login enquanto a sessão é conferida. */
+<script>/* Sessão salva no aparelho ("Manter conectado"): mostra "Carregando…" em vez do formulário de login enquanto a sessão é conferida. */
 try{var rm=localStorage.getItem("amci-remember")!=="0",st=rm?localStorage:sessionStorage,at=+localStorage.getItem("amci-login-at");if(!(rm&&at&&Date.now()-at>2592e6))for(var i=0;i<st.length;i++){var k=st.key(i);if(/^sb-.+-auth-token$/.test(k)&&st.getItem(k)){document.documentElement.classList.add("auth-restoring");break;}}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1318,6 +1318,7 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 /* Plataforma: cards de outros módulos no seletor e aba Configurações › Módulos */
 .project-modules{margin-top:22px}
 a.project-card{text-decoration:none;color:inherit}
+.project-monogram.module-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #cfgTabs [hidden]{display:none!important}
 .mods-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .mods-bar .fx-search{flex:1 1 240px}
@@ -1974,6 +1975,7 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .auth-link:disabled{color:#8a9690}
 :root[data-theme="dark"] .auth-help{color:#abbcb4}
 :root[data-theme="dark"] a.project-card{color:inherit}
+:root[data-theme="dark"] .project-monogram.module-icon svg{stroke:currentColor;fill:none}
 :root[data-theme="dark"] .mods-sel{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
 :root[data-theme="dark"] .mods-row{background:#282828;border:1px solid #414a43}
 :root[data-theme="dark"] .mods-row.on{border-left:3px solid #6B8040}
@@ -2111,7 +2113,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <div class="toast" id="toast"></div>
 
 <div class="login-ov open" id="loginOv" aria-live="polite">
-  <div class="auth-restore" role="status"><img src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"><span><i aria-hidden="true"></i>Entrando…</span></div>
+  <div class="auth-restore" role="status"><img src="./assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral"><span><i aria-hidden="true"></i>Carregando…</span></div>
   <button class="icon-btn login-theme" id="loginTheme" type="button" data-theme-toggle title="Usar tema escuro" aria-label="Alternar tema claro/escuro"><svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
   <div class="login-shell">
     <section class="login-brand-panel" aria-label="Alto Mangueiral e Engertal">
@@ -2206,7 +2208,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
     <div class="project-body">
       <div id="projectObrasSection">
       <div class="project-section-head">
-        <div class="project-section-title">Obras e condomínios disponíveis</div>
+        <div class="project-section-title">Vistorias - Condomínios disponíveis</div>
         <button class="project-overview-btn" id="projectOverview" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h4M7 17h7"/></svg><span>Visão Geral</span></button>
       </div>
       <div class="project-list" id="projectList"></div>
@@ -3372,7 +3374,7 @@ function showAuthView(view){
 }
 /* Plataforma: páginas de outros módulos (Suprimentos, futuramente Contratos).
    Espelha src/platform/modules.js; o acesso real é conferido no banco (module_members + RLS). */
-const PLATFORM_PAGES=[{module:"suprimentos",moduleName:"Suprimentos",code:"SP",color:"#A38F52",name:"Relatório de Pedidos",description:"Pedidos, ordens de compra e entregas de materiais por obra.",href:"/relatorios#suprimentos"},{module:"contratos",moduleName:"Contratos",code:"CT",color:"#2c6a57",name:"Relatório de Contratos",description:"Contratos, medições e saldos por obra e fornecedor.",href:"/relatorios#contratos"}];
+const PLATFORM_PAGES=[{module:"suprimentos",moduleName:"Suprimentos",code:"SP",color:"#A38F52",name:"Relatório de Pedidos",description:"Pedidos, ordens de compra e entregas de materiais por obra.",href:"/relatorios#suprimentos",icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>'},{module:"contratos",moduleName:"Contratos",code:"CT",color:"#2c6a57",name:"Relatório de Contratos",description:"Contratos, medições e saldos por obra e fornecedor.",href:"/relatorios#contratos",icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>'}];
 const MODULE_ROLE_LABEL={admin:"Administrador",leitor:"Leitor"};
 let moduleAccess=new Map();
 async function loadModuleAccess(userId){
@@ -3415,7 +3417,7 @@ function renderProjectChooser(){
   const pages=modulePages();
   document.getElementById("projectModules").hidden=!pages.length;
   document.getElementById("moduleList").innerHTML=pages.map(p=>`<a class="project-card module-card" href="${esc(IS_NATIVE?p.href.replace(/(#|$)/,".html$1"):p.href)}" style="--pc:${p.color}">
-      <span class="project-card-top"><span class="project-monogram" style="--pc:${p.color}">${esc(p.code)}</span><span class="project-card-copy"><strong>${esc(p.name)}</strong><span>${esc(p.description)}</span></span></span>
+      <span class="project-card-top"><span class="project-monogram module-icon" style="--pc:${p.color}" aria-hidden="true">${p.icon||esc(p.code)}</span><span class="project-card-copy"><strong>${esc(p.name)}</strong><span>${esc(p.description)}</span></span></span>
       <span class="project-card-foot"><span class="project-role">${esc(p.moduleName)} · ${esc(MODULE_ROLE_LABEL[moduleAccess.get(p.module)]||"")}</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>`).join("");
   const list=document.getElementById("projectList");

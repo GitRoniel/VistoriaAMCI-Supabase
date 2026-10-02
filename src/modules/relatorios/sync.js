@@ -56,32 +56,37 @@ function statusPill(e) {
   return '<span class="pf-badge b-partial">Em andamento</span>';
 }
 
-/** HTML da faixa de atualização. `news` = [{n, label}] registros novos (opcional, chega depois). */
-export function syncHTML(sum, execs, { news = null, unit = "linhas", fresh = false } = {}) {
-  if (!sum.last) return `<div class="pf-sync-main"><span class="pf-sync-st muted"><i></i>Sem registro de execução da automação</span></div>`;
+/**
+ * HTML da faixa de atualização: uma linha discreta (situação · data · o que mudou) que abre, ao clicar,
+ * os detalhes (motivo da falha, comparação com a anterior e histórico completo).
+ * `news` = [{n, label}] registros novos (opcional, chega depois).
+ */
+export function syncHTML(sum, execs, { news = null, unit = "linhas", fresh = false, open = false } = {}) {
+  if (!sum.last) return `<div class="pf-sync-line"><i class="pf-sync-dot muted"></i><span>Sem registro de execução da automação</span></div>`;
   const { lastOk, prevOk, running, failed, lineDiff } = sum;
+  const dataWhen = lastOk ? fmtWhen(lastOk.finalizado_em || lastOk.iniciado_em) : "";
   const st = running
-    ? `<span class="pf-sync-st run"><i></i>Atualização em andamento desde ${esc(fmtWhen(running.iniciado_em))}</span>`
+    ? `<i class="pf-sync-dot run"></i><span class="pf-sync-st run">Atualizando agora</span>`
     : failed
-      ? `<span class="pf-sync-st err"><i></i>Última atualização falhou em ${esc(fmtWhen(failed.finalizado_em || failed.iniciado_em))}</span>`
-      : `<span class="pf-sync-st ok"><i></i>Atualização concluída com sucesso</span>`;
-  const when = lastOk
-    ? `<span class="pf-sync-it"><small>Dados atualizados em</small><b>${esc(fmtWhen(lastOk.finalizado_em || lastOk.iniciado_em))}</b></span>` : "";
-  const total = lastOk?.linhas != null ? `<span class="pf-sync-it"><small>Linhas no ERP</small><b>${fmtNum(lastOk.linhas)}</b></span>` : "";
-  let delta = "";
+      ? `<i class="pf-sync-dot err"></i><span class="pf-sync-st err">Falha na última atualização (${esc(fmtWhen(failed.finalizado_em || failed.iniciado_em))})</span>`
+      : `<i class="pf-sync-dot ok"></i>`;
+  const when = lastOk ? `<span>${failed || running ? "Dados de" : "Atualizado em"} <b>${esc(dataWhen)}</b></span>` : "";
+  const parts = [];
   if (lastOk && prevOk) {
-    const parts = [];
     if (news) news.forEach((x) => parts.push(`<b class="${x.n > 0 ? "up" : ""}">${x.n > 0 ? "+" : ""}${fmtNum(x.n)}</b> ${esc(x.label)}`));
     if (lineDiff != null) parts.push(`<b class="${lineDiff > 0 ? "up" : lineDiff < 0 ? "down" : ""}">${signed(lineDiff)}</b> ${esc(unit)}`);
-    delta = `<span class="pf-sync-it pf-sync-delta"><small>Desde a atualização anterior (${esc(fmtWhen(prevOk.finalizado_em || prevOk.iniciado_em))})</small><span>${parts.join('<i class="sep">·</i>') || (news === null ? "calculando…" : "sem mudanças")}</span></span>`;
-  } else if (lastOk) {
-    delta = '<span class="pf-sync-it pf-sync-delta"><small>Mudanças</small><span>primeira atualização registrada</span></span>';
   }
-  const err = failed?.erro ? `<div class="pf-sync-err"><b>Motivo:</b> ${esc(failed.erro)}${lastOk ? ` · os dados abaixo são da atualização de ${esc(fmtWhen(lastOk.finalizado_em))}.` : ""}</div>` : "";
-  const hist = execs.length ? `<details class="pf-sync-hist"><summary>Histórico</summary><table><thead><tr><th>Início</th><th>Situação</th><th class="r">Linhas</th><th class="r">Duração</th><th>Observação</th></tr></thead><tbody>${execs.map((e) =>
-    `<tr${e.id === lastOk?.id ? ' class="cur"' : ""}><td>${esc(fmtWhen(e.iniciado_em))}</td><td>${statusPill(e)}</td><td class="r">${e.linhas != null ? fmtNum(e.linhas) : "—"}</td><td class="r">${esc(fmtDur(e.iniciado_em, e.finalizado_em)) || "—"}</td><td class="obs">${e.id === lastOk?.id ? "dados exibidos" : esc(e.erro || "")}</td></tr>`).join("")}</tbody></table></details>` : "";
-  const banner = fresh ? '<div class="pf-sync-new"><span>Chegaram dados novos da automação.</span><button type="button" class="pf-btn primary" data-sync-reload>Atualizar agora</button></div>' : "";
-  return `${banner}<div class="pf-sync-main">${st}${when}${delta}${total}${hist}</div>${err}`;
+  const chg = parts.length ? `<span class="pf-sync-chg">${parts.join(" · ")}</span>` : "";
+  const reload = fresh ? '<span class="pf-sync-new">Novos dados disponíveis <button type="button" class="pf-sync-btn" data-sync-reload>Atualizar</button></span>' : "";
+  const detail = [
+    failed?.erro ? `<p class="pf-sync-err"><b>Motivo da falha:</b> ${esc(failed.erro)}${lastOk ? ` Os dados exibidos são da atualização de ${esc(dataWhen)}.` : ""}</p>` : "",
+    lastOk && prevOk ? `<p>Comparação com a atualização anterior, de ${esc(fmtWhen(prevOk.finalizado_em || prevOk.iniciado_em))}${parts.length ? `: ${parts.join(" · ")}` : news === null ? " (calculando…)" : ": sem mudanças"}.</p>`
+      : lastOk ? "<p>Primeira atualização registrada.</p>" : "",
+    lastOk?.linhas != null ? `<p>Linhas do ERP nesta atualização: <b>${fmtNum(lastOk.linhas)}</b>.</p>` : ""
+  ].join("");
+  const hist = execs.length ? `<table><thead><tr><th>Início</th><th>Situação</th><th class="r">Linhas</th><th class="r">Duração</th><th>Observação</th></tr></thead><tbody>${execs.map((e) =>
+    `<tr${e.id === lastOk?.id ? ' class="cur"' : ""}><td>${esc(fmtWhen(e.iniciado_em))}</td><td>${statusPill(e)}</td><td class="r">${e.linhas != null ? fmtNum(e.linhas) : "—"}</td><td class="r">${esc(fmtDur(e.iniciado_em, e.finalizado_em)) || "—"}</td><td class="obs">${e.id === lastOk?.id ? "dados exibidos" : esc(e.erro || "")}</td></tr>`).join("")}</tbody></table>` : "";
+  return `<details class="pf-sync-hist"${open ? " open" : ""}><summary class="pf-sync-line" title="Ver detalhes e histórico da automação UAU-Sync">${st}${when}${chg}${reload}<span class="pf-sync-more">Histórico</span></summary><div class="pf-sync-body">${detail}${hist}</div></details>`;
 }
 
 /**
@@ -91,7 +96,8 @@ export function syncHTML(sum, execs, { news = null, unit = "linhas", fresh = fal
  */
 export function mountSync(el, tab, { isVisible, ready = Promise.resolve() }) {
   let execs = [], sum = summarize([]), news = null, fresh = false, shownOkId = null, timer = null;
-  const paint = () => { el.innerHTML = syncHTML(sum, execs, { news, unit: tab.unit, fresh }); };
+  // Repinta mantendo o histórico aberto/fechado como o usuário deixou.
+  const paint = () => { const open = !!el.querySelector(".pf-sync-hist[open]"); el.innerHTML = syncHTML(sum, execs, { news, unit: tab.unit, fresh, open }); };
 
   async function refresh(first = false) {
     try {
@@ -109,10 +115,10 @@ export function mountSync(el, tab, { isVisible, ready = Promise.resolve() }) {
       }
     } catch (err) {
       console.error(err);
-      if (first) el.innerHTML = '<div class="pf-sync-main"><span class="pf-sync-st muted"><i></i>Não foi possível consultar a situação da automação</span></div>';
+      if (first) el.innerHTML = '<div class="pf-sync-line"><i class="pf-sync-dot muted"></i><span>Não foi possível consultar a situação da automação</span></div>';
     }
   }
-  el.addEventListener("click", (e) => { if (e.target.closest("[data-sync-reload]")) location.reload(); });
+  el.addEventListener("click", (e) => { if (e.target.closest("[data-sync-reload]")) { e.preventDefault(); location.reload(); } });
   const tick = () => { if (document.visibilityState === "visible" && isVisible()) refresh(false); };
   timer = setInterval(tick, POLL_MS);
   document.addEventListener("visibilitychange", tick);
