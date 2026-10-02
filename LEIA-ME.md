@@ -41,7 +41,7 @@ pnpm build
 - **Visão Geral** (botão na seleção de obra): agendamentos de todos os condomínios liberados ao usuário numa só lista, com filtros, resumo e atalho para abrir a unidade. Usa as mesmas tabelas (`client_inspections` + `units`), sem cópia de dados.
 - **Acomp. Técnico** (Engenheiro, Arquiteto ou Sem Acomp. Técnico): campo `client_inspections.technical_escort`, editável na Lista e no popup do Mapa de qualquer condomínio.
 - A relação de clientes do Alto do Buriti foi importada direto no Supabase a partir da planilha de vendas (sem CPF). Dados pessoais não vão para o Git.
-- Cadastro: o novo usuário fica **pendente** até um administrador aprovar em cada condomínio. Em *Authentication → URL Configuration* do Supabase, o **Site URL** e os **Redirect URLs** precisam apontar para `https://amci-vistoria.vercel.app` (Site URL) e `https://amci-vistoria.vercel.app/**` (Redirect URLs), não `localhost`, senão o link de confirmação de e-mail abre uma página inexistente.
+- Cadastro: o novo usuário fica **pendente** até um administrador aprovar em cada condomínio. Em *Authentication → URL Configuration* do Supabase, o **Site URL** e os **Redirect URLs** precisam apontar para `https://www.amci.com.br` (Site URL) e `https://www.amci.com.br/**` (Redirect URLs; mantenha também `https://amci-vistoria.vercel.app/**`, endereço antigo que continua funcionando), não `localhost`, senão o link de confirmação de e-mail abre uma página inexistente.
 - As regras do banco garantem: administrador edita tudo; cada frente edita sua própria etapa; visitante apenas visualiza; somente administrador edita a vistoria do cliente e a data planejada.
 
 ## Desenvolvimento local
@@ -72,7 +72,7 @@ pnpm ios:open       # abre no Xcode (escolha o Team em Signing & Capabilities e 
 ```
 
 Sempre que alterar `www/index.html`, rode `pnpm cap:sync:ios` antes de gerar o app.
-No app o endereço interno é `capacitor://localhost`; o link do e-mail de confirmação aponta para `https://amci-vistoria.vercel.app` (padrão de `APP_PUBLIC_URL` em `scripts/build.mjs`, pode ser trocado no `.env`).
+No app o endereço interno é `capacitor://localhost`; o link do e-mail de confirmação aponta para `https://www.amci.com.br` (padrão de `APP_PUBLIC_URL` em `scripts/build.mjs`, pode ser trocado no `.env`).
 
 ## Tema claro/escuro
 
