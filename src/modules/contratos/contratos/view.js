@@ -31,6 +31,7 @@ const money = (n, cls = "") => `<span class="ct-money${cls ? " " + cls : ""}">${
 export function mountContratos(root, { contratos }) {
   const f = emptyFilters();
   const servicos = [...new Set(contratos.flatMap((c) => c.itens.map((i) => i.servico)))].sort();
+  const fornecedores = [...new Set(contratos.map((c) => c.fornecedor).filter(Boolean))].sort();
   const expanded = new Set();
   let view = [];
   const compact = document.body.classList.contains("compact");
@@ -41,6 +42,7 @@ export function mountContratos(root, { contratos }) {
       <div class="ct-line">
         <label class="fx-search ct-fnum" id="ctNumWrap" title="Número do contrato (também encontra fornecedor ou objeto)">${SEARCH}<input type="search" id="ctNum" placeholder="Nº contrato" aria-label="Número do contrato" autocomplete="off"></label>
         <label class="fx-search ct-serv" id="ctServWrap">${SEARCH}<input type="search" id="ctServ" placeholder="Serviço / item: concreto, locação…" aria-label="Buscar serviço ou item" autocomplete="off"></label>
+        <label class="fx-search ct-fforn" id="ctFornWrap">${SEARCH}<input type="search" id="ctForn" placeholder="Fornecedor" aria-label="Buscar fornecedor" autocomplete="off"></label>
         <div class="ms ct-obras" id="ctObras"><button type="button" class="fx-field ms-btn" aria-label="Obra"><small class="ms-lbl">Obra</small><span>Todas as obras</span></button></div>
         <label class="fx-field ct-sel" id="ctStatusWrap"><span>Tipo</span><select id="ctStatus" aria-label="Tipo de contrato">${statusOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
         <label class="fx-field ct-sel" id="ctSituacaoWrap"><span>Status</span><select id="ctSituacao" aria-label="Status do contrato">${situacaoOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
@@ -75,9 +77,11 @@ export function mountContratos(root, { contratos }) {
   const live = debounce(render, 220);
   $("ctNum").addEventListener("input", (e) => { f.contrato = e.target.value; live(); });
   $("ctServ").addEventListener("input", (e) => { f.servico = e.target.value; live(); });
-  [["ctNum", "contrato"], ["ctServ", "servico"]].forEach(([id, k]) =>
+  $("ctForn").addEventListener("input", (e) => { f.fornecedor = e.target.value; live(); });
+  [["ctNum", "contrato"], ["ctServ", "servico"], ["ctForn", "fornecedor"]].forEach(([id, k]) =>
     $(id).addEventListener("search", (e) => { if (f[k] !== e.target.value) { f[k] = e.target.value; render(); } }));
   attachAutocomplete($("ctServ"), { getItems: () => servicos, onPick: (v) => { f.servico = v; render(); } });
+  attachAutocomplete($("ctForn"), { getItems: () => fornecedores, onPick: (v) => { f.fornecedor = v; render(); } });
   $("ctSituacao").addEventListener("change", (e) => { f.situacao = e.target.value; render(); });
   $("ctStatus").addEventListener("change", (e) => { f.status = e.target.value; render(); });
   $("ctSaldo").addEventListener("change", (e) => { f.comSaldo = e.target.checked; render(); });
@@ -97,6 +101,7 @@ export function mountContratos(root, { contratos }) {
     obras: () => { f.obras.clear(); },
     num: () => { f.contrato = ""; $("ctNum").value = ""; },
     serv: () => { f.servico = ""; $("ctServ").value = ""; },
+    forn: () => { f.fornecedor = ""; $("ctForn").value = ""; },
     status: () => { f.status = "todos"; $("ctStatus").value = "todos"; },
     situacao: () => { f.situacao = "todas"; $("ctSituacao").value = "todas"; },
     saldo: () => { f.comSaldo = false; $("ctSaldo").checked = false; }
@@ -114,14 +119,15 @@ export function mountContratos(root, { contratos }) {
     if (f.comSaldo) add("saldo", "Com saldo a medir");
     if (f.contrato.trim()) add("num", "Contrato: " + f.contrato.trim());
     if (f.servico.trim()) add("serv", "Serviço: " + f.servico.trim());
+    if (f.fornecedor.trim()) add("forn", "Fornecedor: " + f.fornecedor.trim());
     $("ctActive").innerHTML = chips.length ? `<span class="af-lbl">Filtros ativos:</span>${chips.join("")}` : "";
-    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"]]
+    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctFornWrap", f.fornecedor.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"]]
       .forEach(([id, on]) => $(id).classList.toggle("on", !!on));
   }
 
   function clearAll() {
     Object.assign(f, emptyFilters());
-    ["ctNum", "ctServ"].forEach((id) => ($(id).value = ""));
+    ["ctNum", "ctServ", "ctForn"].forEach((id) => ($(id).value = ""));
     $("ctSituacao").value = f.situacao; $("ctStatus").value = f.status; $("ctSaldo").checked = false;
     expanded.clear(); obrasMs.refresh(); render();
   }

@@ -45,9 +45,10 @@ Uma linha compacta, nesta ordem:
 
 1. **Nº contrato** (prefixo do número; texto também encontra fornecedor ou objeto);
 2. **Serviço / item** (palavras-chave, com sugestões; abre e destaca os itens encontrados);
-3. **Obra** (seleção múltipla);
-4. **Tipo** = campo `status` do ERP (Aprovado, Em Aditivo, Não Aprovado);
-5. **Status** = campo `situacao` do ERP (Andamento, Concluído, Cancelado; padrão **em aberto**, sem concluídos e cancelados).
+3. **Fornecedor** (trecho do nome, com sugestões);
+4. **Obra** (seleção múltipla);
+5. **Tipo** = campo `status` do ERP (Aprovado, Em Aditivo, Não Aprovado);
+6. **Status** = campo `situacao` do ERP (Andamento, Concluído, Cancelado; padrão **em aberto**, sem concluídos e cancelados).
 
 Abaixo: "somente com saldo a medir", modo compacto e, à direita, a quantidade de contratos, **Limpar** e
 **Expandir todos**. Ao rolar, cada obra mantém no topo a linha da obra (totais) e a linha dos títulos das colunas.
