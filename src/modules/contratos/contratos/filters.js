@@ -17,21 +17,22 @@ export const emptyFilters = () => ({
 /** Opções de situação/status a partir dos dados reais (valor original do ERP → rótulo). */
 export function situacaoOptions(contratos) {
   const vals = [...new Set(contratos.map((c) => c.situacao))].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  return [["abertas", "Em aberto"], ["todas", "Todas as situações"], ...vals.map((v) => [v, statusLabel(v)])];
+  return [["abertas", "Em aberto"], ["todas", "Todos os status"], ...vals.map((v) => [v, statusLabel(v)])];
 }
 export function statusOptions(contratos) {
   const vals = [...new Set(contratos.map((c) => c.status))].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  return [["todos", "Todos os status"], ...vals.map((v) => [v, statusLabel(v)])];
+  return [["todos", "Todos os tipos"], ...vals.map((v) => [v, statusLabel(v)])];
 }
 
 /** Palavras do filtro de serviço/item (todas precisam aparecer, sem acento). */
 export const servicoWords = (f) => normText(f.servico.trim()).split(/\s+/).filter(Boolean);
 export const itemHit = (i, words) => words.length > 0 && words.every((w) => normText(i.servico).includes(w) || normText(i.codigo).includes(w));
 
-/** Contrato: número exato/prefixo ou trecho do objeto. */
+/** Contrato: número (prefixo) ou trecho do objeto ou do fornecedor. */
 function contratoMatches(c, q) {
   if (/^\d+$/.test(q)) return String(c.contrato).startsWith(q);
-  return normText(c.objeto).includes(normText(q)) || String(c.contrato).includes(q);
+  const n = normText(q);
+  return normText(c.objeto).includes(n) || normText(c.fornecedor).includes(n) || String(c.contrato).includes(q);
 }
 
 export function applyFilters(contratos, f) {

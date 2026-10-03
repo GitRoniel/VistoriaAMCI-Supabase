@@ -1,13 +1,27 @@
 /* Relatório de Contratos · mesmo padrão visual do Relatório de Pedidos (pedidos.css + platform.css) */
-.ct-filters .fx-search{flex:1 1 180px}
-.ct-filters .ct-serv{flex:2 1 260px}
-.ct-adv{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ct-adv .ms{flex:1 1 190px;max-width:280px}
-.ct-adv .fx-field.ct-sel{flex:0 1 250px}
+/* ── Filtros: uma linha compacta (nº do contrato · serviço/item · obra · tipo · status) ── */
+.ct-filters{padding:10px 12px}
+.ct-line{display:grid;grid-template-columns:128px minmax(180px,1fr) minmax(170px,220px) minmax(170px,210px) minmax(170px,210px);gap:8px;align-items:center}
+.ct-filters .fx-search,.ct-filters .fx-field{height:32px;padding:0 9px;border-radius:9px;gap:6px;min-width:0}
+.ct-filters .fx-search input,.ct-filters .fx-field select,.ct-filters .ms-btn span:first-of-type{font-size:12.5px}
+.ct-filters .fx-search svg{width:14px;height:14px;flex:0 0 auto}
+.ct-filters .fx-field>span{font-size:10.5px}
+.ct-filters .ms{min-width:0}
+.ct-tools{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;margin-top:8px}
+.ct-tools .fx-toggles{gap:14px}
+.ct-acts{display:flex;align-items:center;gap:8px;margin-left:auto}
+.ct-acts .pf-btn{height:30px}
+.ct-filters .pf-active{margin-top:8px}
+@media(max-width:1100px) and (min-width:721px){.ct-line{grid-template-columns:128px repeat(2,minmax(0,1fr))}.ct-line .ct-serv{grid-column:2 / -1}}
 
 /* ── Grupo por obra ── */
 .ct-obra{margin-bottom:16px;overflow:clip;border-left:4px solid var(--ink-2)}
-.ct-obra-h{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+/* Topo fixo de cada obra ao rolar: linha da obra (totais) + linha dos títulos das colunas. */
+.ct-sticky{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;background:var(--surface)}
+.ct-thead-wrap{overflow:hidden;border-bottom:1px solid var(--border)}
+.ct-thead thead th{border-bottom:0}
+.ct-thead-a11y{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ct-obra-h{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
 .ct-obra-t{display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap}
 .ct-obra-k{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fern)}
 .ct-obra-h h2{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:.01em;line-height:1.2}
@@ -85,9 +99,16 @@ body.compact .ct-obra-h{padding:7px 14px}
 body.compact .ct-obra{margin-bottom:10px}
 
 @media(max-width:720px){
-  .ct-adv{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .ct-adv .ms,.ct-adv .fx-field.ct-sel{max-width:none;min-width:0}
-  .ct-adv .ct-sel{grid-column:1 / -1}
+  .ct-filters{padding:10px}
+  .ct-line{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+  .ct-line .ct-serv{grid-column:1 / -1;grid-row:2}
+  .ct-filters .fx-search,.ct-filters .fx-field{height:38px}
+  .ct-filters .fx-search input,.ct-filters .fx-field select,.ct-filters .ms-btn span:first-of-type{font-size:16px}
+  .ct-tools .fx-toggles{gap:10px 14px}
+  .ct-acts{width:100%;margin-left:0}
+  .ct-acts .fx-count{margin-right:auto}
+  .ct-thead-wrap{display:none}
+  .ct-filters .ct-sel>span{display:none}
   .ct-obra{border-left-width:3px;border-radius:12px}
   .ct-obra-h{padding:9px 11px;gap:7px}
   .ct-obra-k{display:none}
@@ -132,7 +153,8 @@ body.compact .ct-obra{margin-bottom:10px}
 }
 @media print{
   .ct-obra{break-inside:auto;border:1px solid #ccc;border-left:3px solid #2f4a34;box-shadow:none;overflow:visible}
-  .ct-obra-h{position:static;break-after:avoid}
+  .ct-sticky{position:static}
+  .ct-obra-h{break-after:avoid}
   .ct-tbl{min-width:0;font-size:9.5px}
   .ct-tbl tr{break-inside:avoid}
   .ct-tbl thead th{background:#2f4a34!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
