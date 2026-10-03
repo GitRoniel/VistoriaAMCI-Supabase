@@ -51,8 +51,6 @@ button{cursor:pointer;border:none;background:none}
   display:grid;place-items:center;color:var(--lioness);transition:.15s}
 .icon-btn:hover{background:rgba(163,143,82,.3)}
 .icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#8a9690;flex-shrink:0}
-.sync-dot.ok{background:#63d69a} .sync-dot.busy{background:var(--lioness);animation:pulse 1s infinite} .sync-dot.err{background:#ef8b7f}
 @keyframes pulse{50%{opacity:.35}}
 
 /* ── MAIN ── */
@@ -412,7 +410,7 @@ html.auth-restoring .login-shell,html.auth-restoring .login-theme{visibility:hid
   .project-switch-btn{max-width:min(112px,36vw)}.userchip{display:none!important}
 }
 @media(max-width:360px){
-  .brand-logo-img{height:28px}.project-switch-btn{max-width:96px}.sync-dot{display:none}
+  .brand-logo-img{height:28px}.project-switch-btn{max-width:96px}
   .project-top{grid-template-columns:1fr;grid-template-areas:'logos' 'welcome' 'logout'}
   .project-logout{justify-self:start}
 }
@@ -1446,10 +1444,6 @@ html{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .icon-btn{background:rgba(163,143,82,.16);border:1px solid rgba(163,143,82,.4);color:var(--lioness)}
 :root[data-theme="dark"] .icon-btn:hover{background:rgba(163,143,82,.3)}
 :root[data-theme="dark"] .icon-btn svg{stroke:currentColor;fill:none}
-:root[data-theme="dark"] .sync-dot{background:#8a9690}
-:root[data-theme="dark"] .sync-dot.ok{background:#63d69a}
-:root[data-theme="dark"] .sync-dot.busy{background:var(--lioness)}
-:root[data-theme="dark"] .sync-dot.err{background:#ef8b7f}
 :root[data-theme="dark"] .sec-head{background:var(--moss);color:#fff}
 :root[data-theme="dark"] .sec-head .icn{background:var(--lioness)}
 :root[data-theme="dark"] .sec-head .icn svg{stroke:#cbd6d4;fill:none}
@@ -2092,7 +2086,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       <img class="hm-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
     </div>
     <nav class="hm-nav" id="hmNav" aria-label="Navegação de Vistorias"><div class="hm-grp" data-hm-screen="home" hidden><label class="hm-search hm-search-top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="hmSearch" placeholder="Buscar condomínio ou relatório…" aria-label="Buscar condomínio ou relatório" autocomplete="off"></label></div>
-      <div class="hm-grp" data-hm-screen="app"><button type="button" id="btnHome" class="hm-btn" title="Voltar para a seleção de obras e módulos" style="display:none" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button><div id="btnProjectSwitch" class="hm-btn hm-ctx" title="Condomínio atual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span class="hm-lbl" id="activeProjectName">Condomínio</span></div><span class="hm-sep" aria-hidden="true"></span><div class="hm-tabs" role="tablist" aria-label="Páginas do condomínio"><button type="button" role="tab" class="hm-btn hm-tab active" data-view="resumo" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span class="hm-lbl">Resumo Geral</span></button><button type="button" role="tab" class="hm-btn hm-tab" data-view="cliente" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="hm-lbl">Vistoria · Cliente</span></button></div><button class="hm-btn hm-icon" id="btnLogin" type="button" title="Entrar para editar" aria-label="Entrar para editar" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button><span class="sync-dot" id="syncDot" title="Modo local"></span></div>
+      <div class="hm-grp" data-hm-screen="app"><button type="button" id="btnHome" class="hm-btn" title="Voltar para a seleção de obras e módulos" style="display:none" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button><div id="btnProjectSwitch" class="hm-btn hm-ctx" title="Condomínio atual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span class="hm-lbl" id="activeProjectName">Condomínio</span></div><span class="hm-sep" aria-hidden="true"></span><div class="hm-tabs" role="tablist" aria-label="Páginas do condomínio"><button type="button" role="tab" class="hm-btn hm-tab active" data-view="resumo" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span class="hm-lbl">Resumo Geral</span></button><button type="button" role="tab" class="hm-btn hm-tab" data-view="cliente" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="hm-lbl">Vistoria · Cliente</span></button></div><button class="hm-btn hm-icon" id="btnLogin" type="button" title="Entrar para editar" aria-label="Entrar para editar" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div>
       <div class="hm-grp" data-hm-screen="overview" hidden><button type="button" id="overviewBack" class="hm-btn" title="Voltar à tela inicial" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button></div>
       <div class="hm-grp" data-hm-screen="import" hidden><button type="button" id="importBack" class="hm-btn" title="Voltar à Visão Geral" aria-label="Visão Geral"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span class="hm-lbl">Visão Geral</span></button></div>
       <div class="hm-grp" data-hm-screen="admin" hidden><button type="button" id="adminBack" class="hm-btn" title="Voltar à tela inicial" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button></div></nav>
@@ -3242,7 +3236,8 @@ function switchView(v){
 document.querySelectorAll(".hm-tab,.navbtn").forEach(t=>t.onclick=()=>switchView(t.dataset.view));
 
 /* ── SYNC ── */
-function setSync(m){const d=document.getElementById("syncDot");d.className="sync-dot"+(m?" "+m:"");}
+// Situação da sincronização: sem indicador no cabeçalho (como nos Relatórios); falhas continuam avisadas por mensagem.
+function setSync(m){}
 let appProject=null,availableProjects=[],realtimeChannel=null,pendingWrites=0,lastSyncFailed=false;
 const writeQueues=new Map();
 const dbIndex={unitByKey:new Map(),unitKeyById:new Map(),stageByKey:new Map(),clientByUnit:new Map(),scheduleByKey:new Map()};
@@ -3368,7 +3363,7 @@ async function load(silent){
     initState();Object.values(dbIndex).forEach(index=>index.clear());
     units.forEach(r=>{const key=kC(_blk(r.bloco),_pav(r.pav),_apt(r.apto));dbIndex.unitByKey.set(key,r);dbIndex.unitKeyById.set(r.id,key);if(state.unitMeta[key])state.unitMeta[key].pcd=!!r.pcd;});
     stages.forEach(applyStageRecord);clients.forEach(applyClientRecord);schedules.forEach(applyScheduleRecord);
-    renderObra();renderCli();renderResumo();window.scrollTo(0,_sy);setSync("ok");if(!silent)toast("Dados sincronizados");
+    renderObra();renderCli();renderResumo();window.scrollTo(0,_sy);setSync("ok");
   }catch(e){setSync("err");if(!silent)toast("Falha ao carregar os dados");throw e;}
 }
 function startRealtime(){
