@@ -89,3 +89,6 @@ ligação com o relatório é **obra + pedido** (mesma chave `OBRA-PEDIDO` dos p
 - Se a observação dos itens (1187) for diferente, ela aparece ao abrir o pedido, como "Observação dos itens".
 - Com o pedido aberto, a descrição aparece inteira (fechado, cortada em uma linha; o texto todo fica no
   título ao passar o mouse). Se a leitura das observações falhar, o relatório abre normalmente sem elas.
+- Acesso (RLS): leitura só para quem tem o módulo **Suprimentos**, como as demais tabelas do ERP; o
+  navegador não grava nada. O robô grava pela função `observacoes_robo` (migração
+  `20261003120000_pedidos_observacoes_rls_suprimentos.sql`).
