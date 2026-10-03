@@ -130,10 +130,15 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Em Configuração de Condomínios, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
 
+## Fonte
+
+- **Inter** (Google Fonts, pesos 300 a 900 com tamanho óptico) em toda a versão web: computador, Android, iPhone e iPad, inclusive na impressão da lista. Só o app instalado no iPhone (Capacitor) usa a fonte do sistema (SF Pro).
+- O texto usa suavização e kerning (`-webkit-font-smoothing`, `text-rendering:optimizeLegibility`) e não sintetiza negrito/itálico (`font-synthesis:none`), para ficar nítido.
+
 ## Cabeçalho único (HM Bar)
 
 - Todas as telas usam o mesmo cabeçalho: tela inicial, condomínio, Visão Geral, Importação, Liberações, Configuração de Condomínios, Logs e Relatórios. Mesma altura, logos, tema e botão do usuário (HM User); cada página só acrescenta os botões dela, à direita, ao lado do tema:
-  - **Condomínio:** Início, condomínio atual e as abas *Resumo Geral* e *Vistoria · Cliente* (no celular, as abas ficam na barra inferior).
+  - **Condomínio:** Início e o condomínio atual. As páginas *Resumo Geral* e *Vistoria · Cliente* ficam no topo do conteúdo, em dois cartões com uma descrição de cada uma (no celular, na barra inferior).
   - **Visão Geral** e **Administração:** Início. **Importação:** voltar à Visão Geral.
   - **Relatórios:** Início, abas *Suprimentos* e *Contratos* e Imprimir.
 - Código: `src/platform/ui/hmbar.js` (HTML) e `src/platform/styles/hmbar.css` (estilos). No `www/index.html` a barra é gerada pelo build entre `<!-- HM-BAR -->` e `<!-- /HM-BAR -->` (botões de Vistorias em `src/modules/vistorias/hmbar.js`) e existe uma única vez: a página a move para a tela aberta. Para mudar o cabeçalho, edite esses arquivos e rode `pnpm build`.
