@@ -18,6 +18,9 @@ const situacaoBadge = (s) => {
   return `<span class="pf-badge ${cls}">${esc(l)}</span>`;
 };
 const statusTone = (s) => { const n = normText(statusLabel(s)); return /nao aprov|reprov/.test(n) ? "t-red" : /aditivo/.test(n) ? "t-orange" : /aprov/.test(n) ? "t-green" : "t-muted"; };
+// Colunas da tabela de contratos (a linha de títulos é repetida no topo fixo de cada obra).
+const COLS = '<colgroup><col class="w-chev"><col class="w-ct"><col><col class="w-itens"><col class="w-val"><col class="w-med"><col class="w-val"><col class="w-st"></colgroup>';
+const HEAD = '<th aria-label="Expandir"></th><th class="l">Contrato</th><th class="l">Fornecedor · objeto</th><th class="r">Itens</th><th class="r">Valor do contrato</th><th class="l">Medido</th><th class="r">Saldo</th><th class="l">Status · tipo</th>';
 const money = (n, cls = "") => `<span class="ct-money${cls ? " " + cls : ""}">${fmtMoney(n)}</span>`;
 
 /**
@@ -28,7 +31,6 @@ const money = (n, cls = "") => `<span class="ct-money${cls ? " " + cls : ""}">${
 export function mountContratos(root, { contratos }) {
   const f = emptyFilters();
   const servicos = [...new Set(contratos.flatMap((c) => c.itens.map((i) => i.servico)))].sort();
-  const fornecedores = [...new Set(contratos.map((c) => c.fornecedor).filter(Boolean))].sort();
   const expanded = new Set();
   let view = [];
   const compact = document.body.classList.contains("compact");
@@ -36,28 +38,23 @@ export function mountContratos(root, { contratos }) {
   root.innerHTML = `
     <section class="pf-kpis" id="ctKpis" aria-label="Indicadores"></section>
     <section class="fx ct-filters" id="ctFilters" aria-label="Filtros">
-      <div class="fx-row">
-        <label class="fx-search" id="ctNumWrap">${SEARCH}<input type="search" id="ctNum" placeholder="Contrato (nº ou objeto)" aria-label="Buscar contrato"></label>
-        <label class="fx-search ct-serv" id="ctServWrap">${SEARCH}<input type="search" id="ctServ" placeholder="Serviço / item (palavras-chave): concreto, locação…" aria-label="Buscar serviço"></label>
-        <label class="fx-search" id="ctFornWrap">${SEARCH}<input type="search" id="ctForn" placeholder="Fornecedor" aria-label="Buscar fornecedor"></label>
-        <div class="fx-end">
-          <span class="fx-count" id="ctCount"></span>
-          <button class="pf-btn" id="ctClear" type="button">Limpar</button>
-          <button class="pf-btn fx-more" id="ctMore" type="button" aria-expanded="false">Filtros <b class="fx-badge" id="ctBadge" hidden></b></button>
-        </div>
+      <div class="ct-line">
+        <label class="fx-search ct-fnum" id="ctNumWrap" title="Número do contrato (também encontra fornecedor ou objeto)">${SEARCH}<input type="search" id="ctNum" placeholder="Nº contrato" aria-label="Número do contrato" autocomplete="off"></label>
+        <label class="fx-search ct-serv" id="ctServWrap">${SEARCH}<input type="search" id="ctServ" placeholder="Serviço / item: concreto, locação…" aria-label="Buscar serviço ou item" autocomplete="off"></label>
+        <div class="ms ct-obras" id="ctObras"><button type="button" class="fx-field ms-btn" aria-label="Obra"><small class="ms-lbl">Obra</small><span>Todas as obras</span></button></div>
+        <label class="fx-field ct-sel" id="ctStatusWrap"><span>Tipo</span><select id="ctStatus" aria-label="Tipo de contrato">${statusOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
+        <label class="fx-field ct-sel" id="ctSituacaoWrap"><span>Status</span><select id="ctSituacao" aria-label="Status do contrato">${situacaoOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
       </div>
-      <div class="fx-row ct-adv fx-adv" id="ctAdv">
-        <div class="ms" id="ctObras"><button type="button" class="fx-field ms-btn"><span>Todas as obras</span></button></div>
-        <div class="ms" id="ctContratos"><button type="button" class="fx-field ms-btn"><span>Todos os contratos</span></button></div>
-        <label class="fx-field ct-sel" id="ctSituacaoWrap"><span>Situação</span><select id="ctSituacao" aria-label="Situação do contrato">${situacaoOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
-        <label class="fx-field ct-sel" id="ctStatusWrap"><span>Status</span><select id="ctStatus" aria-label="Status do contrato">${statusOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
-      </div>
-      <div class="fx-row fx-toggles pd-toggles">
+      <div class="ct-tools">
         <div class="fx-toggles">
           <label class="pf-switch"><input type="checkbox" id="ctSaldo"><b></b>Somente com saldo a medir</label>
           <label class="pf-switch"><input type="checkbox" id="ctCompact" data-compact-toggle${compact ? " checked" : ""}><b></b>Modo compacto</label>
         </div>
-        <button class="pf-btn pd-expand-all" id="ctExpandAll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span>Expandir todos</span></button>
+        <div class="ct-acts">
+          <span class="fx-count" id="ctCount"></span>
+          <button class="pf-btn" id="ctClear" type="button">Limpar</button>
+          <button class="pf-btn pd-expand-all" id="ctExpandAll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span>Expandir todos</span></button>
+        </div>
       </div>
       <div class="pf-active" id="ctActive"></div>
     </section>
@@ -70,36 +67,23 @@ export function mountContratos(root, { contratos }) {
     allLabel: "Todas as obras", searchPlaceholder: "Buscar obra…",
     getOptions: () => obraOptions(contratos).map((c) => ({ key: c.obra, label: c.obra, sub: c.obra_desc, search: `${c.obra} ${c.obra_desc} ${c.condominio}` })),
     getSelected: () => f.obras,
-    onChange: (sel) => { f.obras = sel; pruneSelections(contratos, f); ctsMs.refresh(); render(); },
-    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? `Obra ${[...sel][0]}` : `${sel.size} obras`
-  });
-  const ctsMs = createMultiSelect($("ctContratos"), {
-    allLabel: "Todos os contratos", searchPlaceholder: "Buscar contrato, obra, fornecedor ou objeto…",
-    getOptions: () => contratoOptions(contratos, f).map((c) => ({ key: c.key, tag: c.obra, label: "#" + c.contrato, sub: c.fornecedor || c.objeto, search: `${c.contrato} ${c.obra} ${c.fornecedor} ${c.objeto}` })),
-    getSelected: () => f.contratos,
-    onChange: (sel) => { f.contratos = sel; render(); },
-    summary: (sel, total) => !sel.size || sel.size === total ? "Todos os contratos" : `${sel.size} contrato(s): ` + [...sel].slice(0, 3).map((k) => "#" + k.split("-").pop()).join(", ") + (sel.size > 3 ? "…" : "")
+    onChange: (sel) => { f.obras = sel; pruneSelections(contratos, f); render(); },
+    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? [...sel][0] : `${sel.size} obras`
   });
 
   /* ── Buscas (com sugestões) ── */
   const live = debounce(render, 220);
   $("ctNum").addEventListener("input", (e) => { f.contrato = e.target.value; live(); });
   $("ctServ").addEventListener("input", (e) => { f.servico = e.target.value; live(); });
-  $("ctForn").addEventListener("input", (e) => { f.fornecedor = e.target.value; live(); });
-  [["ctNum", "contrato"], ["ctServ", "servico"], ["ctForn", "fornecedor"]].forEach(([id, k]) =>
+  [["ctNum", "contrato"], ["ctServ", "servico"]].forEach(([id, k]) =>
     $(id).addEventListener("search", (e) => { if (f[k] !== e.target.value) { f[k] = e.target.value; render(); } }));
   attachAutocomplete($("ctServ"), { getItems: () => servicos, onPick: (v) => { f.servico = v; render(); } });
-  attachAutocomplete($("ctForn"), { getItems: () => fornecedores, onPick: (v) => { f.fornecedor = v; render(); } });
   $("ctSituacao").addEventListener("change", (e) => { f.situacao = e.target.value; render(); });
   $("ctStatus").addEventListener("change", (e) => { f.status = e.target.value; render(); });
   $("ctSaldo").addEventListener("change", (e) => { f.comSaldo = e.target.checked; render(); });
   $("ctCompact").addEventListener("change", (e) => {
     document.body.classList.toggle("compact", e.target.checked);
     try { localStorage.setItem(COMPACT_KEY, e.target.checked ? "1" : "0"); } catch { /* ignora */ }
-  });
-  $("ctMore").addEventListener("click", (e) => {
-    const open = !$("ctFilters").classList.contains("fx-open");
-    $("ctFilters").classList.toggle("fx-open", open); e.currentTarget.setAttribute("aria-expanded", String(open));
   });
   $("ctClear").addEventListener("click", clearAll);
   $("ctExpandAll").addEventListener("click", () => {
@@ -111,9 +95,7 @@ export function mountContratos(root, { contratos }) {
   /* ── Filtros ativos (com remoção individual) ── */
   const CLEAR = {
     obras: () => { f.obras.clear(); },
-    cts: () => { f.contratos.clear(); },
     num: () => { f.contrato = ""; $("ctNum").value = ""; },
-    forn: () => { f.fornecedor = ""; $("ctForn").value = ""; },
     serv: () => { f.servico = ""; $("ctServ").value = ""; },
     status: () => { f.status = "todos"; $("ctStatus").value = "todos"; },
     situacao: () => { f.situacao = "todas"; $("ctSituacao").value = "todas"; },
@@ -121,31 +103,27 @@ export function mountContratos(root, { contratos }) {
   };
   $("ctActive").addEventListener("click", (e) => {
     const k = e.target.closest("[data-af]")?.dataset.af; if (!k) return;
-    CLEAR[k](); obrasMs.refresh(); ctsMs.refresh(); render();
+    CLEAR[k](); obrasMs.refresh(); render();
   });
   function renderActive() {
     const chips = [];
     const add = (k, label) => chips.push(`<span class="af"><span>${esc(label)}</span><button type="button" data-af="${k}" aria-label="Remover filtro ${esc(label)}">×</button></span>`);
     if (f.obras.size) add("obras", "Obra: " + (f.obras.size === 1 ? [...f.obras][0] : f.obras.size + " obras"));
-    if (f.contratos.size) add("cts", `${f.contratos.size} contrato(s)`);
-    if (f.situacao !== "todas") add("situacao", "Situação: " + (f.situacao === "abertas" ? "em aberto" : statusLabel(f.situacao)));
-    if (f.status !== "todos") add("status", "Status: " + statusLabel(f.status));
+    if (f.situacao !== "todas") add("situacao", "Status: " + (f.situacao === "abertas" ? "em aberto" : statusLabel(f.situacao)));
+    if (f.status !== "todos") add("status", "Tipo: " + statusLabel(f.status));
     if (f.comSaldo) add("saldo", "Com saldo a medir");
     if (f.contrato.trim()) add("num", "Contrato: " + f.contrato.trim());
-    if (f.fornecedor.trim()) add("forn", "Fornecedor: " + f.fornecedor.trim());
     if (f.servico.trim()) add("serv", "Serviço: " + f.servico.trim());
     $("ctActive").innerHTML = chips.length ? `<span class="af-lbl">Filtros ativos:</span>${chips.join("")}` : "";
-    const adv = [f.obras.size, f.contratos.size, f.status !== "todos", f.situacao !== "abertas"].filter(Boolean).length;
-    $("ctBadge").textContent = adv; $("ctBadge").hidden = !adv;
-    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctFornWrap", f.fornecedor.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"]]
+    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"]]
       .forEach(([id, on]) => $(id).classList.toggle("on", !!on));
   }
 
   function clearAll() {
     Object.assign(f, emptyFilters());
-    ["ctNum", "ctServ", "ctForn"].forEach((id) => ($(id).value = ""));
+    ["ctNum", "ctServ"].forEach((id) => ($(id).value = ""));
     $("ctSituacao").value = f.situacao; $("ctStatus").value = f.status; $("ctSaldo").checked = false;
-    expanded.clear(); obrasMs.refresh(); ctsMs.refresh(); render();
+    expanded.clear(); obrasMs.refresh(); render();
   }
 
   /* ── Indicadores (cada contrato entra uma vez) ── */
@@ -203,13 +181,14 @@ export function mountContratos(root, { contratos }) {
       const itens = rows.reduce((t, c) => t + c.n_itens, 0);
       const cond = first.condominio.split(" - ")[0];
       html += `<section class="pf-card ct-obra" aria-label="Obra ${esc(obra)}">
+        <div class="ct-sticky">
         <header class="ct-obra-h">
           <div class="ct-obra-t"><span class="ct-obra-k">Obra</span><h2>${esc(obra)}</h2><span class="ct-obra-m">${esc([first.obra_desc, cond].filter(Boolean).join(" · "))}${first.obra_desc || cond ? " · " : ""}${rows.length} contrato(s) · ${itens} ${itens === 1 ? "item" : "itens"}</span></div>
           <div class="ct-obra-s">${obraTotals(rows)}</div>
         </header>
-        <div class="pf-table-wrap"><table class="ct-tbl"><colgroup><col class="w-chev"><col class="w-ct"><col><col class="w-itens"><col class="w-val"><col class="w-med"><col class="w-val"><col class="w-st"></colgroup><thead><tr>
-          <th aria-label="Expandir"></th><th class="l">Contrato</th><th class="l">Fornecedor · objeto</th><th class="r">Itens</th><th class="r">Valor do contrato</th><th class="l">Medido</th><th class="r">Saldo</th><th class="l">Situação · status</th>
-        </tr></thead><tbody>${rows.map((c, i) => {
+        <div class="ct-thead-wrap" aria-hidden="true"><table class="ct-tbl ct-thead">${COLS}<thead><tr>${HEAD}</tr></thead></table></div>
+        </div>
+        <div class="pf-table-wrap"><table class="ct-tbl">${COLS}<thead class="ct-thead-a11y"><tr>${HEAD}</tr></thead><tbody>${rows.map((c, i) => {
           const open = expanded.has(c.key);
           return `<tr class="ct-row${i % 2 ? " z" : ""}${open ? " open" : ""}" data-key="${esc(c.key)}" tabindex="0" aria-expanded="${open}">
             <td class="c-chev">${CHEV}</td>
@@ -234,6 +213,12 @@ export function mountContratos(root, { contratos }) {
     b.setAttribute("aria-pressed", String(all));
     b.querySelector("span").textContent = all ? "Recolher todos" : "Expandir todos";
   }
+
+  // A linha de títulos das colunas fica fixa junto com a da obra; acompanha a rolagem lateral da tabela.
+  $("ctList").addEventListener("scroll", (e) => {
+    const wrap = e.target; if (!wrap.classList?.contains("pf-table-wrap")) return;
+    const head = wrap.closest(".ct-obra")?.querySelector(".ct-thead"); if (head) head.style.transform = `translateX(${-wrap.scrollLeft}px)`;
+  }, true);
 
   const toggleRow = (key) => { expanded.has(key) ? expanded.delete(key) : expanded.add(key); renderList(); root.querySelector(`tr.ct-row[data-key="${CSS.escape(key)}"]`)?.focus({ preventScroll: true }); };
   $("ctList").addEventListener("click", (e) => { const tr = e.target.closest("tr.ct-row"); if (tr) toggleRow(tr.dataset.key); });

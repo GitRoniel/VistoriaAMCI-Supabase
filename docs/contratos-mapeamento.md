@@ -41,9 +41,16 @@ sem regra clara de nível (contrato ou item). Somá-los poderia duplicar valores
 
 ## Filtros
 
-Contrato (número ou trecho do objeto), serviço/item (palavras-chave, com sugestões; abre e destaca os
-itens encontrados), fornecedor (com sugestões), obras e contratos (seleção múltipla), situação
-(padrão: **em aberto**, ou seja, sem concluídos e cancelados), status e "somente com saldo a medir".
+Uma linha compacta, nesta ordem:
+
+1. **Nº contrato** (prefixo do número; texto também encontra fornecedor ou objeto);
+2. **Serviço / item** (palavras-chave, com sugestões; abre e destaca os itens encontrados);
+3. **Obra** (seleção múltipla);
+4. **Tipo** = campo `status` do ERP (Aprovado, Em Aditivo, Não Aprovado);
+5. **Status** = campo `situacao` do ERP (Andamento, Concluído, Cancelado; padrão **em aberto**, sem concluídos e cancelados).
+
+Abaixo: "somente com saldo a medir", modo compacto e, à direita, a quantidade de contratos, **Limpar** e
+**Expandir todos**. Ao rolar, cada obra mantém no topo a linha da obra (totais) e a linha dos títulos das colunas.
 
 ## Conferência com os dados reais (execução 12, 01/10/2026)
 
