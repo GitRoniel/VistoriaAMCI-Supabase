@@ -130,9 +130,17 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Em Configuração de Condomínios, cada obra tem **Excluir obra** (só administradores da obra). A confirmação mostra quantas unidades, vistorias com dados e usuários são afetados e exige digitar o nome da obra.
 - A exclusão é lógica (`projects.archived_at` / `archived_by`): nada é apagado. A obra some de todas as telas, do seletor e da Visão Geral, e pode ser restaurada em **Obras excluídas**. Exclusão e restauração ficam registradas em `audit_log` (ações `ARCHIVE`/`RESTORE`) com usuário e horário.
 
+## Cabeçalho único (HM Bar)
+
+- Todas as telas usam o mesmo cabeçalho: tela inicial, condomínio, Visão Geral, Importação, Liberações, Configuração de Condomínios, Logs e Relatórios. Mesma altura, logos, tema e botão do usuário (HM User); cada página só acrescenta os botões dela:
+  - **Condomínio:** Início, condomínio atual e as abas *Resumo Geral* e *Vistoria · Cliente* (no celular, as abas ficam na barra inferior).
+  - **Visão Geral** e **Administração:** Início. **Importação:** voltar à Visão Geral.
+  - **Relatórios:** Início, abas *Suprimentos* e *Contratos* e Imprimir.
+- Código: `src/platform/ui/hmbar.js` (HTML) e `src/platform/styles/hmbar.css` (estilos). No `www/index.html` a barra é gerada pelo build entre `<!-- HM-BAR -->` e `<!-- /HM-BAR -->` (botões de Vistorias em `src/modules/vistorias/hmbar.js`) e existe uma única vez: a página a move para a tela aberta. Para mudar o cabeçalho, edite esses arquivos e rode `pnpm build`.
+
 ## Tela inicial (central de acesso)
 
-- Barra verde (igual às páginas internas) com busca, tema e o menu do usuário. O botão do usuário mostra o número de acessos pendentes.
+- Barra verde com busca, tema e o menu do usuário. O botão do usuário mostra o número de acessos pendentes.
 - **Menu do usuário › Administração** (só para administradores): **Liberações** (abas *Acesso de usuários* e *Acesso aos módulos*), **Configuração de Condomínios** e **Logs**. Cada uma abre uma página própria, com o mesmo cabeçalho da tela inicial (Início, tema e menu do usuário) e endereço próprio (`#liberacoes`, `#condominios`, `#logs`); o Voltar do navegador retorna à tela inicial. Quem vê cada página segue as mesmas regras de antes: administradores de condomínio veem as três; administradores de módulo veem Liberações › Acesso aos módulos.
 - Saudação com a data e o menu em dois grupos: **Vistorias · Condomínios** (um card por condomínio + Visão Geral) e **Relatórios** (Suprimentos e Contratos, com a data da última atualização do ERP).
 - Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).

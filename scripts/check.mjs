@@ -140,7 +140,12 @@ assert.doesNotMatch(importUi, /text\("(responsavel|obs|etapa)"/, "Responsável, 
 const importFields = await readFile(resolve(root, "supabase/migrations/20260929033637_importacao_campos_atendimento.sql"), "utf8");
 assert.match(importFields, /allowed text\[\] := array\['client_name', 'inspection_date', 'inspection_time', 'status'\];/);
 assert.doesNotMatch(importFields, /(responsible|notes|sale_stage) = v_rec/, "A função não pode gravar responsável, observação ou etapa.");
-assert.ok((html.match(/data-theme-toggle/g) || []).length >= 6, "Botão de tema em todas as telas.");
+// HM Bar: um único cabeçalho (com o tema e o menu do usuário) para todas as telas.
+assert.equal((html.match(/<header class="hm-bar" id="hmBar">/g) || []).length, 1, "A HM Bar deve existir uma única vez.");
+assert.ok(html.includes("<!-- HM-BAR") && html.includes("<!-- /HM-BAR -->") && html.includes('./platform/hmbar.css'), "HM Bar gerada a partir de src/platform/ui/hmbar.js.");
+assert.ok(!html.includes('class="header"') && !html.includes('class="project-top"'), "Cabeçalhos antigos não devem voltar.");
+assert.ok((html.match(/data-hm-host="/g) || []).length >= 4 && html.includes("function syncHmBar"), "Telas de Vistorias precisam receber a HM Bar.");
+assert.ok((html.match(/data-theme-toggle/g) || []).length >= 2, "Botão de tema no login e na HM Bar.");
 assert.match(html, /const IMPORT_COLUMNS=\[/);
 assert.match(html, /supabase\.rpc\("aplicar_importacao_agendamentos"/);
 assert.doesNotMatch(html.slice(html.indexOf("async function onImportFile"), html.indexOf("function impRows")), /supabase\.(rpc|from)\(/, "Selecionar o arquivo não pode gravar no banco.");

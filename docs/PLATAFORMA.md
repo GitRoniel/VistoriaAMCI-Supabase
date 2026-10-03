@@ -20,9 +20,11 @@ src/
 │   │   ├── theme.js              tema claro/escuro (mesma chave "amci-theme")
 │   │   └── utils.js              escape, datas, números, busca sem acento, destaque
 │   ├── ui/
-│   │   ├── shell.js              cabeçalho no padrão da Visão Geral, telas de estado, avisos
+│   │   ├── hmbar.js              HM Bar: cabeçalho único da plataforma (logos, navegação da página, tema, menu do usuário)
+│   │   ├── shell.js              cabeçalho dos módulos (HM Bar + abas), telas de estado, avisos
 │   │   ├── multiselect.js        seleção múltipla com busca (obras, pedidos…)
 │   │   └── autocomplete.js       sugestões enquanto digita
+│   ├── styles/hmbar.css          estilos da HM Bar (também usados pelo index.html via www/platform/hmbar.css)
 │   ├── styles/platform.css       tokens de cor (claro/escuro) e componentes: filtros, cards, tabelas
 │   └── modules.js                registro dos módulos e páginas
 └── modules/

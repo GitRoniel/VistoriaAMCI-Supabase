@@ -1,6 +1,7 @@
 import { build } from "esbuild";
 import { copyFile, cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { inject as injectDarkTheme } from "./theme-dark.mjs";
+import { vistoriasHmBarHTML } from "../src/modules/vistorias/hmbar.js";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -29,7 +30,12 @@ await mkdir(www, { recursive: true });
 // Mantém o Modo Escuro sincronizado com o CSS do Modo Claro.
 const pagePath = resolve(www, "index.html");
 const page = await readFile(pagePath, "utf8");
-const themed = injectDarkTheme(page);
+// HM Bar (cabeçalho único da plataforma): gerada a partir de src/platform/ui/hmbar.js.
+const HM_BEGIN = "<!-- HM-BAR · gerado por scripts/build.mjs (src/modules/vistorias/hmbar.js) -->", HM_END = "<!-- /HM-BAR -->";
+const hb = page.indexOf(HM_BEGIN), he = page.indexOf(HM_END);
+if (hb < 0 || he < hb) throw new Error("Marcadores da HM Bar não encontrados em www/index.html");
+const withBar = page.slice(0, hb + HM_BEGIN.length) + "\n" + vistoriasHmBarHTML() + "\n" + page.slice(he);
+const themed = injectDarkTheme(withBar);
 if (themed !== page) await writeFile(pagePath, themed, "utf8");
 await cp(resolve(root, "assets"), resolve(www, "assets"), { recursive: true });
 // Navegadores pedem /favicon.ico automaticamente.
@@ -63,6 +69,8 @@ const PLATFORM_PAGES = [
 ];
 const platformBuilds = [
   { ...buildOptions, entryPoints: ["./src/platform/styles/platform.css"], outfile: "www/platform/platform.css", format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] },
+  // HM Bar: a mesma folha de estilos nas telas de Vistorias (index.html) e nos módulos (dentro de platform.css).
+  { ...buildOptions, entryPoints: ["./src/platform/styles/hmbar.css"], outfile: "www/platform/hmbar.css", format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] },
   ...PLATFORM_PAGES.flatMap((p) => [
     { ...buildOptions, entryPoints: [p.js], outfile: `${p.out}.js` },
     { ...buildOptions, entryPoints: [p.css], outfile: `${p.out}.css`, format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] }
