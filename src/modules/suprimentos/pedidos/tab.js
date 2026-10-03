@@ -1,7 +1,7 @@
 // Aba Suprimentos › Relatório de Controle de Pedidos (montada pela página Relatórios).
 // Fluxo: dados da última execução do relatório 1187 → regras (model) → tela (view).
 import { fmtDateShort } from "../../../platform/core/utils.js";
-import { fetchPedidoRows, fetchUltimaExecucao, fetchPedidoKeys, REPORT_ID } from "./service.js";
+import { fetchPedidoRows, fetchUltimaExecucao, fetchPedidoKeys, fetchObservacoes, REPORT_ID } from "./service.js";
 import { buildPedidos } from "./model.js";
 import { mountPedidos } from "./view.js";
 
@@ -22,8 +22,8 @@ export const suprimentosTab = {
   unit: "linhas do ERP",
   /** Busca e monta a aba em `root`. Devolve o subtítulo do cabeçalho. */
   async load(root) {
-    const [rows, exec] = await Promise.all([fetchPedidoRows(), fetchUltimaExecucao()]);
-    const pedidos = buildPedidos(rows);
+    const [rows, exec, observacoes] = await Promise.all([fetchPedidoRows(), fetchUltimaExecucao(), fetchObservacoes()]);
+    const pedidos = buildPedidos(rows, observacoes);
     currentKeys = new Set(pedidos.map((p) => p.key));
     root.innerHTML = '<div id="pdRoot"></div>';
     if (!pedidos.length) {

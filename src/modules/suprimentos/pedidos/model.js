@@ -105,8 +105,12 @@ export function dedupeRows(rows) {
   return out.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
 }
 
-/** Agrupa as linhas do relatório em pedidos (chave: OBRA-PEDIDO). */
-export function buildPedidos(rows) {
+/**
+ * Agrupa as linhas do relatório em pedidos (chave: OBRA-PEDIDO).
+ * `observacoes` (opcional): Map("OBRA-PEDIDO" → observação do pedido, de pedidos_observacoes). Quando existe,
+ * é a descrição do pedido; senão vale a observação mais frequente das linhas do relatório 1187.
+ */
+export function buildPedidos(rows, observacoes = null) {
   const groups = new Map();
   dedupeRows(rows).forEach((r) => {
     if (r.obra == null || r.pedido == null) return;
@@ -151,12 +155,20 @@ export function buildPedidos(rows) {
       pct,
       fornecedor: fornecedores.join(" · "),
       fornecedores,
-      descricao: mostFrequent(list.map((r) => r.observacao_pedido)) || DEFAULT_DESC,
+      ...descricaoPedido(observacoes?.get(key), mostFrequent(list.map((r) => r.observacao_pedido))),
       materiais
     });
   });
 
   return pedidos.sort((a, b) => a.obra.localeCompare(b.obra, "pt-BR") || a.pedido - b.pedido);
+}
+
+/** Descrição exibida: observação do pedido (tabela de observações) ou a do relatório; a outra fica como nota. */
+function descricaoPedido(obs, rel) {
+  const o = String(obs || "").trim(), r = String(rel || "").trim();
+  const descricao = o || r || DEFAULT_DESC;
+  const nota = o && r && o.toLocaleUpperCase("pt-BR") !== r.toLocaleUpperCase("pt-BR") ? r : "";
+  return { descricao, descricao_obs: !!o, nota };
 }
 
 /** Pedido ainda em aberto (nem entregue totalmente nem cancelado). */

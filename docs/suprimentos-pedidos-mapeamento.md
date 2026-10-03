@@ -77,3 +77,15 @@ Uma linha compacta, nesta ordem: **Pedido** (número, cabe 4 dígitos), **OC** (
 (chips coloridos) e as opções: "Ocultar pedidos totalmente entregues" (sempre começa **desligado**),
 modo compacto e gráficos; à direita, a quantidade de pedidos, **Limpar** e **Expandir todos**.
 Ao rolar, cada obra mantém no topo a linha da obra (contagens) e a linha dos títulos das colunas.
+
+## Observações dos pedidos
+
+Fonte: `public.pedidos_observacoes` (relatório 9001, gravado pelo robô), lida pela view
+`pedidos_observacoes_atual` (só a última execução com sucesso). Uma linha por empresa + obra + pedido; a
+ligação com o relatório é **obra + pedido** (mesma chave `OBRA-PEDIDO` dos pedidos da tela).
+
+- A coluna `observacao` passa a ser a **descrição** do pedido. Sem observação, vale a regra anterior
+  (`observacao_pedido` mais frequente das linhas do 1187, ou "Materiais diversos").
+- Se a observação dos itens (1187) for diferente, ela aparece ao abrir o pedido, como "Observação dos itens".
+- Com o pedido aberto, a descrição aparece inteira (fechado, cortada em uma linha; o texto todo fica no
+  título ao passar o mouse). Se a leitura das observações falhar, o relatório abre normalmente sem elas.

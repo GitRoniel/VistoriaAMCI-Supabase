@@ -25,6 +25,27 @@ export async function fetchPedidoRows() {
   return fetchAllPages(() => supabase.from(SOURCE_VIEW).select(COLUMNS).order("id", { ascending: true }));
 }
 
+// Observações dos pedidos (cabeçalho do pedido no ERP): public.pedidos_observacoes, gravada pelo robô
+// (relatório 9001). A view pedidos_observacoes_atual traz só a última execução com sucesso; uma linha por
+// empresa + obra + pedido. Ligação com o relatório: obra + pedido (mesma chave dos pedidos da tela).
+export const OBS_VIEW = "pedidos_observacoes_atual";
+
+/** Observações por pedido: Map("OBRA-PEDIDO" → texto). Falha na leitura não impede o relatório. */
+export async function fetchObservacoes() {
+  const supabase = getSupabase();
+  if (!supabase) return new Map();
+  try {
+    const rows = await fetchAllPages(() => supabase.from(OBS_VIEW).select("id,obra,pedido,observacao")
+      .not("observacao", "is", null).order("id", { ascending: true }));
+    const map = new Map();
+    rows.forEach((r) => { const t = String(r.observacao || "").trim(); if (t && r.obra != null && r.pedido != null) map.set(`${r.obra}-${r.pedido}`, t); });
+    return map;
+  } catch (err) {
+    console.warn("Observações dos pedidos indisponíveis:", err);
+    return new Map();
+  }
+}
+
 /** Última execução com sucesso do relatório (data de atualização e período coberto). */
 export async function fetchUltimaExecucao() {
   const supabase = getSupabase();

@@ -167,7 +167,9 @@ export function mountPedidos(root, { pedidos }) {
   /* ── Tabela agrupada por obra ── */
   // Material: no celular cada linha vira um cartão (rótulos em data-l).
   function materialsHTML(p, words) {
-    return `<div class="pd-exp-in">
+    // A observação do pedido já aparece inteira na descrição (linha aberta); aqui só a dos itens, quando diferente.
+    const obs = p.nota ? `<p class="pd-obs nota"><b>Observação dos itens</b>${esc(p.nota)}</p>` : "";
+    return `<div class="pd-exp-in">${obs}
       <table class="pd-mat-tbl"><thead><tr>
         <th class="l">Material</th><th class="l">Ordem de compra</th><th class="r">Solicitada</th><th class="r">Entregue</th><th class="r">Descartada</th><th class="r">Saldo</th><th class="l">% Entrega</th><th>Status</th>
       </tr></thead><tbody>${p.materiais.map((m) => {
@@ -216,7 +218,7 @@ export function mountPedidos(root, { pedidos }) {
           return `<tr class="pd-row${i % 2 ? " z" : ""}${open ? " open" : ""}${ocDone ? "" : " no-oc"}" data-key="${esc(p.key)}" tabindex="0" aria-expanded="${open}">
             <td class="c-chev">${CHEV}</td>
             <td class="c-ped l"><b class="pd-ped" title="Pedido ${esc(p.pedido)}">${esc(p.pedido)}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
-            <td class="c-desc l"><span class="pd-desc-t" title="${esc(p.descricao)}">${esc(p.descricao)}</span><span class="pd-forn-t"${p.fornecedor ? ` title="${esc(p.fornecedor)}"` : ""}>${p.fornecedor ? esc(p.fornecedor) : "Sem fornecedor"}</span></td>
+            <td class="c-desc l"><span class="pd-desc-t" title="${esc(p.descricao + (p.nota ? "\nObservação dos itens: " + p.nota : ""))}">${esc(p.descricao)}</span><span class="pd-forn-t"${p.fornecedor ? ` title="${esc(p.fornecedor)}"` : ""}>${p.fornecedor ? esc(p.fornecedor) : "Sem fornecedor"}</span></td>
             <td class="c-itens r" data-l="Itens">${p.n_itens}</td>
             <td class="c-oc l" data-l="Ordem de compra"><span class="pd-oc"${p.oc ? ` title="${esc(p.oc)}"` : ""}>${p.oc ? esc(p.oc) : "—"}</span><span class="pd-ocst ${ocDone ? "ok" : "pend"}">${ocDone ? "OC gerada" : "OC pendente"}</span></td>
             <td class="c-ent l">${statusBadge(p.delivery_status)}${bar(p.pct)}</td>
