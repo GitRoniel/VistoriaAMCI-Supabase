@@ -215,7 +215,7 @@ export function mountPedidos(root, { pedidos }) {
           const ocDone = p.oc_status === OC.DONE;
           return `<tr class="pd-row${i % 2 ? " z" : ""}${open ? " open" : ""}${ocDone ? "" : " no-oc"}" data-key="${esc(p.key)}" tabindex="0" aria-expanded="${open}">
             <td class="c-chev">${CHEV}</td>
-            <td class="c-ped l"><b class="pd-ped">#${p.pedido}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
+            <td class="c-ped l"><b class="pd-ped" title="Pedido ${esc(p.pedido)}">${esc(p.pedido)}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
             <td class="c-desc l"><span class="pd-desc-t" title="${esc(p.descricao)}">${esc(p.descricao)}</span><span class="pd-forn-t"${p.fornecedor ? ` title="${esc(p.fornecedor)}"` : ""}>${p.fornecedor ? esc(p.fornecedor) : "Sem fornecedor"}</span></td>
             <td class="c-itens r" data-l="Itens">${p.n_itens}</td>
             <td class="c-oc l" data-l="Ordem de compra"><span class="pd-oc"${p.oc ? ` title="${esc(p.oc)}"` : ""}>${p.oc ? esc(p.oc) : "—"}</span><span class="pd-ocst ${ocDone ? "ok" : "pend"}">${ocDone ? "OC gerada" : "OC pendente"}</span></td>

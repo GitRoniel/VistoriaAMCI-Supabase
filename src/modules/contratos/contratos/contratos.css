@@ -54,7 +54,11 @@
 tr.ct-row:hover .pd-chev{background:var(--surface-3)}
 .ct-tbl .c-ct,.ct-tbl .c-desc,.ct-tbl .c-med,.ct-tbl .c-st{line-height:1.25}
 .ct-tbl .c-ct>*,.ct-tbl .c-desc>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ct-num{font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+/* Número do contrato em destaque (sem "#"): selo com o número; fica sólido com o contrato aberto. */
+.ct-tbl .c-ct>.ct-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;max-width:100%;height:24px;padding:0 9px;border-radius:7px;background:color-mix(in srgb,var(--ink-2) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--ink-2) 22%,transparent);color:var(--ink);font-size:14.5px;font-weight:800;letter-spacing:-.01em;line-height:1;font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+tr.ct-row.open .ct-num{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+.ct-tbl .c-ct>.ct-cod{margin-top:4px}
+body.compact .ct-tbl .c-ct>.ct-num{height:21px;font-size:13.5px;padding:0 7px}
 .ct-cod{margin-top:2px;font-size:10.5px;font-weight:600;color:var(--muted)}
 .ct-forn{font-weight:700;color:var(--text)}
 .ct-obj{margin-top:2px;font-size:11px;color:var(--muted)}
@@ -132,7 +136,7 @@ body.compact .ct-obra{margin-bottom:10px}
   .ct-tbl tr.ct-row.z{background:color-mix(in srgb,var(--surface-2) 70%,var(--surface))}
   .ct-tbl tr.ct-row.open{background:color-mix(in srgb,var(--fern) 9%,var(--surface))}
   .ct-tbl td.c-chev{grid-column:1;grid-row:1}
-  .ct-tbl td.c-ct{grid-column:2 / 4;grid-row:1;display:flex;align-items:baseline;gap:8px}
+  .ct-tbl td.c-ct{grid-column:2 / 4;grid-row:1;display:flex;align-items:center;gap:8px}
   .ct-tbl td.c-ct .ct-cod{margin:0}
   .ct-tbl td.c-itens{grid-column:4;grid-row:1;text-align:right}
   .ct-tbl td.c-desc{grid-column:2 / -1;grid-row:2}

@@ -198,7 +198,7 @@ export function mountContratos(root, { contratos }) {
           const open = expanded.has(c.key);
           return `<tr class="ct-row${i % 2 ? " z" : ""}${open ? " open" : ""}" data-key="${esc(c.key)}" tabindex="0" aria-expanded="${open}">
             <td class="c-chev">${CHEV}</td>
-            <td class="c-ct l"><b class="ct-num">#${esc(c.contrato)}</b>${c.cod_fornecedor ? `<span class="ct-cod">Forn. ${esc(c.cod_fornecedor)}</span>` : ""}</td>
+            <td class="c-ct l"><b class="ct-num" title="Contrato ${esc(c.contrato)}">${esc(c.contrato)}</b>${c.cod_fornecedor ? `<span class="ct-cod">Forn. ${esc(c.cod_fornecedor)}</span>` : ""}</td>
             <td class="c-desc l"><span class="ct-forn"${c.fornecedor ? ` title="${esc(c.fornecedor)}"` : ""}>${c.fornecedor ? esc(c.fornecedor) : "Fornecedor não informado"}</span><span class="ct-obj"${c.objeto ? ` title="${esc(c.objeto)}"` : ""}>${c.objeto ? esc(c.objeto) : "Sem objeto"}</span></td>
             <td class="c-itens r" data-l="Itens">${c.n_itens}</td>
             <td class="c-val r" data-l="Valor">${money(c.valor, "strong")}</td>

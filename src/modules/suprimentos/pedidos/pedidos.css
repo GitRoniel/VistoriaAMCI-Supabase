@@ -79,7 +79,11 @@ tr.open .pd-chev{transform:rotate(90deg)}
 /* Células empilhadas: linha principal + linha de apoio */
 .c-ped,.c-desc,.c-oc,.c-ent{line-height:1.25}
 .c-ped>*,.c-desc>*,.c-oc>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pd-ped{font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+/* Número do pedido em destaque (sem "#"): selo com o número; fica sólido com o pedido aberto. */
+.c-ped>.pd-ped{display:inline-flex;align-items:center;justify-content:center;min-width:34px;max-width:100%;height:24px;padding:0 9px;border-radius:7px;background:color-mix(in srgb,var(--ink-2) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--ink-2) 22%,transparent);color:var(--ink);font-size:14.5px;font-weight:800;letter-spacing:-.01em;line-height:1;font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+tr.pd-row.open .pd-ped{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+.c-ped>.pd-sol-tag{margin-top:4px}
+body.compact .c-ped>.pd-ped{height:21px;font-size:13.5px;padding:0 7px}
 .pd-sol-tag{margin-top:2px;font-size:10.5px;font-weight:700;color:var(--text-2);letter-spacing:.02em}
 .pd-sol-tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
 .pd-desc-t{font-weight:600;color:var(--text)}
@@ -174,7 +178,7 @@ body.compact .pd-chart .box{height:118px}
   .pd-tbl tr.pd-row.no-oc{box-shadow:inset 3px 0 0 var(--sunset)}
   .pd-tbl tr.pd-row.no-oc td:first-child{box-shadow:none}
   .pd-tbl td.c-chev{grid-column:1;grid-row:1}
-  .pd-tbl td.c-ped{grid-column:2 / 4;grid-row:1;display:flex;align-items:baseline;gap:8px}
+  .pd-tbl td.c-ped{grid-column:2 / 4;grid-row:1;display:flex;align-items:center;gap:8px}
   .pd-tbl td.c-ped .pd-sol-tag{margin:0}
   .pd-tbl td.c-itens{grid-column:4;grid-row:1;text-align:right}
   .pd-tbl td.c-desc{grid-column:2 / -1;grid-row:2}
