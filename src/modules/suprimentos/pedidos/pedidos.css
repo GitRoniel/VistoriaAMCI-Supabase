@@ -87,6 +87,13 @@ body.compact .c-ped>.pd-ped{height:21px;font-size:13.5px;padding:0 7px}
 .pd-sol-tag{margin-top:2px;font-size:10.5px;font-weight:700;color:var(--text-2);letter-spacing:.02em}
 .pd-sol-tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
 .pd-desc-t{font-weight:600;color:var(--text)}
+/* Observação do pedido (tabela pedidos_observacoes): texto completo ao abrir o pedido. */
+tr.pd-row.open .c-desc>.pd-desc-t{white-space:normal;overflow-wrap:anywhere}
+.pd-obs{display:flex;gap:8px;align-items:baseline;margin:0 0 8px;padding:7px 10px;border-radius:8px;background:color-mix(in srgb,var(--fern) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--fern) 22%,transparent);font-size:12px;line-height:1.4;color:var(--text);white-space:normal;overflow-wrap:anywhere}
+.pd-obs b{flex:0 0 auto;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--fern)}
+.pd-obs.nota{background:var(--surface);border-color:var(--border)}
+.pd-obs.nota b{color:var(--muted)}
+@media(max-width:720px){.pd-obs{flex-direction:column;gap:2px}}
 .pd-forn-t{margin-top:2px;font-size:11px;color:var(--muted)}
 .c-itens,.c-dt{font-variant-numeric:tabular-nums;color:var(--text-2)}
 .c-itens{font-weight:700;color:var(--ink)}

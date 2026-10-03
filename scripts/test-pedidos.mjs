@@ -59,6 +59,21 @@ const row = (o) => ({ id: ++id, obra: "06CS", pedido: 3, ordem_compra: null, cod
   assert.deepEqual(kpis(ps), { total: 2, comOC: 1, semOC: 1, entregues: 0, parciais: 1, pendentes: 1, obras: 1 });
 }
 
+// 3b) Observação do pedido (pedidos_observacoes, chave OBRA-PEDIDO): vira a descrição; a do relatório fica como nota.
+{
+  const rows = [
+    row({ obra: "E01", pedido: 51, cod_insumo: "X", qtde_restante: 2, observacao_pedido: "620 UND. de 3m" }),
+    row({ obra: "E01", pedido: 52, cod_insumo: "Y", qtde_restante: 3 }),
+    row({ obra: "E01", pedido: 53, cod_insumo: "Z", qtde_restante: 1, observacao_pedido: "Postes praça" })
+  ];
+  const obs = new Map([["E01-51", "Cantoneira de alumínio"], ["E01-52", "MAT- USINA"], ["E01-53", "POSTES PRAÇA"]]);
+  const ps = buildPedidos(rows, obs), by = (n) => ps.find((p) => p.pedido === n);
+  assert.deepEqual([by(51).descricao, by(51).nota, by(51).descricao_obs], ["Cantoneira de alumínio", "620 UND. de 3m", true]);
+  assert.deepEqual([by(52).descricao, by(52).nota], ["MAT- USINA", ""]);
+  assert.equal(by(53).nota, "", "mesma observação (sem diferenciar maiúsculas) não repete como nota");
+  assert.equal(buildPedidos(rows).find((p) => p.pedido === 52).descricao, "Materiais diversos", "sem observações: regra antiga");
+}
+
 // 4) Filtros: em aberto por padrão, material sem acento (todas as palavras), OC dos itens, solicitantes.
 {
   const ps = buildPedidos([
