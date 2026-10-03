@@ -24,7 +24,7 @@
 /* Topo fixo de cada obra ao rolar: linha da obra (totais) + linha dos títulos das colunas. */
 .ct-sticky{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;background:var(--surface)}
 .ct-thead-wrap{overflow:hidden;border-bottom:1px solid var(--border)}
-.ct-thead thead th{border-bottom:0}
+.ct-thead-wrap .ct-thead thead th{border-bottom:0}
 .ct-thead-a11y{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ct-obra-h{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
 .ct-obra-t{display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap}
