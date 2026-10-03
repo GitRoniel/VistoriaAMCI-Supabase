@@ -1,6 +1,6 @@
 // HM Bar: cabeçalho único da plataforma (estilos em src/platform/styles/hmbar.css).
 //
-//   logos → navegação da página (.hm-nav) → espaço flexível → ações → tema → menu do usuário
+//   logos → espaço flexível → navegação da página (.hm-nav) → ações → tema → menu do usuário
 //
 // Todas as telas usam esta mesma barra: a página inicial e as telas de Vistorias recebem o HTML
 // gerado aqui no build (scripts/build.mjs injeta em www/index.html) e Relatórios a monta em tempo

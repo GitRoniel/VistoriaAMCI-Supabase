@@ -132,7 +132,7 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 ## Cabeçalho único (HM Bar)
 
-- Todas as telas usam o mesmo cabeçalho: tela inicial, condomínio, Visão Geral, Importação, Liberações, Configuração de Condomínios, Logs e Relatórios. Mesma altura, logos, tema e botão do usuário (HM User); cada página só acrescenta os botões dela:
+- Todas as telas usam o mesmo cabeçalho: tela inicial, condomínio, Visão Geral, Importação, Liberações, Configuração de Condomínios, Logs e Relatórios. Mesma altura, logos, tema e botão do usuário (HM User); cada página só acrescenta os botões dela, à direita, ao lado do tema:
   - **Condomínio:** Início, condomínio atual e as abas *Resumo Geral* e *Vistoria · Cliente* (no celular, as abas ficam na barra inferior).
   - **Visão Geral** e **Administração:** Início. **Importação:** voltar à Visão Geral.
   - **Relatórios:** Início, abas *Suprimentos* e *Contratos* e Imprimir.
