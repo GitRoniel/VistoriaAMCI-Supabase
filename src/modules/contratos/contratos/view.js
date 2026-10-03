@@ -41,7 +41,7 @@ export function mountContratos(root, { contratos }) {
       <div class="ct-line">
         <label class="fx-search ct-fnum" id="ctNumWrap" title="Número do contrato (também encontra fornecedor ou objeto)">${SEARCH}<input type="search" id="ctNum" placeholder="Nº contrato" aria-label="Número do contrato" autocomplete="off"></label>
         <label class="fx-search ct-serv" id="ctServWrap">${SEARCH}<input type="search" id="ctServ" placeholder="Serviço / item: concreto, locação…" aria-label="Buscar serviço ou item" autocomplete="off"></label>
-        <div class="ms ct-obras" id="ctObras"><button type="button" class="fx-field ms-btn"><span>Todas as obras</span></button></div>
+        <div class="ms ct-obras" id="ctObras"><button type="button" class="fx-field ms-btn" aria-label="Obra"><small class="ms-lbl">Obra</small><span>Todas as obras</span></button></div>
         <label class="fx-field ct-sel" id="ctStatusWrap"><span>Tipo</span><select id="ctStatus" aria-label="Tipo de contrato">${statusOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
         <label class="fx-field ct-sel" id="ctSituacaoWrap"><span>Status</span><select id="ctSituacao" aria-label="Status do contrato">${situacaoOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
       </div>
@@ -68,7 +68,7 @@ export function mountContratos(root, { contratos }) {
     getOptions: () => obraOptions(contratos).map((c) => ({ key: c.obra, label: c.obra, sub: c.obra_desc, search: `${c.obra} ${c.obra_desc} ${c.condominio}` })),
     getSelected: () => f.obras,
     onChange: (sel) => { f.obras = sel; pruneSelections(contratos, f); render(); },
-    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? `Obra ${[...sel][0]}` : `${sel.size} obras`
+    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? [...sel][0] : `${sel.size} obras`
   });
 
   /* ── Buscas (com sugestões) ── */

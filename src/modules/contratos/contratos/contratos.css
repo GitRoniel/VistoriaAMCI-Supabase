@@ -6,6 +6,7 @@
 .ct-filters .fx-search input,.ct-filters .fx-field select,.ct-filters .ms-btn span:first-of-type{font-size:12.5px}
 .ct-filters .fx-search svg{width:14px;height:14px;flex:0 0 auto}
 .ct-filters .fx-field>span{font-size:10.5px}
+.ct-filters .ms-lbl{flex:0 0 auto;font-size:10.5px;font-weight:600;color:var(--muted);white-space:nowrap}
 .ct-filters .ms{min-width:0}
 .ct-tools{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;margin-top:8px}
 .ct-tools .fx-toggles{gap:14px}
@@ -108,7 +109,7 @@ body.compact .ct-obra{margin-bottom:10px}
   .ct-acts{width:100%;margin-left:0}
   .ct-acts .fx-count{margin-right:auto}
   .ct-thead-wrap{display:none}
-  .ct-filters .ct-sel>span{display:none}
+  .ct-filters .ct-sel>span,.ct-filters .ms-lbl{display:none}
   .ct-obra{border-left-width:3px;border-radius:12px}
   .ct-obra-h{padding:9px 11px;gap:7px}
   .ct-obra-k{display:none}
