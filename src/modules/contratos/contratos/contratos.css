@@ -1,7 +1,7 @@
 /* Relatório de Contratos · mesmo padrão visual do Relatório de Pedidos (pedidos.css + platform.css) */
-/* ── Filtros: uma linha compacta (nº do contrato · serviço/item · obra · tipo · status) ── */
+/* ── Filtros: uma linha compacta (nº do contrato · serviço/item · fornecedor · obra · tipo · status) ── */
 .ct-filters{padding:10px 12px}
-.ct-line{display:grid;grid-template-columns:128px minmax(180px,1fr) minmax(170px,220px) minmax(170px,210px) minmax(170px,210px);gap:8px;align-items:center}
+.ct-line{display:grid;grid-template-columns:128px minmax(150px,1.25fr) minmax(130px,1fr) minmax(150px,200px) minmax(150px,190px) minmax(150px,190px);gap:8px;align-items:center}
 .ct-filters .fx-search,.ct-filters .fx-field{height:32px;padding:0 9px;border-radius:9px;gap:6px;min-width:0}
 .ct-filters .fx-search input,.ct-filters .fx-field select,.ct-filters .ms-btn span:first-of-type{font-size:12.5px}
 .ct-filters .fx-search svg{width:14px;height:14px;flex:0 0 auto}
@@ -13,7 +13,11 @@
 .ct-acts{display:flex;align-items:center;gap:8px;margin-left:auto}
 .ct-acts .pf-btn{height:30px}
 .ct-filters .pf-active{margin-top:8px}
-@media(max-width:1100px) and (min-width:721px){.ct-line{grid-template-columns:128px repeat(2,minmax(0,1fr))}.ct-line .ct-serv{grid-column:2 / -1}}
+@media(max-width:1100px) and (min-width:721px){
+  .ct-line{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .ct-line .ct-fnum{grid-column:span 1}.ct-line .ct-serv{grid-column:span 3}.ct-line .ct-fforn{grid-column:span 2}
+  .ct-line .ct-obras,.ct-line .ct-sel{grid-column:span 2}
+}
 
 /* ── Grupo por obra ── */
 .ct-obra{margin-bottom:16px;overflow:clip;border-left:4px solid var(--ink-2)}
@@ -103,6 +107,7 @@ body.compact .ct-obra{margin-bottom:10px}
   .ct-filters{padding:10px}
   .ct-line{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
   .ct-line .ct-serv{grid-column:1 / -1;grid-row:2}
+  .ct-line .ct-fforn{grid-column:1 / -1;grid-row:3}
   .ct-filters .fx-search,.ct-filters .fx-field{height:38px}
   .ct-filters .fx-search input,.ct-filters .fx-field select,.ct-filters .ms-btn span:first-of-type{font-size:16px}
   .ct-tools .fx-toggles{gap:10px 14px}
