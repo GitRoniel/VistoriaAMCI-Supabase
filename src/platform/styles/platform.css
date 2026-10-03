@@ -27,8 +27,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:var(--chrome-top);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased}
-@supports (-webkit-touch-callout:none){body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}}
+body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility;font-kerning:normal;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased}
+input::placeholder,textarea::placeholder{font-family:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 svg{flex:0 0 auto}

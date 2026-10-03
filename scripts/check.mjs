@@ -35,7 +35,7 @@ assert.ok(html.includes("units!inner(project_id)"), "Consultas precisam ficar re
 assert.ok(html.includes('id="projectOverview"') && html.includes('id="overviewOv"'), "Visão Geral não encontrada na seleção de obra.");
 assert.ok(html.includes("technical_escort") && html.includes("Acomp. Técnico"), "Campo Acomp. Técnico não encontrado.");
 assert.ok(!html.includes("fonts.googleapis.com/css2?family=Geist"), "A fonte do projeto deve ser a do sistema (SF Pro).");
-assert.ok(html.includes("family=Inter") && html.includes("-webkit-touch-callout:none"), "Inter no desktop/Android e fonte nativa no iOS.");
+assert.ok(html.includes("family=Inter:opsz,wght@14..32,300..900") && html.includes("html.native body{font-family:-apple-system") && !/@supports \(-webkit-touch-callout:none\)\{body\{font-family/.test(html), "Inter em toda a versão web; fonte do sistema só no app iOS.");
 assert.ok(!/transform:scale\(/.test(html), "Não usar scale() em elementos com texto.");
 assert.ok(html.includes('data-admin-page="condominios"') && html.includes('data-pane="cond"') && html.includes("sort_order"), "Configuração de Condomínios não encontrada.");
 assert.ok(html.includes('class="stk-bar"'), "Gráfico empilhado por bloco não encontrado no resumo.");

@@ -19,7 +19,7 @@ try{var rm=localStorage.getItem("amci-remember")!=="0",st=rm?localStorage:sessio
 <title>Gestão de Obras · Vistorias</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./platform/hmbar.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -36,8 +36,10 @@ body{font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 body.auth-locked{overflow:hidden;padding-bottom:0}
 body.auth-locked>.hm-bar,body.auth-locked>.main,body.auth-locked>.botnav,body.auth-locked>.pop,body.auth-locked>.toast{visibility:hidden;pointer-events:none;user-select:none}
 button,input,select,textarea{font-family:inherit}
-/* iOS (iPhone/iPad): fonte nativa do sistema (SF Pro). Desktop e Android usam Inter. */
-@supports (-webkit-touch-callout:none){body{font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif}}
+/* Fonte: Inter em toda a versão web (computador, Android, iPhone e iPad). Só o app instalado no iPhone
+   (Capacitor, html.native) usa a fonte do sistema (SF Pro). */
+@supports (-webkit-touch-callout:none){html.native body{font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif}}
+input::placeholder,textarea::placeholder{font-family:inherit}
 b,strong{font-weight:700}
 button{cursor:pointer;border:none;background:none}
 ::selection{background:var(--lioness);color:#fff}
@@ -2968,10 +2970,10 @@ function printCliList(){
   const rows=cliListLastRows;
   if(!rows||!rows.length){ toast("Nada para imprimir com esses filtros"); return; }
   const now=new Date().toLocaleString("pt-BR");
-  let body=`<!doctype html><html><head><meta charset="utf-8"><title>Vistoria Cliente — Lista</title><style>
+  let body=`<!doctype html><html><head><meta charset="utf-8"><title>Vistoria Cliente — Lista</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&display=swap" rel="stylesheet"><style>
     @page{margin:10mm}
     *{box-sizing:border-box}
-    body{font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#12241a;margin:0;padding:0}
+    body{font-family:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;font-optical-sizing:auto;font-synthesis:none;text-rendering:optimizeLegibility;font-kerning:normal;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:#12241a;margin:0;padding:0}
     h1{font-size:14px;margin:0 0 2px}
     .sub{font-size:9.5px;color:#666;margin-bottom:9px}
     table{width:100%;border-collapse:collapse;font-size:10px}
@@ -2992,7 +2994,7 @@ function printCliList(){
   const w=window.open("","_blank");
   if(!w){ toast("Habilite pop-ups para imprimir"); return; }
   w.document.write(body); w.document.close();
-  w.onload=()=>{ w.focus(); w.print(); };
+  w.onload=()=>{ const go=()=>{ w.focus(); w.print(); }; (w.document.fonts?.ready||Promise.resolve()).then(go,go); };
 }
 /* Exportação (CSV com ; e BOM: abre direto no Excel em português). */
 function downloadCsv(name,header,rows){
