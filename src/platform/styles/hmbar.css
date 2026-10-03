@@ -1,0 +1,114 @@
+/* ══ HM BAR · cabeçalho único da plataforma ══
+   Usado em todas as telas: tela inicial, Vistorias (condomínio, Visão Geral, Importação,
+   Administração) e Relatórios. Estrutura (src/platform/ui/hmbar.js):
+     logos → espaço flexível → navegação da página (.hm-nav) → ações + tema + menu do usuário.
+   Os botões da página ficam à direita, ao lado do tema (a busca da tela inicial continua centralizada).
+   Cada página só preenche .hm-nav (e, se precisar, ações extras); altura, espaçamentos e o
+   botão do usuário são sempre os mesmos. Fonte única: o build copia este arquivo para
+   www/platform/hmbar.css (Vistorias) e o inclui em www/platform/platform.css (Relatórios). */
+.hm-bar{position:sticky;top:0;z-index:60;background:linear-gradient(145deg,#102a24 0%,#173a32 52%,#1f493e 100%);box-shadow:0 10px 30px rgba(4,20,16,.28);padding-top:var(--safe-t)}
+.hm-bar-in{max-width:1280px;min-height:58px;box-sizing:border-box;margin:0 auto;padding:10px calc(20px + var(--safe-r)) 10px calc(20px + var(--safe-l));display:flex;align-items:center;gap:16px}
+.hm-logos{display:flex;align-items:center;gap:11px;flex:0 0 auto}
+.hm-alto{height:36px;width:auto;display:block}
+.hm-vsep{width:1px;height:28px;background:rgba(255,255,255,.22)}
+.hm-engertal{height:26px;width:90px;object-fit:contain;filter:grayscale(1) brightness(0) invert(1)}
+/* Navegação da página atual: grupos por tela (só o da tela aberta aparece), alinhados à direita,
+   colados nas ações (mesmo espaçamento de 8px entre os botões). */
+.hm-nav{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:1 1 auto;min-width:0;margin-right:-8px}
+.hm-grp{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:1 1 auto;min-width:0}
+.hm-grp[hidden]{display:none}
+.hm-tabs{display:flex;align-items:center;gap:8px;min-width:0}
+.hm-sep{width:1px;height:22px;background:rgba(255,255,255,.18);flex:0 0 auto}
+.hm-search{display:flex;align-items:center;gap:9px;height:38px;padding:0 12px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.75)}
+.hm-search svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex:0 0 auto}
+.hm-search input{flex:1;min-width:0;height:100%;border:0;outline:none;background:transparent;color:#ffffff;font:inherit;font-size:13px}
+.hm-search input::placeholder{color:rgba(255,255,255,.6)}
+.hm-search:focus-within{border-color:rgba(220,203,145,.6);background:rgba(255,255,255,.12)}
+.hm-search-top{flex:1 1 auto;max-width:520px;margin:0 auto}
+.hm-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.hm-btn{position:relative;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#ffffff;font-family:inherit;font-size:12px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;box-sizing:border-box;transition:background .15s,border-color .15s}
+.hm-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(220,203,145,.5)}
+.hm-btn svg{width:15px;height:15px;stroke:#dccb91;fill:none;stroke-width:2;flex:0 0 auto}
+.hm-btn[hidden]{display:none}
+.hm-btn.active{background:rgba(220,203,145,.18);border-color:rgba(220,203,145,.65)}
+.hm-btn:focus-visible{outline:2px solid #dccb91;outline-offset:2px}
+.hm-btn .hm-lbl{min-width:0;overflow:hidden;text-overflow:ellipsis}
+/* Contexto da página (ex.: condomínio aberto): mesmo formato, sem ação. */
+.hm-ctx{cursor:default;min-width:0;flex:0 1 auto}
+.hm-ctx:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+.hm-icon{width:34px;padding:0;justify-content:center}
+.hm-icon svg{width:16px;height:16px}
+.hm-bar .tab-badge{min-width:18px;height:18px;padding:0 6px;border-radius:999px;background:#ED7A12;color:#fff;font-size:10.5px;font-weight:700;display:inline-grid;place-items:center;letter-spacing:0;box-sizing:border-box}
+.hm-bar .tab-badge[hidden]{display:none}
+.hm-user{position:relative}
+.hm-user-btn{padding:0 10px 0 4px}
+.hm-avatar{width:26px;height:26px;border-radius:6px;background:#dccb91;color:#173a32;display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}
+.hm-user-btn .hm-caret{width:13px;height:13px;stroke:rgba(255,255,255,.7)}
+.hm-user-btn .hm-lbl{max-width:200px}
+.hm-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:20;min-width:250px;background:#ffffff;border:1px solid #dbe4dd;border-radius:12px;box-shadow:0 14px 34px rgba(16,42,36,.18);padding:6px;color:#172c25;box-sizing:border-box}
+.hm-menu[hidden]{display:none}
+.hm-menu-who{padding:8px 10px 10px;border-bottom:1px solid #e6ece8;margin-bottom:4px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.hm-menu-who b{font-size:13px;color:#173a32;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-menu-who span{font-size:11.5px;color:#617168;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-menu-item{width:100%;display:flex;align-items:center;gap:9px;height:38px;padding:0 10px;border:0;border-radius:8px;background:none;font-family:inherit;font-size:13px;font-weight:700;color:#9e2f25;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.hm-menu-item:hover{background:#fdf1ef}
+.hm-menu-item[hidden],.hm-menu-sec[hidden]{display:none}
+.hm-menu-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex:0 0 auto}
+.hm-menu-sec{display:flex;flex-direction:column;padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid #e6ece8}
+.hm-menu-lbl{padding:6px 10px 4px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#6a7a71}
+.hm-menu-nav{color:#173a32;font-weight:600}
+.hm-menu-nav:hover{background:#eef3ef}
+.hm-menu-nav svg{color:#55682f}
+.hm-menu-nav span:not(.tab-badge){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.theme-ico-sun{display:none}
+:root[data-theme="dark"] .hm-bar .theme-ico-moon{display:none}
+:root[data-theme="dark"] .hm-bar .theme-ico-sun{display:block}
+/* Telas médias: rótulos encurtam antes de quebrar a linha. */
+@media(max-width:1100px){
+  .hm-bar-in{gap:12px}
+  .hm-nav{margin-right:-4px}
+  .hm-user-btn .hm-lbl{max-width:120px}
+  .hm-tabs .hm-btn .hm-lbl{max-width:130px}
+}
+@media(max-width:900px){.hm-engertal,.hm-vsep{display:none}}
+/* Celular: botões quadrados de 44px; a navegação por abas vai para a barra inferior da página. */
+@media(max-width:720px){
+  .hm-bar{box-shadow:none}
+  .hm-bar-in{min-height:0;padding:12px calc(14px + var(--safe-r)) 6px calc(14px + var(--safe-l));gap:8px}
+  .hm-nav{margin-right:0}
+  .hm-vsep,.hm-engertal,.hm-search-top,.hm-lbl,.hm-caret,.hm-tabs,.hm-sep{display:none}
+  .hm-ctx{display:none!important}
+  .hm-alto{height:30px}
+  .hm-btn,.hm-icon{width:44px;height:44px;padding:0;justify-content:center;border-radius:12px}
+  .hm-btn svg{width:18px;height:18px}
+  .hm-btn .tab-badge{position:absolute;top:-5px;right:-5px}
+  .hm-user-btn .hm-avatar{background:transparent;color:#dccb91;font-size:13px}
+  .hm-menu{position:fixed;right:calc(12px + var(--safe-r));top:calc(64px + var(--safe-t))}
+}
+/* Tema escuro: a barra é verde nos dois temas. As regras abaixo garantem que estilos genéricos do
+   tema escuro de cada página (ex.: botões e campos) não alterem a barra; muda só o menu. */
+:root[data-theme="dark"] .hm-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#ffffff}
+:root[data-theme="dark"] .hm-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(220,203,145,.5)}
+:root[data-theme="dark"] .hm-btn.active{background:rgba(220,203,145,.18);border-color:rgba(220,203,145,.65)}
+:root[data-theme="dark"] .hm-ctx:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+:root[data-theme="dark"] .hm-btn svg{stroke:#dccb91;fill:none}
+:root[data-theme="dark"] .hm-avatar{background:#dccb91;color:#173a32}
+:root[data-theme="dark"] .hm-user-btn .hm-caret{stroke:rgba(255,255,255,.7)}
+:root[data-theme="dark"] .hm-search{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.75)}
+:root[data-theme="dark"] .hm-search:focus-within{border-color:rgba(220,203,145,.6);background:rgba(255,255,255,.12)}
+:root[data-theme="dark"] .hm-search input{background:transparent;border:0;color:#ffffff}
+:root[data-theme="dark"] .hm-bar .tab-badge{background:#ED7A12;color:#fff}
+:root[data-theme="dark"] .hm-menu-item{background:none}
+:root[data-theme="dark"] .hm-bar{box-shadow:0 10px 30px rgba(0,0,0,.5)}
+:root[data-theme="dark"] .hm-menu{background:#282828;border-color:#414a43;box-shadow:0 14px 34px rgba(0,0,0,.32);color:#d4ddda}
+:root[data-theme="dark"] .hm-menu-who,:root[data-theme="dark"] .hm-menu-sec{border-bottom-color:#3e4641}
+:root[data-theme="dark"] .hm-menu-who b{color:#cfd9d7}
+:root[data-theme="dark"] .hm-menu-who span{color:#a6b2ab}
+:root[data-theme="dark"] .hm-menu-item{color:#de7b73}
+:root[data-theme="dark"] .hm-menu-item:hover{background:#2c1e1c}
+:root[data-theme="dark"] .hm-menu-lbl{color:#a0ada6}
+:root[data-theme="dark"] .hm-menu-nav{color:#cfd9d7}
+:root[data-theme="dark"] .hm-menu-nav:hover{background:#1f2420}
+:root[data-theme="dark"] .hm-menu-nav svg{color:#c1c6b7}
+@media(max-width:720px){:root[data-theme="dark"] .hm-bar{box-shadow:none}:root[data-theme="dark"] .hm-user-btn .hm-avatar{background:transparent;color:#dccb91}}
+@media print{.hm-bar{display:none!important}}

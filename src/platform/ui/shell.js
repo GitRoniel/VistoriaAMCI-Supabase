@@ -1,6 +1,7 @@
 // Moldura das páginas de módulo: cabeçalho no padrão da Visão Geral, telas de estado e avisos.
 import { esc } from "../core/utils.js";
 import { HOME_URL } from "../core/config.js";
+import { hmBarHTML, hmBtnHTML, HM_ICON } from "./hmbar.js";
 
 const ICON = {
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
@@ -14,34 +15,18 @@ ICON.user = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 
 export { ICON };
 
 /**
- * Cabeçalho do app no mesmo padrão das páginas dos condomínios (Vistorias):
- * faixa verde com logos, título, botões e, abaixo, a faixa de abas (no celular, barra inferior).
- * @param {{title:string, user?:{name:string}, actions?:string, tabs?:Array<{id:string,label:string,icon:string}>, active?:string}} o
+ * Cabeçalho do app: a HM Bar, o mesmo cabeçalho de todas as telas da plataforma (src/platform/ui/hmbar.js).
+ * A página informa só a navegação (abas) e ações extras; logos, Início, tema e o menu do usuário são os da barra.
+ * No celular as abas ficam na barra inferior (botnav), como nas telas de Vistorias.
+ * @param {{tabs?:Array<{id:string,label:string,icon:string}>, active?:string, actions?:string, navLabel?:string}} o
  */
-export function appHeaderHTML({ title, user = null, actions = "", tabs = [], active = "" }) {
-  const tabBtns = (cls) => tabs.map((t) => `<button type="button" role="tab" class="${cls}${t.id === active ? " active" : ""}" data-tab="${esc(t.id)}" aria-selected="${t.id === active}"${cls === "tab" ? ` id="tab-${esc(t.id)}" aria-controls="pane-${esc(t.id)}"` : ""}>`
-    + (cls === "tab" ? `<span class="ti">${t.icon}</span>${esc(t.label)}` : `${t.icon}<span>${esc(t.label)}</span>`) + "</button>").join("");
-  return `<div class="pf-appbar">
-    <div class="header">
-      <div class="header-inner">
-        <a class="brand" href="${HOME_URL}" aria-label="Voltar à página inicial">
-          <img class="brand-logo-img" src="/assets/alto-mangueiral-logo-white.png" alt="Alto Mangueiral">
-          <div class="brand-vsep"></div>
-          <div class="engertal-badge"><img src="/assets/engertal-logo.png" alt="Engertal Construtora"></div>
-        </a>
-        <div class="head-spacer"></div>
-        <div class="head-title"><strong>${esc(title)}</strong></div>
-        <div class="head-actions">
-          ${user ? `<span class="userchip" title="${esc(user.name)}">${ICON.user}<span class="ub">${esc(user.name)}</span></span>` : ""}
-          ${actions}
-          <a class="project-switch-btn" href="${HOME_URL}" title="Voltar para a seleção de obras e módulos">${ICON.home}<span>Início</span></a>
-          <button class="icon-btn" type="button" data-theme-toggle aria-label="Alternar tema claro/escuro" title="Alternar tema">${ICON.moon}${ICON.sun}</button>
-        </div>
-      </div>
-    </div>
-    ${tabs.length > 1 ? `<div class="tabs-strip"><div class="tabs" role="tablist" aria-label="Relatórios">${tabBtns("tab")}</div></div>` : ""}
-  </div>
-  ${tabs.length > 1 ? `<nav class="botnav" aria-label="Relatórios">${tabBtns("navbtn")}</nav>` : ""}`;
+export function appHeaderHTML({ actions = "", tabs = [], active = "", navLabel = "Relatórios" }) {
+  const nav = hmBtnHTML({ label: "Início", icon: HM_ICON.home, href: HOME_URL, title: "Voltar à tela inicial" })
+    + (tabs.length > 1 ? `<span class="hm-sep" aria-hidden="true"></span><div class="hm-tabs" role="tablist" aria-label="${esc(navLabel)}">${tabs.map((t) =>
+      `<button type="button" role="tab" class="hm-btn hm-tab${t.id === active ? " active" : ""}" data-tab="${esc(t.id)}" id="tab-${esc(t.id)}" aria-controls="pane-${esc(t.id)}" aria-selected="${t.id === active}">${t.icon}<span class="hm-lbl">${esc(t.label)}</span></button>`).join("")}</div>` : "");
+  const botnav = tabs.length > 1 ? `<nav class="botnav" aria-label="${esc(navLabel)}">${tabs.map((t) =>
+    `<button type="button" role="tab" class="navbtn${t.id === active ? " active" : ""}" data-tab="${esc(t.id)}" aria-selected="${t.id === active}">${t.icon}<span>${esc(t.label)}</span></button>`).join("")}</nav>` : "";
+  return `<div class="pf-appbar">${hmBarHTML({ assets: "/", home: HOME_URL, nav, actions, navLabel })}</div>${botnav}`;
 }
 
 /** Título da seção (mesmo "sec-head" das páginas dos condomínios). O subtítulo fica em #pfSubtitle. */

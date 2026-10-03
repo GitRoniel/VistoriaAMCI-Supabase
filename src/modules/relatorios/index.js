@@ -3,9 +3,11 @@
 // Cada aba busca os dados só quando é aberta pela primeira vez e mantém o estado (filtros) ao alternar.
 import { initTheme } from "../../platform/core/theme.js";
 import { loadSession, signOut } from "../../platform/core/auth.js";
+import { getSupabase } from "../../platform/core/supabase.js";
+import { mountHmUser, HM_ICON } from "../../platform/ui/hmbar.js";
 import { HOME_URL } from "../../platform/core/config.js";
 import { esc } from "../../platform/core/utils.js";
-import { appHeaderHTML, secHeadHTML, stateHTML, ICON } from "../../platform/ui/shell.js";
+import { appHeaderHTML, secHeadHTML, stateHTML } from "../../platform/ui/shell.js";
 import { suprimentosTab } from "../suprimentos/pedidos/tab.js";
 import { contratosTab } from "../contratos/contratos/tab.js";
 import { mountSync } from "./sync.js";
@@ -19,13 +21,35 @@ const page = document.getElementById("app");
 
 const goHome = `<a class="pf-btn primary" href="${HOME_URL}">Ir para a página inicial</a>`;
 const retry = `<button class="pf-btn primary" type="button" onclick="location.reload()">Tentar novamente</button>`;
-const printBtn = `<button class="icon-btn" type="button" data-pf-print aria-label="Imprimir / PDF" title="Imprimir / PDF">${ICON.print}</button>`;
+const printBtn = `<button class="hm-btn hm-icon" type="button" data-pf-print aria-label="Imprimir / PDF" title="Imprimir / PDF">${HM_ICON.print}</button>`;
 
-/** Cabeçalho do app (igual ao das páginas dos condomínios) + conteúdo. */
+/** HM Bar (cabeçalho único da plataforma) + conteúdo. */
+let hmUser = null;
 function frame({ user = null, tabs = [], active = "", body }) {
-  page.innerHTML = appHeaderHTML({ title: "Relatórios", user, actions: user ? printBtn : "", tabs, active }) + `<div class="pf-page" id="pfBody">${body}</div>`;
+  page.innerHTML = appHeaderHTML({ actions: user ? printBtn : "", tabs, active }) + `<div class="pf-page" id="pfBody">${body}</div>`;
   document.body.classList.toggle("has-botnav", tabs.length > 1);
+  document.querySelector(".hm-user").hidden = !user;
+  if (user && hmUser) mountHmUser({ ...hmUser, onLogout: logout });
   trackAppbar();
+}
+async function logout() { await signOut(); location.href = HOME_URL; }
+
+/**
+ * Menu do usuário: mesmas páginas de administração da tela inicial (abrem lá). Leitura apenas,
+ * protegida por RLS: administrador de condomínio vê as três; administrador de módulo, Liberações.
+ */
+async function userMenuInfo(session) {
+  let projectAdmin = false;
+  try {
+    const { data } = await getSupabase().from("project_members").select("role").eq("user_id", session.user.id).eq("active", true);
+    projectAdmin = (data || []).some((m) => m.role === "admin");
+  } catch { /* sem administração no menu */ }
+  const moduleAdmin = [...session.modules.values()].includes("admin");
+  return {
+    name: session.user.name, email: session.user.email,
+    role: projectAdmin || moduleAdmin ? "Admin" : "",
+    adminPages: projectAdmin ? ["liberacoes", "condominios", "logs"] : moduleAdmin ? ["liberacoes"] : []
+  };
 }
 
 // Altura do cabeçalho fixo: os títulos das obras grudam logo abaixo dele ao rolar.
@@ -84,7 +108,7 @@ function mountTabs(tabs, user) {
     if (!wasActive && b.classList.contains("navbtn")) window.scrollTo({ top: 0 });
   });
   page.addEventListener("keydown", (e) => {
-    const b = e.target.closest(".tab[data-tab]"); if (!b || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    const b = e.target.closest(".hm-tab[data-tab]"); if (!b || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
     const i = tabs.findIndex((t) => t.id === b.dataset.tab), n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
     show(n.id); document.getElementById("tab-" + n.id).focus();
   });
@@ -101,7 +125,7 @@ async function boot() {
   initTheme();
   document.addEventListener("click", async (e) => {
     if (e.target.closest("[data-pf-print]")) window.print();
-    if (e.target.closest("[data-pf-logout]")) { await signOut(); location.href = HOME_URL; }
+    if (e.target.closest("[data-pf-logout]")) await logout();
   });
   try { if (localStorage.getItem("amCompact") === "1") document.body.classList.add("compact"); } catch { /* ignora */ }
 
@@ -114,9 +138,10 @@ async function boot() {
     frame({ body: stateHTML({ title: session.status === "offline" ? "Configuração indisponível" : "Faça login para continuar", text: msg, action: goHome }) });
     return;
   }
+  hmUser = await userMenuInfo(session);
   const tabs = TABS.filter((t) => session.modules.has(t.module));
   if (!tabs.length) {
-    frame({ user: session.user, body: stateHTML({ title: "Sem acesso aos relatórios", text: "Peça a um administrador para liberar o módulo Suprimentos ou Contratos em Configurações › Módulos.", action: goHome }) });
+    frame({ user: session.user, body: stateHTML({ title: "Sem acesso aos relatórios", text: "Peça a um administrador para liberar o módulo Suprimentos ou Contratos em Liberações › Acesso aos módulos.", action: goHome }) });
     return;
   }
   mountTabs(tabs, session.user);
