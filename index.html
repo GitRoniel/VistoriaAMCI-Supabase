@@ -1360,6 +1360,21 @@ a.hm-tile{color:#172c25}
   #moduleList .hm-go{display:none}
 }
 #cfgTabs [hidden],#cfgTabs[hidden]{display:none!important}
+/* Páginas do condomínio (Resumo Geral / Vistoria · Cliente): cartões com título e descrição no topo do conteúdo. */
+.vw-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.vw-tab{display:flex;align-items:center;gap:13px;min-height:64px;padding:11px 16px;text-align:left;background:#f8faf8;border:1.5px solid #dbe4dd;border-radius:14px;color:#617168;font-family:inherit;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+.vw-tab:hover{border-color:#9fb6a6;background:#ffffff}
+.vw-tab:focus-visible{outline:3px solid rgba(107,128,64,.45);outline-offset:2px}
+.vw-tab.active{background:#ffffff;border-color:#1f4a3f;box-shadow:0 6px 18px rgba(31,61,56,.1);color:#173a32}
+.vw-ic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto;background:#eef3ef;color:#617168}
+.vw-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vw-tab.active .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
+.vw-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.vw-txt b{font-size:15px;font-weight:700;color:inherit}
+.vw-txt small{font-size:12.5px;font-weight:500;color:#617168;line-height:1.35}
+@media(max-width:720px){.vw-switch{display:none}}
+/* Visão Geral: mesma largura do conteúdo das páginas dos condomínios (1600px − 16px de cada lado = 1568px). */
+@media(min-width:721px){.overview-ov .hm-hero-in,.overview-ov .hm-body{max-width:1600px;padding-left:calc(16px + var(--safe-l));padding-right:calc(16px + var(--safe-r))}}
 /* Páginas de administração: mesma estrutura da tela inicial (barra, saudação, corpo). */
 .adm-body{gap:0}
 .adm-body .cfg-tabs{max-width:460px}
@@ -2034,6 +2049,15 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
   :root[data-theme="dark"] .hm-hero h2{color:#ffffff}
   :root[data-theme="dark"] .hm-hero p{color:rgba(255,255,255,.8)}
 }
+:root[data-theme="dark"] .vw-tab{background:#222822;border:1.5px solid #414a43;color:#a6b2ab}
+:root[data-theme="dark"] .vw-tab:hover{border-color:#515c55;background:#282828}
+:root[data-theme="dark"] .vw-tab:focus-visible{outline:3px solid rgba(107,128,64,.45)}
+:root[data-theme="dark"] .vw-tab.active{background:#282828;border-color:#1f4a3f;box-shadow:0 6px 18px rgba(0,0,0,0.18);color:#cfd9d7}
+:root[data-theme="dark"] .vw-ic{background:#1f2420;color:#a6b2ab}
+:root[data-theme="dark"] .vw-ic svg{stroke:currentColor;fill:none}
+:root[data-theme="dark"] .vw-tab.active .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
+:root[data-theme="dark"] .vw-txt b{color:inherit}
+:root[data-theme="dark"] .vw-txt small{color:#a6b2ab}
 :root[data-theme="dark"] .mods-sel{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
 :root[data-theme="dark"] .mods-row{background:#282828;border:1px solid #414a43}
 :root[data-theme="dark"] .mods-row.on{border-left:3px solid #6B8040}
@@ -2086,7 +2110,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       <img class="hm-engertal" src="./assets/engertal-logo.png" alt="Engertal Construtora">
     </div>
     <nav class="hm-nav" id="hmNav" aria-label="Navegação de Vistorias"><div class="hm-grp" data-hm-screen="home" hidden><label class="hm-search hm-search-top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="hmSearch" placeholder="Buscar condomínio ou relatório…" aria-label="Buscar condomínio ou relatório" autocomplete="off"></label></div>
-      <div class="hm-grp" data-hm-screen="app"><button type="button" id="btnHome" class="hm-btn" title="Voltar para a seleção de obras e módulos" style="display:none" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button><div id="btnProjectSwitch" class="hm-btn hm-ctx" title="Condomínio atual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span class="hm-lbl" id="activeProjectName">Condomínio</span></div><span class="hm-sep" aria-hidden="true"></span><div class="hm-tabs" role="tablist" aria-label="Páginas do condomínio"><button type="button" role="tab" class="hm-btn hm-tab active" data-view="resumo" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span class="hm-lbl">Resumo Geral</span></button><button type="button" role="tab" class="hm-btn hm-tab" data-view="cliente" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="hm-lbl">Vistoria · Cliente</span></button></div><button class="hm-btn hm-icon" id="btnLogin" type="button" title="Entrar para editar" aria-label="Entrar para editar" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div>
+      <div class="hm-grp" data-hm-screen="app"><button type="button" id="btnHome" class="hm-btn" title="Voltar para a seleção de obras e módulos" style="display:none" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button><div id="btnProjectSwitch" class="hm-btn hm-ctx" title="Condomínio atual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg><span class="hm-lbl" id="activeProjectName">Condomínio</span></div><button class="hm-btn hm-icon" id="btnLogin" type="button" title="Entrar para editar" aria-label="Entrar para editar" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button></div>
       <div class="hm-grp" data-hm-screen="overview" hidden><button type="button" id="overviewBack" class="hm-btn" title="Voltar à tela inicial" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button></div>
       <div class="hm-grp" data-hm-screen="import" hidden><button type="button" id="importBack" class="hm-btn" title="Voltar à Visão Geral" aria-label="Visão Geral"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span class="hm-lbl">Visão Geral</span></button></div>
       <div class="hm-grp" data-hm-screen="admin" hidden><button type="button" id="adminBack" class="hm-btn" title="Voltar à tela inicial" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="hm-lbl">Início</span></button></div></nav>
@@ -2110,6 +2134,12 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <!-- /HM-BAR -->
 
 <main class="main">
+
+  <!-- Páginas do condomínio: escolha clara entre o resumo e o mapa/lista (no celular, barra inferior) -->
+  <nav class="vw-switch" aria-label="Páginas do condomínio">
+    <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Números e andamento das vistorias do condomínio</small></span></button>
+    <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
+  </nav>
 
   <!-- ====== OBRA ====== -->
   <section class="view active" id="v-resumo">
@@ -3224,7 +3254,7 @@ function switchView(v){
   closePop(true);
   if(!document.getElementById("v-"+v))v="resumo";
   obraBlk="ALL"; cliBlk="ALL";
-  document.querySelectorAll(".hm-tab,.navbtn").forEach(t=>{t.classList.toggle("active",t.dataset.view===v);if(t.classList.contains("hm-tab"))t.setAttribute("aria-selected",String(t.dataset.view===v));});
+  document.querySelectorAll(".vw-tab,.navbtn").forEach(t=>{t.classList.toggle("active",t.dataset.view===v);if(t.classList.contains("vw-tab"))t.setAttribute("aria-pressed",String(t.dataset.view===v));});
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active",s.id==="v-"+v));
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
@@ -3233,7 +3263,7 @@ function switchView(v){
   animateView(v);
   scrollTo(0,0);
 }
-document.querySelectorAll(".hm-tab,.navbtn").forEach(t=>t.onclick=()=>switchView(t.dataset.view));
+document.querySelectorAll(".vw-tab,.navbtn").forEach(t=>t.onclick=()=>switchView(t.dataset.view));
 
 /* ── SYNC ── */
 // Situação da sincronização: sem indicador no cabeçalho (como nos Relatórios); falhas continuam avisadas por mensagem.
@@ -4977,7 +5007,7 @@ document.getElementById("aprQ").addEventListener("input",e=>{aprFilt.q=e.target.
 document.getElementById("aprRefresh").onclick=()=>loadUsers();
 document.getElementById("aprStatus").addEventListener("click",e=>{const b=e.target.closest("[data-apr-status]");if(!b)return;aprFilt.status=b.dataset.aprStatus;renderApr();});
 document.getElementById("aprList").addEventListener("click",e=>{const b=e.target.closest("[data-apr-act]");if(b&&!b.disabled)aprAction(b.dataset.aprAct,+b.dataset.aprI,b);});
-if(window.gsap){gsap.from(".hm-tabs .hm-tab",{y:-8,opacity:0,duration:.4,stagger:.06,delay:.15,clearProps:"all"});}
+if(window.gsap){gsap.from(".vw-switch .vw-tab",{y:-8,opacity:0,duration:.4,stagger:.06,delay:.15,clearProps:"all"});}
 switchView("resumo");
 setSync("");
 bootAuth();
