@@ -12,11 +12,12 @@ export const STATUS_OPTIONS = [
 ];
 
 export const emptyFilters = () => ({
-  oc: "", material: "", fornecedor: "",
+  pedido: "", oc: "", material: "", fornecedor: "",
   dtIni: "", dtFim: "",
   obras: new Set(), pedidos: new Set(), solicitantes: new Set(),
   status: "abertos",
-  ocultarEntregues: true
+  // "Ocultar pedidos totalmente entregues" começa sempre desligado.
+  ocultarEntregues: false
 });
 
 /** Palavras do filtro de material (todas precisam aparecer, sem acento). */
@@ -28,8 +29,12 @@ export function ocMatches(p, q) {
   return p.ocs.some((oc) => oc.toLowerCase().includes(q)) || p.materiais.some((m) => (m.oc || "").toLowerCase().includes(q));
 }
 
+/** Pedido: número (prefixo) ou trecho do número. */
+const pedidoMatches = (p, q) => (/^\d+$/.test(q) ? String(p.pedido).startsWith(q) : String(p.pedido).includes(q));
+
 export function applyFilters(pedidos, f) {
   const words = materialWords(f);
+  const ped = (f.pedido || "").trim();
   const oc = f.oc.trim().toLowerCase();
   const forn = normText(f.fornecedor.trim());
   return pedidos.filter((p) => {
@@ -41,6 +46,7 @@ export function applyFilters(pedidos, f) {
     if (f.solicitantes.size && !f.solicitantes.has(p.solicitante)) return false;
     if (f.ocultarEntregues && p.delivery_status === DELIVERY.TOTAL) return false;
     if (f.pedidos.size && !f.pedidos.has(p.key)) return false;
+    if (ped && !pedidoMatches(p, ped)) return false;
     if (oc && !ocMatches(p, oc)) return false;
     if (forn && !p.fornecedores.some((n) => normText(n).includes(forn))) return false;
     if (words.length && !p.materiais.some((m) => materialHit(m, words))) return false;

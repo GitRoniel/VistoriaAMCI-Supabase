@@ -4,7 +4,7 @@ import { ICON, toast } from "../../../platform/ui/shell.js";
 import { createMultiSelect } from "../../../platform/ui/multiselect.js";
 import { attachAutocomplete } from "../../../platform/ui/autocomplete.js";
 import { DELIVERY, OC, kpis } from "./model.js";
-import { STATUS_OPTIONS, emptyFilters, applyFilters, materialWords, materialHit, obraOptions, pedidoOptions, syncPedidosWithSolicitantes, pruneSelections } from "./filters.js";
+import { STATUS_OPTIONS, emptyFilters, applyFilters, materialWords, materialHit, obraOptions, pruneSelections } from "./filters.js";
 import { renderCharts } from "./charts.js";
 
 const SOL_PALETTE = ["#1F3D38", "#6B8040", "#A38F52", "#ED7A12", "#2980b9", "#8e44ad", "#16a085", "#d35400", "#c0392b", "#27ae60", "#2c3e50", "#7f8c8d", "#e67e22", "#1abc9c", "#9b59b6"];
@@ -12,6 +12,9 @@ const COMPACT_KEY = "amCompact";
 const SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
 const CHEV = '<span class="pd-chev" aria-hidden="true"><svg viewBox="0 0 16 16"><polyline points="6,3 10,8 6,13"/></svg></span>';
 
+// Colunas da tabela de pedidos (a linha de títulos é repetida no topo fixo de cada obra).
+const COLS = '<colgroup><col class="w-chev"><col class="w-ped"><col><col class="w-itens"><col class="w-oc"><col class="w-ent"><col class="w-dt"><col class="w-dt"></colgroup>';
+const HEAD = '<th aria-label="Expandir"></th><th class="l">Pedido</th><th class="l">Descrição · fornecedor</th><th class="r">Itens</th><th class="l">Ordem de compra</th><th class="l">Entrega</th><th class="r">Dt. pedido</th><th class="r">Prev. entrega</th>';
 const statusBadge = (s) => s === DELIVERY.TOTAL ? '<span class="pf-badge b-ok">Entregue</span>'
   : s === DELIVERY.PARTIAL ? '<span class="pf-badge b-partial">Parcial</span>'
   : s === DELIVERY.PENDING ? '<span class="pf-badge b-danger">Pendente</span>'
@@ -33,7 +36,6 @@ export function mountPedidos(root, { pedidos }) {
   const solicitantes = [...new Set(pedidos.map((p) => p.solicitante))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const solColor = new Map(solicitantes.map((u, i) => [u, SOL_PALETTE[i % SOL_PALETTE.length]]));
   const insumos = [...new Set(pedidos.flatMap((p) => p.materiais.map((m) => m.nome)))].sort();
-  const fornecedores = [...new Set(pedidos.flatMap((p) => p.fornecedores))].filter((n) => n && n !== "********").sort();
   const expanded = new Set();
   let view = [], showCharts = false;
   let compact = false;
@@ -43,27 +45,25 @@ export function mountPedidos(root, { pedidos }) {
   root.innerHTML = `
     <section class="pf-kpis" id="pdKpis" aria-label="Indicadores"></section>
     <section class="fx pd-filters" id="pdFilters" aria-label="Filtros">
-      <label class="fx-search" id="pdOcWrap">${SEARCH}<input type="search" id="pdOc" placeholder="Ordem de compra" aria-label="Buscar ordem de compra"></label>
-      <label class="fx-search pd-mat" id="pdMatWrap">${SEARCH}<input type="search" id="pdMat" placeholder="Material (palavras-chave): cabo flexível, tinta…" aria-label="Buscar material"></label>
-      <label class="fx-search" id="pdFornWrap">${SEARCH}<input type="search" id="pdForn" placeholder="Fornecedor" aria-label="Buscar fornecedor"></label>
-      <div class="pd-adv fx-adv" id="pdAdv">
-        <label class="fx-field" id="pdIniWrap"><span>De</span><input type="date" id="pdIni" aria-label="Data do pedido a partir de"></label>
-        <label class="fx-field" id="pdFimWrap"><span>Até</span><input type="date" id="pdFim" aria-label="Data do pedido até"></label>
-        <div class="ms" id="pdObras"><button type="button" class="fx-field ms-btn"><span>Todas as obras</span></button></div>
+      <div class="pd-line">
+        <label class="fx-search pd-fped" id="pdPedWrap">${SEARCH}<input type="search" id="pdPed" placeholder="Pedido" aria-label="Número do pedido" inputmode="numeric" autocomplete="off"></label>
+        <label class="fx-search pd-foc" id="pdOcWrap">${SEARCH}<input type="search" id="pdOc" placeholder="OC" aria-label="Ordem de compra" autocomplete="off"></label>
+        <label class="fx-search pd-mat" id="pdMatWrap">${SEARCH}<input type="search" id="pdMat" placeholder="Material (palavras-chave): cabo flexível, tinta…" aria-label="Buscar material" autocomplete="off"></label>
+        <div class="ms pd-obras" id="pdObras"><button type="button" class="fx-field ms-btn" aria-label="Obra"><small class="ms-lbl">Obra</small><span>Todas as obras</span></button></div>
         <label class="fx-field pd-status" id="pdStatusWrap"><span>Entrega</span><select id="pdStatus" aria-label="Status de entrega">${STATUS_OPTIONS.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
-        <div class="ms" id="pdPeds"><button type="button" class="fx-field ms-btn"><span>Todos os pedidos</span></button></div>
       </div>
       <div class="pd-sol"><span class="fx-lbl">Solicitantes</span><div class="fx-scroll" id="pdSol"></div></div>
-      <div class="pd-tg fx-toggles">
-        <label class="pf-switch"><input type="checkbox" id="pdHide" checked><b></b>Ocultar pedidos totalmente entregues</label>
-        <label class="pf-switch"><input type="checkbox" id="pdCompact"${compact ? " checked" : ""}><b></b>Modo compacto</label>
-        <label class="pf-switch"><input type="checkbox" id="pdShowCharts"><b></b>Mostrar gráficos</label>
-      </div>
-      <div class="pd-acts">
-        <span class="fx-count" id="pdCount"></span>
-        <button class="pf-btn" id="pdClear" type="button">Limpar</button>
-        <button class="pf-btn fx-more" id="pdMore" type="button" aria-expanded="false">Filtros <b class="fx-badge" id="pdBadge" hidden></b></button>
-        <button class="pf-btn pd-expand-all" id="pdExpandAll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span>Expandir todos</span></button>
+      <div class="pd-tools">
+        <div class="pd-tg fx-toggles">
+          <label class="pf-switch"><input type="checkbox" id="pdHide"><b></b>Ocultar pedidos totalmente entregues</label>
+          <label class="pf-switch"><input type="checkbox" id="pdCompact"${compact ? " checked" : ""}><b></b>Modo compacto</label>
+          <label class="pf-switch"><input type="checkbox" id="pdShowCharts"><b></b>Mostrar gráficos</label>
+        </div>
+        <div class="pd-acts">
+          <span class="fx-count" id="pdCount"></span>
+          <button class="pf-btn" id="pdClear" type="button">Limpar</button>
+          <button class="pf-btn pd-expand-all" id="pdExpandAll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span>Expandir todos</span></button>
+        </div>
       </div>
       <div class="pf-active" id="pdActive"></div>
     </section>
@@ -85,39 +85,28 @@ export function mountPedidos(root, { pedidos }) {
     const b = e.target.closest("[data-sol]"); if (!b) return;
     const u = b.dataset.sol;
     if (!u) f.solicitantes.clear(); else f.solicitantes.has(u) ? f.solicitantes.delete(u) : f.solicitantes.add(u);
-    syncPedidosWithSolicitantes(pedidos, f);
     pruneSelections(pedidos, f);
-    renderSolicitantes(); obrasMs.refresh(); pedsMs.refresh(); render();
+    renderSolicitantes(); obrasMs.refresh(); render();
   });
 
-  /* ── Obras e pedidos (seleção múltipla) ── */
+  /* ── Obras (seleção múltipla) ── */
   const obrasMs = createMultiSelect($("pdObras"), {
     allLabel: "Todas as obras", searchPlaceholder: "Buscar obra…",
     getOptions: () => obraOptions(pedidos, f).map((o) => ({ key: o, label: o })),
     getSelected: () => f.obras,
-    onChange: (sel) => { f.obras = sel; pruneSelections(pedidos, f); pedsMs.refresh(); render(); },
-    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? `Obra ${[...sel][0]}` : `${sel.size} obras`
-  });
-  const pedsMs = createMultiSelect($("pdPeds"), {
-    allLabel: "Todos os pedidos", searchPlaceholder: "Buscar pedido, obra, solicitante ou fornecedor…",
-    getOptions: () => pedidoOptions(pedidos, f).map((p) => ({ key: p.key, tag: p.obra, label: "#" + p.pedido, sub: p.fornecedor || p.solicitante, search: `${p.pedido} ${p.obra} ${p.solicitante} ${p.fornecedor}` })),
-    getSelected: () => f.pedidos,
-    onChange: (sel) => { f.pedidos = sel; render(); },
-    summary: (sel, total) => !sel.size || sel.size === total ? "Todos os pedidos" : `${sel.size} pedido(s): ` + [...sel].slice(0, 3).map((k) => "#" + k.split("-").pop()).join(", ") + (sel.size > 3 ? "…" : "")
+    onChange: (sel) => { f.obras = sel; pruneSelections(pedidos, f); render(); },
+    summary: (sel) => !sel.size ? "Todas as obras" : sel.size === 1 ? [...sel][0] : `${sel.size} obras`
   });
 
   /* ── Buscas (com sugestões) ── */
   const live = debounce(render, 220);
+  $("pdPed").addEventListener("input", (e) => { f.pedido = e.target.value; live(); });
   $("pdOc").addEventListener("input", (e) => { f.oc = e.target.value; live(); });
   $("pdMat").addEventListener("input", (e) => { f.material = e.target.value; live(); });
-  $("pdForn").addEventListener("input", (e) => { f.fornecedor = e.target.value; live(); });
   // O "x" e o Esc de campos de busca limpam o texto: mantém o filtro igual ao que está escrito.
-  [["pdOc", "oc"], ["pdMat", "material"], ["pdForn", "fornecedor"]].forEach(([id, k]) =>
+  [["pdPed", "pedido"], ["pdOc", "oc"], ["pdMat", "material"]].forEach(([id, k]) =>
     $(id).addEventListener("search", (e) => { if (f[k] !== e.target.value) { f[k] = e.target.value; render(); } }));
   attachAutocomplete($("pdMat"), { getItems: () => insumos, onPick: (v) => { f.material = v; render(); } });
-  attachAutocomplete($("pdForn"), { getItems: () => fornecedores, onPick: (v) => { f.fornecedor = v; render(); } });
-  $("pdIni").addEventListener("change", (e) => { f.dtIni = e.target.value; render(); });
-  $("pdFim").addEventListener("change", (e) => { f.dtFim = e.target.value; render(); });
   $("pdStatus").addEventListener("change", (e) => { f.status = e.target.value; render(); });
   $("pdHide").addEventListener("change", (e) => { f.ocultarEntregues = e.target.checked; render(); });
   $("pdCompact").addEventListener("change", (e) => {
@@ -128,10 +117,6 @@ export function mountPedidos(root, { pedidos }) {
     showCharts = e.target.checked; $("pdCharts").hidden = !showCharts;
     if (showCharts) renderCharts(view).catch(() => toast("Não foi possível carregar os gráficos."));
   });
-  $("pdMore").addEventListener("click", (e) => {
-    const open = !$("pdFilters").classList.contains("fx-open");
-    $("pdFilters").classList.toggle("fx-open", open); e.currentTarget.setAttribute("aria-expanded", String(open));
-  });
   $("pdClear").addEventListener("click", clearAll);
   $("pdExpandAll").addEventListener("click", () => {
     const all = view.length > 0 && view.every((p) => expanded.has(p.key));
@@ -141,40 +126,34 @@ export function mountPedidos(root, { pedidos }) {
 
   /* ── Filtros ativos (com remoção individual) ── */
   const CLEAR = {
-    sol: () => { f.solicitantes.clear(); syncPedidosWithSolicitantes(pedidos, f); renderSolicitantes(); },
-    datas: () => { f.dtIni = f.dtFim = ""; $("pdIni").value = $("pdFim").value = ""; },
+    sol: () => { f.solicitantes.clear(); renderSolicitantes(); },
     obras: () => { f.obras.clear(); },
-    peds: () => { f.pedidos.clear(); },
+    ped: () => { f.pedido = ""; $("pdPed").value = ""; },
     oc: () => { f.oc = ""; $("pdOc").value = ""; },
-    forn: () => { f.fornecedor = ""; $("pdForn").value = ""; },
     mat: () => { f.material = ""; $("pdMat").value = ""; }
   };
   $("pdActive").addEventListener("click", (e) => {
     const k = e.target.closest("[data-af]")?.dataset.af; if (!k) return;
-    CLEAR[k](); obrasMs.refresh(); pedsMs.refresh(); render();
+    CLEAR[k](); obrasMs.refresh(); render();
   });
   function renderActive() {
     const chips = [];
     const add = (k, label) => chips.push(`<span class="af"><span>${esc(label)}</span><button type="button" data-af="${k}" aria-label="Remover filtro ${esc(label)}">×</button></span>`);
     if (f.solicitantes.size) add("sol", [...f.solicitantes].join(", "));
-    if (f.dtIni || f.dtFim) add("datas", `Período: ${f.dtIni ? fmtDateShort(f.dtIni) : "…"} a ${f.dtFim ? fmtDateShort(f.dtFim) : "…"}`);
     if (f.obras.size) add("obras", "Obra: " + (f.obras.size === 1 ? [...f.obras][0] : f.obras.size + " obras"));
-    if (f.pedidos.size) add("peds", `${f.pedidos.size} pedido(s)`);
+    if (f.pedido.trim()) add("ped", "Pedido: " + f.pedido.trim());
     if (f.oc.trim()) add("oc", "OC: " + f.oc.trim());
-    if (f.fornecedor.trim()) add("forn", "Fornecedor: " + f.fornecedor.trim());
     if (f.material.trim()) add("mat", "Material: " + f.material.trim());
     $("pdActive").innerHTML = chips.length ? `<span class="af-lbl">Filtros ativos:</span>${chips.join("")}` : "";
-    const adv = [f.dtIni, f.dtFim, f.obras.size, f.pedidos.size, f.status !== "abertos"].filter(Boolean).length;
-    $("pdBadge").textContent = adv; $("pdBadge").hidden = !adv;
-    [["pdIniWrap", f.dtIni], ["pdFimWrap", f.dtFim], ["pdOcWrap", f.oc.trim()], ["pdMatWrap", f.material.trim()], ["pdFornWrap", f.fornecedor.trim()], ["pdStatusWrap", f.status !== "abertos"]]
+    [["pdPedWrap", f.pedido.trim()], ["pdOcWrap", f.oc.trim()], ["pdMatWrap", f.material.trim()], ["pdStatusWrap", f.status !== "abertos"]]
       .forEach(([id, on]) => $(id).classList.toggle("on", !!on));
   }
 
   function clearAll() {
     Object.assign(f, emptyFilters());
-    ["pdOc", "pdMat", "pdForn", "pdIni", "pdFim"].forEach((id) => ($(id).value = ""));
-    $("pdStatus").value = "abertos"; $("pdHide").checked = true;
-    expanded.clear(); renderSolicitantes(); obrasMs.refresh(); pedsMs.refresh(); render();
+    ["pdPed", "pdOc", "pdMat"].forEach((id) => ($(id).value = ""));
+    $("pdStatus").value = "abertos"; $("pdHide").checked = f.ocultarEntregues;
+    expanded.clear(); renderSolicitantes(); obrasMs.refresh(); render();
   }
 
   /* ── Indicadores ── */
@@ -223,19 +202,20 @@ export function mountPedidos(root, { pedidos }) {
       const rows = byObra.get(obra);
       const itens = rows.reduce((t, p) => t + p.n_itens, 0);
       html += `<section class="pf-card pd-obra" aria-label="Obra ${esc(obra)}">
+        <div class="pd-sticky">
         <header class="pd-obra-h">
           <div class="pd-obra-t"><span class="pd-obra-k">Obra</span><h2>${esc(obra)}</h2><span class="pd-obra-m">${rows.length} pedido(s) · ${itens} ${itens === 1 ? "item" : "itens"}</span></div>
           <div class="pd-obra-s">${obraTotals(rows)}</div>
         </header>
-        <div class="pf-table-wrap"><table class="pd-tbl"><colgroup><col class="w-chev"><col class="w-ped"><col><col class="w-itens"><col class="w-oc"><col class="w-ent"><col class="w-dt"><col class="w-dt"></colgroup><thead><tr>
-          <th aria-label="Expandir"></th><th class="l">Pedido</th><th class="l">Descrição · fornecedor</th><th class="r">Itens</th><th class="l">Ordem de compra</th><th class="l">Entrega</th><th class="r">Dt. pedido</th><th class="r">Prev. entrega</th>
-        </tr></thead><tbody>${rows.map((p, i) => {
+        <div class="pd-thead-wrap" aria-hidden="true"><table class="pd-tbl pd-thead">${COLS}<thead><tr>${HEAD}</tr></thead></table></div>
+        </div>
+        <div class="pf-table-wrap"><table class="pd-tbl">${COLS}<thead class="pd-thead-a11y"><tr>${HEAD}</tr></thead><tbody>${rows.map((p, i) => {
           const open = expanded.has(p.key);
           const c = solColor.get(p.solicitante) || "#6B8040";
           const ocDone = p.oc_status === OC.DONE;
           return `<tr class="pd-row${i % 2 ? " z" : ""}${open ? " open" : ""}${ocDone ? "" : " no-oc"}" data-key="${esc(p.key)}" tabindex="0" aria-expanded="${open}">
             <td class="c-chev">${CHEV}</td>
-            <td class="c-ped l"><b class="pd-ped">#${p.pedido}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
+            <td class="c-ped l"><b class="pd-ped" title="Pedido ${esc(p.pedido)}">${esc(p.pedido)}</b><span class="pd-sol-tag" style="--c:${c}">${esc(p.solicitante)}</span></td>
             <td class="c-desc l"><span class="pd-desc-t" title="${esc(p.descricao)}">${esc(p.descricao)}</span><span class="pd-forn-t"${p.fornecedor ? ` title="${esc(p.fornecedor)}"` : ""}>${p.fornecedor ? esc(p.fornecedor) : "Sem fornecedor"}</span></td>
             <td class="c-itens r" data-l="Itens">${p.n_itens}</td>
             <td class="c-oc l" data-l="Ordem de compra"><span class="pd-oc"${p.oc ? ` title="${esc(p.oc)}"` : ""}>${p.oc ? esc(p.oc) : "—"}</span><span class="pd-ocst ${ocDone ? "ok" : "pend"}">${ocDone ? "OC gerada" : "OC pendente"}</span></td>
@@ -256,6 +236,12 @@ export function mountPedidos(root, { pedidos }) {
     b.setAttribute("aria-pressed", String(all));
     b.querySelector("span").textContent = all ? "Recolher todos" : "Expandir todos";
   }
+
+  // A linha de títulos das colunas fica fixa junto com a da obra; acompanha a rolagem lateral da tabela.
+  $("pdList").addEventListener("scroll", (e) => {
+    const wrap = e.target; if (!wrap.classList?.contains("pf-table-wrap")) return;
+    const head = wrap.closest(".pd-obra")?.querySelector(".pd-thead"); if (head) head.style.transform = `translateX(${-wrap.scrollLeft}px)`;
+  }, true);
 
   const toggleRow = (key) => { expanded.has(key) ? expanded.delete(key) : expanded.add(key); renderList(); root.querySelector(`tr.pd-row[data-key="${CSS.escape(key)}"]`)?.focus({ preventScroll: true }); };
   $("pdList").addEventListener("click", (e) => { const tr = e.target.closest("tr.pd-row"); if (tr) toggleRow(tr.dataset.key); });

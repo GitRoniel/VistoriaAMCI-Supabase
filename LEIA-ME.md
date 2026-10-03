@@ -140,7 +140,7 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Todas as telas usam o mesmo cabeçalho: tela inicial, condomínio, Visão Geral, Importação, Liberações, Configuração de Condomínios, Logs e Relatórios. Mesma altura, logos, tema e botão do usuário (HM User); cada página só acrescenta os botões dela, à direita, ao lado do tema:
   - **Condomínio:** Início e o condomínio atual. As páginas *Resumo Geral* e *Vistoria · Cliente* ficam no topo do conteúdo, em dois cartões com uma descrição de cada uma (no celular, na barra inferior).
   - **Visão Geral** e **Administração:** Início. **Importação:** voltar à Visão Geral.
-  - **Relatórios:** Início, abas *Suprimentos* e *Contratos* e Imprimir.
+  - **Relatórios:** Início e as abas *Suprimentos* e *Contratos*.
 - Código: `src/platform/ui/hmbar.js` (HTML) e `src/platform/styles/hmbar.css` (estilos). No `www/index.html` a barra é gerada pelo build entre `<!-- HM-BAR -->` e `<!-- /HM-BAR -->` (botões de Vistorias em `src/modules/vistorias/hmbar.js`) e existe uma única vez: a página a move para a tela aberta. Para mudar o cabeçalho, edite esses arquivos e rode `pnpm build`.
 
 ## Tela inicial (central de acesso)

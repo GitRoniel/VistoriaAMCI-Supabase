@@ -68,3 +68,12 @@ não comprado (ex.: 15POS pedido 5: 200 com OC + 1 sem OC).
 - **Status da OC:** um pedido fica "OC pendente" quando qualquer item com saldo está sem OC.
 - **Descrição do pedido:** vem da observação do pedido no ERP. Se a planilha usava outro texto (resumo dos itens, por exemplo), basta ajustar `model.js`.
 - **Obras:** aparecem pelo código do ERP (ex.: 18OBA), não pelo nome do condomínio.
+
+## Filtros da tela
+
+Uma linha compacta, nesta ordem: **Pedido** (número, cabe 4 dígitos), **OC** (ordem de compra, cabe
+4 dígitos), **Material** (palavras-chave, com sugestões; abre e destaca os itens encontrados),
+**Obra** (seleção múltipla) e **Entrega** (padrão: apenas em aberto). Abaixo, os **solicitantes**
+(chips coloridos) e as opções: "Ocultar pedidos totalmente entregues" (sempre começa **desligado**),
+modo compacto e gráficos; à direita, a quantidade de pedidos, **Limpar** e **Expandir todos**.
+Ao rolar, cada obra mantém no topo a linha da obra (contagens) e a linha dos títulos das colunas.

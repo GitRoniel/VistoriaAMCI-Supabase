@@ -1,34 +1,30 @@
 /* Relatório de Pedidos · estilos específicos (o restante vem de platform.css) */
-/* ── Filtros: grade compacta (mesmos campos e ids; só a disposição muda) ──
-   Computador: 1) buscas + obras + pedidos · 2) datas, entrega e solicitantes · 3) opções e ações. */
-.pd-filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px 8px;padding:10px 12px;
-  grid-template-areas:"oc mat mat forn obras peds" "ini fim st sol sol sol" "tg tg tg acts acts acts" "af af af af af af"}
-.pd-filters .pd-adv{display:contents}
-#pdOcWrap{grid-area:oc} #pdMatWrap{grid-area:mat} #pdFornWrap{grid-area:forn} #pdObras{grid-area:obras} #pdPeds{grid-area:peds}
-#pdIniWrap{grid-area:ini} #pdFimWrap{grid-area:fim} #pdStatusWrap{grid-area:st}
-.pd-filters .pd-sol{grid-area:sol} .pd-filters .pd-tg{grid-area:tg} .pd-filters .pd-acts{grid-area:acts} .pd-filters .pf-active{grid-area:af;margin-top:0}
-.pd-filters .fx-search,.pd-filters .fx-field{min-width:0}
-.pd-filters .fx-field input[type=date]{width:auto;flex:1;min-width:0}
-.pd-sol{display:flex;align-items:center;gap:8px;min-width:0}
+/* ── Filtros (compactos) ──
+   1ª linha: Pedido · OC · Material · Obra · Entrega  ·  2ª: solicitantes  ·  3ª: opções e ações. */
+.pd-filters{padding:10px 12px}
+.pd-line{display:grid;grid-template-columns:112px 112px minmax(200px,1fr) minmax(170px,220px) minmax(190px,230px);gap:8px;align-items:center}
+.pd-filters .fx-search,.pd-filters .fx-field{height:32px;padding:0 9px;border-radius:9px;gap:6px;min-width:0}
+.pd-filters .fx-search input,.pd-filters .fx-field select,.pd-filters .ms-btn span:first-of-type{font-size:12.5px}
+.pd-filters .fx-search svg{width:14px;height:14px;flex:0 0 auto}
+.pd-filters .fx-field:not(.ms-btn)>span,.pd-filters .ms-lbl{flex:0 0 auto;font-size:10.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.pd-filters .ms{min-width:0}
+.pd-sol{display:flex;align-items:center;gap:8px;min-width:0;margin-top:8px}
 .pd-sol .fx-lbl{min-width:0;flex:0 0 auto;font-size:10px}
 .pd-sol .fx-scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding:1px 0}
 .pd-sol .fchip{height:26px;padding:0 9px;font-size:11px;flex:0 0 auto}
+.pd-tools{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;margin-top:8px}
 .pd-tg{display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap;min-width:0}
 .pd-tg .pf-switch{font-size:11.5px;gap:7px}
 .pd-tg .pf-switch b{width:28px;height:16px}
 .pd-tg .pf-switch b::after{top:3px;left:3px;width:10px;height:10px}
 .pd-tg .pf-switch input:checked+b::after{left:15px}
-.pd-acts{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;min-width:0}
-.pd-acts .fx-count{margin-right:4px}
-@media(min-width:721px){
-  .pd-filters .fx-search,.pd-filters .fx-field{height:32px;padding:0 9px;border-radius:9px;gap:6px}
-  .pd-filters .fx-search input,.pd-filters .fx-field input,.pd-filters .fx-field select,.pd-filters .ms-btn span:first-of-type{font-size:12.5px}
-  .pd-filters .fx-search svg{width:14px;height:14px}
-  .pd-acts .pf-btn{min-height:30px;padding:0 10px;font-size:12px}
-}
+.pd-acts{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
+.pd-acts .pf-btn{height:30px;padding:0 10px;font-size:12px}
+.pd-filters .pf-active{margin-top:8px}
 @media(min-width:721px) and (max-width:1100px){
-  .pd-filters{grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-template-areas:"mat mat oc forn" "obras peds ini fim" "st sol sol sol" "tg tg tg tg" "af af acts acts"}
+  .pd-line{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .pd-line .pd-fped,.pd-line .pd-foc{grid-column:span 1}.pd-line .pd-mat{grid-column:span 4}
+  .pd-line .pd-obras,.pd-line .pd-status{grid-column:span 3}
 }
 .pd-toggles{justify-content:space-between}
 .pd-expand-all svg{transition:transform .15s}
@@ -42,7 +38,12 @@
 /* ── Grupo por obra ──
    Cabeçalho forte (nome da obra + totais) e tabela leve: a cor fica só para status e agrupamento. */
 .pd-obra{margin-bottom:16px;overflow:clip;border-left:4px solid var(--ink-2)}
-.pd-obra-h{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+/* Topo fixo de cada obra ao rolar: linha da obra (totais) + linha dos títulos das colunas. */
+.pd-sticky{position:sticky;top:var(--pf-appbar-h,max(var(--safe-t),4px));z-index:5;background:var(--surface)}
+.pd-thead-wrap{overflow:hidden;border-bottom:1px solid var(--border)}
+.pd-thead-wrap .pd-thead thead th{border-bottom:0}
+.pd-thead-a11y{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pd-obra-h{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
 .pd-obra-t{display:flex;align-items:baseline;gap:10px;min-width:0}
 .pd-obra-k{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fern)}
 .pd-obra-h h2{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:.01em;line-height:1.2}
@@ -78,7 +79,11 @@ tr.open .pd-chev{transform:rotate(90deg)}
 /* Células empilhadas: linha principal + linha de apoio */
 .c-ped,.c-desc,.c-oc,.c-ent{line-height:1.25}
 .c-ped>*,.c-desc>*,.c-oc>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pd-ped{font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+/* Número do pedido em destaque (sem "#"): selo com o número; fica sólido com o pedido aberto. */
+.c-ped>.pd-ped{display:inline-flex;align-items:center;justify-content:center;min-width:34px;max-width:100%;height:24px;padding:0 9px;border-radius:7px;background:color-mix(in srgb,var(--ink-2) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--ink-2) 22%,transparent);color:var(--ink);font-size:14.5px;font-weight:800;letter-spacing:-.01em;line-height:1;font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+tr.pd-row.open .pd-ped{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+.c-ped>.pd-sol-tag{margin-top:4px}
+body.compact .c-ped>.pd-ped{height:21px;font-size:13.5px;padding:0 7px}
 .pd-sol-tag{margin-top:2px;font-size:10.5px;font-weight:700;color:var(--text-2);letter-spacing:.02em}
 .pd-sol-tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
 .pd-desc-t{font-weight:600;color:var(--text)}
@@ -140,26 +145,19 @@ body.compact .pd-chart .box{height:118px}
 
 @media(max-width:900px){.pd-charts{grid-template-columns:1fr 1fr}.pd-charts .wide{grid-column:1 / -1}}
 @media(max-width:720px){
-  /* Celular: buscas · ações (Limpar, Filtros, Expandir) · painel de filtros · solicitantes · opções · filtros ativos + contagem */
-  .pd-filters{grid-template-columns:repeat(10,minmax(0,1fr));gap:7px;padding:10px;
-    grid-template-areas:"mat mat mat mat mat mat mat mat mat mat" "oc oc oc oc oc forn forn forn forn forn" "clr clr clr more more more exp exp exp exp"
-      "adv adv adv adv adv adv adv adv adv adv" "sol sol sol sol sol sol sol sol sol sol" "tg tg tg tg tg tg tg tg tg tg" "af af af af af af af cnt cnt cnt"}
-  .pd-filters .pd-acts{display:contents}
-  #pdClear{grid-area:clr} #pdMore{grid-area:more} #pdExpandAll{grid-area:exp}
-  .pd-filters .pd-acts .pf-btn{min-width:0;padding:0 8px}
-  #pdCount{grid-area:cnt;justify-self:end;align-self:center;margin:0}
-  .pd-filters .pd-adv{grid-area:adv}
-  /* Dentro do painel "Filtros" do celular, os campos voltam ao fluxo normal da grade de 2 colunas. */
-  #pdIniWrap,#pdFimWrap,#pdObras,#pdPeds{grid-area:auto}
-  #pdStatusWrap{grid-area:auto;grid-column:1 / -1}
+  /* Celular: Pedido + OC · Material · Obra + Entrega · solicitantes · opções · ações */
+  .pd-filters{padding:10px}
+  .pd-line{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+  .pd-line .pd-mat{grid-column:1 / -1}
+  .pd-filters .fx-search,.pd-filters .fx-field{height:38px}
+  .pd-filters .fx-search input,.pd-filters .fx-field select,.pd-filters .ms-btn span:first-of-type{font-size:16px}
+  .pd-filters .fx-field:not(.ms-btn)>span,.pd-filters .ms-lbl{display:none}
   .pd-tg{gap:8px 14px}
-  .pd-adv{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .pd-adv .ms,.pd-adv .fx-field.pd-status{max-width:none}
-  .pd-adv .fx-field{min-width:0}
-  .pd-adv .fx-field input[type=date]{width:100%}
-  .pd-adv .pd-status{grid-column:1 / -1;order:5}
+  .pd-acts{width:100%;margin-left:0}
+  .pd-acts .fx-count{margin-right:auto}
   .pd-sol .fx-scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   .pd-sol .fx-scroll::-webkit-scrollbar{display:none}
+  .pd-thead-wrap{display:none}
   .pd-charts{grid-template-columns:1fr}
   /* Pedidos e materiais viram cartões: sem rolagem lateral */
   .pd-obra{border-left-width:3px;border-radius:12px}
@@ -180,7 +178,7 @@ body.compact .pd-chart .box{height:118px}
   .pd-tbl tr.pd-row.no-oc{box-shadow:inset 3px 0 0 var(--sunset)}
   .pd-tbl tr.pd-row.no-oc td:first-child{box-shadow:none}
   .pd-tbl td.c-chev{grid-column:1;grid-row:1}
-  .pd-tbl td.c-ped{grid-column:2 / 4;grid-row:1;display:flex;align-items:baseline;gap:8px}
+  .pd-tbl td.c-ped{grid-column:2 / 4;grid-row:1;display:flex;align-items:center;gap:8px}
   .pd-tbl td.c-ped .pd-sol-tag{margin:0}
   .pd-tbl td.c-itens{grid-column:4;grid-row:1;text-align:right}
   .pd-tbl td.c-desc{grid-column:2 / -1;grid-row:2}
@@ -217,7 +215,8 @@ body.compact .pd-chart .box{height:118px}
 @media print{
   .pd-charts{display:none!important}
   .pd-obra{break-inside:auto;border:1px solid #ccc;border-left:3px solid #2f4a34;box-shadow:none;overflow:visible}
-  .pd-obra-h{position:static;break-after:avoid}
+  .pd-sticky{position:static}
+  .pd-obra-h{break-after:avoid}
   .pd-st{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .pd-tbl{min-width:0;font-size:9.5px}
   .pd-tbl tr{break-inside:avoid}

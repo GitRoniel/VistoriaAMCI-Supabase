@@ -4,7 +4,7 @@
 import { initTheme } from "../../platform/core/theme.js";
 import { loadSession, signOut } from "../../platform/core/auth.js";
 import { getSupabase } from "../../platform/core/supabase.js";
-import { mountHmUser, HM_ICON } from "../../platform/ui/hmbar.js";
+import { mountHmUser } from "../../platform/ui/hmbar.js";
 import { HOME_URL } from "../../platform/core/config.js";
 import { esc } from "../../platform/core/utils.js";
 import { appHeaderHTML, secHeadHTML, stateHTML } from "../../platform/ui/shell.js";
@@ -21,12 +21,11 @@ const page = document.getElementById("app");
 
 const goHome = `<a class="pf-btn primary" href="${HOME_URL}">Ir para a página inicial</a>`;
 const retry = `<button class="pf-btn primary" type="button" onclick="location.reload()">Tentar novamente</button>`;
-const printBtn = `<button class="hm-btn hm-icon" type="button" data-pf-print aria-label="Imprimir / PDF" title="Imprimir / PDF">${HM_ICON.print}</button>`;
 
 /** HM Bar (cabeçalho único da plataforma) + conteúdo. */
 let hmUser = null;
 function frame({ user = null, tabs = [], active = "", body }) {
-  page.innerHTML = appHeaderHTML({ actions: user ? printBtn : "", tabs, active }) + `<div class="pf-page" id="pfBody">${body}</div>`;
+  page.innerHTML = appHeaderHTML({ tabs, active }) + `<div class="pf-page" id="pfBody">${body}</div>`;
   document.body.classList.toggle("has-botnav", tabs.length > 1);
   document.querySelector(".hm-user").hidden = !user;
   if (user && hmUser) mountHmUser({ ...hmUser, onLogout: logout });
@@ -124,7 +123,6 @@ function mountTabs(tabs, user) {
 async function boot() {
   initTheme();
   document.addEventListener("click", async (e) => {
-    if (e.target.closest("[data-pf-print]")) window.print();
     if (e.target.closest("[data-pf-logout]")) await logout();
   });
   try { if (localStorage.getItem("amCompact") === "1") document.body.classList.add("compact"); } catch { /* ignora */ }
