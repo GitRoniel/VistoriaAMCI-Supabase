@@ -78,7 +78,8 @@ No app o endereço interno é `capacitor://localhost`; o link do e-mail de confi
 
 - Botão de sol/lua no login, no cabeçalho, na escolha de obra, na Visão Geral, na importação e nas páginas de administração; a escolha fica salva no aparelho (`localStorage`, chave `amci-theme`).
 - O Modo Escuro é gerado automaticamente a partir do CSS do Modo Claro por `scripts/theme-dark.mjs` (roda no `pnpm build`; o `pnpm check` falha se estiver desatualizado). Ajustes manuais ficam logo após o bloco gerado em `www/index.html`.
-- As cores de status (Não agendado, Agendado, Remarcado, Revistoria, Revistoria Finalizada, Aprovado) são iguais nos dois temas.
+- As cores de status (Não agendado, Agendado, Remarcado, Revistoria, Revistoria Finalizada, Aprovado, Inadimplência) são iguais nos dois temas.
+- **Inadimplência** (cinza) é o último status da lista: aparece na legenda, no popup da unidade, nos filtros, no resumo e na Visão Geral. Não conta como unidade vistoriada nem como "agendada p/ cliente"; na tela inicial entra em "a agendar". Na importação da planilha, o texto "Inadimplência" é reconhecido.
 - A área da barra de status no iPhone (tela cheia/app) usa `--chrome-top`, que acompanha o tema.
 
 ## Importação de agendamentos (Excel)

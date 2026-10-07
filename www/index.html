@@ -136,9 +136,9 @@ table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
 @media(max-width:720px){.clitop{grid-template-columns:1fr}}
 .cbox{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
 .cbox .ch{background:var(--moss);color:#fff;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:7px 12px}
-.resumo{display:grid;grid-template-columns:repeat(6,1fr)}
+.resumo{display:grid;grid-template-columns:repeat(7,1fr)}
 .resumo .rc{padding:9px 11px;border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
-.resumo .rc:nth-child(6n){border-right:none}
+.resumo .rc:nth-child(7n){border-right:none}
 .resumo .rl{display:flex;align-items:center;gap:5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--text-light)}
 .resumo .rl .sw{width:10px;height:10px;border-radius:3px;border:1px solid var(--border)}
 .resumo .rv{font-size:21px;font-weight:700;color:var(--moss);margin-top:2px;font-variant-numeric:tabular-nums}
@@ -900,7 +900,7 @@ table.mx.casas{min-width:0;width:max-content;border-spacing:2px;background:#fff}
   .resumo .rv{font-size:18px;margin-top:0}
   .resumo .rc.tot .rv{font-size:18px}
   .resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .resumo .rc,.resumo .rc:nth-child(6n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
+  .resumo .rc,.resumo .rc:nth-child(7n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
   .resumo .rc:nth-child(3n){border-right:none}
   .resumo .rc.tot{grid-column:1/-1;background:#f6f8f4;border-bottom:none}
   .resumo .rc.tot .rv span{font-size:10px!important}
@@ -1507,7 +1507,7 @@ html{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .cbox{border:1px solid #414a43;background:#282828}
 :root[data-theme="dark"] .cbox .ch{background:var(--moss);color:#fff}
 :root[data-theme="dark"] .resumo .rc{border-right:1px solid #41473a;border-bottom:1px solid #41473a}
-:root[data-theme="dark"] .resumo .rc:nth-child(6n){border-right:none}
+:root[data-theme="dark"] .resumo .rc:nth-child(7n){border-right:none}
 :root[data-theme="dark"] .resumo .rl{color:#b1c1b1}
 :root[data-theme="dark"] .resumo .rl .sw{border:1px solid #414a43}
 :root[data-theme="dark"] .resumo .rv{color:#cbd6d4}
@@ -1905,7 +1905,7 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .pp-select:focus{outline:none;border-color:#53775f;background:#282828;box-shadow:0 0 0 4px rgba(0,0,0,0.252)}
 :root[data-theme="dark"] .pp-select:disabled{background:#202422;color:#a0ada6}
 @media(max-width:720px){
-  :root[data-theme="dark"] .resumo .rc,:root[data-theme="dark"] .resumo .rc:nth-child(6n){border-right:1px solid #41473a;border-bottom:1px solid #41473a}
+  :root[data-theme="dark"] .resumo .rc,:root[data-theme="dark"] .resumo .rc:nth-child(7n){border-right:1px solid #41473a;border-bottom:1px solid #41473a}
   :root[data-theme="dark"] .resumo .rc:nth-child(3n){border-right:none}
   :root[data-theme="dark"] .resumo .rc.tot{background:#242720;border-bottom:none}
 }
@@ -2183,6 +2183,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
           <div class="lg"><span class="sw" style="background:#e8842a;border-color:#c96a1a"></span>Revistoria</div>
           <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
+          <div class="lg"><span class="sw" style="background:#8a948f;border-color:#6f7a74"></span>Inadimplência</div>
         </div>
       </div>
       <div id="cliListaWrap" style="display:none">
@@ -2551,10 +2552,12 @@ const FRENTES=[
   {key:"qual",step:"Etapa 2",name:"Qualidade",flow:FLOW,done:["lv","rev","fz"]},
   {key:"astec",step:"Etapa 3",name:"Assist. Técnica",flow:FLOW,done:["lv","rev","fz"]},
 ];
-const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado"};
-const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"}};
-const CLI_FLOW=["na","ag","rm","rv","rf","ap"];
+const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado",in:"Inadimplência"};
+const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"},in:{bg:"#8a948f",tx:"#fff",bd:"#6f7a74"}};
+// "Inadimplência" (cinza) é o último status da lista: não conta como vistoriada nem como agendada.
+const CLI_FLOW=["na","ag","rm","rv","rf","ap","in"];
 function normCli(t){t=(t||"").toString().trim().toLowerCase();
+  if(t.includes("inadimpl"))return"in";
   if(t.includes("não agend")||t.includes("nao agend"))return"na";
   if(t.includes("aprov"))return"ap";
   if(t.includes("revist")&&t.includes("finaliz"))return"rf";
@@ -2813,8 +2816,8 @@ function renderCli(){
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
-  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap");
-  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap]];
+  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap"),inad=n("in");
+  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap],["#8a948f","#6f7a74","Inadimplência",inad]];
   document.getElementById("cliResumo").innerHTML=R.map(([bg,bd,l,val])=>
     `<div class="rc"><div class="rl"><span class="sw" style="background:${bg};border-color:${bd}"></span>${l}</div><div class="rv">${val}</div></div>`).join("")+
     `<div class="rc tot"><div class="rl">Total de unidades</div><div class="rv">${t} <span style="font-size:12px;color:#9aa39a;font-weight:700">${LAYOUT.unitsWord}</span></div></div>`;
@@ -3703,7 +3706,7 @@ function renderOvFilters(){
   const projects=ovProjects();
   document.getElementById("ovProjects").innerHTML=`<button class="fchip fx-all${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL" style="--c:#1f4a3f">Todos</button>`+
     projects.map(p=>`<button class="fchip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--c:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
-  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na"].map(c=>
+  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na","in"].map(c=>
     `<button class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
   const fx=document.getElementById("ovFilters");fx.classList.toggle("ov-resumo",ovMode==="resumo");fx.classList.toggle("fx-open",ovFiltOpen);
   document.querySelectorAll("#ovMode [data-ovmode]").forEach(b=>{const on=b.dataset.ovmode===ovMode;b.classList.toggle("active",on);b.setAttribute("aria-selected",on);});
@@ -3867,6 +3870,7 @@ let impState=null,impReaderPromise=null;
 function impStatusCode(raw){
   const t=impNorm(raw);if(!t)return "";
   if(/n[ao]o agend/.test(t)||t==="nao agendada")return "";
+  if(/inadimpl/.test(t))return "in";
   if(/finaliz/.test(t))return "rf";
   if(/aprov/.test(t))return "ap";
   if(/reprov|revist/.test(t))return "rv";
@@ -4643,15 +4647,16 @@ const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDig
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
-  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap");
-  const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na)/ct*100):0;
+  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap"),inad=cc("in");
+  // Inadimplência não conta como agendada para o cliente.
+  const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na-inad)/ct*100):0;
   let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
   h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
      `<div class="rb"><div class="n">${ct}</div><div class="l">Unidades</div></div>`+
      `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
      `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
-  h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
-  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap]];
+  h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na-inad}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
+  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Inadimplência",inad]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
