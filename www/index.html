@@ -2183,7 +2183,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
           <div class="lg"><span class="sw" style="background:#e8842a;border-color:#c96a1a"></span>Revistoria</div>
           <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
-          <div class="lg"><span class="sw" style="background:#8a948f;border-color:#6f7a74"></span>Inadimplência</div>
+          <div class="lg"><span class="sw" style="background:#8a948f;border-color:#6f7a74"></span>Processo em Andamento</div>
         </div>
       </div>
       <div id="cliListaWrap" style="display:none">
@@ -2552,12 +2552,17 @@ const FRENTES=[
   {key:"qual",step:"Etapa 2",name:"Qualidade",flow:FLOW,done:["lv","rev","fz"]},
   {key:"astec",step:"Etapa 3",name:"Assist. Técnica",flow:FLOW,done:["lv","rev","fz"]},
 ];
-const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado",in:"Inadimplência"};
+const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado",in:"Processo em Andamento"};
+// Valor gravado no banco (client_inspections.status). Só o rótulo exibido do status "in" mudou:
+// no banco ele continua "Inadimplência" (restrição client_inspections_status_check).
+const CLI_DB={...CLL,in:"Inadimplência"};
+// Texto de status vindo do banco (logs, histórico) → rótulo da tela.
+const cliStatusLabel=v=>/inadimpl/i.test(String(v??""))?CLL.in:v;
 const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"},in:{bg:"#8a948f",tx:"#fff",bd:"#6f7a74"}};
-// "Inadimplência" (cinza) é o último status da lista: não conta como vistoriada nem como agendada.
+// "Processo em Andamento" (cinza; "Inadimplência" no banco) é o último status da lista: não conta como vistoriada nem como agendada.
 const CLI_FLOW=["na","ag","rm","rv","rf","ap","in"];
 function normCli(t){t=(t||"").toString().trim().toLowerCase();
-  if(t.includes("inadimpl"))return"in";
+  if(t.includes("inadimpl")||t.includes("processo em andamento"))return"in";
   if(t.includes("não agend")||t.includes("nao agend"))return"na";
   if(t.includes("aprov"))return"ap";
   if(t.includes("revist")&&t.includes("finaliz"))return"rf";
@@ -2817,7 +2822,7 @@ function renderCli(){
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
   const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap"),inad=n("in");
-  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap],["#8a948f","#6f7a74","Inadimplência",inad]];
+  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap],["#8a948f","#6f7a74","Processo em Andamento",inad]];
   document.getElementById("cliResumo").innerHTML=R.map(([bg,bd,l,val])=>
     `<div class="rc"><div class="rl"><span class="sw" style="background:${bg};border-color:${bd}"></span>${l}</div><div class="rv">${val}</div></div>`).join("")+
     `<div class="rc tot"><div class="rl">Total de unidades</div><div class="rv">${t} <span style="font-size:12px;color:#9aa39a;font-weight:700">${LAYOUT.unitsWord}</span></div></div>`;
@@ -3207,7 +3212,7 @@ async function setStatus(code){
     if((code==="ag"||code==="rm")&&!cliDraftValue("data_vistoria"))pop.querySelector('[name="data_vistoria"]')?.focus();
     // Revistoria Finalizada: data e responsável da revistoria são opcionais (aparecem para preencher se quiser).
     if(code==="rf"&&!cliDraftValue("data_revistoria"))pop.querySelector('[name="data_revistoria"]')?.focus();
-    try{await setCell("cli",target.b,target.p,target.a,"status",CLL[code],detalhe);toast("Status: "+CLL[code]);}
+    try{await setCell("cli",target.b,target.p,target.a,"status",CLI_DB[code],detalhe);toast("Status: "+CLL[code]);}
     catch(e){state.cli[key]=old;renderCli();renderResumo();if(ctx&&kC(ctx.b,ctx.p,ctx.a)===key)renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   }
 }
@@ -3343,7 +3348,7 @@ async function setCliFields(b,pav,a,changes){
   const patch={};
   Object.entries(changes).forEach(([field,value])=>{
     // Status junto com os campos (ex.: finalizar revistoria com data e responsável numa única gravação).
-    if(field==="status"){if(!CLL[value])throw new Error("Status inválido.");patch.status=CLL[value];return;}
+    if(field==="status"){if(!CLI_DB[value])throw new Error("Status inválido.");patch.status=CLI_DB[value];return;}
     const column=CLI_COLUMNS[field];if(!column)throw new Error("Campo inválido.");
     patch[column]=(column==="inspection_date"||column==="inspection_time"||column==="reinspection_date")?(value||null):(value==null?"":String(value).trim());
   });
@@ -3870,7 +3875,7 @@ let impState=null,impReaderPromise=null;
 function impStatusCode(raw){
   const t=impNorm(raw);if(!t)return "";
   if(/n[ao]o agend/.test(t)||t==="nao agendada")return "";
-  if(/inadimpl/.test(t))return "in";
+  if(/inadimpl|processo em andamento/.test(t))return "in";
   if(/finaliz/.test(t))return "rf";
   if(/aprov/.test(t))return "ap";
   if(/reprov|revist/.test(t))return "rv";
@@ -3990,10 +3995,11 @@ function impCompare(sys,sheet){
   }
   if(sheet.statusInvalid)items.push({key:"status",label:"Status",kind:"invalid",cur:sys.status,next:sheet.statusInvalid,message:"Status desconhecido"});
   else if(sheet.status){
-    const curCode=normCli(sys.status),next=CLL[sheet.status];
-    if(curCode==="na")items.push({key:"status",label:"Status",kind:"fill",cur:"",next,changes:[{field:"status",old:sys.status||"Não agendado",new:next}]});
-    else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur:sys.status,next});
-    else items.push({key:"status",label:"Status",kind:"conflict",cur:sys.status,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:next}]});
+    // Exibe o rótulo da tela; grava o valor do banco (CLI_DB).
+    const curCode=normCli(sys.status),next=CLL[sheet.status],nextDb=CLI_DB[sheet.status],cur=sys.status?CLL[curCode]:"";
+    if(curCode==="na")items.push({key:"status",label:"Status",kind:"fill",cur:"",next,changes:[{field:"status",old:sys.status||"Não agendado",new:nextDb}]});
+    else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur,next});
+    else items.push({key:"status",label:"Status",kind:"conflict",cur,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:nextDb}]});
   }
   return items;
 }
@@ -4262,7 +4268,7 @@ async function openImportDetails(id){
   impBody(`<div class="imp-bar"><button type="button" class="btn g" data-imp="history">← Histórico</button></div>`+(!data?.length?'<div class="clif-empty">Esta importação não registrou alterações.</div>':
     `<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Condomínio</th><th>Unidade</th><th class="th-cli">Cliente</th><th>Campo</th><th>Anterior</th><th>Novo</th><th>Ação</th></tr></thead><tbody>`+
     data.map(r=>`<tr><td>${esc(pname(r.project_id))}</td><td class="cunit">${esc(r.unit_label||"—")}${r.row_number?`<small>linha ${r.row_number}</small>`:""}</td><td class="ccli">${esc(r.client_name||"—")}</td>
-      <td>${esc(IMP_DB_LABEL[r.field]||r.field||"—")}</td><td>${esc(r.old_value)||'<span class="imp-empty">vazio</span>'}</td><td>${esc(r.new_value)||"—"}</td>
+      <td>${esc(IMP_DB_LABEL[r.field]||r.field||"—")}</td><td>${esc(r.field==="status"?cliStatusLabel(r.old_value):r.old_value)||'<span class="imp-empty">vazio</span>'}</td><td>${esc(r.field==="status"?cliStatusLabel(r.new_value):r.new_value)||"—"}</td>
       <td><span class="imp-tag ${/preenchido|usado/.test(r.action)?"g":/mantido/.test(r.action)?"y":/pendente|nao_enc|alterado/.test(r.action)?"r":"n"}">${IMP_ACTION[r.action]||r.action}</span>${r.message?`<small class="imp-msg">${esc(r.message)}</small>`:""}</td></tr>`).join("")+"</tbody></table></div>"));
 }
 document.getElementById("impFile").addEventListener("change",e=>onImportFile(e.target.files?.[0]));
@@ -4589,7 +4595,7 @@ function auditDetail(l){
   const fields={technical_escort:"Acomp. Técnico",sale_stage:"Etapa da venda",status:"Status",planned_date:"Data planejada",released_date:"Data de liberação",client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",responsible:"Responsável",reinspection_date:"Data da revistoria",reinspection_responsible:"Responsável da revistoria",notes:"Observações",role:"Nível",active:"Ativo"};
   const old=l.old_data||{},now=l.new_data||{},ignored=new Set(["version","updated_at","updated_by","field_sources","updated_source"]);
   const changed=[...new Set([...Object.keys(old),...Object.keys(now)])].filter(k=>!ignored.has(k)&&JSON.stringify(old[k])!==JSON.stringify(now[k]));
-  const parts=changed.slice(0,4).map(k=>(fields[k]||k)+": "+auditValue(old[k])+" → "+auditValue(now[k]));
+  const parts=changed.slice(0,4).map(k=>(fields[k]||k)+": "+auditValue(k==="status"?cliStatusLabel(old[k]):old[k])+" → "+auditValue(k==="status"?cliStatusLabel(now[k]):now[k]));
   return (tables[l.table_name]||l.table_name)+(l.record_id?" #"+l.record_id:"")+(parts.length?" · "+parts.join(" · "):"");
 }
 async function loadLogs(){
@@ -4648,7 +4654,7 @@ function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
   const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap"),inad=cc("in");
-  // Inadimplência não conta como agendada para o cliente.
+  // Processo em Andamento não conta como agendada para o cliente.
   const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na-inad)/ct*100):0;
   let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
   h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
@@ -4656,7 +4662,7 @@ function renderResumo(){
      `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
      `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na-inad}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
-  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Inadimplência",inad]];
+  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
