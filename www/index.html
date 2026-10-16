@@ -1375,6 +1375,73 @@ a.hm-tile{color:#172c25}
 .vw-txt b{font-size:15px;font-weight:700;color:inherit}
 .vw-txt small{font-size:12.5px;font-weight:500;color:#617168;line-height:1.35}
 @media(max-width:720px){.vw-switch{display:none}}
+.vw-switch{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1100px){.vw-txt small{display:none}.vw-tab{min-height:54px}}
+/* ── ESTATÍSTICA GERAL ── */
+.st-wrap{display:grid;gap:14px}
+.st-wrap .rg-body{padding:16px 18px}
+.st-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.st-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.st-kpis .rb{min-width:0}
+.st-kpis .rb .n{font-size:22px}
+.st-kpis .rb.bad .n{color:var(--sunset)}
+.st-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.st-acomp .stk-row{grid-template-columns:150px minmax(0,1fr) 92px}
+.st-acomp .stk-lbl small{display:block;font-size:10.5px;font-weight:600;color:var(--muted)}
+.st-acomp .stk-tot b{display:block;color:#2f9e5b}
+.st-acomp .stk-tot span{color:#c96a1a}
+.st-cmp{display:grid;gap:10px}
+.st-cmp .st-cr{display:grid;grid-template-columns:150px minmax(0,1fr) 48px;gap:10px;align-items:center;font-size:12px;font-weight:700;color:var(--ink)}
+.st-cmp .track{height:10px;border-radius:6px;background:#eef3ef;overflow:hidden}
+.st-cmp .track i{display:block;height:100%;border-radius:6px;background:#2f9e5b}
+.st-cmp .track.r i{background:var(--sunset)}
+.st-cmp .pv{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.st-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:10px 0 0}
+.st-tbl{min-width:900px;font-size:12px}
+.st-tbl thead th{padding:6px 7px}
+.st-tbl thead tr+tr th{font-size:9px;top:27px}
+.st-tbl thead th.g-geral{background:#1f493e}
+.st-tbl thead th.g-eng{background:#2f5d8a}
+.st-tbl thead th.g-arq{background:#7a5a2f}
+.st-tbl thead th.g-sem{background:#55682f}
+.st-tbl thead th.g-ni{background:#6b6b6b}
+.st-tbl td{padding:6px 7px;font-variant-numeric:tabular-nums}
+.st-tbl td.st-nm{text-align:left;font-weight:700;color:var(--ink);position:sticky;left:0;background:#fff;z-index:1}
+.st-tbl thead th.st-nm{text-align:left;position:sticky;left:0;z-index:3}
+.st-tbl td.ok,.st-data td.ok{color:#268a4d;font-weight:700}
+.st-tbl td.bad,.st-data td.bad{color:#c96a1a;font-weight:700}
+.st-tbl td.sep,.st-tbl th.sep{border-left:1px solid #e3e9e4}
+.st-tbl td.dim{color:#a3aca6}
+.st-tbl tr.st-tot td{background:#eef3ef;font-weight:800;border-top:2px solid #1f493e}
+.st-tbl th button{all:unset;cursor:pointer}
+.st-tbl th button:focus-visible{outline:2px solid #dccb91;outline-offset:2px}
+.st-tbl th button[aria-sort]::after{content:" ▾"}
+.st-tbl th button[aria-sort="ascending"]::after{content:" ▴"}
+.st-data{min-width:640px}
+.st-data td.st-l{text-align:left}
+.st-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:12px}
+.st-bar .fld{display:flex;flex-direction:column;min-width:150px;flex:1 1 150px}
+.st-bar .fld label{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#6a7a71;margin-bottom:4px}
+.st-bar .fld select{height:36px;font-size:13px;border-radius:10px;padding:0 11px;border:1px solid var(--border);background:#fff;color:var(--ink);font-family:inherit}
+.st-bar .btn{height:36px;min-height:36px;padding:0 13px;border-radius:10px;font-size:12.5px}
+.st-count{font-size:12px;font-weight:700;color:var(--muted);margin-left:auto;align-self:center}
+.st-scroll{max-height:520px;overflow:auto}
+.st-empty{padding:26px 12px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:1100px){.st-grid2{grid-template-columns:1fr}}
+@media(max-width:720px){
+  .st-wrap{gap:10px}
+  .st-wrap .rg-body{padding:12px}
+  .st-top{grid-template-columns:1fr;justify-items:center;gap:10px}
+  .st-kpis{width:100%}
+  .st-kpis .rb .n{font-size:19px}
+  .st-acomp .stk-row{grid-template-columns:minmax(0,1fr) 58px;gap:4px 8px}
+  .st-acomp .stk-lbl{grid-column:1/-1;white-space:normal;font-size:12px}
+  .st-acomp .stk-lbl small{display:inline;margin-left:6px}
+  .st-cmp .st-cr{grid-template-columns:118px minmax(0,1fr) 44px;gap:7px;font-size:11.5px}
+  .st-bar .fld{min-width:0;flex:1 1 calc(50% - 8px)}
+  .st-count{margin-left:0;width:100%}
+  .st-scroll{max-height:70vh}
+}
 /* Visão Geral: mesma largura do conteúdo das páginas dos condomínios (1600px − 16px de cada lado = 1568px). */
 @media(min-width:721px){.overview-ov .hm-hero-in,.overview-ov .hm-body{max-width:1600px;padding-left:calc(16px + var(--safe-l));padding-right:calc(16px + var(--safe-r))}}
 /* Páginas de administração: mesma estrutura da tela inicial (barra, saudação, corpo). */
@@ -2060,6 +2127,32 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .vw-tab.active .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
 :root[data-theme="dark"] .vw-txt b{color:inherit}
 :root[data-theme="dark"] .vw-txt small{color:#a6b2ab}
+:root[data-theme="dark"] .st-kpis .rb.bad .n{color:var(--sunset)}
+:root[data-theme="dark"] .st-acomp .stk-lbl small{color:#a6b2ab}
+:root[data-theme="dark"] .st-acomp .stk-tot b{color:#79d79f}
+:root[data-theme="dark"] .st-acomp .stk-tot span{color:#c96a1a}
+:root[data-theme="dark"] .st-cmp .st-cr{color:#cfd9d7}
+:root[data-theme="dark"] .st-cmp .track{background:#1f2420}
+:root[data-theme="dark"] .st-cmp .track i{background:#2f9e5b}
+:root[data-theme="dark"] .st-cmp .track.r i{background:var(--sunset)}
+:root[data-theme="dark"] .st-cmp .pv{color:#a6b2ab}
+:root[data-theme="dark"] .st-note{color:#a6b2ab}
+:root[data-theme="dark"] .st-tbl thead th.g-geral{background:#1f493e}
+:root[data-theme="dark"] .st-tbl thead th.g-eng{background:#2f5d8a}
+:root[data-theme="dark"] .st-tbl thead th.g-arq{background:#7a5a2f}
+:root[data-theme="dark"] .st-tbl thead th.g-sem{background:#55682f}
+:root[data-theme="dark"] .st-tbl thead th.g-ni{background:#6b6b6b}
+:root[data-theme="dark"] .st-tbl td.st-nm{color:#cfd9d7;background:#282828}
+:root[data-theme="dark"] .st-tbl td.ok,:root[data-theme="dark"] .st-data td.ok{color:#77da9d}
+:root[data-theme="dark"] .st-tbl td.bad,:root[data-theme="dark"] .st-data td.bad{color:#c96a1a}
+:root[data-theme="dark"] .st-tbl td.sep,:root[data-theme="dark"] .st-tbl th.sep{border-left:1px solid #404741}
+:root[data-theme="dark"] .st-tbl td.dim{color:#a3aca6}
+:root[data-theme="dark"] .st-tbl tr.st-tot td{background:#1f2420;border-top:2px solid #1f493e}
+:root[data-theme="dark"] .st-tbl th button:focus-visible{outline:2px solid #635c45}
+:root[data-theme="dark"] .st-bar .fld label{color:#a0ada6}
+:root[data-theme="dark"] .st-bar .fld select{border:1px solid #414a43;background:#282828;color:#cfd9d7}
+:root[data-theme="dark"] .st-count{color:#a6b2ab}
+:root[data-theme="dark"] .st-empty{color:#a6b2ab}
 :root[data-theme="dark"] .mods-sel{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
 :root[data-theme="dark"] .mods-row{background:#282828;border:1px solid #414a43}
 :root[data-theme="dark"] .mods-row.on{border-left:3px solid #6B8040}
@@ -2141,6 +2234,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   <nav class="vw-switch" aria-label="Páginas do condomínio">
     <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Números e andamento das vistorias do condomínio</small></span></button>
     <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
+    <button type="button" class="vw-tab" data-view="stats" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="vw-txt"><b>Estatística Geral</b><small>Aprovação e reprovação por vistoriador e acompanhamento técnico</small></span></button>
   </nav>
 
   <!-- ====== OBRA ====== -->
@@ -2192,12 +2286,25 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       </div>
     </div>
   </section>
+
+  <!-- ====== ESTATÍSTICA GERAL ====== -->
+  <section class="view" id="v-stats">
+    <div class="sec-head">
+      <span class="icn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+      <h2>Estatística Geral</h2>
+      <div class="sh-flow">Vistoriadores × <b>Acompanhamento Técnico</b></div>
+    </div>
+    <div class="sec-body">
+      <div class="st-wrap" id="statsWrap"></div>
+    </div>
+  </section>
 </main>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="botnav">
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
+  <button class="navbtn" data-view="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Estatística</span></button>
 </nav>
 
 <div class="pop" id="pop"></div>
@@ -3269,6 +3376,7 @@ function switchView(v){
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
   if(v==="resumo"){renderResumo(); animateResumo();}
+  if(v==="stats")renderStats();
 
   animateView(v);
   scrollTo(0,0);
@@ -4690,7 +4798,109 @@ function renderResumo(){
   });
   h+=`</div></div></div></div>`;
   grid.innerHTML=h;
+  // A Estatística Geral usa os mesmos dados: atualiza junto quando estiver aberta.
+  if(document.getElementById("v-stats")?.classList.contains("active"))renderStats();
 }
+/* ── ESTATÍSTICA GERAL ──
+   Vistoriadores × Acompanhamento Técnico, calculado no navegador com os dados do Supabase já
+   carregados para o condomínio (state.cli / state.cliInfo, atualizados em tempo real).
+   Mesma regra do Resumo Geral e da planilha Excel: vistoriada = Aprovado + Revistoria +
+   Revistoria Finalizada; aprovação = Aprovado ÷ vistoriadas; reprovação = (Revistoria +
+   Revistoria Finalizada) ÷ vistoriadas. client_inspections tem 1 registro por unidade (status
+   atual), então a revistoria não duplica a unidade; ela conta para o Responsável da vistoria. */
+const ST_ACOMP=[{k:"engenheiro",l:"Engenheiro",g:"g-eng"},{k:"arquiteto",l:"Arquiteto",g:"g-arq"},{k:"nenhum",l:"Sem acompanhamento",g:"g-sem"},{k:"",l:"Não informado",g:"g-ni"}];
+const ST_NO_RESP="Não informado";
+let stFilt={resp:"",acomp:"ALL",res:"ALL"},stSort={key:"n",dir:-1},stDataRows=[];
+function statsRows(){
+  const out=[];
+  LAYOUT.units.forEach(u=>{
+    const k=kC(u.b,u.p,u.a),code=state.cli[k];if(code!=="ap"&&code!=="rv"&&code!=="rf")return;
+    const i=state.cliInfo[k]||{};
+    out.push({b:u.b,p:u.p,a:u.a,code,ok:code==="ap",resp:String(i.responsavel||"").trim()||ST_NO_RESP,acomp:ACOMP[i.acomp]?i.acomp:"",data:i.data_vistoria||""});
+  });
+  return out;
+}
+function stAgg(rows){const n=rows.length,ap=rows.filter(r=>r.ok).length;return {n,ap,rp:n-ap,pa:n?ap/n*100:0,pr:n?(n-ap)/n*100:0};}
+const stPct=(v,n)=>n?fmtPct(v):"—";
+function renderStats(){
+  const wrap=document.getElementById("statsWrap");if(!wrap)return;
+  const rows=statsRows(),tot=stAgg(rows);
+  if(!rows.length){wrap.innerHTML=`<div class="rg-card"><div class="rgh"><span>Estatística Geral</span></div><div class="st-empty">Nenhuma unidade vistoriada neste condomínio ainda (Aprovado, Revistoria ou Revistoria Finalizada).</div></div>`;return;}
+  const byResp=new Map();rows.forEach(r=>{if(!byResp.has(r.resp))byResp.set(r.resp,[]);byResp.get(r.resp).push(r);});
+  const people=[...byResp.entries()].map(([name,rs])=>({name,rs,...stAgg(rs),ac:Object.fromEntries(ST_ACOMP.map(c=>[c.k,stAgg(rs.filter(r=>r.acomp===c.k))]))}));
+  const cats=ST_ACOMP.map(c=>({...c,...stAgg(rows.filter(r=>r.acomp===c.k))}));
+  const sortVal=(x,k)=>k==="name"?x.name:x[k];
+  people.sort((x,y)=>{const a=sortVal(x,stSort.key),b=sortVal(y,stSort.key);const c=typeof a==="string"?a.localeCompare(b,"pt-BR"):a-b;return c*stSort.dir||y.n-x.n||x.name.localeCompare(y.name,"pt-BR");});
+  // 1. Indicadores gerais
+  let h=`<div class="rg-card"><div class="rgh"><span>Indicadores gerais</span><b>${fmtPct(tot.pa)} aprov.</b></div><div class="rg-body"><div class="st-top">${donut(tot.pa,"#2f9e5b","Aprovação",132).replace(/>[\d.]+%</,">"+fmtPct(tot.pa)+"<")}<div class="rg-big st-kpis">`+
+    `<div class="rb"><div class="n">${tot.n}</div><div class="l">Vistorias</div></div>`+
+    `<div class="rb ok"><div class="n">${tot.ap}</div><div class="l">Aprovadas</div></div>`+
+    `<div class="rb bad"><div class="n">${tot.rp}</div><div class="l">Reprovadas</div></div>`+
+    `<div class="rb ok"><div class="n">${fmtPct(tot.pa)}</div><div class="l">% Aprovação</div></div>`+
+    `<div class="rb bad"><div class="n">${fmtPct(tot.pr)}</div><div class="l">% Reprovação</div></div>`+
+    `<div class="rb"><div class="n">${people.length}</div><div class="l">Vistoriadores</div></div></div></div></div></div>`;
+  // 2. Acompanhamento técnico + comparativo
+  h+=`<div class="st-grid2"><div class="rg-card"><div class="rgh"><span>Por acompanhamento técnico</span></div><div class="rg-body st-acomp">`+
+    `<div class="stk-legend"><span><i class="stk-ok"></i>Aprovadas</span><span><i class="stk-rev"></i>Reprovadas (Revistoria / Rev. finalizada)</span></div><div class="stk-chart">`+
+    cats.filter(c=>c.n||c.k).map(c=>{
+      const tip=x=>`${c.l} · ${x}`;
+      const segs=[{cls:"stk-ok",n:c.ap,pct:c.pa,l:"Aprovadas"},{cls:"stk-rev",n:c.rp,pct:c.pr,l:"Reprovadas"}].filter(x=>x.n>0);
+      return `<div class="stk-row"><span class="stk-lbl">${esc(c.l)}<small>${c.n} vistoria(s) · ${stPct(tot.n?c.n/tot.n*100:0,tot.n)} do total</small></span>`+
+        `<div class="stk-bar" role="img" aria-label="${esc(c.l)}: aprovação ${stPct(c.pa,c.n)}, reprovação ${stPct(c.pr,c.n)}">`+
+        segs.map(x=>`<i class="${x.cls}" style="width:${x.pct}%" data-tip="${esc(tip(`${x.l}: ${x.n} de ${c.n} (${fmtPct(x.pct)})`))}" tabindex="0">${x.pct>=18?`<span>${fmtPct(x.pct)}</span>`:""}</i>`).join("")+
+        `</div><span class="stk-tot"><b>${stPct(c.pa,c.n)}</b><span>${stPct(c.pr,c.n)}</span></span></div>`;}).join("")+
+    `</div><p class="st-note">À direita: % de aprovação (verde) e % de reprovação (laranja) de cada categoria.</p></div></div>`;
+  const cmp=(lbl,cls,key)=>`<div class="rg-sub">${lbl}</div><div class="st-cmp">`+cats.filter(c=>c.n).map(c=>`<div class="st-cr"><span>${esc(c.l)}</span><div class="track${cls}"><i style="width:${c[key]}%"></i></div><span class="pv">${fmtPct(c[key])}</span></div>`).join("")+
+    `<div class="st-cr"><span>Geral</span><div class="track${cls}"><i style="width:${tot[key]}%"></i></div><span class="pv">${fmtPct(tot[key])}</span></div></div>`;
+  h+=`<div class="rg-card"><div class="rgh"><span>Comparativo de taxas</span></div><div class="rg-body">${cmp("Taxa de aprovação","","pa")}${cmp("Taxa de reprovação"," r","pr")}</div></div></div>`;
+  // 3. Por vistoriador × acompanhamento
+  const sb=(key,lbl)=>`<button type="button" data-st-sort="${key}"${stSort.key===key?` aria-sort="${stSort.dir>0?"ascending":"descending"}"`:""}>${lbl}</button>`;
+  const cell=(a,cls="")=>a.n?`<td class="sep${cls}">${a.n}</td><td class="ok">${fmtPct(a.pa)}</td><td class="bad">${fmtPct(a.pr)}</td>`:`<td class="sep dim">–</td><td class="dim">–</td><td class="dim">–</td>`;
+  const acCols=ST_ACOMP.filter(c=>c.k);const ni=ST_ACOMP.find(c=>!c.k);
+  const row=(name,x,cls="")=>`<tr class="${cls}"><td class="st-nm">${esc(name)}</td><td class="sep">${x.n}</td><td>${x.ap}</td><td>${x.rp}</td><td class="ok">${fmtPct(x.pa)}</td><td class="bad">${fmtPct(x.pr)}</td>`+
+    acCols.map(c=>cell(x.ac[c.k])).join("")+`<td class="sep${x.ac[""].n?"":" dim"}">${x.ac[""].n||"–"}</td></tr>`;
+  const totRow={...tot,ac:Object.fromEntries(cats.map(c=>[c.k,c]))};
+  h+=`<div class="rg-card"><div class="rgh"><span>Por vistoriador × acompanhamento técnico</span><b>${people.length} vistoriador(es)</b></div><div class="rg-body">`+
+    `<div class="gridscroll st-scroll"><table class="ctbl st-tbl"><thead><tr><th class="st-nm" rowspan="2">${sb("name","Vistoriador")}</th><th class="g-geral sep" colspan="5">Geral</th>`+
+    acCols.map(c=>`<th class="${c.g} sep" colspan="3">${esc(c.l)}</th>`).join("")+`<th class="${ni.g} sep" rowspan="2">Não<br>inf.</th></tr>`+
+    `<tr><th class="g-geral sep">${sb("n","Vistorias")}</th><th class="g-geral">${sb("ap","Aprov.")}</th><th class="g-geral">${sb("rp","Reprov.")}</th><th class="g-geral">${sb("pa","% Aprov.")}</th><th class="g-geral">${sb("pr","% Reprov.")}</th>`+
+    acCols.map(c=>`<th class="${c.g} sep">Vist.</th><th class="${c.g}">% Aprov.</th><th class="${c.g}">% Reprov.</th>`).join("")+`</tr></thead><tbody>`+
+    people.map(x=>row(x.name,x)).join("")+row("Total",totRow,"st-tot")+`</tbody></table></div>`+
+    `<p class="st-note">Clique no título de uma coluna para ordenar. Nomes como foram registrados no campo Responsável (variações do mesmo nome aparecem separadas).</p></div></div>`;
+  // 4. Dados utilizados
+  const names=people.map(x=>x.name).sort((x,y)=>x.localeCompare(y,"pt-BR"));
+  if(stFilt.resp&&!names.includes(stFilt.resp))stFilt.resp="";
+  const data=rows.filter(r=>(!stFilt.resp||r.resp===stFilt.resp)&&(stFilt.acomp==="ALL"||r.acomp===stFilt.acomp)&&(stFilt.res==="ALL"||(stFilt.res==="ap")===r.ok))
+    .sort((x,y)=>x.resp.localeCompare(y.resp,"pt-BR")||String(x.data).localeCompare(String(y.data))||String(x.b).localeCompare(String(y.b),"pt-BR",{numeric:true})||unitCode(x.b,x.p,x.a).localeCompare(unitCode(y.b,y.p,y.a),"pt-BR",{numeric:true}));
+  stDataRows=data;const fa=stAgg(data);
+  const opt=(v,l,cur)=>`<option value="${esc(v)}"${v===cur?" selected":""}>${esc(l)}</option>`;
+  h+=`<div class="rg-card"><div class="rgh"><span>Dados utilizados</span><b>${rows.length} unidade(s)</b></div><div class="rg-body">`+
+    `<div class="st-bar"><div class="fld"><label for="stResp">Vistoriador</label><select id="stResp">${opt("","Todos",stFilt.resp)}${names.map(n=>opt(n,n,stFilt.resp)).join("")}</select></div>`+
+    `<div class="fld"><label for="stAcomp">Acomp. técnico</label><select id="stAcomp">${opt("ALL","Todos",stFilt.acomp)}${ST_ACOMP.map(c=>opt(c.k,c.l,stFilt.acomp)).join("")}</select></div>`+
+    `<div class="fld"><label for="stRes">Resultado</label><select id="stRes">${opt("ALL","Todos",stFilt.res)}${opt("ap","Aprovada",stFilt.res)}${opt("rp","Reprovada",stFilt.res)}</select></div>`+
+    `<button type="button" class="btn g" id="stExport">Exportar CSV</button><span class="st-count">${data.length} unidade(s) · ${stPct(fa.pa,fa.n)} aprov. · ${stPct(fa.pr,fa.n)} reprov.</span></div>`+
+    (data.length?`<div class="gridscroll st-scroll"><table class="ctbl st-data"><thead><tr><th>${esc(LAYOUT.group)}</th><th>${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th>Data vistoria</th><th class="th-cli">Vistoriador</th><th>Acomp. técnico</th><th>Status</th><th>Resultado</th></tr></thead><tbody>`+
+      data.map(r=>{const s=CLR_C[r.code];return `<tr><td>${esc(r.b)}</td><td class="cunit">${unitCode(r.b,r.p,r.a)}</td><td>${r.data?fmtDate(r.data):"—"}</td><td class="st-l">${esc(r.resp)}</td><td>${esc(ST_ACOMP.find(c=>c.k===r.acomp).l)}</td>`+
+        `<td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td><td class="${r.ok?"ok":"bad"}">${r.ok?"Aprovada":"Reprovada"}</td></tr>`;}).join("")+`</tbody></table></div>`
+      :`<div class="st-empty">Nenhuma unidade com esses filtros.</div>`)+
+    `<p class="st-note"><b>Critérios:</b> vistoriada = Aprovado + Revistoria + Revistoria Finalizada (mesma regra do Resumo Geral). Aprovação = Aprovado ÷ vistoriadas; reprovação = (Revistoria + Revistoria Finalizada) ÷ vistoriadas. Cada unidade conta uma vez (o banco guarda o status atual da unidade; a revistoria não cria registro novo) e entra para o vistoriador do campo Responsável. Não agendado, Agendado, Remarcado e Processo em Andamento ficam de fora. Dados em tempo real do Supabase.</p></div></div>`;
+  wrap.innerHTML=h;
+}
+document.getElementById("statsWrap")?.addEventListener("click",e=>{
+  const s=e.target.closest("[data-st-sort]");
+  if(s){const k=s.dataset.stSort;stSort=stSort.key===k?{key:k,dir:-stSort.dir}:{key:k,dir:k==="name"?1:-1};renderStats();return;}
+  if(e.target.closest("#stExport")){
+    if(!stDataRows.length){toast("Nada para exportar com esses filtros");return;}
+    downloadCsv(`estatistica-${appProject?.slug||"condominio"}-${fileStamp()}.csv`,
+      [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Data vistoria","Vistoriador","Acompanhamento técnico","Status","Resultado"],
+      stDataRows.map(r=>[r.b,unitCode(r.b,r.p,r.a),csvDate(r.data),r.resp,ST_ACOMP.find(c=>c.k===r.acomp).l,CLL[r.code],r.ok?"Aprovada":"Reprovada"]));
+    toast(stDataRows.length+" unidade(s) exportada(s)");
+  }
+});
+document.getElementById("statsWrap")?.addEventListener("change",e=>{
+  const id=e.target.id;if(id==="stResp")stFilt.resp=e.target.value;else if(id==="stAcomp")stFilt.acomp=e.target.value;else if(id==="stRes")stFilt.res=e.target.value;else return;
+  renderStats();document.getElementById(id)?.focus();
+});
 /* tooltip dos gráficos (mouse, teclado e toque) */
 const chartTip=document.createElement("div");chartTip.className="chart-tip";chartTip.setAttribute("role","tooltip");document.body.appendChild(chartTip);
 function showTip(el,x,y){chartTip.textContent=el.dataset.tip;chartTip.classList.add("show");
