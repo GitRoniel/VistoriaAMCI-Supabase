@@ -1375,6 +1375,127 @@ a.hm-tile{color:#172c25}
 .vw-txt b{font-size:15px;font-weight:700;color:inherit}
 .vw-txt small{font-size:12.5px;font-weight:500;color:#617168;line-height:1.35}
 @media(max-width:720px){.vw-switch{display:none}}
+.vw-switch{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1100px){.vw-txt small{display:none}.vw-tab{min-height:54px}}
+/* ── ESTATÍSTICA GERAL ── (compacto; usa rg-card, stk-bar e ctbl do restante do site) */
+#v-stats .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
+#v-stats .sec-head .icn{width:30px;height:30px;border-radius:9px}
+#v-stats .sec-head .icn svg{width:15px;height:15px}
+#v-stats .sec-head h2{font-size:17px;white-space:nowrap}
+#v-stats .sec-head .sh-flow{font-size:12px;min-width:0}
+#v-stats .sec-body{padding:12px 14px}
+.st-wrap{display:grid;gap:10px}
+.st-wrap .rg-card{border-radius:12px;box-shadow:0 1px 2px rgba(16,42,36,.04)}
+.st-wrap .rg-card .rgh{padding:7px 12px;gap:10px;min-height:34px;box-sizing:border-box}
+.st-wrap .rg-card .rgh b{font-size:12px}
+.st-wrap .rg-body{padding:10px 12px}
+/* indicadores: anel + 6 números em uma linha */
+.st-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+.st-top .donut{width:84px;height:84px}
+.st-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:0}
+.st-kpis .rb{min-width:0;padding:7px 4px;border-radius:9px;background:#f8faf8}
+.st-kpis .rb .n{font-size:20px}
+.st-kpis .rb .l{font-size:8.5px;margin-top:3px}
+.st-kpis .rb.bad .n{color:var(--sunset)}
+.st-kpis .rb.ok .n{color:#2f9e5b}
+.st-grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:10px}
+/* por acompanhamento: barra empilhada */
+.st-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0 0 8px;font-size:11px;font-weight:700;color:var(--muted)}
+.st-legend span{display:inline-flex;align-items:center;gap:5px}
+.st-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.st-acomp{display:grid;gap:7px}
+.st-acomp .stk-row{grid-template-columns:132px minmax(0,1fr) 78px;gap:8px}
+.st-acomp .stk-lbl{font-size:11.5px;line-height:1.2}
+.st-acomp .stk-lbl small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
+.st-acomp .stk-bar{height:18px;border-radius:6px}
+.st-acomp .stk-bar i span{font-size:10px}
+.st-acomp .stk-tot{font-size:11px;line-height:1.2;display:flex;justify-content:flex-end;gap:6px}
+.st-acomp .stk-tot b{color:#268a4d}
+.st-acomp .stk-tot span{color:#c96a1a}
+/* comparativo: duas barras finas por categoria */
+.st-cmp{display:grid;gap:6px}
+.st-cr{display:grid;grid-template-columns:132px minmax(0,1fr);gap:8px;align-items:center;font-size:11.5px;font-weight:700;color:var(--ink)}
+.st-cr.geral{padding-top:6px;border-top:1px dashed #dbe4dd}
+.st-pair{display:grid;gap:3px}
+.st-pair .ln{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:6px;align-items:center}
+.st-pair .track{height:7px;border-radius:4px;background:#eef3ef;overflow:hidden}
+.st-pair .track i{display:block;height:100%;border-radius:4px;background:#2f9e5b}
+.st-pair .track.r i{background:var(--sunset)}
+.st-pair .pv{font-size:10.5px;text-align:right;font-variant-numeric:tabular-nums;color:#268a4d}
+.st-pair .pv.r{color:#c96a1a}
+.st-note{font-size:10.5px;color:var(--muted);line-height:1.45;margin:8px 0 0}
+/* ordenação */
+.st-sort{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.st-sort select{height:26px;padding:0 8px;border-radius:8px;border:1px solid var(--border);background:#ffffff;color:var(--ink);font:inherit;font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;cursor:pointer}
+.st-sort select:focus-visible{outline:2px solid rgba(107,128,64,.45);outline-offset:1px}
+/* tabela vistoriador × acompanhamento */
+.st-scroll{max-height:62vh;overflow:auto}
+.st-tbl{min-width:860px;font-size:11.5px}
+.st-tbl thead th{padding:5px 6px;font-size:9px}
+.st-tbl thead tr+tr th{top:23px}
+.st-tbl thead th.g-geral{background:#1f493e}
+.st-tbl thead th.g-eng{background:#2f5d8a}
+.st-tbl thead th.g-arq{background:#7a5a2f}
+.st-tbl thead th.g-sem{background:#55682f}
+.st-tbl thead th.g-ni{background:#6b6b6b}
+.st-tbl td{padding:4px 6px;font-variant-numeric:tabular-nums}
+.st-tbl tbody tr:hover td{background:#f4f7f2}
+.st-tbl td.st-nm{text-align:left;font-weight:700;color:var(--ink);position:sticky;left:0;background:#ffffff;z-index:1;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.st-tbl thead th.st-nm{text-align:left;position:sticky;left:0;z-index:3}
+.st-tbl td.ok{color:#268a4d;font-weight:700}
+.st-tbl td.bad{color:#c96a1a;font-weight:700}
+.st-tbl td.sep,.st-tbl th.sep{border-left:1px solid #e3e9e4}
+.st-tbl td.dim{color:#b3bbb6}
+.st-tbl tr.st-tot td{background:#eef3ef;font-weight:800;border-top:2px solid #1f493e;position:sticky;bottom:0;z-index:1}
+.st-tbl tr.st-tot td.st-nm{z-index:2}
+.st-tbl th button{all:unset;cursor:pointer}
+.st-tbl th button:focus-visible{outline:2px solid #dccb91;outline-offset:2px}
+.st-tbl th button[aria-sort]::after{content:" ▾"}
+.st-tbl th button[aria-sort="ascending"]::after{content:" ▴"}
+/* celular/tablet estreito: cartões por vistoriador no lugar da tabela larga */
+.st-cards{display:none}
+.st-pc{border:1px solid var(--border);border-radius:10px;padding:7px 9px;background:#ffffff}
+.st-pc.tot{background:#eef3ef;border-color:#c5d3c9}
+.st-pc .hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:700;color:var(--ink);min-width:0}
+.st-pc .hd span{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+.st-pc .stk-bar{height:8px;border-radius:4px;margin:5px 0 3px}
+.st-pc .rt{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:700}
+.st-pc .rt b{color:#268a4d}.st-pc .rt span{color:#c96a1a}
+.st-pc .ac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:5px}
+.st-pc .ac div{background:#f5f8f3;border-radius:6px;padding:3px 5px;font-size:10px;line-height:1.35;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-pc .ac div b{font-size:9px;letter-spacing:.3px;text-transform:uppercase;color:var(--ink)}
+.st-pc .ac div i{font-style:normal;color:var(--muted)}
+.st-pc .ac .ok{color:#268a4d;font-weight:700}.st-pc .ac .bad{color:#c96a1a;font-weight:700}
+.st-pc .ni{margin-top:3px;font-size:10px;color:var(--muted)}
+.st-empty{padding:20px 12px;text-align:center;color:var(--muted);font-size:12.5px}
+@media(max-width:1180px){.st-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px){.st-grid2{grid-template-columns:1fr}}
+@media(max-width:1000px){
+  .st-tblwrap{display:none}
+  .st-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+}
+@media(max-width:720px){
+  #v-stats .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
+  #v-stats .sec-head .icn{width:26px;height:26px;border-radius:8px}
+  #v-stats .sec-head .icn svg{width:13px;height:13px}
+  #v-stats .sec-head h2{font-size:15px}
+  #v-stats .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
+  #v-stats .sec-body{padding:8px}
+  .st-wrap{gap:8px}
+  .st-wrap .rg-body{padding:8px}
+  .st-wrap .rg-card .rgh{padding:6px 10px;min-height:30px;font-size:10px}
+  .st-top{grid-template-columns:1fr}
+  .st-top .donut{display:none}
+  .st-kpis{gap:5px}
+  .st-kpis .rb{padding:6px 2px}
+  .st-kpis .rb .n{font-size:17px}
+  .st-kpis .rb .l{font-size:7.8px}
+  .st-acomp .stk-row{grid-template-columns:minmax(0,1fr) 84px;gap:3px 8px}
+  .st-acomp .stk-lbl{grid-column:1/-1;white-space:normal}
+  .st-acomp .stk-lbl small{display:inline;margin-left:5px}
+  .st-cr{grid-template-columns:96px minmax(0,1fr);gap:6px;font-size:11px}
+  .st-cards{grid-template-columns:1fr;gap:5px}
+}
 /* Visão Geral: mesma largura do conteúdo das páginas dos condomínios (1600px − 16px de cada lado = 1568px). */
 @media(min-width:721px){.overview-ov .hm-hero-in,.overview-ov .hm-body{max-width:1600px;padding-left:calc(16px + var(--safe-l));padding-right:calc(16px + var(--safe-r))}}
 /* Páginas de administração: mesma estrutura da tela inicial (barra, saudação, corpo). */
@@ -2060,6 +2181,51 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .vw-tab.active .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
 :root[data-theme="dark"] .vw-txt b{color:inherit}
 :root[data-theme="dark"] .vw-txt small{color:#a6b2ab}
+:root[data-theme="dark"] .st-wrap .rg-card{box-shadow:0 1px 2px rgba(0,0,0,0.072)}
+:root[data-theme="dark"] .st-kpis .rb{background:#222822}
+:root[data-theme="dark"] .st-kpis .rb.bad .n{color:var(--sunset)}
+:root[data-theme="dark"] .st-kpis .rb.ok .n{color:#79d79f}
+:root[data-theme="dark"] .st-legend{color:#a6b2ab}
+:root[data-theme="dark"] .st-acomp .stk-lbl small{color:#a6b2ab}
+:root[data-theme="dark"] .st-acomp .stk-tot b{color:#77da9d}
+:root[data-theme="dark"] .st-acomp .stk-tot span{color:#c96a1a}
+:root[data-theme="dark"] .st-cr{color:#cfd9d7}
+:root[data-theme="dark"] .st-cr.geral{border-top:1px dashed #414a43}
+:root[data-theme="dark"] .st-pair .track{background:#1f2420}
+:root[data-theme="dark"] .st-pair .track i{background:#2f9e5b}
+:root[data-theme="dark"] .st-pair .track.r i{background:var(--sunset)}
+:root[data-theme="dark"] .st-pair .pv{color:#77da9d}
+:root[data-theme="dark"] .st-pair .pv.r{color:#c96a1a}
+:root[data-theme="dark"] .st-note{color:#a6b2ab}
+:root[data-theme="dark"] .st-sort{color:#a6b2ab}
+:root[data-theme="dark"] .st-sort select{border:1px solid #414a43;background:#282828;color:#cfd9d7}
+:root[data-theme="dark"] .st-sort select:focus-visible{outline:2px solid rgba(107,128,64,.45)}
+:root[data-theme="dark"] .st-tbl thead th.g-geral{background:#1f493e}
+:root[data-theme="dark"] .st-tbl thead th.g-eng{background:#2f5d8a}
+:root[data-theme="dark"] .st-tbl thead th.g-arq{background:#7a5a2f}
+:root[data-theme="dark"] .st-tbl thead th.g-sem{background:#55682f}
+:root[data-theme="dark"] .st-tbl thead th.g-ni{background:#6b6b6b}
+:root[data-theme="dark"] .st-tbl tbody tr:hover td{background:#22271f}
+:root[data-theme="dark"] .st-tbl td.st-nm{color:#cfd9d7;background:#282828}
+:root[data-theme="dark"] .st-tbl td.ok{color:#77da9d}
+:root[data-theme="dark"] .st-tbl td.bad{color:#c96a1a}
+:root[data-theme="dark"] .st-tbl td.sep,:root[data-theme="dark"] .st-tbl th.sep{border-left:1px solid #404741}
+:root[data-theme="dark"] .st-tbl td.dim{color:#b3bbb6}
+:root[data-theme="dark"] .st-tbl tr.st-tot td{background:#1f2420;border-top:2px solid #1f493e}
+:root[data-theme="dark"] .st-tbl th button:focus-visible{outline:2px solid #635c45}
+:root[data-theme="dark"] .st-pc{border:1px solid #414a43;background:#282828}
+:root[data-theme="dark"] .st-pc.tot{background:#1f2420;border-color:#48514a}
+:root[data-theme="dark"] .st-pc .hd{color:#cfd9d7}
+:root[data-theme="dark"] .st-pc .hd span{color:#a6b2ab}
+:root[data-theme="dark"] .st-pc .rt b{color:#77da9d}
+:root[data-theme="dark"] .st-pc .rt span{color:#c96a1a}
+:root[data-theme="dark"] .st-pc .ac div{background:#23281f;color:#a6b2ab}
+:root[data-theme="dark"] .st-pc .ac div b{color:#cfd9d7}
+:root[data-theme="dark"] .st-pc .ac div i{color:#a6b2ab}
+:root[data-theme="dark"] .st-pc .ac .ok{color:#77da9d}
+:root[data-theme="dark"] .st-pc .ac .bad{color:#c96a1a}
+:root[data-theme="dark"] .st-pc .ni{color:#a6b2ab}
+:root[data-theme="dark"] .st-empty{color:#a6b2ab}
 :root[data-theme="dark"] .mods-sel{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
 :root[data-theme="dark"] .mods-row{background:#282828;border:1px solid #414a43}
 :root[data-theme="dark"] .mods-row.on{border-left:3px solid #6B8040}
@@ -2141,6 +2307,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   <nav class="vw-switch" aria-label="Páginas do condomínio">
     <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Números e andamento das vistorias do condomínio</small></span></button>
     <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
+    <button type="button" class="vw-tab" data-view="stats" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="vw-txt"><b>Estatística Geral</b><small>Aprovação e reprovação por vistoriador e acompanhamento técnico</small></span></button>
   </nav>
 
   <!-- ====== OBRA ====== -->
@@ -2192,12 +2359,25 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
       </div>
     </div>
   </section>
+
+  <!-- ====== ESTATÍSTICA GERAL ====== -->
+  <section class="view" id="v-stats">
+    <div class="sec-head">
+      <span class="icn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+      <h2>Estatística Geral</h2>
+      <div class="sh-flow">Vistoriadores × <b>Acompanhamento Técnico</b></div>
+    </div>
+    <div class="sec-body">
+      <div class="st-wrap" id="statsWrap"></div>
+    </div>
+  </section>
 </main>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="botnav">
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
+  <button class="navbtn" data-view="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Estatística</span></button>
 </nav>
 
 <div class="pop" id="pop"></div>
@@ -3269,6 +3449,7 @@ function switchView(v){
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
   if(v==="resumo"){renderResumo(); animateResumo();}
+  if(v==="stats")renderStats();
 
   animateView(v);
   scrollTo(0,0);
@@ -4690,7 +4871,94 @@ function renderResumo(){
   });
   h+=`</div></div></div></div>`;
   grid.innerHTML=h;
+  // A Estatística Geral usa os mesmos dados: atualiza junto quando estiver aberta.
+  if(document.getElementById("v-stats")?.classList.contains("active"))renderStats();
 }
+/* ── ESTATÍSTICA GERAL ──
+   Vistoriadores × Acompanhamento Técnico, calculado no navegador com os dados do Supabase já
+   carregados para o condomínio (state.cli / state.cliInfo, vindos de client_inspections e
+   atualizados em tempo real): nenhuma consulta ou cópia de dados à parte.
+   Mesma regra do Resumo Geral e da planilha Excel: vistoriada = Aprovado + Revistoria +
+   Revistoria Finalizada; aprovação = Aprovado ÷ vistoriadas; reprovação = (Revistoria +
+   Revistoria Finalizada) ÷ vistoriadas. client_inspections tem 1 registro por unidade (status
+   atual), então a revistoria não duplica a unidade; ela conta para o Responsável da vistoria. */
+const ST_ACOMP=[{k:"engenheiro",l:"Engenheiro",s:"Eng.",g:"g-eng"},{k:"arquiteto",l:"Arquiteto",s:"Arq.",g:"g-arq"},{k:"nenhum",l:"Sem acompanhamento",s:"S/ acomp.",g:"g-sem"},{k:"",l:"Não informado",s:"Não inf.",g:"g-ni"}];
+const ST_NO_RESP="Não informado";
+const ST_SORTS=[["n","Vistorias"],["ap","Aprovadas"],["rp","Reprovadas"],["pa","% Aprovação"],["pr","% Reprovação"],["name","Nome"]];
+let stSort={key:"n",dir:-1};
+function statsRows(){
+  const out=[];
+  LAYOUT.units.forEach(u=>{
+    const k=kC(u.b,u.p,u.a),code=state.cli[k];if(code!=="ap"&&code!=="rv"&&code!=="rf")return;
+    const i=state.cliInfo[k]||{};
+    out.push({code,ok:code==="ap",resp:String(i.responsavel||"").trim()||ST_NO_RESP,acomp:ACOMP[i.acomp]?i.acomp:""});
+  });
+  return out;
+}
+function stAgg(rows){const n=rows.length,ap=rows.filter(r=>r.ok).length;return {n,ap,rp:n-ap,pa:n?ap/n*100:0,pr:n?(n-ap)/n*100:0};}
+const stPct=(v,n)=>n?fmtPct(v):"—";
+// Barra aprovadas × reprovadas (mesmo componente stk-bar do Resumo Geral).
+function stBar(x,label,minTxt=18){
+  const segs=[{cls:"stk-ok",n:x.ap,pct:x.pa,l:"Aprovadas"},{cls:"stk-rev",n:x.rp,pct:x.pr,l:"Reprovadas"}].filter(s=>s.n>0);
+  return `<div class="stk-bar" role="img" aria-label="${esc(label)}: aprovação ${stPct(x.pa,x.n)}, reprovação ${stPct(x.pr,x.n)}">`+
+    segs.map(s=>`<i class="${s.cls}" style="width:${s.pct}%" data-tip="${esc(`${label} · ${s.l}: ${s.n} de ${x.n} (${fmtPct(s.pct)})`)}" tabindex="0">${s.pct>=minTxt?`<span>${fmtPct(s.pct)}</span>`:""}</i>`).join("")+`</div>`;
+}
+function renderStats(){
+  const wrap=document.getElementById("statsWrap");if(!wrap)return;
+  const rows=statsRows(),tot=stAgg(rows);
+  if(!rows.length){wrap.innerHTML=`<div class="rg-card"><div class="rgh"><span>Estatística Geral</span></div><div class="st-empty">Nenhuma unidade vistoriada neste condomínio ainda (Aprovado, Revistoria ou Revistoria Finalizada).</div></div>`;return;}
+  const byResp=new Map();rows.forEach(r=>{if(!byResp.has(r.resp))byResp.set(r.resp,[]);byResp.get(r.resp).push(r);});
+  const people=[...byResp.entries()].map(([name,rs])=>({name,...stAgg(rs),ac:Object.fromEntries(ST_ACOMP.map(c=>[c.k,stAgg(rs.filter(r=>r.acomp===c.k))]))}));
+  const cats=ST_ACOMP.map(c=>({...c,...stAgg(rows.filter(r=>r.acomp===c.k))}));
+  const sortVal=(x,k)=>k==="name"?x.name:x[k];
+  people.sort((x,y)=>{const a=sortVal(x,stSort.key),b=sortVal(y,stSort.key);const c=typeof a==="string"?a.localeCompare(b,"pt-BR"):a-b;return c*stSort.dir||y.n-x.n||x.name.localeCompare(y.name,"pt-BR");});
+  const shown=cats.filter(c=>c.n||c.k);
+  // 1. Indicadores gerais
+  let h=`<div class="rg-card"><div class="rgh"><span>Indicadores gerais</span><b>${fmtPct(tot.pa)} aprov.</b></div><div class="rg-body"><div class="st-top">${donut(tot.pa,"#2f9e5b","Aprovação",84).replace(/>[\d.]+%</,">"+fmtPct(tot.pa)+"<")}<div class="rg-big st-kpis">`+
+    `<div class="rb"><div class="n">${tot.n}</div><div class="l">Vistorias</div></div>`+
+    `<div class="rb ok"><div class="n">${tot.ap}</div><div class="l">Aprovadas</div></div>`+
+    `<div class="rb bad"><div class="n">${tot.rp}</div><div class="l">Reprovadas</div></div>`+
+    `<div class="rb ok"><div class="n">${fmtPct(tot.pa)}</div><div class="l">% Aprovação</div></div>`+
+    `<div class="rb bad"><div class="n">${fmtPct(tot.pr)}</div><div class="l">% Reprovação</div></div>`+
+    `<div class="rb"><div class="n">${people.length}</div><div class="l">Vistoriadores</div></div></div></div></div></div>`;
+  // 2. Por acompanhamento técnico + comparativo de taxas
+  const legend=`<div class="st-legend"><span><i class="stk-ok"></i>Aprovadas</span><span><i class="stk-rev"></i>Reprovadas (Revistoria / Rev. finalizada)</span></div>`;
+  h+=`<div class="st-grid2"><div class="rg-card"><div class="rgh"><span>Por acompanhamento técnico</span><b>${tot.n} vistorias</b></div><div class="rg-body">${legend}<div class="st-acomp">`+
+    shown.map(c=>`<div class="stk-row"><span class="stk-lbl">${esc(c.l)}<small>${c.n} vist. · ${stPct(tot.n?c.n/tot.n*100:0,tot.n)} do total</small></span>${stBar(c,c.l)}`+
+      `<span class="stk-tot"><b>${stPct(c.pa,c.n)}</b><span>${stPct(c.pr,c.n)}</span></span></div>`).join("")+`</div></div></div>`;
+  const pair=(x)=>`<div class="st-pair"><div class="ln"><div class="track"><i style="width:${x.pa}%"></i></div><span class="pv">${stPct(x.pa,x.n)}</span></div><div class="ln"><div class="track r"><i style="width:${x.pr}%"></i></div><span class="pv r">${stPct(x.pr,x.n)}</span></div></div>`;
+  h+=`<div class="rg-card"><div class="rgh"><span>Comparativo de taxas</span><b>aprov. × reprov.</b></div><div class="rg-body"><div class="st-cmp">`+
+    cats.filter(c=>c.n).map(c=>`<div class="st-cr"><span>${esc(c.l)}</span>${pair(c)}</div>`).join("")+
+    `<div class="st-cr geral"><span>Geral</span>${pair(tot)}</div></div></div></div></div>`;
+  // 3. Por vistoriador × acompanhamento técnico (tabela no computador, cartões no celular)
+  const sb=(key,lbl)=>`<button type="button" data-st-sort="${key}"${stSort.key===key?` aria-sort="${stSort.dir>0?"ascending":"descending"}"`:""}>${lbl}</button>`;
+  const cell=a=>a.n?`<td class="sep">${a.n}</td><td class="ok">${fmtPct(a.pa)}</td><td class="bad">${fmtPct(a.pr)}</td>`:`<td class="sep dim">–</td><td class="dim">–</td><td class="dim">–</td>`;
+  const acCols=ST_ACOMP.filter(c=>c.k),ni=ST_ACOMP.find(c=>!c.k);
+  const totRow={name:"Total",...tot,ac:Object.fromEntries(cats.map(c=>[c.k,c]))};
+  const row=(x,cls="")=>`<tr class="${cls}"><td class="st-nm" title="${esc(x.name)}">${esc(x.name)}</td><td class="sep">${x.n}</td><td>${x.ap}</td><td>${x.rp}</td><td class="ok">${fmtPct(x.pa)}</td><td class="bad">${fmtPct(x.pr)}</td>`+
+    acCols.map(c=>cell(x.ac[c.k])).join("")+`<td class="sep${x.ac[""].n?"":" dim"}">${x.ac[""].n||"–"}</td></tr>`;
+  const card=(x,cls="")=>`<div class="st-pc${cls}"><div class="hd">${esc(x.name)}<span>${x.n} vist.</span></div>${stBar(x,x.name,101)}`+
+    `<div class="rt"><b>${x.ap} aprov. · ${fmtPct(x.pa)}</b><span>${x.rp} reprov. · ${fmtPct(x.pr)}</span></div>`+
+    `<div class="ac" aria-label="Vistorias, % aprovação e % reprovação por acompanhamento técnico">${acCols.map(c=>{const a=x.ac[c.k];return `<div title="${esc(c.l)}"><b>${c.s}</b> <i>${a.n?a.n:"–"}</i><br>${a.n?`<span class="ok">${fmtPct(a.pa)}</span> · <span class="bad">${fmtPct(a.pr)}</span>`:"&nbsp;"}</div>`;}).join("")}</div>`+
+    (x.ac[""].n?`<div class="ni">${ni.l}: ${x.ac[""].n} vist.</div>`:"")+`</div>`;
+  const sortSel=`<label class="st-sort">Ordenar<select id="stSortSel" aria-label="Ordenar vistoriadores">${ST_SORTS.map(([k,l])=>`<option value="${k}"${stSort.key===k?" selected":""}>${l}</option>`).join("")}</select></label>`;
+  h+=`<div class="rg-card"><div class="rgh"><span>Por vistoriador × acompanhamento técnico</span>${sortSel}</div><div class="rg-body">`+
+    `<div class="st-tblwrap"><div class="gridscroll st-scroll"><table class="ctbl st-tbl"><thead><tr><th class="st-nm" rowspan="2">${sb("name","Vistoriador")}</th><th class="g-geral sep" colspan="5">Geral</th>`+
+    acCols.map(c=>`<th class="${c.g} sep" colspan="3">${esc(c.l)}</th>`).join("")+`<th class="${ni.g} sep" rowspan="2">Não<br>inf.</th></tr>`+
+    `<tr><th class="g-geral sep">${sb("n","Vistorias")}</th><th class="g-geral">${sb("ap","Aprov.")}</th><th class="g-geral">${sb("rp","Reprov.")}</th><th class="g-geral">${sb("pa","% Aprov.")}</th><th class="g-geral">${sb("pr","% Reprov.")}</th>`+
+    acCols.map(c=>`<th class="${c.g} sep">Vist.</th><th class="${c.g}">% Aprov.</th><th class="${c.g}">% Reprov.</th>`).join("")+`</tr></thead><tbody>`+
+    people.map(x=>row(x)).join("")+row(totRow,"st-tot")+`</tbody></table></div></div>`+
+    `<div class="st-cards">${people.map(x=>card(x)).join("")}${card(totRow," tot")}</div>`+
+    `<p class="st-note"><b>Critérios:</b> vistoriada = Aprovado + Revistoria + Revistoria Finalizada (mesma regra do Resumo Geral); aprovação = Aprovado ÷ vistoriadas; reprovação = (Revistoria + Revistoria Finalizada) ÷ vistoriadas. Cada unidade conta uma vez (a revistoria não cria registro novo) para o vistoriador do campo Responsável, com o nome como foi registrado. Não agendado, Agendado, Remarcado e Processo em Andamento ficam de fora. Dados em tempo real do Supabase.</p></div></div>`;
+  wrap.innerHTML=h;
+}
+document.getElementById("statsWrap")?.addEventListener("click",e=>{
+  const s=e.target.closest("[data-st-sort]");if(!s)return;
+  const k=s.dataset.stSort;stSort=stSort.key===k?{key:k,dir:-stSort.dir}:{key:k,dir:k==="name"?1:-1};renderStats();
+});
+document.getElementById("statsWrap")?.addEventListener("change",e=>{
+  if(e.target.id!=="stSortSel")return;const k=e.target.value;stSort={key:k,dir:k==="name"?1:-1};renderStats();document.getElementById("stSortSel")?.focus();
+});
 /* tooltip dos gráficos (mouse, teclado e toque) */
 const chartTip=document.createElement("div");chartTip.className="chart-tip";chartTip.setAttribute("role","tooltip");document.body.appendChild(chartTip);
 function showTip(el,x,y){chartTip.textContent=el.dataset.tip;chartTip.classList.add("show");
