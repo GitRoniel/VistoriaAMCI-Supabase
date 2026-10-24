@@ -11,6 +11,7 @@ import { appHeaderHTML, secHeadHTML, stateHTML } from "../../platform/ui/shell.j
 import { suprimentosTab } from "../suprimentos/pedidos/tab.js";
 import { contratosTab } from "../contratos/contratos/tab.js";
 import { mountSync } from "./sync.js";
+import { mountManualRun } from "./manual-run.js";
 
 const TABS = [suprimentosTab, contratosTab];
 const TAB_ICON = {
@@ -62,7 +63,7 @@ function trackAppbar() {
   if ("ResizeObserver" in window) { appbarObs = new ResizeObserver(set); appbarObs.observe(bar); }
 }
 
-function mountTabs(tabs, user) {
+function mountTabs(tabs, user, modules = new Map()) {
   const state = new Map(tabs.map((t) => [t.id, { loaded: false, loading: null, subtitle: "" }]));
   const items = tabs.map((t) => ({ id: t.id, label: t.label, icon: TAB_ICON[t.id] || "" }));
   frame({ user, tabs: items, active: tabs[0].id, body: `
@@ -87,7 +88,9 @@ function mountTabs(tabs, user) {
     sub.innerHTML = st.subtitle || "&nbsp;";
     if (st.loaded || st.loading) return;
     const pane = document.getElementById("pane-" + tab.id);
-    pane.innerHTML = `<section class="pf-sync" data-sync aria-label="Atualização dos dados"></section><div data-body>${stateHTML({ title: tab.loading, text: "Buscando os dados mais recentes do ERP.", spinner: true })}</div>`;
+    // Botão "Atualizar relatório agora": só para o administrador do módulo (o servidor confere de novo).
+    const manual = tab.manualRun && modules.get(tab.module) === "admin";
+    pane.innerHTML = `<div class="pf-sync-row"><section class="pf-sync" data-sync aria-label="Atualização dos dados"></section>${manual ? '<div class="pf-run" data-run aria-live="polite"></div>' : ""}</div><div data-body>${stateHTML({ title: tab.loading, text: "Buscando os dados mais recentes do ERP.", spinner: true })}</div>`;
     const body = pane.querySelector("[data-body]");
     st.loading = tab.load(body).then((subtitle) => {
       st.loaded = true; st.subtitle = subtitle;
@@ -97,7 +100,8 @@ function mountTabs(tabs, user) {
       body.innerHTML = stateHTML({ title: "Erro ao carregar os dados", text: "Verifique sua conexão e tente novamente.", action: retry });
     }).finally(() => { st.loading = null; });
     // Situação da automação (UAU-Sync): última execução, horário, o que mudou e histórico.
-    mountSync(pane.querySelector("[data-sync]"), tab, { isVisible: () => !pane.hidden, ready: st.loading });
+    const sync = mountSync(pane.querySelector("[data-sync]"), tab, { isVisible: () => !pane.hidden, ready: st.loading });
+    if (manual) mountManualRun(pane.querySelector("[data-run]"), { onConcluido: () => sync.refresh(false) });
   }
 
   page.addEventListener("click", (e) => {
@@ -142,7 +146,7 @@ async function boot() {
     frame({ user: session.user, body: stateHTML({ title: "Sem acesso aos relatórios", text: "Peça a um administrador para liberar o módulo Suprimentos ou Contratos em Liberações › Acesso aos módulos.", action: goHome }) });
     return;
   }
-  mountTabs(tabs, session.user);
+  mountTabs(tabs, session.user, session.modules);
 }
 
 boot();

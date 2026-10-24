@@ -6,6 +6,28 @@
 
 /* ── Situação da automação (UAU-Sync): uma linha discreta; detalhes e histórico ao clicar ── */
 .pf-sync{margin:-4px 2px 10px}
+/* faixa de atualização + botão "Atualizar relatório agora" (só administrador) na mesma linha */
+.pf-sync-row{display:flex;align-items:flex-start;flex-wrap:wrap;gap:4px 12px;margin:-4px 2px 10px}
+.pf-sync-row .pf-sync{margin:0;flex:1 1 320px;min-width:0}
+.pf-run{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px 10px;margin-left:auto;min-height:26px;font-size:12px}
+.pf-run[hidden]{display:none}
+.pf-run-btn{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-family:inherit;font-size:11.5px;font-weight:700;white-space:nowrap;cursor:pointer;transition:border-color .15s,color .15s}
+.pf-run-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pf-run-btn:hover:not(:disabled){border-color:var(--fern);color:var(--ink)}
+.pf-run-btn:focus-visible{outline:2px solid var(--fern);outline-offset:1px}
+.pf-run-btn:disabled{opacity:.55;cursor:not-allowed}
+.pf-run-st{display:inline-flex;align-items:center;gap:6px;font-weight:700;max-width:520px;min-width:0}
+.pf-run-st small{font-size:11px;font-weight:600;color:var(--muted)}
+.pf-run-st.run{color:var(--blue)} .pf-run-st.ok{color:var(--green)} .pf-run-st.err{color:var(--red)}
+.pf-run-link{font-size:11.5px;font-weight:700;color:var(--fern);text-decoration:none}
+.pf-run-link:hover{text-decoration:underline}
+/* confirmação antes de executar */
+.pf-dlg{position:fixed;inset:0;margin:auto;height:fit-content;border:1px solid var(--border);border-radius:16px;padding:18px 20px;width:calc(100% - 32px);max-width:420px;background:var(--surface);color:var(--text);box-shadow:0 24px 60px rgba(16,42,36,.28)}
+.pf-dlg::backdrop{background:rgba(16,42,36,.45)}
+.pf-dlg h3{margin:0 0 8px;font-size:16px;color:var(--ink)}
+.pf-dlg p{margin:0 0 6px;font-size:13px;line-height:1.45;color:var(--text-2)}
+.pf-dlg p.muted{color:var(--muted);font-size:12px}
+.pf-dlg-act{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
 .pf-sync:empty{display:none}
 .pf-sync-line{display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap;min-height:26px;font-size:12px;font-weight:600;color:var(--muted)}
 .pf-sync-line b{color:var(--text-2);font-weight:700;font-variant-numeric:tabular-nums}
@@ -37,6 +59,9 @@ summary.pf-sync-line:focus-visible{outline:2px solid var(--fern);outline-offset:
 .pf-sync-body .obs{white-space:normal;color:var(--muted)}
 .pf-sync-body .pf-badge{padding:1px 8px;font-size:10px}
 @media(max-width:720px){
+  .pf-sync-row{margin:-2px 0 8px}
+  .pf-run{margin-left:0;width:100%;justify-content:flex-start}
+  .pf-run-st{max-width:100%}
   .pf-sync{margin:-2px 0 8px}
   .pf-sync-line{font-size:11.5px}
   .pf-sync-chg::before{display:none}
@@ -46,4 +71,4 @@ summary.pf-sync-line:focus-visible{outline:2px solid var(--fern);outline-offset:
   .pf-sync-body th:nth-child(4),.pf-sync-body td:nth-child(4){display:none}
   .pf-sync-body td{white-space:normal}
 }
-@media print{.pf-sync-more,.pf-sync-new{display:none!important}.pf-sync-body{display:none}}
+@media print{.pf-sync-more,.pf-sync-new,.pf-run{display:none!important}.pf-sync-body{display:none}}

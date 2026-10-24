@@ -20,6 +20,8 @@ export const suprimentosTab = {
   loading: "Carregando pedidos…",
   report: REPORT_ID,
   unit: "linhas do ERP",
+  /** Administrador do módulo vê o botão "Atualizar relatório agora" (robô UAU-Sync sob demanda). */
+  manualRun: true,
   /** Busca e monta a aba em `root`. Devolve o subtítulo do cabeçalho. */
   async load(root) {
     const [rows, exec, observacoes] = await Promise.all([fetchPedidoRows(), fetchUltimaExecucao(), fetchObservacoes()]);
