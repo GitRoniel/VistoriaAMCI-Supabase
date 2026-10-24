@@ -60,6 +60,9 @@ const buildOptions = {
 
 // Leitor de Excel da importação de agendamentos: carregado só quando o usuário importa.
 const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], outfile: "www/xlsx-reader.js" };
+// Controle de Chaves: aba das Vistorias (index.html), que expõe window.AmciChaves. O CSS fica no
+// index.html para o tema escuro ser gerado junto com o restante da tela.
+const chavesOptions = { ...buildOptions, entryPoints: ["./src/modules/chaves/index.js"], outfile: "www/chaves.js" };
 
 // Plataforma: estilos compartilhados e páginas dos módulos (src/platform + src/modules).
 // Para uma página nova, acrescente { js, css, out } aqui e o HTML em www/<modulo>/<pagina>.html.
@@ -82,11 +85,13 @@ if (watch) {
   const ctx = await context(buildOptions);
   await ctx.watch();
   await (await context(xlsxOptions)).watch();
+  await (await context(chavesOptions)).watch();
   for (const options of platformBuilds) await (await context(options)).watch();
   console.log("Build em observação. Pressione Ctrl+C para encerrar.");
 } else {
   await build(buildOptions);
   await build(xlsxOptions);
+  await build(chavesOptions);
   await Promise.all(platformBuilds.map((options) => build(options)));
   // Mantém o index da raiz sincronizado para quem abrir o projeto localmente.
   await copyFile(resolve(www, "index.html"), resolve(root, "index.html"));

@@ -172,5 +172,6 @@ assert.match(rlsErp, /private\.has_module\('suprimentos'\)/);
 assert.match(rlsErp, /private\.has_module\('contratos'\)/);
 await import("./test-pedidos.mjs");
 await import("./test-contratos.mjs");
+await import("./test-chaves.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");
