@@ -154,6 +154,45 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).
 - A busca filtra os cards de condomínios e relatórios, sem acento.
 
+## Controle de Chaves (claviculário)
+
+Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). O mapa é o mesmo das vistorias. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
+
+- **Situação das chaves** (cor da unidade): Base (azul, no claviculário), CX (verde), Asstec (laranja), Produção (vermelho) e Sem status (cinza). Marcadores:
+  - bolinha vermelha = devolução pendente (previsão vencida);
+  - "!" amarelo = divergência;
+  - cor dividida = retirada parcial;
+  - borda tracejada = quantidades a cadastrar.
+- **Status da vistoria:** a barra na parte de baixo de cada unidade e o selo no popup mostram o status de `client_inspections`. O módulo só lê esse status, não grava nem copia.
+- **Indicadores:** unidades, todas as chaves na Base, com retiradas, devoluções pendentes, sem status e movimentações de hoje. Os alertas de pendência, divergência e "a cadastrar" filtram o mapa.
+- **Filtros:** condomínio, bloco ou conjunto, unidade, tipologia, status da vistoria, situação das chaves, setor, e os atalhos "Aprovadas com chaves disponíveis" e "Aguardando vistoria ou revistoria".
+- **Popup da unidade:**
+  - identificação: condomínio, bloco/apto, tipologia e vistoria;
+  - cada chave por categoria (Entrada, Quarto n, Banheiro n), com as cópias e onde cada uma está;
+  - abas Retirar, Devolver, Transferir, Ocorrência e Cadastro (admin);
+  - histórico completo da unidade.
+- **Regras:**
+  - retirada parcial permitida; só sai chave ativa e na Base;
+  - chave já retirada só muda de mãos por transferência;
+  - exige responsável, data/hora e as chaves movimentadas, e pede confirmação antes de gravar;
+  - data/hora e usuário são registrados automaticamente;
+  - o mesmo envio nunca grava duas vezes;
+  - duas retiradas simultâneas da mesma chave: a segunda é recusada;
+  - o cadastro só muda com todas as chaves na Base;
+  - o status da vistoria nunca é alterado pelo módulo.
+- **Permissões** (papel no condomínio): admin cadastra chaves e tipologia e movimenta; revistorias movimenta; visitante só consulta. Condomínio arquivado não aparece.
+- **Banco** (migration `20261024120000_controle_chaves.sql`, só aditiva):
+  - `units.quartos` guarda a tipologia. No Alto do Jerivá: finais 01, 04, 05 e 08 = 2 quartos; finais 02, 03, 06 e 07 = 3 quartos. Nos outros condomínios fica "não informada" até o admin definir.
+  - `chaves_unidades` guarda o cadastro da unidade no claviculário.
+  - `chaves` tem uma linha por cópia física, com o local atual.
+  - `chaves_movimentacoes` é o histórico imutável: nem o dono do banco altera; só sai em cascata se a unidade for apagada.
+  - Escrita só pelas funções `chaves_cadastrar`, `chaves_retirar`, `chaves_transferir`, `chaves_devolver`, `chaves_ocorrencia` e `chaves_definir_tipologia` (security definer, com trava das chaves e `pedido_id` contra duplicidade). Leitura por RLS, para membros do condomínio.
+- **Carga inicial:** planilha "Levantamento Inicial" do Alto do Jerivá, com 448 unidades. "Tem chave SIM" = chaves na Base (345); "NÃO" = sem status (103). A coluna "Qtd. Chaves" estava vazia, então as quantidades de cada unidade são cadastradas no popup. As observações "24.10" foram desconsideradas.
+- **Sem a migration aplicada**, a aba avisa que o módulo não está instalado; o resto das Vistorias continua igual.
+- **Testes:**
+  - regras da tela: `scripts/test-chaves.mjs` (no `pnpm check`);
+  - banco (RLS, concorrência, histórico): `scripts/db-tests/chaves/` (Postgres local).
+
 ## Plataforma: Relatórios (Suprimentos e Contratos)
 
 - Página única `/relatorios`, com uma aba por módulo:
