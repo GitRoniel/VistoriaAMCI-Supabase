@@ -71,7 +71,8 @@ function confirmar() {
  * (a faixa de atualização confere a nova execução e oferece recarregar os dados).
  */
 export function mountManualRun(el, { onConcluido = () => {} } = {}) {
-  let exec = null, configurado = true, busy = false, aviso = "", timer = null, visto = null;
+  // só libera o botão depois que o servidor responder (função publicada e token configurado)
+  let exec = null, configurado = false, busy = false, aviso = "", timer = null, visto = null;
   const paint = () => { el.innerHTML = estadoHTML(exec, { configurado, busy, aviso }); };
   const agendar = () => {
     clearTimeout(timer);
@@ -86,11 +87,11 @@ export function mountManualRun(el, { onConcluido = () => {} } = {}) {
   async function atualizar() {
     try {
       const r = await chamar("status");
-      configurado = r.configurado !== false; aviso = "";
+      configurado = r.configurado === true; aviso = "";
       aplicar(r.execucao);
     } catch (err) {
       if (err.status === 403) { el.hidden = true; return; }   // sem permissão no servidor: some
-      aviso = ""; paint(); timer = setTimeout(atualizar, POLL_MS * 3);
+      configurado = false; aviso = ""; paint(); timer = setTimeout(atualizar, POLL_MS * 3);
     }
   }
   el.addEventListener("click", async (e) => {
