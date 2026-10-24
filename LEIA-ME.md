@@ -22,6 +22,7 @@ pnpm exec supabase login
 pnpm exec supabase link --project-ref SEU_PROJECT_REF
 pnpm exec supabase db push
 pnpm exec supabase functions deploy admin-users
+pnpm exec supabase functions deploy suprimentos-atualizar
 pnpm import:data -- --dry-run
 pnpm import:data
 pnpm export:reports
@@ -163,3 +164,8 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Arquitetura, segurança e como criar novos relatórios: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
 - Regras e mapeamentos: [Pedidos](docs/suprimentos-pedidos-mapeamento.md) · [Contratos](docs/contratos-mapeamento.md).
 - Situação da automação UAU-Sync (GitHub Actions) no topo de cada relatório, lida de `pedidos_execucoes`: se a última execução deu certo (ou o motivo da falha), data e horário dos dados exibidos, o que mudou desde a atualização anterior (pedidos novos, contratos e itens novos, diferença de linhas) e o histórico das últimas execuções. A página confere a cada minuto e avisa quando chegam dados novos.
+- **Atualizar relatório agora** (aba Suprimentos, só administradores do módulo): ao lado da situação da automação, um botão discreto pede confirmação e executa o mesmo robô da atualização agendada (workflow "UAU → Supabase" do repositório UAU-Sync), só com o Relatório 1187 e os Pedidos de Compra. A tela mostra *aguardando*, *executando*, *concluído* ou *erro* (com o motivo) e, ao concluir, oferece recarregar os dados.
+  - Backend: função `suprimentos-atualizar` (Edge Function). Ela confere a cada chamada se quem chamou é administrador ativo de Suprimentos (`module_members`); leitores e outros usuários recebem 403, inclusive chamando a API direto. O token do GitHub fica só nos secrets da função.
+  - Proteção contra execução dupla: uma execução manual ativa por vez (índice único) e nenhuma enquanto o workflow estiver na fila ou rodando, inclusive o agendado. O workflow já tem `concurrency: uau-sync`.
+  - Registro: tabela `robo_execucoes_manuais` (quem pediu, quando, execução do GitHub, início, fim, resultado e detalhe da falha), que só os administradores do módulo leem. O resultado de cada relatório continua em `pedidos_execucoes`.
+  - Configuração (uma vez): crie no GitHub um token *fine-grained* só para o repositório UAU-Sync, com permissão **Actions: Read and write**. Depois: `pnpm exec supabase db push`, `pnpm exec supabase secrets set UAU_SYNC_GITHUB_TOKEN=<token>` e `pnpm exec supabase functions deploy suprimentos-atualizar`. Sem o token, o botão aparece desativado ("Execução manual ainda não configurada").
