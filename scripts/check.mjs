@@ -173,5 +173,14 @@ assert.match(rlsErp, /private\.has_module\('contratos'\)/);
 await import("./test-pedidos.mjs");
 await import("./test-contratos.mjs");
 await import("./test-chaves.mjs");
+const revPlanilha = await readFile(resolve(root, "supabase/migrations/20261027120000_revistorias_planilha.sql"), "utf8");
+assert.match(revPlanilha, /alter table public\.revistorias enable row level security/);
+assert.match(revPlanilha, /grant select on table public\.revistorias to authenticated/);
+assert.doesNotMatch(revPlanilha, /grant (insert|update|delete)[^;]*revistorias/i, "Revistorias: escrita só pela função de importação.");
+assert.match(revPlanilha, /is_project_admin\(p\.id\) is not true/, "Importação precisa recusar quem não é administrador (inclusive sem acesso).");
+assert.match(revPlanilha, /coalesce\(private\.project_role\(p_project_id\) = 'admin', false\)/, "is_project_admin nunca pode devolver nulo.");
+assert.doesNotMatch(revPlanilha.slice(revPlanilha.indexOf("-- ── Revistorias ──")), /set\s+status\s*=\s*v_rec/, "Revistoria não altera o status da vistoria.");
+assert.ok(html.includes('<script src="./revistorias.js"></script>') && html.includes("p_revistorias") && html.includes("IMPORT_REV_COLUMNS"), "Importação e telas das revistorias.");
+await import("./test-revistorias.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

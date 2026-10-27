@@ -97,6 +97,23 @@ A planilha só atualiza **Cliente, Data, Horário e Status** da vistoria. As col
 
 Origem de cada campo em `client_inspections.field_sources` / `updated_source` (MANUAL, PLANILHA, SISTEMA). Histórico em `importacoes_agendamentos` e `importacoes_agendamentos_itens`.
 
+### Revistorias da planilha (colunas K, L e M)
+
+A mesma importação lê as colunas de revistoria do Relatório 854 (opcionais; reconhecidas por "revistoria" no nome, inclusive o erro de digitação "REVSITORIA", e lidas antes das colunas da vistoria):
+
+| Coluna | Cabeçalho | Gravado em |
+|---|---|---|
+| K | STATUS DA REVISTORIA | `revistorias.status` (Agendada, Em revistoria, Aprovada, Reprovada) e o texto original em `status_planilha` |
+| L | DATA DA REVISTORIA | `revistorias.data` |
+| M | HORÁRIO DO AGENDAMENTO REVISTORIA | `revistorias.horario` |
+
+- Cada unidade pode ter várias revistorias (nº 1, 2…), na tabela `public.revistorias`. O **status da vistoria nunca muda** por causa da revistoria (coluna H continua indo só para `client_inspections.status`).
+- Sem duplicar: a linha é comparada com a revistoria mais recente da unidade. Agendada/Em revistoria → a mesma revistoria é atualizada (status, reagendamento). Reprovada + data posterior na planilha → revistoria nova (nº seguinte). Revistoria já Aprovada/Reprovada que a planilha altere → **conflito** (Manter sistema / Usar planilha). Importar de novo a mesma planilha não muda nada.
+- Planilha vazia nunca apaga. Status desconhecido, data ou horário inválidos são ignorados com aviso na linha, sem interromper a importação (o resto da linha é importado).
+- A **Data da revistoria** da unidade (`reinspection_date`, usada na lista, filtros, impressão e exportação) acompanha a revistoria quando está vazia ou igual à data anterior; se alguém a mudou no site, é mantida e registrada como "Mantido do sistema".
+- Onde aparece: canto colorido nas unidades do mapa (cor = status da revistoria), coluna **Revistoria** e filtro na lista, histórico no popup da unidade, indicadores no Resumo Geral, coluna na Visão Geral e colunas no fim da exportação.
+- Gravação só por `aplicar_importacao_agendamentos` (parâmetro `p_revistorias`, só administradores); leitura por RLS para quem tem acesso ao condomínio. Testes: `scripts/test-revistorias.mjs` (regras, no `pnpm check`) e `scripts/db-tests/revistorias/test.mjs` (banco local).
+
 ## Cadastro de condomínios
 
 Em **Configuração de Condomínios** (menu do usuário, administradores):

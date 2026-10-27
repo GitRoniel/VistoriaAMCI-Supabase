@@ -1066,6 +1066,8 @@ html.native .apt,html.native .navbtn,html.native .tab,html.native .modetog butto
 .imp-empty{color:#9aa39a;font-style:italic}
 .imp-src{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:#eef3ef;color:#52675d;vertical-align:middle}
 .imp-warn{font-size:11px;color:#a15c00;margin-top:3px;font-weight:600;line-height:1.35}
+.imp-warn span{display:block}
+.imp-warn span+span{margin-top:2px}
 .imp-tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;background:#eef3ef;color:#52675d}
 .imp-tag.g{background:#e3f4ea;color:#1d6b3e}.imp-tag.y{background:#fdf3d8;color:#7a5600}.imp-tag.b{background:#e3ecfd;color:#1f4fa8}.imp-tag.r{background:#fde8e5;color:#9e2f25;white-space:normal}.imp-tag.n{background:#eef1ef;color:#5f6d66}
 .imp-dec{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
@@ -1749,6 +1751,32 @@ html{background-color:var(--status-top,var(--chrome-top))}
   .pop.pp.ch-pop.sheet .ch-acoes{margin-bottom:4px}
 }
 @media print{.ch-filters,.ch-alert,#chPop{display:none!important}}
+/* Revistorias da planilha: chip de status, canto no mapa, lista, popup e resumo */
+.rvs-chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;line-height:1;padding:3px 8px 3px 6px;border-radius:999px;background:color-mix(in srgb,var(--rvs) 14%,#fff);color:color-mix(in srgb,var(--rvs) 78%,#10201a);border:1px solid color-mix(in srgb,var(--rvs) 45%,#fff);white-space:nowrap}
+.rvs-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--rvs)}
+.apt.rvs::before{content:'';position:absolute;bottom:2px;right:2px;width:7px;height:7px;border-radius:2px 2px 4px 2px;background:var(--rvs);box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+.mx.casas .apt.rvs::before{bottom:1px;right:1px;width:6px;height:6px}
+.legend .lg-rvs{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;font-size:10.5px;font-weight:700;color:var(--text-light);flex-basis:100%;padding-top:7px;border-top:1px dashed var(--border)}
+.legend .lg-rvs[hidden]{display:none}
+.lg-rvs-t{display:inline-flex;align-items:center;gap:6px}
+.rvs-corner{position:relative;width:13px;height:13px;border-radius:4px;border:1px solid var(--border);background:#fff}
+.rvs-corner::after{content:'';position:absolute;bottom:1px;right:1px;width:5px;height:5px;border-radius:1px;background:#7b8a82}
+.lg-rvs-i{display:inline-flex;align-items:center;gap:5px}
+.lg-rvs-i i{width:8px;height:8px;border-radius:2px;background:var(--rvs)}
+.ctbl th.th-rvs{white-space:nowrap}
+.ctbl td.crvs{white-space:nowrap;text-align:left}
+.ctbl td.crvs small{display:block;font-size:10px;font-weight:600;color:var(--text-light);margin-top:3px}
+.pp-revs{margin:-6px 0 14px;padding:9px 11px;border:1px solid var(--border);border-radius:11px;background:#f7f9f6}
+.pp-revs .pp-label{margin-bottom:6px}
+.pp-revs .pp-label small{text-transform:none;letter-spacing:0;font-weight:600}
+.pp-revs ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.pp-revs li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:12px}
+.pp-revs li b{font-weight:700;color:var(--text)}
+.pp-revs li span:last-child{color:var(--text-light);font-weight:600;font-size:11.5px;white-space:nowrap}
+.rg-sub-rv{margin-top:18px}
+.rg-mini.rg-mini-rv{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:6px}
+.rg-mini-rv .m{border-top:3px solid var(--rvs)}
+@media(max-width:420px){.pp-revs li{grid-template-columns:auto 1fr}.pp-revs li span:last-child{grid-column:1/-1}}
 /* TEMA ESCURO · gerado por scripts/theme-dark.mjs (não editar à mão) */
 :root[data-theme="dark"] body{background:#212522;color:#d3ddd6}
 :root[data-theme="dark"] button{border:none;background:none}
@@ -2526,6 +2554,18 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .ch-dlg p{color:#c1cec8}
 :root[data-theme="dark"] .ch-dlg-l{background:#212522}
 :root[data-theme="dark"] .ch-dlg-w{color:#f2b05e!important}
+:root[data-theme="dark"] .rvs-chip{background:color-mix(in srgb,var(--rvs) 14%,#282828);color:color-mix(in srgb,var(--rvs) 78%,#dae2df);border:1px solid color-mix(in srgb,var(--rvs) 45%,#3b3b3b)}
+:root[data-theme="dark"] .rvs-chip::before{background:var(--rvs)}
+:root[data-theme="dark"] .apt.rvs::before{background:var(--rvs);box-shadow:0 0 0 1.5px #282828}
+:root[data-theme="dark"] .legend .lg-rvs{color:#b1c1b1;border-top:1px dashed #414a43}
+:root[data-theme="dark"] .rvs-corner{border:1px solid #414a43;background:#282828}
+:root[data-theme="dark"] .rvs-corner::after{background:#7b8a82}
+:root[data-theme="dark"] .lg-rvs-i i{background:var(--rvs)}
+:root[data-theme="dark"] .ctbl td.crvs small{color:#b1c1b1}
+:root[data-theme="dark"] .pp-revs{border:1px solid #414a43;background:#232821}
+:root[data-theme="dark"] .pp-revs li b{color:#d3ddd6}
+:root[data-theme="dark"] .pp-revs li span:last-child{color:#b1c1b1}
+:root[data-theme="dark"] .rg-mini-rv .m{border-top:3px solid var(--rvs)}
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -2623,6 +2663,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
           <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
           <div class="lg"><span class="sw" style="background:#8a948f;border-color:#6f7a74"></span>Processo em Andamento</div>
+          <div class="lg-rvs" id="cliRevLegend" hidden></div>
         </div>
       </div>
       <div id="cliListaWrap" style="display:none">
@@ -2904,6 +2945,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="./config.js"></script>
 <script src="./supabase-client.js"></script>
+<script src="./revistorias.js"></script>
 <script src="./chaves.js" defer></script>
 <script>
 const CONFIG=window.APP_CONFIG||{};
@@ -3077,7 +3119,7 @@ function norm(t){t=(t||"").toString().trim().toLowerCase();
 const SEED=[{"bloco": "A", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "5º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "4º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "3º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "2º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "1º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "T", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Em Andamento", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "5º", "acab": "Em Andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "4º", "acab": "Em andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "3º", "acab": "Em andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "2º", "acab": "Em Andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "1º", "acab": "Não Iniciado", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "T", "acab": "Não Iniciado", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}];
 
 const SEED_CRON=[["A","6º","","","","","2026-05-12","2026-05-12","",""],["A","5º","","","","","2026-05-18","2026-05-18","2026-06-22",""],["A","4º","","","","","2026-05-26","2026-05-26","2026-06-24",""],["A","3º","","","","","2026-05-28","2026-05-28","2026-06-26",""],["A","2º","","","","","2026-06-02","2026-06-02","2026-06-29",""],["A","1º","","","","","2026-06-05","2026-06-05","2026-07-01",""],["A","T","","","","","2026-06-09","2026-06-09","2026-07-03",""],["B","6º","2026-07-20","","2026-07-20","","2026-07-20","","2026-07-20",""],["B","5º","2026-07-20","","2026-07-20","","2026-07-21","","2026-07-21",""],["B","4º","2026-07-21","","2026-07-21","","2026-07-21","","2026-07-21",""],["B","3º","2026-07-21","","2026-07-21","","2026-07-22","","2026-07-22",""],["B","2º","2026-07-22","","2026-07-22","","2026-07-22","","2026-07-22",""],["B","1º","2026-07-22","","2026-07-22","","2026-07-23","","2026-07-23",""],["B","T","2026-07-23","","2026-07-23","","2026-07-24","","2026-07-24",""],["C","6º","2026-06-11","","2026-06-11","","2026-06-15","2026-07-01","2026-06-15",""],["C","5º","2026-06-12","","2026-06-12","","2026-06-16","","2026-06-16",""],["C","4º","2026-06-15","","2026-06-15","","2026-06-17","","2026-06-17",""],["C","3º","2026-06-16","","2026-06-16","","2026-06-17","","2026-06-17",""],["C","2º","2026-06-17","","2026-06-17","","2026-06-18","","2026-06-18",""],["C","1º","2026-06-18","","2026-06-18","","2026-06-19","","2026-06-19",""],["C","T","2026-06-19","","2026-06-19","","2026-06-22","","2026-06-22",""],["D","6º","2026-07-14","","2026-07-14","","2026-07-14","","2026-07-14",""],["D","5º","2026-07-14","","2026-07-14","","2026-07-15","","2026-07-15",""],["D","4º","2026-07-15","","2026-07-15","","2026-07-15","","2026-07-15",""],["D","3º","2026-07-15","","2026-07-15","","2026-07-16","","2026-07-16",""],["D","2º","2026-07-16","","2026-07-16","","2026-07-16","","2026-07-16",""],["D","1º","2026-07-16","","2026-07-16","","2026-07-17","","2026-07-17",""],["D","T","2026-07-17","","2026-07-17","","2026-07-20","","2026-07-20",""],["E","6º","2026-06-22","","2026-06-22","","2026-06-22","","2026-06-22",""],["E","5º","2026-06-22","","2026-06-22","","2026-06-23","","2026-06-23",""],["E","4º","2026-06-23","","2026-06-23","","2026-06-23","","2026-06-23",""],["E","3º","2026-06-23","","2026-06-23","","2026-06-24","","2026-06-24",""],["E","2º","2026-06-24","","2026-06-24","","2026-06-24","","2026-06-24",""],["E","1º","2026-06-24","","2026-06-24","","2026-06-25","","2026-06-25",""],["E","T","2026-06-25","","2026-06-25","","2026-06-26","","2026-06-26",""],["F","6º","2026-07-08","","2026-07-08","","2026-07-08","","2026-07-08",""],["F","5º","2026-07-08","","2026-07-08","","2026-07-09","","2026-07-09",""],["F","4º","2026-07-09","","2026-07-09","","2026-07-09","","2026-07-09",""],["F","3º","2026-07-09","","2026-07-09","","2026-07-10","","2026-07-10",""],["F","2º","2026-07-10","","2026-07-10","","2026-07-10","","2026-07-10",""],["F","1º","2026-07-10","","2026-07-10","","2026-07-13","","2026-07-13",""],["F","T","2026-07-13","","2026-07-13","","2026-07-14","","2026-07-14",""],["G","6º","2026-06-26","","2026-06-26","","2026-06-26","","2026-06-26",""],["G","5º","2026-06-26","","2026-06-26","","2026-06-29","","2026-06-29",""],["G","4º","2026-06-29","","2026-06-29","","2026-06-29","","2026-06-29",""],["G","3º","2026-06-29","","2026-06-29","","2026-06-30","","2026-06-30",""],["G","2º","2026-06-30","","2026-06-30","","2026-06-30","","2026-06-30",""],["G","1º","2026-06-30","","2026-06-30","","2026-07-01","","2026-07-01",""],["G","T","2026-07-01","","2026-07-01","","2026-07-02","","2026-07-02",""],["H","6º","2026-07-02","","2026-07-02","","2026-07-02","","2026-07-02",""],["H","5º","2026-07-02","","2026-07-02","","2026-07-03","","2026-07-03",""],["H","4º","2026-07-03","","2026-07-03","","2026-07-03","","2026-07-03",""],["H","3º","2026-07-03","","2026-07-03","","2026-07-06","","2026-07-06",""],["H","2º","2026-07-06","","2026-07-06","","2026-07-06","","2026-07-06",""],["H","1º","2026-07-06","","2026-07-06","","2026-07-07","","2026-07-07",""],["H","T","2026-07-07","","2026-07-07","","2026-07-08","","2026-07-08",""]];
-const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{}};
+const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{},revs:{}};
 const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",resp_revistoria:"",obs:"",sale_stage:"",acomp:""});
 /* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
 const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
@@ -3088,6 +3130,18 @@ function acompSelect(value,attrs,empty="— Não informado"){
 const kPV=(b,p)=>b+"|"+p;
 const dstr=v=>(""+(v||"")).slice(0,10);
 const kO=(b,p,a)=>b+"|"+p+"|"+a, kC=(b,p,a)=>b+"|"+p+"|"+a;
+/* Revistorias da planilha (tabela revistorias): state.revs[unidade] = [nº 1, nº 2…], separadas do status da vistoria.
+   Regras (status, nova × mesma revistoria, indicadores) em src/modules/vistorias/revistorias.js → window.AmciRevistorias. */
+const REV=window.AmciRevistorias;
+let revInstalled=false;
+const revList=k=>state.revs[k]||[];
+const revLast=k=>REV.ultima(revList(k));
+const revWhen=r=>r?[r.data?fmtDate(r.data):"",String(r.horario||"").slice(0,5)].filter(Boolean).join(" · "):"";
+function revChip(r){if(!r)return "";const s=REV.revInfo(r.status);return `<span class="rvs-chip" style="--rvs:${s.cor};--rvs-tx:${s.texto}">${esc(s.label)}</span>`;}
+function applyRevRecord(r){
+  const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;
+  const list=revList(key).filter(x=>x.id!==r.id);list.push(r);list.sort((x,y)=>x.numero-y.numero);state.revs[key]=list;
+}
 function initState(){
   Object.keys(state).forEach(group=>Object.keys(state[group]).forEach(key=>delete state[group][key]));
   const m={};
@@ -3103,7 +3157,7 @@ function initState(){
 /* state */
 let obraFrente="acab", obraBlk="ALL", cliBlk="ALL", obraMode="frente";
 /* dtTipo: qual data o período filtra (vistoria, revistoria ou qualquer das duas); ordem: data usada na ordenação. */
-const CLI_FILT0=()=>({status:[],bloco:"ALL",dtIni:"",dtFim:"",dtTipo:"vist",ordem:"vist",hrSort:"asc",u:"",q:""});
+const CLI_FILT0=()=>({status:[],rev:[],bloco:"ALL",dtIni:"",dtFim:"",dtTipo:"vist",ordem:"vist",hrSort:"asc",u:"",q:""});
 let cliMode="mapa", cliFilt=CLI_FILT0();
 let cliListLastRows=[];
 let isMobile=matchMedia("(max-width:720px)").matches;
@@ -3117,9 +3171,9 @@ function buildGrid(kind,fr){
   const CLR = kind==="obra" ? CLR_O : CLR_C;
   const aptBtn=(b,p,a)=>{const c=codeOf(b,p,a),s=CLR[c];
     if(kind==="obra")return `<button class="apt" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${a}</button>`;
-    const k=kC(b,p,a),info=state.cliInfo[k]||{},pcd=state.unitMeta[k]?.pcd;
-    const tip=unitTitle(b,p,a)+" · "+CLL[c]+(info.cliente?" · "+info.cliente:"")+(pcd?" · PCD":"");
-    return `<button class="apt${pcd?" pcd":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${LAYOUT.kind==="casa"?+a:a}</button>`;};
+    const k=kC(b,p,a),info=state.cliInfo[k]||{},pcd=state.unitMeta[k]?.pcd,rv=revLast(k);
+    const tip=unitTitle(b,p,a)+" · "+CLL[c]+(info.cliente?" · "+info.cliente:"")+(pcd?" · PCD":"")+(rv?" · Revistoria "+REV.rotulo(rv):"");
+    return `<button class="apt${pcd?" pcd":""}${rv?" rvs":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}${rv?";--rvs:"+REV.revInfo(rv.status).cor:""}">${LAYOUT.kind==="casa"?+a:a}</button>`;};
   if(kind==="cli"&&LAYOUT.kind==="casa"){
     if(single)return `<div class="casa-single"><div class="casa-single-head">Conjunto ${blk} · ${groupUnits(blk).length} casas</div><div class="casa-wrap">`+groupUnits(blk).map(u=>aptBtn(u.b,u.p,u.a)).join("")+`</div></div>`;
     const cols=Array.from({length:LAYOUT.maxHouses},(_,i)=>i+1);
@@ -3284,6 +3338,9 @@ function renderCli(){
   bindBlocos();
   document.getElementById("cliGrid").innerHTML=buildGrid("cli");
   markSelectedUnit();
+  const revLeg=document.getElementById("cliRevLegend");
+  if(revLeg){const has=Object.values(state.revs).some(l=>l.length);revLeg.hidden=!has;
+    if(has)revLeg.innerHTML='<span class="lg-rvs-t"><span class="rvs-corner" aria-hidden="true"></span>Revistoria (canto):</span>'+REV.REV_STATUS.map(x=>`<span class="lg-rvs-i" style="--rvs:${x.cor}"><i></i>${x.label}</span>`).join("");}
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
@@ -3331,6 +3388,8 @@ function hrSortLabel(){return `${FX_ICON.clock}Horário ${cliFilt.hrSort==="asc"
 function ensureCliFilters(){
   const el=document.getElementById("cliFilters"); if(!el||el.dataset.built)return;
   el.dataset.built="1";el.classList.add("fx");el.classList.toggle("fx-open",cliFiltOpen);
+  const revFilterChip=c=>{const none=c===REV.SEM_REVISTORIA,info=REV.revInfo(c);
+    return `<button type="button" class="fchip${c==="ALL"?" fx-all":""}${(c==="ALL"?!cliFilt.rev.length:cliFilt.rev.includes(c))?" active":""}" data-frev="${esc(c)}" style="--c:${c==="ALL"?"#1f4a3f":none?"#9aa39a":info.cor}">${c==="ALL"?"Todas":"<i></i>"+(none?"Sem revistoria":info.label)}</button>`;};
   const statusChip=c=>`<button type="button" class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(cliFilt.status.length===0?" active":""):(cliFilt.status.includes(c)?" active":"")}" data-fstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`;
   el.innerHTML=`
     <div class="fx-row fx-main">
@@ -3352,6 +3411,7 @@ function ensureCliFilters(){
       </div>
     </div>
     <div class="fx-row"><span class="fx-lbl">Status</span><div class="fx-scroll" id="clifStatus">${["ALL",...CLI_FLOW].map(statusChip).join("")}</div></div>
+    ${revInstalled?`<div class="fx-row"><span class="fx-lbl">Revistoria</span><div class="fx-scroll" id="clifRev">${["ALL",...REV.REV_STATUS.map(x=>x.key),REV.SEM_REVISTORIA].map(revFilterChip).join("")}</div></div>`:""}
     <div class="fx-row"><span class="fx-lbl">${LAYOUT.group}</span><div class="fx-scroll" id="clifBloco">${["ALL",...LAYOUT.groups].map(b=>
       `<button type="button" class="fchip blk${b==="ALL"?" fx-all":""}${cliFilt.bloco===b?" active":""}" data-fbloco="${b}" style="--c:#1f4a3f">${b==="ALL"?"Todos":b}</button>`).join("")}</div></div>`;
   el.querySelectorAll("[data-fstatus]").forEach(b=>b.onclick=()=>{
@@ -3365,6 +3425,12 @@ function ensureCliFilters(){
       const xc=x.dataset.fstatus;
       x.classList.toggle("active", xc==="ALL"?cliFilt.status.length===0:cliFilt.status.includes(xc));
     });
+    renderCliList();
+  });
+  el.querySelectorAll("[data-frev]").forEach(b=>b.onclick=()=>{
+    const c=b.dataset.frev;
+    if(c==="ALL")cliFilt.rev=[];else{const i=cliFilt.rev.indexOf(c);if(i>=0)cliFilt.rev.splice(i,1);else cliFilt.rev.push(c);}
+    el.querySelectorAll("[data-frev]").forEach(x=>x.classList.toggle("active",x.dataset.frev==="ALL"?!cliFilt.rev.length:cliFilt.rev.includes(x.dataset.frev)));
     renderCliList();
   });
   el.querySelectorAll("[data-fbloco]").forEach(b=>b.onclick=()=>{cliFilt.bloco=b.dataset.fbloco;el.querySelectorAll("[data-fbloco]").forEach(x=>x.classList.toggle("active",x===b));renderCliList();});
@@ -3384,7 +3450,7 @@ function ensureCliFilters(){
 function syncCliFilterUI(){
   const el=document.getElementById("cliFilters");if(!el||!el.dataset.built)return;
   const adv=[cliFilt.u,cliFilt.dtIni,cliFilt.dtFim,cliFilt.dtTipo!=="vist",cliFilt.ordem!=="vist"].filter(Boolean).length;
-  const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.bloco!=="ALL"?1:0);
+  const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.rev.length?1:0)+(cliFilt.bloco!=="ALL"?1:0);
   const clear=el.querySelector("#clifClear"),badge=el.querySelector("#clifBadge");
   if(clear)clear.hidden=!total;if(badge){badge.textContent=adv;badge.hidden=!adv;}
   [["#clifQ",cliFilt.q],["#clifU",cliFilt.u],["#clifDtIni",cliFilt.dtIni],["#clifDtFim",cliFilt.dtFim],["#clifDtTipo",cliFilt.dtTipo!=="vist"],["#clifOrdem",cliFilt.ordem!=="vist"]].forEach(([id,v])=>el.querySelector(id)?.closest("label")?.classList.toggle("on",!!v));
@@ -3394,9 +3460,10 @@ function renderCliList(){
   syncCliFilterUI();
   let rows=[];
   LAYOUT.units.forEach(({b,p,a})=>{
-    const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd});
+    const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd,rev:revLast(k),revCode:REV.codigoFiltro(revList(k))});
   });
   if(cliFilt.status.length) rows=rows.filter(r=>cliFilt.status.includes(r.code));
+  if(cliFilt.rev.length) rows=rows.filter(r=>cliFilt.rev.includes(r.revCode));
   if(cliFilt.bloco!=="ALL") rows=rows.filter(r=>r.b===cliFilt.bloco);
   if(cliFilt.dtIni||cliFilt.dtFim){
     const inRange=d=>!!d&&(!cliFilt.dtIni||d>=cliFilt.dtIni)&&(!cliFilt.dtFim||d<=cliFilt.dtFim);
@@ -3420,7 +3487,7 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-rvs">Revistoria</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
@@ -3433,6 +3500,7 @@ function renderCliList(){
       <td class="crev">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
       <td class="crev">${esc(i.resp_revistoria)||"—"}</td>
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
+      <td class="crvs">${revCell(r.rev)}</td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
       <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`,"—"):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
     </tr>`;
@@ -3440,6 +3508,8 @@ function renderCliList(){
   h+='</tbody></table></div>';
   wrap.innerHTML=h;
 }
+// Revistoria mais recente na lista: status + data/horário (+ nº quando houver mais de uma).
+function revCell(rv){return rv?`${revChip(rv)}<small>${esc(revWhen(rv))||"Sem data"}${rv.numero>1?" · nº "+rv.numero:""}</small>`:"—";}
 function printCliList(){
   const rows=cliListLastRows;
   if(!rows||!rows.length){ toast("Nada para imprimir com esses filtros"); return; }
@@ -3459,10 +3529,10 @@ function printCliList(){
   </style></head><body>
     <h1>${esc(projectExperience(appProject).title)} · Vistoria Cliente</h1>
     <div class="sub">Lista filtrada — gerado em ${now} — ${rows.length} unidade(s)</div>
-    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data vistoria</th><th class="w-h">Horário</th><th>Responsável</th><th class="w-d">Data revistoria</th><th>Resp. revistoria</th><th>Status</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
+    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data vistoria</th><th class="w-h">Horário</th><th>Responsável</th><th class="w-d">Data revistoria</th><th>Resp. revistoria</th><th>Status</th><th>Revistoria</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const i=r.info;
-    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td class="w-d">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td><td>${esc(i.resp_revistoria)||"—"}</td><td>${esc(CLL[r.code]||"")}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
+    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td class="w-d">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td><td>${esc(i.resp_revistoria)||"—"}</td><td>${esc(CLL[r.code]||"")}</td><td>${esc(REV.rotulo(r.rev))||"—"}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
   });
   body+='</tbody></table></body></html>';
   const w=window.open("","_blank");
@@ -3479,14 +3549,17 @@ function downloadCsv(name,header,rows){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 const csvDate=d=>d?fmtDate(d):"";
+// Colunas da revistoria mais recente, no fim da exportação (as colunas anteriores ficam na mesma ordem).
+const REV_CSV_HEAD=["Status revistoria (planilha)","Data revistoria (planilha)","Horário revistoria","Nº revistoria"];
+const revCsv=rv=>rv?[rv.status||"",csvDate(rv.data),String(rv.horario||"").slice(0,5),rv.numero]:["","","",""];
 const fileStamp=()=>todayISO();
 function exportCliList(){
   const rows=cliListLastRows;
   if(!rows||!rows.length){ toast("Nada para exportar com esses filtros"); return; }
   const slug=(appProject?.slug||"condominio");
   downloadCsv(`vistorias-${slug}-${fileStamp()}.csv`,
-    [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações"],
-    rows.map(r=>{const i=r.info;return [r.b,unitCode(r.b,r.p,r.a),i.cliente,csvDate(i.data_vistoria),i.horario_vistoria,i.responsavel,csvDate(i.data_revistoria),i.resp_revistoria,CLL[r.code]||"",ACOMP[i.acomp]||"",i.obs];}));
+    [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações",...REV_CSV_HEAD],
+    rows.map(r=>{const i=r.info;return [r.b,unitCode(r.b,r.p,r.a),i.cliente,csvDate(i.data_vistoria),i.horario_vistoria,i.responsavel,csvDate(i.data_revistoria),i.resp_revistoria,CLL[r.code]||"",ACOMP[i.acomp]||"",i.obs,...revCsv(r.rev)];}));
   toast(rows.length+" unidade(s) exportada(s)");
 }
 
@@ -3579,6 +3652,8 @@ function renderCliPop(){
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
   // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (opcionais); os valores salvos são mantidos.
   const showRev=cur==="rf";
+  const revs=revList(key).slice().reverse();
+  const revHist=revs.length?`<div class="pp-revs"><div class="pp-label">Revistorias <small>· planilha</small></div><ul>${revs.map(r=>`<li>${revChip(r)}<b>${r.numero}ª revistoria</b><span>${esc(revWhen(r))||"Sem data"}</span></li>`).join("")}</ul></div>`:"";
   const dateField=(field,label)=>`<label class="pp-f"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
   const revBlock=showRev?`<div class="pp-rev pp-full">
           <div class="pp-rev-t">Revistoria finalizada <small>(opcional)</small></div>
@@ -3598,6 +3673,7 @@ function renderCliPop(){
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
       <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      ${revHist}
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
@@ -3875,11 +3951,14 @@ async function load(silent){
   try{
     // Todas as consultas ficam restritas ao condomínio selecionado (via units.project_id).
     const projectId=appProject.id,byProject=q=>q.eq("units.project_id",projectId);
-    const [units,stages,clients,schedules]=await Promise.all([
+    const [units,stages,clients,schedules,revistorias]=await Promise.all([
       fetchAll("units","id,project_id,bloco,pav,apto,kind,pcd",q=>q.eq("project_id",projectId)),
       fetchAll("unit_stage_status","*,units!inner(project_id)",byProject),
       fetchAll("client_inspections","*,units!inner(project_id)",byProject),
-      fetchAll("floor_schedule","*",q=>q.eq("project_id",projectId))
+      fetchAll("floor_schedule","*",q=>q.eq("project_id",projectId)),
+      // Sem a tabela de revistorias (migration ainda não aplicada) o restante funciona igual.
+      fetchAll("revistorias","id,unit_id,numero,status,status_planilha,data,horario,atualizado_em",q=>q.eq("project_id",projectId))
+        .then(r=>{revInstalled=true;return r;},()=>{revInstalled=false;return [];})
     ]);
     if(!appProject||appProject.id!==projectId)return;
     if(LAYOUT.kind==="casa"&&units.length){
@@ -3888,18 +3967,22 @@ async function load(silent){
     }
     initState();Object.values(dbIndex).forEach(index=>index.clear());
     units.forEach(r=>{const key=kC(_blk(r.bloco),_pav(r.pav),_apt(r.apto));dbIndex.unitByKey.set(key,r);dbIndex.unitKeyById.set(r.id,key);if(state.unitMeta[key])state.unitMeta[key].pcd=!!r.pcd;});
-    stages.forEach(applyStageRecord);clients.forEach(applyClientRecord);schedules.forEach(applyScheduleRecord);
+    stages.forEach(applyStageRecord);clients.forEach(applyClientRecord);schedules.forEach(applyScheduleRecord);revistorias.forEach(applyRevRecord);
+    const fx=document.getElementById("cliFilters");if(fx&&fx.dataset.built&&!!fx.querySelector("#clifRev")!==revInstalled){fx.dataset.built="";fx.innerHTML="";}
     renderObra();renderCli();renderResumo();window.scrollTo(0,_sy);setSync("ok");
     if(document.getElementById("v-chaves")?.classList.contains("active"))window.AmciChaves?.show(chavesHost());
   }catch(e){setSync("err");if(!silent)toast("Falha ao carregar os dados");throw e;}
 }
 function startRealtime(){
   if(!SUPABASE_READY||!appProject)return;stopRealtime();
-  realtimeChannel=supabase.channel("vistorias-"+appProject.id)
+  let channel=supabase.channel("vistorias-"+appProject.id)
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"unit_stage_status"},p=>{applyStageRecord(p.new);renderObra();renderResumo();})
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"client_inspections"},p=>{applyClientRecord(p.new);renderCli();renderResumo();window.AmciChaves?.vistoriaMudou();})
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"floor_schedule",filter:"project_id=eq."+appProject.id},p=>{applyScheduleRecord(p.new);renderObra();renderResumo();})
-    .subscribe(status=>{if(status==="SUBSCRIBED")setSync("ok");else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")setSync("err");});
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"floor_schedule",filter:"project_id=eq."+appProject.id},p=>{applyScheduleRecord(p.new);renderObra();renderResumo();});
+  // Só assina a tabela de revistorias quando ela existe (uma tabela inexistente derrubaria o canal todo).
+  if(revInstalled)channel=channel.on("postgres_changes",{event:"*",schema:"public",table:"revistorias",filter:"project_id=eq."+appProject.id},p=>{
+    if(p.new?.id)applyRevRecord(p.new);renderCli();renderResumo();if(ctx&&ctx.k==="cli"&&!ctx.dirty)renderPop();});
+  realtimeChannel=channel.subscribe(status=>{if(status==="SUBSCRIBED")setSync("ok");else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")setSync("err");});
 }
 function stopRealtime(){if(realtimeChannel&&supabase)supabase.removeChannel(realtimeChannel);realtimeChannel=null;}
 
@@ -4182,13 +4265,17 @@ async function loadOverview(){
   const list=document.getElementById("ovList");
   if(!ovRows.length)list.innerHTML='<div class="clif-empty">Carregando agendamentos…</div>';
   try{
-    const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,reinspection_responsible,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)");
+    const [rows,revRows]=await Promise.all([
+      fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,reinspection_responsible,notes,sale_stage,technical_escort,units!inner(project_id,bloco,pav,apto,kind,pcd)"),
+      fetchAll("revistorias","id,unit_id,numero,status,data,horario").catch(()=>[])]);
     const projects=new Map(availableProjects.map(p=>[String(p.id),p]));
+    const revByUnit=new Map();revRows.forEach(r=>{if(!revByUnit.has(r.unit_id))revByUnit.set(r.unit_id,[]);revByUnit.get(r.unit_id).push(r);});
     ovRows=rows.map(r=>{
       const u=r.units||{},project=projects.get(String(u.project_id));if(!project)return null;
       return {projectId:project.id,projectName:projectExperience(project).title||project.name,...ovUnit(u),pcd:!!u.pcd,code:normCli(r.status),
         cliente:r.client_name||"",data:dstr(r.inspection_date),hora:(""+(r.inspection_time||"")).slice(0,5),resp:r.responsible||"",
-        rev:dstr(r.reinspection_date),revResp:r.reinspection_responsible||"",obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||""};
+        rev:dstr(r.reinspection_date),revResp:r.reinspection_responsible||"",obs:r.notes||"",stage:r.sale_stage||"",acomp:r.technical_escort||"",
+        revistoria:REV.ultima(revByUnit.get(r.unit_id))};
     }).filter(r=>r&&(r.code!=="na"||r.data));
     document.getElementById("ovUpdated").textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
     renderOvFilters();renderOverview();
@@ -4243,10 +4330,10 @@ function renderOverview(){
   const dayLabel=d=>{if(!d)return "Sem data definida";const dt=new Date(d+"T12:00:00");const w=dt.toLocaleDateString("pt-BR",{weekday:"long"});
     return (d===today?"Hoje · ":"")+w.charAt(0).toUpperCase()+w.slice(1)+", "+fmtDate(d);};
   const perDay={};rows.forEach(r=>{perDay[r.data]=(perDay[r.data]||0)+1;});
-  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h='<div class="gridscroll"><table class="ctbl ov-tbl"><thead><tr><th class="th-cli">Condomínio</th><th class="cw-b">Bloco / Conj.</th><th class="cw-u">Unidade</th><th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-rvs">Revistoria</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   let lastDay=null;
   rows.forEach((r,i)=>{
-    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="12"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
+    if(r.data!==lastDay){lastDay=r.data;h+=`<tr class="ov-day${r.data===today?" is-today":""}"><td colspan="13"><b>${dayLabel(r.data)}</b><span>${perDay[r.data]} agendamento(s)</span></td></tr>`;}
     const s=CLR_C[r.code]||CLR_C.na,color=ovColor(r.projectId);
     h+=`<tr class="ov-row" data-ov="${i}" tabindex="0" style="--ov:${color}" title="Abrir ${esc(r.unitLabel)} no ${esc(r.projectName)}">
       <td class="ov-proj"><span class="ov-badge"><i></i>${esc(r.projectName)}</span></td>
@@ -4259,6 +4346,7 @@ function renderOverview(){
       <td class="crev">${r.rev?fmtDate(r.rev):"—"}</td>
       <td class="crev">${esc(r.revResp)||"—"}</td>
       <td><span class="ov-status" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${CLL[r.code]}</span></td>
+      <td class="crvs">${revCell(r.revistoria)}</td>
       <td class="clif-obs" title="${esc(r.obs)}">${r.obs?(esc(r.obs).slice(0,28)+(r.obs.length>28?"…":"")):"—"}</td>
       <td class="cacomp">${ACOMP[r.acomp]||"—"}</td>
     </tr>`;
@@ -4348,8 +4436,18 @@ const IMPORT_COLUMNS=[
 const IMPORT_FIELDS=[
   {key:"cliente",label:"Cliente",db:"client_name"},
   {key:"agenda",label:"Data/horário"},
-  {key:"status",label:"Status",db:"status"}];
-const IMP_DB_LABEL={client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",status:"Status"};
+  {key:"status",label:"Status",db:"status"},
+  {key:"revistoria",label:"Revistoria"}];
+// Revistoria (colunas K, L e M do Relatório 854: STATUS DA REVISTORIA, DATA DA REVISTORIA e HORÁRIO DO
+// AGENDAMENTO REVISTORIA): reconhecidas por "revistoria" no nome, inclusive com o erro de digitação
+// "REVSITORIA", e lidas ANTES das colunas da vistoria para não serem confundidas com elas. São opcionais.
+const IMPORT_REV_COLUMNS=[
+  {key:"rev_status",label:"Status da revistoria",test:t=>/\b(status|situacao)\b/.test(t)},
+  {key:"rev_data",label:"Data da revistoria",test:t=>/\b(data|dt)\b/.test(t)},
+  {key:"rev_hora",label:"Horário da revistoria",test:t=>/\b(horario|hora)\b/.test(t)}];
+const impIsRevHeader=t=>/rev(is|si)t/.test(t);
+const IMP_DB_LABEL={client_name:"Cliente",inspection_date:"Data da vistoria",inspection_time:"Horário",status:"Status",
+  revistoria:"Revistoria","revistoria.status":"Status da revistoria","revistoria.data":"Data da revistoria (planilha)","revistoria.horario":"Horário da revistoria",reinspection_date:"Data da revistoria"};
 const IMP_ACTION={preenchido:"Preenchido",usado_planilha:"Usado da planilha",mantido_sistema:"Mantido do sistema",conflito_pendente:"Conflito não resolvido",nao_encontrado:"Não encontrado",ignorado:"Ignorado",alterado_no_sistema:"Alterado no sistema (pulado)"};
 const IMP_TABS=[["all","Todos"],["update","Atualizações"],["same","Sem alterações"],["new","Novos dados"],["conflict","Conflitos"],["missing","Não encontrados"]];
 
@@ -4396,6 +4494,7 @@ function impParseTime(v){
   if(!(h>=0&&h<=23&&m>=0&&m<=59))return {invalid:impClean(typeof v==="object"?"":v)};
   return {value:String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")};
 }
+const impColLetter=i=>{let s="";for(i++;i>0;i=Math.floor((i-1)/26))s=String.fromCharCode(65+(i-1)%26)+s;return s;};
 function impCell(v){if(v==null)return "";if(typeof v==="object"&&"serial" in v)return String(v.serial);return impClean(v);}
 
 /* 1) Estrutura: acha o cabeçalho por nome e confere as colunas obrigatórias. */
@@ -4404,6 +4503,10 @@ function impFindColumns(sheets){
   for(const sheet of sheets){
     for(let r=0;r<Math.min(sheet.rows.length,15);r++){
       const cells=sheet.rows[r]||[],map={},used=new Set();
+      cells.forEach((c,idx)=>{
+        const t=typeof c==="string"?impNorm(c):"";if(!t||!impIsRevHeader(t))return;
+        const col=IMPORT_REV_COLUMNS.find(x=>map[x.key]==null&&x.test(t));if(col){map[col.key]=idx;used.add(idx);}
+      });
       for(const col of IMPORT_COLUMNS){
         for(const alias of col.aliases){
           const i=cells.findIndex((c,idx)=>!used.has(idx)&&typeof c==="string"&&(impNorm(c)===alias||(alias.length>=6&&impNorm(c).startsWith(alias+" "))));
@@ -4446,17 +4549,21 @@ function impUnitCode(u){
 }
 
 async function impLoadSystem(projectIds){
-  const rows=await fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,field_sources,units!inner(id,project_id,bloco,pav,apto,kind)",q=>q.in("units.project_id",projectIds));
+  const [rows,revs]=await Promise.all([
+    fetchAll("client_inspections","id,unit_id,status,client_name,inspection_date,inspection_time,responsible,reinspection_date,field_sources,units!inner(id,project_id,bloco,pav,apto,kind)",q=>q.in("units.project_id",projectIds)),
+    // null = tabela de revistorias ainda não instalada: as colunas K, L e M são ignoradas (com aviso).
+    fetchAll("revistorias","id,unit_id,numero,status,data,horario",q=>q.in("project_id",projectIds)).catch(()=>null)]);
+  const revByUnit=new Map();(revs||[]).forEach(r=>{if(!revByUnit.has(r.unit_id))revByUnit.set(r.unit_id,[]);revByUnit.get(r.unit_id).push(r);});
   const byKey=new Map(),blocks=new Map(),byUnit=new Map();
   for(const r of rows){const u=r.units||{};if(!u.project_id)continue;
     const pid=String(u.project_id),bloco=_blk(u.bloco);
     byKey.set(pid+"|"+bloco+"|"+impUnitCode(u),r);byUnit.set(r.unit_id,r);
     if(!blocks.has(pid))blocks.set(pid,new Set());blocks.get(pid).add(bloco);}
-  return {byKey,blocks,byUnit};
+  return {byKey,blocks,byUnit,revByUnit,revOk:revs!==null};
 }
 
 /* 3) Comparação campo a campo (nada é gravado aqui). */
-function impCompare(sys,sheet){
+function impCompare(sys,sheet,revOpt){
   const items=[],src=sys.field_sources||{};
   const text=(key,label,db,sheetVal)=>{
     const cur=impClean(sys[db]),next=impClean(sheetVal);if(!next)return;
@@ -4488,6 +4595,12 @@ function impCompare(sys,sheet){
     else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur,next});
     else items.push({key:"status",label:"Status",kind:"conflict",cur,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:nextDb}]});
   }
+  // Revistoria: comparada com a revistoria mais recente da unidade; nunca muda o status da vistoria.
+  if(revOpt?.ok){
+    const it=REV.comparar(REV.ultima(revOpt.byUnit.get(sys.unit_id)),{status:sheet.revStatus,statusOriginal:sheet.revStatusOriginal,statusInvalido:sheet.revStatusInvalido,
+      data:sheet.revData,dataInvalida:sheet.revDataInvalida,hora:sheet.revHora,horaInvalida:sheet.revHoraInvalida},dstr(sys.reinspection_date));
+    if(it)items.push(it);
+  }
   return items;
 }
 
@@ -4503,8 +4616,10 @@ async function impAnalyze(file,sheets){
     const rowNum=cols.row+i+2,rawProj=impCell(get(row,"condominio")),rawUnit=impCell(get(row,"unidade"));
     if(!rawProj&&!rawUnit)return;
     const d=impParseDate(get(row,"data")),h=impParseTime(get(row,"hora")),st=impStatusCode(get(row,"status"));
+    const rs=REV.statusDaPlanilha(impCell(get(row,"rev_status"))),rd=impParseDate(get(row,"rev_data")),rh=impParseTime(get(row,"rev_hora"));
     const sheet={cliente:impClean(get(row,"cliente")),data:d.value||"",dataInvalid:d.invalid||"",hora:h.value||"",horaInvalid:h.invalid||"",
-      status:st||"",statusInvalid:st===null?impCell(get(row,"status")):""};
+      status:st||"",statusInvalid:st===null?impCell(get(row,"status")):"",
+      revStatus:rs.status||"",revStatusOriginal:rs.original||"",revStatusInvalido:rs.invalid||"",revData:rd.value||"",revDataInvalida:rd.invalid||"",revHora:rh.value||"",revHoraInvalida:rh.invalid||""};
     const rec={row:rowNum,rawProj,rawUnit,sheet,cliente:sheet.cliente,items:[],warnings:[]};
     const project=matchProject(rawProj);
     if(!rawProj){rec.cls="missing";rec.error="Condomínio não informado na planilha";}
@@ -4514,7 +4629,9 @@ async function impAnalyze(file,sheets){
     records.push(rec);
   });
   const projectIds=[...new Set(records.filter(r=>r.project&&!r.error).map(r=>String(r.project.id)))];
-  const sys=projectIds.length?await impLoadSystem(projectIds):{byKey:new Map(),blocks:new Map(),byUnit:new Map()};
+  const sys=projectIds.length?await impLoadSystem(projectIds):{byKey:new Map(),blocks:new Map(),byUnit:new Map(),revByUnit:new Map(),revOk:true};
+  const revCols=IMPORT_REV_COLUMNS.filter(c=>cols.map[c.key]!=null).map(c=>impColLetter(cols.map[c.key]));
+  const revOpt={ok:!!revCols.length&&sys.revOk,byUnit:sys.revByUnit};
   // Unidade: condomínio + bloco/conjunto + número. Nunca pelo nome do cliente.
   for(const rec of records){
     if(rec.error)continue;
@@ -4540,14 +4657,15 @@ async function impAnalyze(file,sheets){
   // Comparação com o banco.
   for(const rec of records){
     if(rec.error||rec.dup||rec.blocked)continue;
-    const cur=rec.current;rec.items=impCompare(cur,rec.sheet);
+    const cur=rec.current;rec.items=impCompare(cur,rec.sheet,revOpt);
+    rec.items.forEach(it=>{if(it.kind!=="invalid")(it.avisos||[]).forEach(w=>rec.warnings.push(w));});
     const clientConflict=rec.items.some(it=>it.key==="cliente"&&it.kind==="conflict");
     if(clientConflict){ // cliente incompatível: nada desta unidade é preenchido sem decisão.
       rec.warnings.push("Cliente diferente do cadastrado: confira se a linha é desta unidade.");
-      rec.items.forEach(it=>{if(it.kind==="fill"){it.kind="conflict";it.source="—";it.note="Aguardando confirmação do cliente";}});
+      rec.items.forEach(it=>{if(it.kind==="fill"||it.kind==="update"){it.kind="conflict";it.source="—";it.note="Aguardando confirmação do cliente";}});
     }
     const hadData=!!(cur.inspection_date||cur.inspection_time||impClean(cur.responsible)||normCli(cur.status)!=="na");
-    rec.cls=rec.items.some(it=>it.kind==="conflict")?"conflict":rec.items.some(it=>it.kind==="fill")?(hadData?"update":"new"):"same";
+    rec.cls=rec.items.some(it=>it.kind==="conflict")?"conflict":rec.items.some(it=>it.kind==="fill"||it.kind==="update")?(hadData||rec.items.some(it=>it.kind==="update")?"update":"new"):"same";
   }
   // Conflito de agenda: mesmo responsável em duas unidades na mesma data/horário (aviso).
   const slots=new Map();
@@ -4559,7 +4677,7 @@ async function impAnalyze(file,sheets){
   const inSheet=new Set(records.filter(r=>r.unitId).map(r=>r.unitId));
   const notInSheet=[...sys.byUnit.values()].filter(r=>!inSheet.has(r.unit_id)).map(r=>{const u=r.units,ou=ovUnit(u),p=availableProjects.find(x=>String(x.id)===String(u.project_id));
     return {cls:"notinsheet",unitId:r.unit_id,project:p,projectName:p?(projectExperience(p).title||p.name):"",label:`${ou.groupLabel} · ${ou.unitLabel}`,cliente:r.client_name||"",items:[],warnings:[]};});
-  return {file:file.name,records,notInSheet,projectIds,decisions:new Map()};
+  return {file:file.name,records,notInSheet,projectIds,decisions:new Map(),revCols,revMissingDb:!!revCols.length&&!sys.revOk};
 }
 
 /* Resumo e montagem do que será enviado. */
@@ -4567,17 +4685,24 @@ function impDecisionKey(rec,idx){return rec.row+":"+idx;}
 function impSummary(st){
   const rs=st.records,cnt=c=>rs.filter(r=>r.cls===c).length;
   let conflicts=0,resolved=0,filled=0;
-  rs.forEach(r=>{if(r.blocked){conflicts++;return;}r.items.forEach((it,i)=>{if(it.kind==="fill")filled++;if(it.kind==="conflict"){conflicts++;if(st.decisions.has(impDecisionKey(r,i)))resolved++;}});});
+  rs.forEach(r=>{if(r.blocked){conflicts++;return;}r.items.forEach((it,i)=>{if(it.kind==="fill"||it.kind==="update")filled++;if(it.kind==="conflict"){conflicts++;if(st.decisions.has(impDecisionKey(r,i)))resolved++;}});});
   return {total:rs.length,updated:cnt("update"),unchanged:cnt("same"),new:cnt("new"),conflictRecords:cnt("conflict"),conflicts,resolved,pending:conflicts-resolved,filled,notFound:cnt("missing"),notInSheet:st.notInSheet.length};
 }
 function impBuildPayload(st){
-  const changes=[],items=[],units=new Set();let fromConflicts=0;
+  const changes=[],items=[],revs=[],units=new Set();let fromConflicts=0;
   const base=r=>({row:r.row,label:r.label||r.rawUnit,client:r.cliente||r.current?.client_name||"",unit_id:r.unitId||null,project_id:r.project?Number(r.project.id):null});
   for(const r of st.records){
     if(r.error){items.push({...base(r),action:"nao_encontrado",message:r.error,new:r.rawProj+" · "+r.rawUnit});continue;}
     if(r.blocked){items.push({...base(r),action:"ignorado",message:r.blocked});continue;}
     r.items.forEach((it,i)=>{
       const dec=st.decisions.get(impDecisionKey(r,i));
+      if(it.key==="revistoria"){ // vai em p_revistorias (cria a nova ou atualiza a atual, sem duplicar)
+        if(it.kind==="fill"||it.kind==="update"||(it.kind==="conflict"&&dec==="sheet")){
+          const {acao,numero,esperado,novo}=it.rev;revs.push({...base(r),acao,numero,esperado,novo});units.add(r.unitId);if(it.kind==="conflict")fromConflicts++;
+        }else if(it.kind==="conflict")items.push({...base(r),field:"revistoria",old:it.cur,new:it.next,action:dec==="keep"?"mantido_sistema":"conflito_pendente",message:it.note||it.nota||""});
+        else if(it.kind==="invalid")items.push({...base(r),field:"revistoria",old:it.cur,new:"",action:"ignorado",message:it.message});
+        return;
+      }
       if(it.kind==="fill"||(it.kind==="conflict"&&dec==="sheet")){
         it.changes.forEach(c=>changes.push({...base(r),field:c.field,old:c.old,new:c.new,action:it.kind==="fill"?"preenchido":"usado_planilha"}));
         units.add(r.unitId);if(it.kind==="conflict")fromConflicts++;
@@ -4585,7 +4710,7 @@ function impBuildPayload(st){
       else if(it.kind==="invalid")items.push({...base(r),field:it.label,old:it.cur,new:it.next,action:"ignorado",message:it.message});
     });
   }
-  return {changes,items,records:units.size,fromConflicts};
+  return {changes,items,revs,records:units.size,fromConflicts};
 }
 
 /* ── Interface ── */
@@ -4640,6 +4765,7 @@ function impActionCell(st,r,it,i){
   if(it.kind==="same")return '<span class="imp-tag y">Sem alteração</span>';
   if(it.kind==="fill")return `<span class="imp-tag ${r.cls==="new"?"b":"g"}">${r.cls==="new"?"Novo dado":"Preencher"}</span>`;
   if(it.kind==="invalid")return `<span class="imp-tag n">Ignorado · ${esc(it.message)}</span>`;
+  if(it.kind==="update")return '<span class="imp-tag g">Atualizar</span>';
   const k=impDecisionKey(r,i),d=st.decisions.get(k);
   return `<div class="imp-dec" role="radiogroup" aria-label="Decisão do conflito">${it.note?`<small>${esc(it.note)}</small>`:""}<button type="button" class="${d==="keep"?"on":""}" data-dec="${k}" data-v="keep" aria-pressed="${d==="keep"}">Manter sistema</button><button type="button" class="${d==="sheet"?"on":""}" data-dec="${k}" data-v="sheet" aria-pressed="${d==="sheet"}">Usar planilha</button></div>`;
 }
@@ -4650,7 +4776,7 @@ function renderImportPreview(){
   const projNames=st.projectIds.map(id=>{const p=availableProjects.find(x=>String(x.id)===id);return p?(projectExperience(p).title||p.name):"";}).filter(Boolean).join(", ");
   const payload=impBuildPayload(st);
   let h=`<div class="imp-head">
-    <div class="imp-file"><span>Arquivo</span><b>${esc(st.file)}</b><small>${esc(projNames||"Nenhum condomínio identificado")} · ${s.total} linha(s) analisada(s)</small></div>
+    <div class="imp-file"><span>Arquivo</span><b>${esc(st.file)}</b><small>${esc(projNames||"Nenhum condomínio identificado")} · ${s.total} linha(s) analisada(s)${st.revCols.length?` · revistorias: coluna(s) ${st.revCols.join(", ")}`:""}</small></div>
     <div class="imp-kpis">
       <div class="imp-kpi g"><b>${s.updated}</b><span>Atualizações</span></div>
       <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alterações</span></div>
@@ -4664,6 +4790,7 @@ function renderImportPreview(){
     <label class="fx-search imp-q">${FX_ICON.search}<input type="search" id="impQ" placeholder="Buscar unidade ou cliente" value="${esc(st.q)}" autocomplete="off" aria-label="Buscar unidade ou cliente"></label>
     ${st.tab==="conflict"&&s.conflicts?`<div class="imp-bulk"><button type="button" class="btn g" data-bulk="keep">Manter sistema${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button><button type="button" class="btn g" data-bulk="sheet">Usar planilha${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button></div>`:""}
   </div>`;
+  if(st.revMissingDb)h+=`<p class="imp-note">As colunas de revistoria (${st.revCols.join(", ")}) foram encontradas, mas o banco ainda não tem a estrutura de revistorias: elas serão ignoradas nesta importação.</p>`;
   if(st.tab==="missing"&&s.notInSheet)h+=`<p class="imp-note">${s.notInSheet} unidade(s) do sistema não aparecem na planilha. Elas não serão excluídas nem alteradas.</p>`;
   if(!rows.length)h+='<div class="clif-empty">Nenhum registro nesta aba.</div>';
   else{
@@ -4677,15 +4804,16 @@ function renderImportPreview(){
         <td class="ccli">${esc(r.cliente||"—")}${warn}</td>
         <td>${it?esc(it.label):"—"}</td>
         <td>${cur}</td>
-        <td>${it?esc(it.next):(r.rawUnit&&r.error?esc(r.rawProj+" · "+r.rawUnit):"—")}</td>
+        <td>${it?esc(it.next)+(it.nota?`<small class="imp-msg">${esc(it.nota)}</small>`:""):(r.rawUnit&&r.error?esc(r.rawProj+" · "+r.rawUnit):"—")}</td>
         <td class="imp-act">${impActionCell(st,r,it,i)}</td></tr>`;
     });
     h+="</tbody></table></div>";
     if(rows.length>shown.length)h+=`<button type="button" class="btn g imp-more" data-imp="more">Mostrar mais (${rows.length-shown.length})</button>`;
   }
-  h+=`<div class="imp-foot"><div class="imp-foot-txt">${payload.changes.length?`<b>${payload.records}</b> unidade(s) · <b>${payload.changes.length}</b> campo(s) serão atualizados.`:"Nada a atualizar ainda."}${s.pending?` <span class="imp-pend">${s.pending} campo(s) em conflito sem decisão não serão aplicados.</span>`:""}</div>
+  const anyChange=payload.changes.length+payload.revs.length;
+  h+=`<div class="imp-foot"><div class="imp-foot-txt">${anyChange?`<b>${payload.records}</b> unidade(s) · <b>${payload.changes.length}</b> campo(s)${payload.revs.length?` · <b>${payload.revs.length}</b> revistoria(s)`:""} serão atualizados.`:"Nada a atualizar ainda."}${s.pending?` <span class="imp-pend">${s.pending} campo(s) em conflito sem decisão não serão aplicados.</span>`:""}</div>
     <button type="button" class="btn g" data-imp="close">Cancelar</button>
-    <button type="button" class="btn p" data-imp="confirm" ${payload.changes.length?"":"disabled"}>Aplicar atualização</button></div>`;
+    <button type="button" class="btn p" data-imp="confirm" ${anyChange?"":"disabled"}>Aplicar atualização</button></div>`;
   const body=impBody(h);
   body.querySelector("#impField").onchange=e=>{st.field=e.target.value;st.limit=300;renderImportPreview();};
   const qi=body.querySelector("#impQ");if(qi){qi.oninput=e=>{st.q=e.target.value;st.limit=300;const pos=e.target.selectionStart;renderImportPreview();const n=document.getElementById("impQ");n.focus();n.setSelectionRange(pos,pos);};}
@@ -4693,7 +4821,7 @@ function renderImportPreview(){
 function impConfirm(){
   const st=impState,s=impSummary(st),p=impBuildPayload(st);
   const box=document.getElementById("impConfirm");
-  box.querySelector(".imp-cf-txt").innerHTML=`Você está prestes a atualizar <b>${p.records}</b> registro(s) (${p.changes.length} campo(s)). <b>${s.resolved}</b> conflito(s) foram resolvidos.`+
+  box.querySelector(".imp-cf-txt").innerHTML=`Você está prestes a atualizar <b>${p.records}</b> registro(s) (${p.changes.length} campo(s)${p.revs.length?` e ${p.revs.length} revistoria(s)`:""}). <b>${s.resolved}</b> conflito(s) foram resolvidos.`+
     (s.pending?`<br><span class="imp-pend">${s.pending} conflito(s) sem resolução não serão aplicados (continuam como estão no sistema).</span>`:"")+"<br>Deseja continuar?";
   box.hidden=false;box.querySelector("[data-imp=apply]").focus();
 }
@@ -4703,18 +4831,21 @@ async function impApply(){
   const btn=box.querySelector("[data-imp=apply]");btn.disabled=true;btn.textContent="Aplicando…";
   try{
     const clean=o=>{const x={...o};if(x.unit_id==null)delete x.unit_id;if(x.project_id==null)delete x.project_id;return x;};
-    const {data,error}=await supabase.rpc("aplicar_importacao_agendamentos",{p_file:st.file,p_summary:{...s,conflicts:s.conflicts,records:p.records},p_changes:p.changes.map(clean),p_items:p.items.map(clean)});
+    const args={p_file:st.file,p_summary:{...s,conflicts:s.conflicts,records:p.records},p_changes:p.changes.map(clean),p_items:p.items.map(clean)};
+    if(p.revs.length)args.p_revistorias=p.revs; // só quando há revistorias: a chamada sem elas é a mesma de antes
+    const {data,error}=await supabase.rpc("aplicar_importacao_agendamentos",args);
     if(error)throw error;
     box.hidden=true;st.result={...data,summary:s,payload:p};
     renderImportReport();
     loadOverview();if(appProject)load(true).catch(()=>{});
   }catch(e){
     btn.disabled=false;btn.textContent="Aplicar";st.applying=false;
-    toast(/administrador/i.test(e?.message||"")?"Somente administradores podem importar":"Falha ao aplicar a importação. Nada foi alterado.");
+    toast(/administrador/i.test(e?.message||"")?"Somente administradores podem importar":/Revistoria inválida/.test(e?.message||"")?e.message+" Nada foi alterado.":"Falha ao aplicar a importação. Nada foi alterado.");
   }
 }
 function renderImportReport(){
-  const {summary:s,applied,skipped,records,import_id}=impState.result;
+  const {summary:s,applied,skipped,records:vist,import_id,revistorias_novas:rn=0,revistorias_atualizadas:ru=0,revistorias_puladas:rp=0,unidades_atualizadas}=impState.result;
+  const records=unidades_atualizadas??vist; // vistoria e/ou revistoria alterada
   impSetTitle("Atualizar agendamentos","Importação concluída");
   impBody(`<div class="imp-done">
     <div class="imp-done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -4725,8 +4856,10 @@ function renderImportReport(){
       <div class="imp-kpi b"><b>${applied}</b><span>Campos preenchidos</span></div>
       <div class="imp-kpi r"><b>${s.resolved}</b><span>Conflitos resolvidos${s.pending?` · ${s.pending} pendente(s)`:""}</span></div>
       <div class="imp-kpi n"><b>${s.notFound}</b><span>Unidades não encontradas</span></div>
+      ${rn+ru?`<div class="imp-kpi b"><b>${rn+ru}</b><span>Revistorias · ${rn} nova(s), ${ru} atualizada(s)</span></div>`:""}
     </div>
-    ${skipped?`<p class="imp-pend">${skipped} campo(s) foram alterados no sistema durante a revisão e não foram sobrescritos.</p>`:""}
+    ${rp?`<p class="imp-pend">${rp} revistoria(s) mudaram durante a revisão e não foram alteradas.</p>`:""}
+    ${skipped-rp?`<p class="imp-pend">${skipped-rp} campo(s) foram alterados no sistema durante a revisão e não foram sobrescritos.</p>`:""}
     <div class="imp-actions"><button type="button" class="btn g" data-imp="details" data-id="${import_id}">Ver detalhes da importação</button><button type="button" class="btn p" data-imp="close">Concluir</button></div>
   </div>`);
 }
@@ -4741,7 +4874,7 @@ async function openImportHistory(){
   impBody(!data?.length?'<div class="clif-empty">Nenhuma importação realizada ainda.</div>':
     `<div class="gridscroll"><table class="ctbl imp-tbl"><thead><tr><th>Data/hora</th><th>Usuário</th><th class="th-cli">Arquivo</th><th>Condomínios</th><th>Total</th><th>Atualizados</th><th>Sem alteração</th><th>Conflitos</th><th>Não encontrados</th><th>Resultado</th><th></th></tr></thead><tbody>`+
     data.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}</td><td>${esc(r.user_email||"—")}</td><td class="ccli">${esc(r.file_name)}</td>
-      <td>${esc((r.project_ids||[]).map(pname).join(", ")||"—")}</td><td>${r.total_rows}</td><td>${r.summary?.records_updated??r.updated_count} un. · ${r.applied_changes} campos</td><td>${r.unchanged_count}</td>
+      <td>${esc((r.project_ids||[]).map(pname).join(", ")||"—")}</td><td>${r.total_rows}</td><td>${r.summary?.unidades_atualizadas??r.summary?.records_updated??r.updated_count} un. · ${r.applied_changes} campos</td><td>${r.unchanged_count}</td>
       <td>${r.conflicts_resolved}/${r.conflicts_count}${r.conflicts_pending?` <span class="imp-pend">(${r.conflicts_pending} pend.)</span>`:""}</td><td>${r.not_found_count}</td>
       <td><span class="imp-tag ${r.result==="concluida"?"g":r.result==="parcial"?"y":"n"}">${RES[r.result]||r.result}</span></td>
       <td><button type="button" class="btn g imp-mini" data-imp="details" data-id="${r.id}">Detalhes</button></td></tr>`).join("")+"</tbody></table></div>");
@@ -5151,6 +5284,10 @@ function renderResumo(){
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na-inad}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
   const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
+  // Revistorias da planilha (revistoria mais recente de cada unidade); não mudam os números da vistoria acima.
+  const rs=REV.resumo(Object.values(state.revs));
+  if(rs.total)h+=`<div class="rg-sub rg-sub-rv">Revistorias · ${rs.total} unidade(s)</div><div class="rg-mini rg-mini-rv">`+
+    REV.REV_STATUS.map(x=>`<div class="m" style="--rvs:${x.cor}"><div class="mn">${rs[x.key]}</div><div class="ml">${x.label}</div></div>`).join("")+`</div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
   h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-fin"></i>Revistorias finalizadas</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
@@ -5567,8 +5704,8 @@ document.getElementById("ovRefresh").onclick=()=>loadOverview();
 document.getElementById("ovExport").onclick=()=>{
   if(ovMode!=="lista"||!ovView.length){toast(ovMode!=="lista"?"Mude para Lista para exportar":"Nada para exportar com esses filtros");return;}
   downloadCsv(`agendamentos-${fileStamp()}.csv`,
-    ["Condomínio","Bloco / Conj.","Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações"],
-    ovView.map(r=>[r.projectName,r.groupLabel,r.ucode,r.cliente,csvDate(r.data),r.hora,r.resp,csvDate(r.rev),r.revResp,CLL[r.code]||"",ACOMP[r.acomp]||"",r.obs]));
+    ["Condomínio","Bloco / Conj.","Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações",...REV_CSV_HEAD],
+    ovView.map(r=>[r.projectName,r.groupLabel,r.ucode,r.cliente,csvDate(r.data),r.hora,r.resp,csvDate(r.rev),r.revResp,CLL[r.code]||"",ACOMP[r.acomp]||"",r.obs,...revCsv(r.revistoria)]));
   toast(ovView.length+" agendamento(s) exportado(s)");
 };
 document.getElementById("ovClear").onclick=()=>{ovFilt=OV_EMPTY();renderOvFilters();renderOverview();};
