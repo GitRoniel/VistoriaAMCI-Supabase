@@ -179,8 +179,13 @@ assert.match(chavesSimples, /Informe o responsável que está recebendo a chave/
 assert.match(chavesSimples, /private\.chaves_pedido_existente\(p_pedido\)/, "Transferência repetida não pode duplicar.");
 assert.doesNotMatch(chavesSimples, /(delete from|truncate|drop table)/i, "Simplificação das chaves não apaga dados.");
 assert.doesNotMatch(chavesSimples, /grant (insert|update|delete)/i, "Escrita só pela função.");
+const chavesPerdidas = await readFile(resolve(root, "supabase/migrations/20261103150000_chaves_perdidas.sql"), "utf8");
+assert.match(chavesPerdidas, /alter table public\.chaves_ocorrencias enable row level security/);
+assert.match(chavesPerdidas, /grant select on table public\.chaves_ocorrencias to authenticated/);
+assert.match(chavesPerdidas, /registrada como perdida\. Use "Regularizar chave"/, "Chave perdida não pode voltar a um setor sem regularização.");
+assert.doesNotMatch(chavesPerdidas, /(delete from|truncate|drop table)|(update|insert into) public\.client_inspections/i, "Chave perdida não apaga dados nem toca na vistoria.");
 const chavesJs = await readFile(resolve(root, "www/chaves.js"), "utf8").catch(() => "");
-assert.ok(chavesJs.includes("chaves_transferir") && !/chaves_(cadastrar|retirar|devolver|ocorrencia)/.test(chavesJs), "Aba Chaves usa só a transferência.");
+assert.ok(chavesJs.includes("chaves_transferir") && chavesJs.includes("chaves_regularizar") && !/chaves_(cadastrar|retirar|devolver|ocorrencia)"/.test(chavesJs), "Aba Chaves: transferência e chave perdida, sem as funções antigas.");
 await import("./test-chaves.mjs");
 const revPlanilha = await readFile(resolve(root, "supabase/migrations/20261027120000_revistorias_planilha.sql"), "utf8");
 assert.match(revPlanilha, /alter table public\.revistorias enable row level security/);

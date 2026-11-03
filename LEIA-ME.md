@@ -184,13 +184,20 @@ Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estat�
   - Data, hora e usuário são gravados automaticamente.
   - Clique repetido ou nova tentativa de rede nunca grava duas vezes (`pedido_id`).
   - Se outra pessoa transferiu a mesma chave enquanto a tela estava aberta, a transferência é recusada e a tela mostra a situação atual.
+- **Chave perdida / sem status:** em qualquer unidade, seja qual for o status da vistoria (aprovada, reprovada, sem agendamento, em revistoria…).
+  - Fluxo: **Marcar chave perdida** (motivo opcional + responsável pelo registro) → **Solicitar chaveiro** → **Registrar cópia** → **Regularizar chave** (setor que fica com a nova chave + quem recebe). A chave encontrada pode ser regularizada direto.
+  - Ao marcar, a unidade fica **Sem status**: sai do setor e do responsável anteriores (guardados na ocorrência). No mapa, cinza hachurado com borda vermelha e selo (! perdida · C chaveiro solicitado · ✓ cópia realizada), por cima da cor do setor; legenda própria.
+  - Enquanto a ocorrência estiver aberta, a chave **não pode ser transferida**: só volta a um setor pela regularização. O status da vistoria nunca muda.
+  - Indicador "Chaves perdidas" e filtro por etapa (todas pendentes, chave perdida, chaveiro solicitado, cópia realizada) no mapa e na lista.
+  - Data, hora e usuário de cada passo são automáticos; uma ocorrência aberta por unidade, atualizada a cada etapa (`chaves_ocorrencias`), e cada passo também entra no histórico.
 - **Histórico:** cada transferência guarda a unidade, os setores de origem e de destino, o responsável anterior, quem recebeu, a data/hora e o usuário. Não pode ser alterado nem apagado (nem pelo dono do banco); só sai em cascata se a unidade for apagada.
 - **Permissões** (papel no condomínio): admin e revistorias transferem; visitante só consulta. Condomínio arquivado não aparece. O status da vistoria só é lido, nunca alterado.
 - **Banco:**
   - `chaves_unidades`: situação atual (setor, responsável, `movimentado_em`, `movimentado_por`, `movimentacao_id`);
   - `chaves_movimentacoes`: histórico (com `setor_origem` e `responsavel_anterior`);
-  - escrita só pela função `chaves_transferir` (security definer); leitura por RLS para membros do condomínio.
-  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial) e `20261103120000_chaves_transferencia_simples.sql` (simplificação).
+  - `chaves_ocorrencias`: chave perdida e o andamento (quem identificou, motivo, setor/responsável anteriores, chaveiro, cópia, regularização);
+  - escrita só pelas funções `chaves_transferir`, `chaves_marcar_perdida`, `chaves_ocorrencia_andamento` e `chaves_regularizar` (security definer, com `pedido_id` contra clique repetido e conferência de tela desatualizada); leitura por RLS para membros do condomínio.
+  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial), `20261103120000_chaves_transferencia_simples.sql` (simplificação) e `20261103150000_chaves_perdidas.sql` (chave perdida). Sem a última, a aba funciona só com as transferências.
 - **Simplificação (03/11/2026):**
   - saíram o cadastro de cópias (entrada, quartos, banheiros), a retirada/devolução com conferência, as ocorrências e a tipologia, e as funções correspondentes;
   - a tabela `chaves` (cópias) e a coluna `units.quartos` ficam guardadas, sem uso;
