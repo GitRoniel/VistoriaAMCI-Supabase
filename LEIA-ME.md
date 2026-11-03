@@ -197,7 +197,7 @@ Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estat�
   - `chaves_movimentacoes`: histórico (com `setor_origem` e `responsavel_anterior`);
   - `chaves_ocorrencias`: chave perdida e o andamento (quem identificou, motivo, setor/responsável anteriores, chaveiro, cópia, regularização);
   - escrita só pelas funções `chaves_transferir`, `chaves_marcar_perdida`, `chaves_ocorrencia_andamento` e `chaves_regularizar` (security definer, com `pedido_id` contra clique repetido e conferência de tela desatualizada); leitura por RLS para membros do condomínio.
-  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial), `20261103120000_chaves_transferencia_simples.sql` (simplificação) `20261103150000_chaves_perdidas.sql` (chave perdida) e `20261103180000_chaves_setor_cliente.sql` (setor Entregue para Cliente). Sem a última, a aba funciona só com as transferências.
+  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial), `20261103120000_chaves_transferencia_simples.sql` (simplificação), `20261103150000_chaves_perdidas.sql` (chave perdida) e `20261103180000_chaves_setor_cliente.sql` (setor Entregue para Cliente). Sem a de chave perdida, a aba funciona só com as transferências.
 - **Simplificação (03/11/2026):**
   - saíram o cadastro de cópias (entrada, quartos, banheiros), a retirada/devolução com conferência, as ocorrências e a tipologia, e as funções correspondentes;
   - a tabela `chaves` (cópias) e a coluna `units.quartos` ficam guardadas, sem uso;
