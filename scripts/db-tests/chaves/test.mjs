@@ -92,6 +92,9 @@ r = await transferir(U.adm_j, A03, 'base', 'Luciana', (await atual(A03)).movimen
 const h = await movs(A03);
 ok(h.length === 5 && h.slice(1).map((x) => `${x.setor_origem}>${x.setor}:${x.responsavel_anterior}>${x.responsavel}`).join(' ') === 'base>cx:>Pedro Silva cx>cx:Pedro Silva>Marcos cx>producao:Marcos>Equipe Lucas producao>base:Equipe Lucas>Luciana',
   'histórico completo mantido após novas transferências: ' + h.slice(1).map((x) => `${x.setor_origem}>${x.setor}`).join(', '));
+r = await transferir(U.adm_j, A04, 'cliente', 'Maria (proprietária)', await ult(A04)); s = await atual(A04);
+ok(r.r?.ok && s.setor === 'cliente' && s.responsavel === 'Maria (proprietária)', 'novo setor: Entregue para Cliente');
+r = await transferir(U.adm_j, A04, 'base', 'Luciana', await ult(A04)); ok(r.r?.ok && (await movs(A04)).at(-1).setor_origem === 'cliente', 'Cliente → Base (origem registrada)');
 r = await transferir(U.adm_j, A01, 'base', 'Luciana', null); s = await atual(A01);
 ok(r.r?.ok && s.setor === 'base' && (await movs(A01))[0].setor_origem === null, 'unidade sem status → Base (origem: sem status)');
 r = await transferir(U.adm_j, A04, 'cx', 'Rita', 999999); ok(/outra pessoa/.test(r.error), 'última movimentação inventada: recusado');
@@ -139,10 +142,10 @@ s = await atual(A04); o = await ocorr(A04);
 ok(s.setor === 'cx' && s.responsavel === 'Pedro' && (await q(`select ocorrencia_id from chaves_unidades where unit_id=$1`, [A04])).rows[0].ocorrencia_id === null, 'unidade volta ao controle normal (CX, Pedro)');
 ok(o.etapa === 'regularizada' && o.chaveiro_por === 'Luciana' && o.chaveiro_email === 'adm_j@teste.com' && o.chaveiro_obs.startsWith('Chaveiro Silva') && o.copia_por === 'Bruno' && !!o.copia_em
   && o.regularizada_setor === 'cx' && o.regularizada_recebido_por === 'Pedro' && !!o.regularizada_em, 'ocorrência completa: quem solicitou, cópia, quem recebeu, datas');
-ok((await movs(A04)).map((x) => x.tipo).join(',') === 'cadastro,transferencia,perda,chaveiro,copia,regularizacao', 'histórico mantém transferência anterior + todos os passos: ' + (await movs(A04)).map((x) => x.tipo).join(','));
+ok((await movs(A04)).map((x) => x.tipo).join(',') === 'cadastro,transferencia,transferencia,transferencia,perda,chaveiro,copia,regularizacao', 'histórico mantém transferência anterior + todos os passos: ' + (await movs(A04)).map((x) => x.tipo).join(','));
 r = await transferir(U.adm_j, A04, 'base', 'Luciana', await ult(A04)); ok(r.r?.ok, 'depois de regularizada, a chave volta a ser transferida');
 r = await perder(U.adm_j, A04, 'Luciana', '', await ult(A04)); ok(r.r?.ok, 'nova perda na mesma unidade: nova ocorrência');
-r = await regularizar(U.adm_j, A04, 'base', 'Luciana', 'Chave encontrada', await ult(A04)); ok(r.r?.ok && (await atual(A04)).setor === 'base', 'regularizar direto (chave encontrada)');
+r = await regularizar(U.adm_j, A04, 'cliente', 'Maria (proprietária)', 'Chave encontrada e entregue', await ult(A04)); ok(r.r?.ok && (await atual(A04)).setor === 'cliente', 'regularizar direto para o cliente (chave encontrada)');
 r = await perder(U.adm_j, A01, 'Luciana', 'Nunca teve chave', await ult(A01)); ok(r.r?.ok && (await ocorr(A01)).setor_anterior === 'base', 'qualquer unidade pode ter a chave marcada como perdida');
 r = await as(U.vis_j, `select count(*)::int n from chaves_ocorrencias`); ok(r.rows[0].n === 3, 'visitante lê as ocorrências');
 r = await as(U.adm_b, `select count(*)::int n from chaves_ocorrencias o join units u on u.id=o.unit_id where u.project_id=$1`, [PJ]); ok(r.rows[0].n === 0, 'admin só do Buriti não lê as ocorrências do Jerivá');

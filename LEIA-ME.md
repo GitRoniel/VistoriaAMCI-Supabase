@@ -175,11 +175,11 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 
 Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). Mostra onde está a chave de cada unidade e quem é o responsável. Usa as unidades do Mapa das Vistorias, sem cadastro próprio. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
 
-- **Setor (cor da unidade):** Base (azul), CX (verde), Asstec (laranja), Produção (vermelho) e Sem status (cinza: nenhum registro). A chave é acompanhada por unidade, como um todo: sem quantidades nem conferência de cópias.
+- **Setor (cor da unidade):** Base (azul), CX (verde), Asstec (laranja), Produção (vermelho), Entregue para Cliente (roxo) e Sem status (cinza: nenhum registro). A chave é acompanhada por unidade, como um todo: sem quantidades nem conferência de cópias.
 - **Mapa e lista** (botões Mapa/Lista). A lista tem Unidade (com o status da vistoria), Setor atual, Responsável, Última movimentação e Ação (Transferir e Histórico). No celular, cada linha vira um cartão.
 - **Filtros:** condomínio, bloco/conjunto, unidade, status da vistoria e setor. Os indicadores de cada setor também filtram ao clicar.
 - **Painel da unidade:** setor atual, responsável, data e hora da última movimentação e quem a registrou, status da vistoria, e os botões **Transferir** e **Histórico**.
-- **Transferir para outro setor:** unidade → Transferir → setor de destino (Base, CX, Asstec ou Produção) → responsável que recebe → Confirmar transferência.
+- **Transferir para outro setor:** unidade → Transferir → setor de destino (Base, CX, Asstec, Produção ou Entregue para Cliente) → responsável que recebe → Confirmar transferência.
   - Setor e responsável são obrigatórios. A mesma situação (mesmo setor e mesmo responsável) é recusada; mudar só o responsável dentro do setor é permitido.
   - Data, hora e usuário são gravados automaticamente.
   - Clique repetido ou nova tentativa de rede nunca grava duas vezes (`pedido_id`).
@@ -197,7 +197,7 @@ Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estat�
   - `chaves_movimentacoes`: histórico (com `setor_origem` e `responsavel_anterior`);
   - `chaves_ocorrencias`: chave perdida e o andamento (quem identificou, motivo, setor/responsável anteriores, chaveiro, cópia, regularização);
   - escrita só pelas funções `chaves_transferir`, `chaves_marcar_perdida`, `chaves_ocorrencia_andamento` e `chaves_regularizar` (security definer, com `pedido_id` contra clique repetido e conferência de tela desatualizada); leitura por RLS para membros do condomínio.
-  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial), `20261103120000_chaves_transferencia_simples.sql` (simplificação) e `20261103150000_chaves_perdidas.sql` (chave perdida). Sem a última, a aba funciona só com as transferências.
+  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial), `20261103120000_chaves_transferencia_simples.sql` (simplificação) `20261103150000_chaves_perdidas.sql` (chave perdida) e `20261103180000_chaves_setor_cliente.sql` (setor Entregue para Cliente). Sem a última, a aba funciona só com as transferências.
 - **Simplificação (03/11/2026):**
   - saíram o cadastro de cópias (entrada, quartos, banheiros), a retirada/devolução com conferência, as ocorrências e a tipologia, e as funções correspondentes;
   - a tabela `chaves` (cópias) e a coluna `units.quartos` ficam guardadas, sem uso;

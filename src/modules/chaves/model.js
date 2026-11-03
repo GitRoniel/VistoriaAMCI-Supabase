@@ -3,7 +3,7 @@
 // A chave de cada unidade é acompanhada como um todo: em que setor está (cor no mapa) e quem é o
 // responsável. Operações: "Transferir para outro setor" e o ciclo da chave perdida
 // (Marcar chave perdida → Chaveiro solicitado → Cópia realizada → Regularizar chave).
-//   Base (azul) · CX (verde) · Asstec (laranja) · Produção (vermelho) · Sem status (cinza)
+//   Base (azul) · CX (verde) · Asstec (laranja) · Produção (vermelho) · Entregue para Cliente (roxo) · Sem status (cinza)
 // Chave perdida = sem status com ocorrência aberta: tem prioridade visual (cinza hachurado + selo).
 // O status da vistoria vem de client_inspections e é mostrado à parte: este módulo nunca o altera.
 
@@ -12,11 +12,12 @@ export const SETORES = {
   cx: { label: "CX", cor: "#2f9e5b", borda: "#268a4d", texto: "#ffffff" },
   asstec: { label: "Asstec", cor: "#e8842a", borda: "#c96a1a", texto: "#ffffff" },
   producao: { label: "Produção", cor: "#d64545", borda: "#b33636", texto: "#ffffff" },
+  cliente: { label: "Entregue para Cliente", cor: "#7b4fc9", borda: "#6340a8", texto: "#ffffff" },
   sem: { label: "Sem status", cor: "#e4e8e5", borda: "#c3cac5", texto: "#7a857e" }
 };
 /** Setores para onde a chave pode ser transferida (ou regularizada). */
-export const SETORES_DESTINO = ["base", "cx", "asstec", "producao"];
-export const STATUS_ORDEM = ["base", "cx", "asstec", "producao", "sem"];
+export const SETORES_DESTINO = ["base", "cx", "asstec", "producao", "cliente"];
+export const STATUS_ORDEM = ["base", "cx", "asstec", "producao", "cliente", "sem"];
 export const setorLabel = (s) => (SETORES[s || "sem"] || SETORES.sem).label;
 
 /** Etapas da ocorrência de chave perdida (a última fecha a ocorrência). */
