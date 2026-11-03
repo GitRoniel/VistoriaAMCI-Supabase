@@ -1,10 +1,15 @@
-// Testes do Controle de Chaves no Postgres local (RLS, regras, concorrência, histórico imutável).
+// Testes do Controle de Chaves (transferência simples entre setores) no Postgres local:
+// situação inicial a partir do modelo anterior, permissões, RLS, validações, cliques repetidos,
+// concorrência, histórico imutável e condomínio arquivado.
+// Uso: scripts/db-tests/chaves/reset.sh 20261024120000 && node scripts/db-tests/chaves/test.mjs
 import pg from 'pg';
+import { readFileSync, readdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 const cfg = { host: process.env.PGHOST || '/var/tmp', port: Number(process.env.PGPORT || 55432), user: 'postgres', database: 'amci' };
+const MIG = resolve(import.meta.dirname, '../../../supabase/migrations');
 const admin = new pg.Client(cfg); await admin.connect();
 let fail = 0; const ok = (c, m) => { console.log((c ? '✔' : '✘') + ' ' + m); if (!c) fail++; };
 const q = (sql, p) => admin.query(sql, p);
-// usuários de teste
 const U = {};
 for (const nome of ['adm_j', 'rev_j', 'vis_j', 'adm_b', 'fora']) {
   const { rows } = await q(`insert into auth.users (email) values ($1) returning id`, [nome + '@teste.com']); U[nome] = rows[0].id;
@@ -13,7 +18,6 @@ const proj = async (slug) => (await q(`select id from projects where slug=$1`, [
 const PJ = await proj('alto-do-jeriva'), PB = await proj('alto-do-buriti');
 await q(`insert into project_members (project_id,user_id,role) values ($1,$2,'admin'),($1,$3,'revistorias'),($1,$4,'visitante'),($5,$6,'admin')`, [PJ, U.adm_j, U.rev_j, U.vis_j, PB, U.adm_b]);
 const unit = async (b, p, a, pid = PJ) => (await q(`select id from units where project_id=$1 and bloco=$2 and pav=$3 and apto=$4`, [pid, b, p, a])).rows[0].id;
-// executa como usuário autenticado (mesmo que o PostgREST faz)
 async function as(user, sql, params, client) {
   const c = client || new pg.Client(cfg); if (!client) await c.connect();
   try {
@@ -23,119 +27,104 @@ async function as(user, sql, params, client) {
   finally { if (!client) await c.end(); }
 }
 const rpc = (user, fn, args) => as(user, `select public.${fn}(${args.map((_, i) => '$' + (i + 1)).join(',')}) as r`, args).then((x) => x.error ? x : { r: x.rows[0].r });
-const keys = async (uid) => (await q(`select id,categoria,comodo,copia,local,situacao,responsavel,movimentacao_id from chaves where unit_id=$1 and situacao<>'inativa' order by categoria,comodo,copia`, [uid])).rows;
-const movCount = async () => Number((await q(`select count(*) from chaves_movimentacoes`)).rows[0].count);
+const transferir = (user, unitId, setor, resp, ultima, pedido = null) => rpc(user, 'chaves_transferir', [unitId, setor, resp, ultima, pedido]);
+const atual = async (uid) => (await q(`select setor,responsavel,movimentado_em,movimentado_por,movimentacao_id from chaves_unidades where unit_id=$1`, [uid])).rows[0] || null;
+const movs = async (uid) => (await q(`select * from chaves_movimentacoes where unit_id=$1 order by id`, [uid])).rows;
+const total = async () => Number((await q(`select count(*) from chaves_movimentacoes`)).rows[0].count);
 
-const A02 = await unit('A', 'T', '02'), A03 = await unit('A', 'T', '03'), A01 = await unit('A', 'T', '01');
-const ITENS = JSON.stringify([{ categoria: 'entrada', comodo: 1, copias: 2 }, { categoria: 'quarto', comodo: 1, copias: 1 }, { categoria: 'quarto', comodo: 2, copias: 1 }, { categoria: 'quarto', comodo: 3, copias: 1 }, { categoria: 'banheiro', comodo: 1, copias: 1 }, { categoria: 'banheiro', comodo: 2, copias: 1 }]);
+const A01 = await unit('A', 'T', '01'), A02 = await unit('A', 'T', '02'), A03 = await unit('A', 'T', '03'), A04 = await unit('A', 'T', '04');
 
-console.log('— RLS (leitura por condomínio)');
-let r = await as(U.vis_j, `select count(*)::int n from chaves_unidades`); ok(r.rows[0].n === 448, 'visitante do Jerivá lê as 448 unidades do claviculário');
-r = await as(U.adm_b, `select count(*)::int n from chaves_unidades cu join units u on u.id=cu.unit_id where u.project_id=$1`, [PJ]); ok(r.rows[0].n === 0, 'admin só do Buriti não lê o Jerivá');
-r = await as(U.fora, `select count(*)::int n from chaves_movimentacoes`); ok(r.rows[0].n === 0, 'usuário sem condomínio não lê nada');
-r = await as(U.adm_j, `insert into chaves (unit_id,project_id,categoria) values ($1,$2,'entrada')`, [A02, PJ]); ok(/permission denied/.test(r.error), 'escrita direta na tabela bloqueada (admin): ' + r.error);
-r = await as(U.adm_j, `update chaves_movimentacoes set observacoes='x'`); ok(/permission denied/.test(r.error), 'alterar histórico pela API bloqueado');
-r = await as(U.adm_j, `update units set quartos=2 where id=$1`, [A02]); ok(!!r.error || true, 'unidades: sem update direto (' + (r.error || 'sem efeito') + ')');
+console.log('— Modelo anterior (antes desta migration): cópias cadastradas e uma retirada');
+let r = await rpc(U.adm_j, 'chaves_cadastrar', [A02, JSON.stringify([{ categoria: 'entrada', comodo: 1, copias: 2 }, { categoria: 'quarto', comodo: 1, copias: 1 }]), '', null]);
+ok(r.r?.ok, 'cadastro antigo de 3 cópias');
+const k = (await q(`select id from chaves where unit_id=$1 order by id`, [A02])).rows;
+r = await rpc(U.rev_j, 'chaves_retirar', [A02, [k[0].id], 'cx', 'João Antigo', null, null, '', null]); ok(r.r?.ok, 'retirada antiga (CX com João Antigo)');
+const movAntes = await total(), chavesAntes = Number((await q(`select count(*) from chaves`)).rows[0].count);
 
-console.log('— Cadastro (só admin)');
-r = await rpc(U.rev_j, 'chaves_cadastrar', [A02, ITENS, '', null]); ok(/administradores/.test(r.error), 'revistorias não cadastra');
-r = await rpc(U.vis_j, 'chaves_cadastrar', [A02, ITENS, '', null]); ok(/administradores/.test(r.error), 'visitante não cadastra');
-r = await rpc(U.adm_b, 'chaves_cadastrar', [A02, ITENS, '', null]); ok(/administradores/.test(r.error), 'admin de outro condomínio não cadastra');
-r = await rpc(U.adm_j, 'chaves_cadastrar', [A02, ITENS, 'cadastro inicial', null]); ok(r.r?.ok, 'admin cadastra 7 chaves (3Q: entrada×2, 3 quartos, 2 banheiros)');
-let k = await keys(A02); ok(k.length === 7 && k.every((x) => x.local === 'base' && x.situacao === 'ativa'), 'todas na Base: ' + k.length);
-r = await rpc(U.adm_j, 'chaves_cadastrar', [A03, JSON.stringify([{ categoria: 'porta', copias: 1 }]), '', null]); ok(/Categoria/.test(r.error), 'categoria inválida recusada');
-const id = (cat, com, cop) => k.find((x) => x.categoria === cat && x.comodo === com && x.copia === cop).id;
+console.log('— Aplica as migrations seguintes (inclusive a simplificação)');
+for (const f of readdirSync(MIG).filter((f) => f > '20261024120000_controle_chaves.sql' && f.endsWith('.sql')).sort()) {
+  if (/rls_erp|somente_leitura_erp|pedidos_observacoes_rls/.test(f)) continue;
+  await q(readFileSync(resolve(MIG, f), 'utf8')); console.log('   aplicada', f);
+}
 
-console.log('— Retirada parcial');
-r = await rpc(U.vis_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'cx', 'João', null, null, '', null]); ok(/não permite/.test(r.error), 'visitante não retira');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'base', 'João', null, null, '', null]); ok(/Setor/.test(r.error), 'setor de destino inválido');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'cx', ' ', null, null, '', null]); ok(/responsável/.test(r.error), 'exige responsável');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [], 'cx', 'João', null, null, '', null]); ok(/Selecione/.test(r.error), 'exige as chaves movimentadas');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'cx', 'João', new Date(Date.now() + 3600e3).toISOString(), null, '', null]); ok(/futuro/.test(r.error), 'data no futuro recusada');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'cx', 'João', new Date().toISOString(), new Date(Date.now() - 864e5).toISOString(), '', null]); ok(/anterior/.test(r.error), 'previsão antes da retirada recusada');
-const outra = (await q(`select id from chaves limit 0`)).rows; // (nenhuma chave em outra unidade ainda)
-const ped1 = crypto.randomUUID();
-const antes = await movCount();
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1), id('quarto', 1, 1)], 'cx', 'João (CX)', null, new Date(Date.now() + 864e5).toISOString(), 'vistoria do cliente', ped1]);
-ok(r.r?.ok && r.r.movimentacao.quantidade === 2, 'revistorias retira 2 chaves (parcial) para CX');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 1), id('quarto', 1, 1)], 'cx', 'João (CX)', null, null, '', ped1]); ok(r.r?.repetido === true, 'mesmo pedido de novo (clique duplo) não duplica');
-ok((await movCount()) === antes + 1, 'uma movimentação só');
-k = await keys(A02); ok(k.filter((x) => x.local === 'cx').length === 2 && k.filter((x) => x.local === 'base').length === 5, 'parcial: 2 em CX, 5 na Base');
-r = await rpc(U.adm_j, 'chaves_retirar', [A02, [id('entrada', 1, 1)], 'producao', 'Maria', null, null, '', null]); ok(/já está retirada/.test(r.error), 'chave indisponível não pode ser retirada: ' + r.error);
-r = await rpc(U.adm_j, 'chaves_retirar', [A03, [id('banheiro', 1, 1)], 'cx', 'Maria', null, null, '', null]); ok(/não encontrada nesta unidade/.test(r.error), 'chave de outra unidade recusada');
-r = await rpc(U.adm_j, 'chaves_cadastrar', [A02, ITENS, '', null]); ok(/fora do claviculário/.test(r.error), 'cadastro bloqueado com chaves fora');
+console.log('— Situação inicial calculada do que já existia (nada apagado)');
+let s = await atual(A02); ok(s.setor === 'cx' && s.responsavel === 'João Antigo' && s.movimentado_por === 'rev_j@teste.com', 'A-T02: chave retirada → CX com João Antigo (registrado por rev_j)');
+s = await atual(A03); ok(s.setor === 'base' && s.responsavel === '' && !!s.movimentado_em, 'A-T03: "tem chave" no levantamento → Base');
+s = await atual(A01); ok(s.setor === null, 'A-T01: sem chave no levantamento → sem status');
+ok(await total() === movAntes, 'histórico preservado (' + movAntes + ' movimentações)');
+ok(Number((await q(`select count(*) from chaves`)).rows[0].count) === chavesAntes, 'cópias do modelo anterior guardadas');
+const cont = (await q(`select setor, count(*)::int n from chaves_unidades cu join units u on u.id=cu.unit_id where u.project_id=$1 group by 1 order by 1`, [PJ])).rows;
+ok(cont.find((x) => x.setor === 'base')?.n === 344 && cont.find((x) => x.setor === 'cx')?.n === 1 && cont.find((x) => x.setor === null)?.n === 103, 'Jerivá: 344 Base + 1 CX + 103 sem status: ' + JSON.stringify(cont));
+r = await as(U.adm_j, `select public.chaves_cadastrar($1,'[]'::jsonb,'',null)`, [A02]); ok(/does not exist/.test(r.error), 'funções do modelo anterior removidas (cadastro)');
+r = await as(U.adm_j, `select public.chaves_retirar($1,array[1]::bigint[],'cx','x',null,null,'',null)`, [A02]); ok(/does not exist/.test(r.error), 'funções do modelo anterior removidas (retirada)');
 
-console.log('— Concorrência (dois usuários, mesma chave)');
-const c1 = new pg.Client(cfg), c2 = new pg.Client(cfg); await c1.connect(); await c2.connect();
-const alvo = id('quarto', 2, 1);
-await c1.query('begin'); await c1.query('set local role authenticated'); await c1.query(`select set_config('request.jwt.claim.sub',$1,true)`, [U.adm_j]);
-await c1.query(`select public.chaves_retirar($1,$2,'producao','Pedro',null,null,'',null)`, [A02, [alvo]]);
-const p2 = as(U.rev_j, `select public.chaves_retirar($1,$2,'asstec','Ana',null,null,'',null) r`, [A02, [alvo]], c2);   // fica esperando a trava
-await new Promise((s) => setTimeout(s, 800));
-await c1.query('commit');
-const r2 = await p2; ok(/já está retirada/.test(r2.error || ''), 'segunda retirada simultânea recusada depois da trava: ' + (r2.error || 'passou!'));
-k = await keys(A02); ok(k.find((x) => x.id === alvo).local === 'producao', 'a chave ficou com quem retirou primeiro (Produção)');
-// retiradas simultâneas de chaves diferentes: as duas passam (em fila)
-const [ra, rb] = await Promise.all([rpc(U.adm_j, 'chaves_retirar', [A02, [id('banheiro', 1, 1)], 'asstec', 'Ana', null, null, '', null]), rpc(U.rev_j, 'chaves_retirar', [A02, [id('banheiro', 2, 1)], 'asstec', 'Ana', null, null, '', null])]);
-ok(ra.r?.ok && rb.r?.ok, 'chaves diferentes ao mesmo tempo: as duas registradas');
-await c1.end(); await c2.end();
+console.log('— Permissões');
+const ult = async (uid) => (await atual(uid))?.movimentacao_id ?? null;
+r = await transferir(U.vis_j, A03, 'cx', 'Pedro', await ult(A03)); ok(/não permite/.test(r.error), 'visitante não transfere');
+r = await transferir(U.adm_b, A03, 'cx', 'Pedro', await ult(A03)); ok(/não permite/.test(r.error), 'admin de outro condomínio não transfere');
+r = await transferir(U.fora, A03, 'cx', 'Pedro', await ult(A03)); ok(/não permite/.test(r.error), 'usuário sem acesso não transfere');
+r = await as(U.adm_j, `update chaves_unidades set setor='cx' where unit_id=$1`, [A03]); ok(/permission denied/.test(r.error), 'escrita direta na tabela bloqueada');
+r = await as(U.adm_j, `insert into chaves_movimentacoes (project_id,unit_id,tipo,data_hora) values ($1,$2,'transferencia',now())`, [PJ, A03]); ok(/permission denied/.test(r.error), 'inserir no histórico pela API bloqueado');
+ok((await atual(A03)).setor === 'base', 'nada mudou com as tentativas negadas');
+
+console.log('— Validações');
+r = await transferir(U.adm_j, A03, null, 'Pedro', await ult(A03)); ok(/setor de destino/.test(r.error), 'sem setor de destino: recusado');
+r = await transferir(U.adm_j, A03, 'cozinha', 'Pedro', await ult(A03)); ok(/setor de destino/.test(r.error), 'setor inexistente: recusado');
+r = await transferir(U.adm_j, A03, 'cx', '  ', await ult(A03)); ok(/responsável/.test(r.error), 'sem responsável: recusado');
+r = await transferir(U.adm_j, A03, 'cx', 'P', await ult(A03)); ok(/responsável/.test(r.error), 'responsável com 1 letra: recusado');
+r = await transferir(U.adm_j, A03, 'cx', 'x'.repeat(81), await ult(A03)); ok(/longo/.test(r.error), 'nome longo demais: recusado');
 
 console.log('— Transferência');
-r = await rpc(U.rev_j, 'chaves_transferir', [A02, [id('quarto', 3, 1)], 'asstec', 'Ana', null, null, '', null]); ok(/não está retirada/.test(r.error), 'transferir chave na Base recusado');
-r = await rpc(U.rev_j, 'chaves_transferir', [A02, [id('quarto', 1, 1)], 'asstec', 'Ana (Asstec)', null, null, 'passou para a assistência', null]);
-ok(r.r?.ok && r.r.movimentacao.chaves[0].de_setor === 'cx', 'transferência CX → Asstec registrada com a origem');
-k = await keys(A02); ok(k.find((x) => x.id === id('quarto', 1, 1)).local === 'asstec' && k.find((x) => x.id === id('quarto', 1, 1)).responsavel === 'Ana (Asstec)', 'chave agora com Ana na Asstec');
+const antes03 = await atual(A03);
+r = await transferir(U.rev_j, A03, 'cx', '  Pedro   Silva ', antes03.movimentacao_id, '11111111-1111-4111-8111-111111111111');
+ok(r.r?.ok, 'revistorias transfere Base → CX');
+s = await atual(A03); ok(s.setor === 'cx' && s.responsavel === 'Pedro Silva' && s.movimentado_por === 'rev_j@teste.com' && String(s.movimentacao_id) === String(r.r.movimentacao.id), 'unidade atualizada: CX, Pedro Silva, quem registrou e quando');
+let m = (await movs(A03)).at(-1);
+ok(m.tipo === 'transferencia' && m.setor_origem === 'base' && m.setor === 'cx' && m.responsavel_anterior === '' && m.responsavel === 'Pedro Silva' && m.registrado_email === 'rev_j@teste.com' && !!m.data_hora, 'histórico: origem Base, destino CX, anterior, recebeu, usuário, data/hora');
+const n1 = await total();
+r = await transferir(U.rev_j, A03, 'cx', 'Pedro Silva', antes03.movimentacao_id, '11111111-1111-4111-8111-111111111111');
+ok(r.r?.repetido && (await total()) === n1, 'clique repetido (mesmo pedido): devolve a mesma, não duplica');
+r = await transferir(U.adm_j, A03, 'cx', 'pedro silva', (await atual(A03)).movimentacao_id); ok(/já está com/.test(r.error), 'mesmo setor e mesmo responsável: recusado');
+r = await transferir(U.adm_j, A03, 'asstec', 'Ana', antes03.movimentacao_id); ok(/outra pessoa/.test(r.error), 'tela desatualizada (outra pessoa transferiu): recusado');
+r = await transferir(U.adm_j, A03, 'cx', 'Marcos', (await atual(A03)).movimentacao_id); ok(r.r?.ok, 'mesmo setor, outro responsável: permitido');
+r = await transferir(U.adm_j, A03, 'producao', 'Equipe Lucas', (await atual(A03)).movimentacao_id); ok(r.r?.ok, 'CX → Produção');
+r = await transferir(U.adm_j, A03, 'base', 'Luciana', (await atual(A03)).movimentacao_id); ok(r.r?.ok, 'Produção → Base');
+const h = await movs(A03);
+ok(h.length === 5 && h.slice(1).map((x) => `${x.setor_origem}>${x.setor}:${x.responsavel_anterior}>${x.responsavel}`).join(' ') === 'base>cx:>Pedro Silva cx>cx:Pedro Silva>Marcos cx>producao:Marcos>Equipe Lucas producao>base:Equipe Lucas>Luciana',
+  'histórico completo mantido após novas transferências: ' + h.slice(1).map((x) => `${x.setor_origem}>${x.setor}`).join(', '));
+r = await transferir(U.adm_j, A01, 'base', 'Luciana', null); s = await atual(A01);
+ok(r.r?.ok && s.setor === 'base' && (await movs(A01))[0].setor_origem === null, 'unidade sem status → Base (origem: sem status)');
+r = await transferir(U.adm_j, A04, 'cx', 'Rita', 999999); ok(/outra pessoa/.test(r.error), 'última movimentação inventada: recusado');
 
-console.log('— Devolução parcial e completa');
-const hist0 = (await q(`select md5(string_agg(to_jsonb(m)::text, '|' order by id)) h, count(*)::int n from chaves_movimentacoes m`)).rows[0];
-r = await rpc(U.vis_j, 'chaves_devolver', [A02, [id('entrada', 1, 1)], 'Carla', null, '', '', null]); ok(/não permite/.test(r.error), 'visitante não registra devolução');
-r = await rpc(U.rev_j, 'chaves_devolver', [A02, [id('entrada', 1, 1)], '', null, '', '', null]); ok(/recebeu/.test(r.error), 'exige quem recebeu');
-r = await rpc(U.rev_j, 'chaves_devolver', [A02, [id('entrada', 1, 1)], 'Carla (Base)', null, 'ok', '', null]); ok(r.r?.ok && r.r.movimentacao.responsavel === 'João (CX)', 'devolução parcial (entrada), responsável vem da retirada');
-r = await rpc(U.rev_j, 'chaves_devolver', [A02, [id('entrada', 1, 1)], 'Carla', null, '', '', null]); ok(/não está retirada/.test(r.error), 'devolver de novo recusado');
-k = await keys(A02); ok(k.filter((x) => x.local !== 'base').length === 4, 'ainda 4 chaves fora (pendentes)');
-const fora = k.filter((x) => x.local !== 'base').map((x) => x.id);
-r = await rpc(U.adm_j, 'chaves_devolver', [A02, fora, 'Carla (Base)', null, 'devolução completa', '', null]); ok(r.r?.ok && r.r.movimentacao.quantidade === 4, 'devolução completa das 4');
-k = await keys(A02); ok(k.every((x) => x.local === 'base' && !x.movimentacao_id), 'todas de volta na Base');
-const hist1 = (await q(`select md5(string_agg(to_jsonb(m)::text, '|' order by id)) h from chaves_movimentacoes m where id <= (select max(id) from (select id from chaves_movimentacoes order by id limit $1) x)`, [hist0.n])).rows[0];
-ok(hist1.h === hist0.h, 'histórico anterior intacto depois das novas movimentações');
+console.log('— Concorrência');
+const base02 = await ult(A02);
+const [c1, c2] = await Promise.all([transferir(U.adm_j, A02, 'asstec', 'Ana', base02), transferir(U.rev_j, A02, 'producao', 'Bruno', base02)]);
+ok([c1, c2].filter((x) => x.r?.ok).length === 1 && [c1, c2].some((x) => /outra pessoa/.test(x.error || '')), 'duas transferências ao mesmo tempo: só uma grava');
+const n2 = await total(), ped = '22222222-2222-4222-8222-222222222222', b02 = await ult(A02);
+const [d1, d2] = await Promise.all([transferir(U.adm_j, A02, 'base', 'Luciana', b02, ped), transferir(U.adm_j, A02, 'base', 'Luciana', b02, ped)]);
+ok(d1.r?.ok && d2.r?.ok && (await total()) === n2 + 1, 'mesmo pedido enviado duas vezes ao mesmo tempo: uma movimentação');
 
-console.log('— Pendência (previsão vencida) e ocorrência');
-const ontem2 = new Date(Date.now() - 2 * 864e5).toISOString(), ontem = new Date(Date.now() - 864e5).toISOString();
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('quarto', 3, 1)], 'producao', 'Equipe pintura', ontem2, ontem, '', null]); ok(r.r?.ok, 'retirada com data passada e previsão vencida (pendência)');
-r = await q(`select count(*)::int n from chaves where unit_id=$1 and local<>'base' and previsao_devolucao < now()`, [A02]); ok(r.rows[0].n === 1, 'pendência de devolução identificável');
-r = await rpc(U.rev_j, 'chaves_ocorrencia', [A02, 'Cópia 2 da entrada perdida', [id('entrada', 1, 2)], null, null]); ok(r.r?.ok, 'ocorrência com extravio');
-r = await rpc(U.rev_j, 'chaves_retirar', [A02, [id('entrada', 1, 2)], 'cx', 'João', null, null, '', null]); ok(/extraviada/.test(r.error), 'chave extraviada não pode ser retirada');
+console.log('— Leitura (RLS) e histórico imutável');
+r = await as(U.vis_j, `select count(*)::int n from chaves_unidades`); ok(r.rows[0].n >= 448, 'visitante do Jerivá lê a situação das unidades');
+r = await as(U.vis_j, `select count(*)::int n from chaves_movimentacoes where unit_id=$1`, [A03]); ok(r.rows[0].n === 5, 'visitante lê o histórico');
+r = await as(U.adm_b, `select count(*)::int n from chaves_unidades cu join units u on u.id=cu.unit_id where u.project_id=$1`, [PJ]); ok(r.rows[0].n === 0, 'admin só do Buriti não lê o Jerivá');
+r = await as(U.fora, `select count(*)::int n from chaves_movimentacoes`); ok(r.rows[0].n === 0, 'usuário sem condomínio não lê nada');
+r = await q(`update chaves_movimentacoes set responsavel='x' where unit_id=$1`, [A03]).then(() => ({})).catch((e) => ({ error: e.message })); ok(/não pode ser alterado/.test(r.error), 'nem o dono do banco altera o histórico');
+r = await q(`delete from chaves_movimentacoes where unit_id=$1`, [A03]).then(() => ({})).catch((e) => ({ error: e.message })); ok(/não pode ser alterado/.test(r.error), 'nem apaga');
 
-console.log('— Histórico imutável');
-r = await q(`update chaves_movimentacoes set observacoes='alterado' where id=(select min(id) from chaves_movimentacoes)`).catch((e) => ({ error: e.message })); ok(/não pode ser alterado/.test(r.error), 'nem o dono do banco altera o histórico');
-r = await q(`delete from chaves_movimentacoes where id=(select min(id) from chaves_movimentacoes)`).catch((e) => ({ error: e.message })); ok(/não pode ser alterado/.test(r.error), 'nem apaga');
-const movsA02 = (await q(`select tipo from chaves_movimentacoes where unit_id=$1 order by id`, [A02])).rows.map((x) => x.tipo);
-ok(movsA02.join(',') === 'cadastro,cadastro,retirada,retirada,retirada,retirada,transferencia,devolucao,devolucao,retirada,ocorrencia', 'histórico da unidade em ordem: ' + movsA02.join(','));
-r = await q(`select registrado_email, registrado_por is not null as tem_user from chaves_movimentacoes where unit_id=$1 and tipo='transferencia'`, [A02]); ok(r.rows[0].registrado_email === 'rev_j@teste.com' && r.rows[0].tem_user, 'usuário autenticado gravado automaticamente');
-
-console.log('— Tipologia');
-r = await rpc(U.rev_j, 'chaves_definir_tipologia', [[A01], 3]); ok(/administradores/.test(r.error), 'revistorias não muda tipologia');
-const B1 = (await q('select id from units where project_id=$1 limit 1', [PB])).rows[0].id; r = await rpc(U.adm_j, 'chaves_definir_tipologia', [[A01, B1], 3]); ok(/administradores|não encontrada/.test(r.error), 'unidades de condomínios diferentes recusadas');
-r = await rpc(U.adm_j, 'chaves_definir_tipologia', [[A01], 3]); ok(r.r?.alteradas === 1, 'admin muda tipologia de A-001 para 3Q');
-r = await q(`select count(*)::int n from audit_log where table_name='units' and record_id=$1`, [A01]); ok(r.rows[0].n === 1, 'mudança registrada no log');
-await rpc(U.adm_j, 'chaves_definir_tipologia', [[A01], 2]);
-
-console.log('— Condomínio arquivado e exclusão em cascata');
+console.log('— Buriti (casas) e condomínio arquivado');
+const C1 = await unit('A', '', '01', PB);
+r = await transferir(U.adm_b, C1, 'cx', 'Carla', null); ok(r.r?.ok && (await atual(C1)).setor === 'cx', 'casa do Buriti sem cadastro prévio: transfere (cria a situação da unidade)');
 await q(`update projects set archived_at=now() where id=$1`, [PJ]);
-r = await rpc(U.adm_j, 'chaves_retirar', [A02, [id('quarto', 2, 1)], 'cx', 'João', null, null, '', null]); ok(/não permite/.test(r.error), 'obra arquivada: ninguém movimenta');
-r = await as(U.vis_j, `select count(*)::int n from chaves`); ok(r.rows[0].n === 0, 'obra arquivada: nada visível');
+r = await transferir(U.adm_j, A04, 'cx', 'Rita', await ult(A04)); ok(/não permite/.test(r.error), 'obra arquivada: ninguém transfere');
+r = await as(U.vis_j, `select count(*)::int n from chaves_unidades`); ok(r.rows[0].n === 0, 'obra arquivada: nada visível');
 await q(`update projects set archived_at=null where id=$1`, [PJ]);
-// cascata: condomínio de teste com uma unidade e histórico
 const pt = (await q(`insert into projects (slug,name) values ('teste-chaves','Teste') returning id`)).rows[0].id;
 const ut = (await q(`insert into units (project_id,bloco,pav,apto) values ($1,'Z','T','01') returning id`, [pt])).rows[0].id;
 await q(`insert into project_members (project_id,user_id,role) values ($1,$2,'admin')`, [pt, U.adm_j]);
-await rpc(U.adm_j, 'chaves_cadastrar', [ut, JSON.stringify([{ categoria: 'entrada', copias: 1 }]), '', null]);
-const kt = (await keys(ut))[0].id; await rpc(U.adm_j, 'chaves_retirar', [ut, [kt], 'cx', 'X', null, null, '', null]);
-r = await q(`delete from units where id=$1`, [ut]).then(() => ({ ok: true })).catch((e) => ({ error: e.message })); ok(r.ok, 'apagar a unidade apaga em cascata o cadastro e o histórico dela ' + (r.error || ''));
-// (o condomínio de teste fica: apagar condomínio com membros já é bloqueado pelo log de auditoria do sistema)
+await transferir(U.adm_j, ut, 'cx', 'X Teste', null);
+r = await q(`delete from units where id=$1`, [ut]).then(() => ({ ok: true })).catch((e) => ({ error: e.message })); ok(r.ok, 'apagar a unidade apaga em cascata a situação e o histórico dela ' + (r.error || ''));
 
-console.log('— Indicadores (consulta do dia)');
-r = await as(U.vis_j, `select count(*)::int n from chaves_movimentacoes where registrado_em >= date_trunc('day', now()) and tipo in ('retirada','devolucao','transferencia')`); ok(r.rows[0].n === 8, 'movimentações do dia (5 retiradas, 1 transferência, 2 devoluções): ' + r.rows[0].n);
 await admin.end();
-console.log(fail ? 'FALHAS: ' + fail : 'OK');
+console.log(fail ? `\n${fail} falha(s)` : '\nOK');
 process.exit(fail ? 1 : 0);

@@ -1,4 +1,4 @@
-// Controle de Chaves: leitura das tabelas (RLS por condomínio) e escrita pelas funções chaves_* do banco.
+// Controle de Chaves: leitura das tabelas (RLS por condomínio) e escrita pela função chaves_transferir.
 // Nenhuma chave de serviço no navegador: tudo com a sessão do usuário e as permissões do papel dele.
 
 const PAGE = 1000;
@@ -13,68 +13,57 @@ async function todas(build, coluna = "id") {
   return out;
 }
 
-/** Erro de "tabela/coluna inexistente": a migration do módulo ainda não foi aplicada. */
-export const naoInstalado = (err) => ["42P01", "42703", "PGRST205", "PGRST204", "PGRST202"].includes(err?.code) ||
+/** Erro de "tabela/coluna/função inexistente": a migration do módulo ainda não foi aplicada. */
+export const naoInstalado = (err) => ["42P01", "42703", "42883", "PGRST205", "PGRST204", "PGRST202"].includes(err?.code) ||
   /does not exist|could not find/i.test(err?.message || "");
 
-/** Dados do condomínio: tipologia das unidades, cadastro, chaves e movimentações de hoje. */
+/** Situação atual das unidades do condomínio e quantidade de transferências de hoje. */
 export async function carregarCondominio(sb, projectId) {
   const inicioHoje = new Date(); inicioHoje.setHours(0, 0, 0, 0);
-  const [unidades, cadastros, chaves, hoje] = await Promise.all([
-    todas(() => sb.from("units").select("id,quartos").eq("project_id", projectId)),
-    todas(() => sb.from("chaves_unidades").select("unit_id,tem_chaves,observacoes,origem").eq("project_id", projectId), "unit_id"),
-    todas(() => sb.from("chaves").select("id,unit_id,categoria,comodo,copia,local,situacao,responsavel,retirada_em,previsao_devolucao,movimentacao_id").eq("project_id", projectId).neq("situacao", "inativa")),
+  const [unidades, hoje] = await Promise.all([
+    todas(() => sb.from("chaves_unidades").select("unit_id,setor,responsavel,movimentado_em,movimentado_por,movimentacao_id").eq("project_id", projectId), "unit_id"),
     sb.from("chaves_movimentacoes").select("id", { count: "exact", head: true }).eq("project_id", projectId)
-      .in("tipo", ["retirada", "devolucao", "transferencia"]).gte("registrado_em", inicioHoje.toISOString())
+      .eq("tipo", "transferencia").gte("registrado_em", inicioHoje.toISOString())
   ]);
   if (hoje.error) throw hoje.error;
-  return { unidades, cadastros, chaves, movsHoje: hoje.count || 0 };
+  return { unidades, hoje: hoje.count || 0 };
 }
 
 /** Histórico de uma unidade (mais recente primeiro). */
-export async function historico(sb, unitId, limite = 60) {
+export async function historico(sb, unitId, limite = 80) {
   const { data, error } = await sb.from("chaves_movimentacoes")
-    .select("id,tipo,setor,responsavel,recebido_por,data_hora,previsao_devolucao,chaves,quantidade,observacoes,registrado_email,registrado_em")
+    .select("id,tipo,setor,setor_origem,responsavel,responsavel_anterior,recebido_por,data_hora,observacoes,registrado_email,registrado_em")
     .eq("unit_id", unitId).order("registrado_em", { ascending: false }).order("id", { ascending: false }).limit(limite);
   if (error) throw error;
   return data || [];
 }
 
-/** Nomes já usados (responsáveis e quem recebeu) para sugerir no formulário. */
+/** Nomes já usados como responsáveis, para sugerir no formulário. */
 export async function nomesUsados(sb, projectId) {
-  const { data } = await sb.from("chaves_movimentacoes").select("responsavel,recebido_por")
-    .eq("project_id", projectId).order("registrado_em", { ascending: false }).limit(400);
+  const { data } = await sb.from("chaves_movimentacoes").select("responsavel,responsavel_anterior")
+    .eq("project_id", projectId).order("registrado_em", { ascending: false }).limit(500);
   const nomes = new Set();
-  (data || []).forEach((m) => [m.responsavel, m.recebido_por].forEach((n) => String(n || "").split(",").map((x) => x.trim()).filter((x) => x.length > 1).forEach((x) => nomes.add(x))));
+  (data || []).forEach((m) => [m.responsavel, m.responsavel_anterior].forEach((n) => String(n || "").split(",").map((x) => x.trim()).filter((x) => x.length > 1).forEach((x) => nomes.add(x))));
   return [...nomes].sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-async function rpc(sb, fn, args) {
-  const { data, error } = await sb.rpc(fn, args);
+/** Transfere a chave da unidade (o banco confere permissão, setor, responsável, concorrência e pedido repetido). */
+export async function transferir(sb, { unitId, setor, responsavel, ultimaMov, pedido }) {
+  const { data, error } = await sb.rpc("chaves_transferir", {
+    p_unit_id: unitId, p_setor: setor, p_responsavel: responsavel, p_ultima_mov: ultimaMov ?? null, p_pedido: pedido
+  });
   if (error) {
     const msg = String(error.message || "").replace(/^.*?ERROR:\s*/i, "");
-    const e = new Error(naoInstalado(error) ? "O Controle de Chaves ainda não foi instalado no banco." : msg || "Não foi possível registrar.");
+    const e = new Error(naoInstalado(error) ? "A transferência ainda não foi instalada no banco." : msg || "Não foi possível registrar a transferência.");
     e.code = error.code; throw e;
   }
   return data;
 }
 
-export const retirar = (sb, a) => rpc(sb, "chaves_retirar", { p_unit_id: a.unitId, p_chave_ids: a.ids, p_setor: a.setor, p_responsavel: a.responsavel,
-  p_data_hora: a.dataHora, p_previsao: a.previsao || null, p_observacoes: a.obs || "", p_pedido: a.pedido });
-export const transferir = (sb, a) => rpc(sb, "chaves_transferir", { p_unit_id: a.unitId, p_chave_ids: a.ids, p_setor: a.setor, p_responsavel: a.responsavel,
-  p_data_hora: a.dataHora, p_previsao: a.previsao || null, p_observacoes: a.obs || "", p_pedido: a.pedido });
-export const devolver = (sb, a) => rpc(sb, "chaves_devolver", { p_unit_id: a.unitId, p_chave_ids: a.ids, p_recebido_por: a.recebidoPor,
-  p_data_hora: a.dataHora, p_observacoes: a.obs || "", p_responsavel: a.responsavel || "", p_pedido: a.pedido });
-export const ocorrencia = (sb, a) => rpc(sb, "chaves_ocorrencia", { p_unit_id: a.unitId, p_texto: a.texto, p_extraviadas: a.ids || [],
-  p_data_hora: a.dataHora || null, p_pedido: a.pedido });
-export const cadastrar = (sb, a) => rpc(sb, "chaves_cadastrar", { p_unit_id: a.unitId, p_itens: a.itens, p_observacoes: a.obs || "", p_pedido: a.pedido });
-export const definirTipologia = (sb, a) => rpc(sb, "chaves_definir_tipologia", { p_unit_ids: a.unitIds, p_quartos: a.quartos });
-
-/** Tempo real: avisa quando outro usuário movimenta chaves do condomínio. */
+/** Tempo real: avisa quando outro usuário transfere chaves do condomínio. */
 export function assinar(sb, projectId, aoMudar) {
   const filtro = `project_id=eq.${projectId}`;
   const canal = sb.channel(`chaves-${projectId}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "chaves", filter: filtro }, aoMudar)
     .on("postgres_changes", { event: "*", schema: "public", table: "chaves_unidades", filter: filtro }, aoMudar)
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "chaves_movimentacoes", filter: filtro }, aoMudar)
     .subscribe();

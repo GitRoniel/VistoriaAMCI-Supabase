@@ -1,25 +1,23 @@
-// Aba "Controle de Chaves" das Vistorias: claviculário digital por condomínio.
+// Aba "Controle de Chaves" das Vistorias: onde está a chave de cada unidade e quem é o responsável.
 //
 // Montada pela tela de Vistorias (www/index.html), que fornece o contexto (`host`): cliente Supabase,
-// condomínio aberto, layout das unidades (o mesmo do Mapa das Vistorias), status da vistoria de cada
-// unidade (client_inspections, só leitura) e o papel do usuário. Os dados de chaves vêm das tabelas
-// chaves_* (RLS por condomínio); toda gravação passa pelas funções chaves_* do banco, que validam
-// permissão, disponibilidade de cada chave e concorrência. Nada recarrega a página.
+// condomínio aberto, unidades (as mesmas do Mapa das Vistorias), status da vistoria de cada unidade
+// (client_inspections, só leitura) e o papel do usuário. A situação vem de chaves_unidades e o
+// histórico de chaves_movimentacoes (RLS por condomínio); a única gravação é chaves_transferir.
+// Fluxo: unidade → Transferir → setor de destino → quem recebe → Confirmar.
 import * as M from "./model.js";
 import * as S from "./service.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const FILTRO0 = () => ({ bloco: "ALL", apto: "", status: [], tipologia: "ALL", vistoria: [], situacao: "", rapido: "" });
+const FILTRO0 = () => ({ bloco: "ALL", apto: "", setor: [], vistoria: "" });
 const pad = (n) => String(n).padStart(2, "0");
-const localInput = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${String(d.getFullYear()).slice(2)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
-const ISO = (v) => (v ? new Date(v).toISOString() : null);
+const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const novoPedido = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)));
+const pill = (setor, extra = "") => { const s = M.SETORES[setor] || M.SETORES.sem; return `<span class="ch-spill${extra}" style="--c:${s.cor};--b:${s.borda};--t:${s.texto}">${esc(s.label)}</span>`; };
 
 let host = null, root = null, projId = null, estado = "idle", erroMsg = "", dados = null, cancelar = null, filt = FILTRO0(), nomes = [];
-let idx = { quartos: new Map(), cad: new Map(), chaves: new Map() };
-let pop = null, fundo = null, cur = null, aba = "", sel = new Set(), hist = null, ocupado = false, aviso = "";
-let recarga = null;
+let modo = "mapa", sit = new Map();
+let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null, recarga = null;
 
 /* ── dados ── */
 async function carregar(silencioso = false) {
@@ -30,10 +28,9 @@ async function carregar(silencioso = false) {
     const d = await S.carregarCondominio(host.sb, pid);
     if (pid !== host.project?.id) return;
     dados = d; estado = "ok"; erroMsg = "";
-    idx = { quartos: new Map(d.unidades.map((u) => [u.id, u.quartos])), cad: new Map(d.cadastros.map((c) => [c.unit_id, c])), chaves: new Map() };
-    d.chaves.forEach((k) => { if (!idx.chaves.has(k.unit_id)) idx.chaves.set(k.unit_id, []); idx.chaves.get(k.unit_id).push(k); });
+    sit = new Map(d.unidades.map((r) => [r.unit_id, M.situacao(r)]));
     pintar();
-    if (cur) pintarPopup(false);
+    if (cur) pintarPopup();
     S.nomesUsados(host.sb, pid).then((n) => { nomes = n; }).catch(() => {});
   } catch (err) {
     console.error(err);
@@ -41,18 +38,16 @@ async function carregar(silencioso = false) {
     pintar();
   }
 }
-function agendarRecarga() { clearTimeout(recarga); recarga = setTimeout(() => carregar(true), 400); }
+function agendarRecarga() { clearTimeout(recarga); recarga = setTimeout(() => { carregar(true); if (cur && painel === "historico") carregarHistorico(); }, 400); }
 
 function unidade(u) {
   const unitId = host.unitId(u.b, u.p, u.a);
-  const chaves = idx.chaves.get(unitId) || [];
-  const quartos = idx.quartos.get(unitId) ?? null;
-  return { ...u, unitId, bloco: u.b, pav: u.p, apto: u.a, codigo: host.codigo(u.b, u.p, u.a), quartos, chaves,
-    cadastro: idx.cad.get(unitId) || null, vistoria: host.vistoria(u.b, u.p, u.a),
-    resumo: M.resumoUnidade(idx.cad.get(unitId), chaves, quartos) };
+  return { ...u, unitId, codigo: host.codigo(u.b, u.p, u.a), titulo: host.titulo(u.b, u.p, u.a), vistoria: host.vistoria(u.b, u.p, u.a), situacao: sit.get(unitId) || M.situacao(null) };
 }
 const todasUnidades = () => host.units().filter((u) => host.unitId(u.b, u.p, u.a)).map(unidade);
-const pode = { mover: () => ["admin", "revistorias"].includes(host?.papel()), cadastrar: () => host?.papel() === "admin" };
+const podeTransferir = () => ["admin", "revistorias"].includes(host?.papel());
+const nomeUnidade = (u) => (host.casa() ? `Casa ${+u.a}` : `Apto ${u.codigo}`);
+const localUnidade = (u) => (host.casa() ? `Conjunto ${u.b}` : `Bloco ${u.b} · ${host.grid().pavLabel[u.p] || u.p}`);
 
 /* ── tela ── */
 function casca() {
@@ -60,107 +55,79 @@ function casca() {
   const vist = host.vistoriaCodigos();
   root.innerHTML = `
     <div class="ch-top" id="chKpis"></div>
-    <div class="ch-alert" id="chAlert" hidden></div>
     <div class="clif ch-filters">
       <div class="ch-line">
         ${projetos.length > 1 ? `<label class="fx-field fx-sel ch-f-cond"><span>Condomínio</span><select id="chCond" aria-label="Condomínio">${projetos.map((p) => `<option value="${esc(p.id)}"${p.id === host.project.id ? " selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : ""}
         <label class="fx-field fx-sel"><span>${esc(host.grupo())}</span><select id="chBloco" aria-label="${esc(host.grupo())}"><option value="ALL">Todos</option>${host.grupos().map((b) => `<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select></label>
-        <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="chApto" type="search" inputmode="text" placeholder="${host.casa() ? "Casa" : "Apto (ex.: 604 ou A604)"}" aria-label="Buscar unidade" autocomplete="off"></label>
-        ${host.casa() ? "" : `<label class="fx-field fx-sel"><span>Tipologia</span><select id="chTipo"><option value="ALL">Todas</option><option value="2">2 quartos</option><option value="3">3 quartos</option><option value="ni">Não informada</option></select></label>`}
-        <label class="fx-field fx-sel"><span>Vistoria</span><select id="chVist"><option value="">Todos</option>${vist.map((c) => `<option value="${c}">${esc(host.vistoriaLabel(c))}</option>`).join("")}</select></label>
-        <label class="fx-field fx-sel"><span>Chaves</span><select id="chSit"><option value="">Todas</option>${Object.entries(M.SITUACOES).map(([k, l]) => `<option value="${k}">${esc(l)}</option>`).join("")}</select></label>
+        <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="chApto" type="search" placeholder="${host.casa() ? "Casa" : "Unidade (ex.: 604 ou A604)"}" aria-label="Buscar unidade" autocomplete="off"></label>
+        <label class="fx-field fx-sel"><span>Status</span><select id="chVist" aria-label="Status da vistoria"><option value="">Todos</option>${vist.map((c) => `<option value="${c}">${esc(host.vistoriaLabel(c))}</option>`).join("")}</select></label>
+        <div class="modetog ch-modo" role="tablist" aria-label="Visualização"><button type="button" data-modo="mapa">Mapa</button><button type="button" data-modo="lista">Lista</button></div>
       </div>
       <div class="ch-line ch-chips">
         <span class="clif-lbl">Setor</span>
         ${M.STATUS_ORDEM.map((s) => `<button type="button" class="fchip ch-st" data-st="${s}" style="--c:${M.SETORES[s].borda}"><i></i>${M.SETORES[s].label}</button>`).join("")}
-        <span class="ch-sep" aria-hidden="true"></span>
-        <button type="button" class="fchip ch-rap" data-rap="aprovada-disponivel">Aprovadas com chaves disponíveis</button>
-        <button type="button" class="fchip ch-rap" data-rap="aguardando">Aguardando vistoria ou revistoria</button>
         <span class="ch-count" id="chCount"></span>
         <button type="button" class="btn g ch-clear" id="chLimpar">Limpar</button>
       </div>
     </div>
-    <div id="chGrid" class="ch-grid"></div>
-    <div class="legend ch-legend">
-      ${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.SETORES[s].cor};border-color:${M.SETORES[s].borda}"></span>${M.SETORES[s].label}</div>`).join("")}
-      <div class="lg"><span class="ch-mk pend"></span>Devolução pendente</div>
-      <div class="lg"><span class="ch-mk div"></span>Divergência</div>
-      <div class="lg"><span class="ch-mk parc"></span>Retirada parcial</div>
-      <div class="lg"><span class="ch-mk cad"></span>Quantidades a cadastrar</div>
-      <div class="lg"><span class="ch-mk vb"></span>Barra inferior: status da vistoria</div>
-    </div>`;
+    <div id="chGrid" class="ch-grid"></div>`;
   root.dataset.proj = String(host.project.id);
   const q = (id) => root.querySelector(id);
   q("#chCond")?.addEventListener("change", (e) => host.trocarCondominio(e.target.value));
-  q("#chBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; pintarMapa(); });
-  q("#chApto").addEventListener("input", (e) => { filt.apto = e.target.value.trim(); pintarMapa(); });
-  q("#chTipo")?.addEventListener("change", (e) => { filt.tipologia = e.target.value; pintarMapa(); });
-  q("#chVist").addEventListener("change", (e) => { filt.vistoria = e.target.value ? [e.target.value] : []; pintarMapa(); });
-  q("#chSit").addEventListener("change", (e) => { filt.situacao = e.target.value; pintarMapa(); });
-  q("#chLimpar").addEventListener("click", () => { filt = FILTRO0(); sincronizarFiltros(); pintarMapa(); });
+  q("#chBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; pintarConteudo(); });
+  q("#chApto").addEventListener("input", (e) => { filt.apto = e.target.value.trim(); pintarConteudo(); });
+  q("#chVist").addEventListener("change", (e) => { filt.vistoria = e.target.value; pintarConteudo(); });
+  q("#chLimpar").addEventListener("click", () => { filt = FILTRO0(); sincronizarFiltros(); pintarConteudo(); });
   root.addEventListener("click", cliqueRaiz);
 }
 function sincronizarFiltros() {
   const q = (id) => root.querySelector(id);
   if (!q("#chBloco")) return;
-  q("#chBloco").value = filt.bloco; q("#chApto").value = filt.apto; if (q("#chTipo")) q("#chTipo").value = filt.tipologia;
-  q("#chVist").value = filt.vistoria[0] || ""; q("#chSit").value = filt.situacao;
-  root.querySelectorAll(".ch-st").forEach((b) => b.classList.toggle("active", filt.status.includes(b.dataset.st)));
-  root.querySelectorAll(".ch-rap").forEach((b) => b.classList.toggle("active", filt.rapido === b.dataset.rap));
+  q("#chBloco").value = filt.bloco; q("#chApto").value = filt.apto; q("#chVist").value = filt.vistoria;
+  root.querySelectorAll(".ch-st").forEach((b) => b.classList.toggle("active", filt.setor.includes(b.dataset.st)));
+  root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-chu]");
-  if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u); return; }
-  const st = e.target.closest(".ch-st");
-  if (st) { const s = st.dataset.st; filt.status = filt.status.includes(s) ? filt.status.filter((x) => x !== s) : [...filt.status, s]; sincronizarFiltros(); pintarMapa(); return; }
-  const rap = e.target.closest(".ch-rap");
-  if (rap) { filt.rapido = filt.rapido === rap.dataset.rap ? "" : rap.dataset.rap; sincronizarFiltros(); pintarMapa(); return; }
-  const kpi = e.target.closest("[data-kpi]");
-  if (kpi) { filt = { ...FILTRO0(), situacao: kpi.dataset.kpi }; sincronizarFiltros(); pintarMapa(); root.querySelector("#chGrid")?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u, u.dataset.acao || ""); return; }
+  const st = e.target.closest(".ch-st,[data-kpi]");
+  if (st) { const s = st.dataset.st || st.dataset.kpi; filt.setor = st.matches("[data-kpi]") ? (filt.setor.length === 1 && filt.setor[0] === s ? [] : [s]) : filt.setor.includes(s) ? filt.setor.filter((x) => x !== s) : [...filt.setor, s]; sincronizarFiltros(); pintarConteudo(); return; }
+  const md = e.target.closest("[data-modo]");
+  if (md) { modo = md.dataset.modo; sincronizarFiltros(); pintarConteudo(); return; }
   if (e.target.closest("[data-retry]")) carregar(false);
 }
 
 function pintar() {
   if (!root || !host) return;
-  if (estado === "carregando" && !dados) { root.innerHTML = `<div class="ch-state"><div class="ch-spin" aria-hidden="true"></div><b>Carregando o claviculário…</b></div>`; delete root.dataset.proj; return; }
-  if (estado === "nao-instalado") { root.innerHTML = `<div class="ch-state"><b>O Controle de Chaves ainda não foi instalado no banco.</b><span>Aplique a migration <code>20261024120000_controle_chaves.sql</code> (supabase db push) e recarregue.</span></div>`; delete root.dataset.proj; return; }
+  if (estado === "carregando" && !dados) { root.innerHTML = `<div class="ch-state"><div class="ch-spin" aria-hidden="true"></div><b>Carregando as chaves…</b></div>`; delete root.dataset.proj; return; }
+  if (estado === "nao-instalado") { root.innerHTML = `<div class="ch-state"><b>O novo Controle de Chaves ainda não foi instalado no banco.</b><span>Aplique a migration <code>20261103120000_chaves_transferencia_simples.sql</code> e recarregue.</span></div>`; delete root.dataset.proj; return; }
   if (estado === "erro" && !dados) { root.innerHTML = `<div class="ch-state"><b>Não foi possível carregar as chaves.</b><span>${esc(erroMsg)}</span><button type="button" class="btn g" data-retry>Tentar de novo</button></div>`; delete root.dataset.proj; root.onclick = (e) => { if (e.target.closest("[data-retry]")) carregar(false); }; return; }
   if (!dados) return;
   if (root.dataset.proj !== String(host.project.id)) { casca(); sincronizarFiltros(); }
-  pintarMapa();
+  pintarConteudo();
 }
 
-function pintarMapa() {
+function pintarConteudo() {
   const lista = todasUnidades();
-  const ok = new Set(lista.filter((u) => M.passaFiltros(u, filt)).map((u) => u.unitId));
-  const ind = M.indicadores(lista, dados.movsHoje);
-  const k = (id, n, l, cls = "", tip = "") => `<button type="button" class="ch-kpi${cls}"${id ? ` data-kpi="${id}"` : ""} title="${esc(tip || l)}"><b>${n}</b><span>${l}</span></button>`;
-  root.querySelector("#chKpis").innerHTML =
-    k("", ind.total, host.casa() ? "Casas" : "Apartamentos", " k-total", "Unidades cadastradas no condomínio") +
-    k("disponivel", ind.disponiveis, "Todas as chaves na Base", " k-base") +
-    k("retirada", ind.retiradas, "Com chaves retiradas", " k-ret") +
-    k("pendente", ind.pendentes, "Devoluções pendentes", ind.pendentes ? " k-alert" : "", "Previsão de devolução vencida") +
-    k("sem", ind.semStatus, "Sem status", " k-sem") +
-    k("", ind.movsHoje, "Movimentações hoje", " k-hoje", "Retiradas, devoluções e transferências registradas hoje");
-  const al = root.querySelector("#chAlert");
-  const partes = [];
-  if (ind.pendentes) partes.push(`<button type="button" data-kpi="pendente"><b>${ind.pendentes}</b> ${ind.pendentes > 1 ? "unidades com devolução pendente" : "unidade com devolução pendente"}</button>`);
-  if (ind.divergentes) partes.push(`<button type="button" data-kpi="divergencia"><b>${ind.divergentes}</b> ${ind.divergentes > 1 ? "unidades com divergência" : "unidade com divergência"}</button>`);
-  if (ind.aCadastrar) partes.push(`<button type="button" data-kpi="cadastrar"><b>${ind.aCadastrar}</b> com quantidades a cadastrar</button>`);
-  al.hidden = !partes.length;
-  al.innerHTML = partes.length ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>${partes.join("<span>·</span>")}` : "";
-  const filtrando = ok.size !== lista.length;
-  root.querySelector("#chCount").textContent = filtrando ? `${ok.size} de ${lista.length} unidade(s)` : `${lista.length} unidade(s)`;
+  const vis = lista.filter((u) => M.passaFiltros(u, filt));
+  const ok = new Set(vis.map((u) => u.unitId));
+  const ind = M.indicadores(lista, dados.hoje);
+  root.querySelector("#chKpis").innerHTML = M.STATUS_ORDEM.map((s) =>
+    `<button type="button" class="ch-kpi${filt.setor.length === 1 && filt.setor[0] === s ? " on" : ""}" data-kpi="${s}" style="--c:${M.SETORES[s].borda}" title="Mostrar só ${esc(M.SETORES[s].label)}"><b>${ind[s]}</b><span>${M.SETORES[s].label}</span></button>`).join("") +
+    `<div class="ch-kpi k-hoje" title="Transferências registradas hoje no condomínio"><b>${ind.hoje}</b><span>Transferências hoje</span></div>`;
+  root.querySelector("#chCount").textContent = ok.size !== lista.length ? `${ok.size} de ${lista.length} unidade(s)` : `${lista.length} unidade(s)`;
+  root.querySelector("#chGrid").innerHTML = modo === "lista" ? htmlLista(vis) : htmlMapa(lista, ok);
+}
+
+function htmlMapa(lista, ok) {
   const porId = new Map(lista.map((u) => [`${u.b}|${u.p}|${u.a}`, u]));
   const btn = (b, p, a) => {
     const u = porId.get(`${b}|${p}|${a}`);
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
-    const r = u.resumo, s = M.SETORES[r.status], vc = host.vistoriaCor(u.vistoria);
-    const bg = r.parcial ? `linear-gradient(135deg,${s.cor} 0 58%,${M.SETORES.base.cor} 58% 100%)` : s.cor;
-    const tip = [host.titulo(b, p, a), `Chaves: ${s.label}${r.parcial ? " (parcial)" : ""}${r.aCadastrar ? " · quantidades a cadastrar" : r.total ? ` · ${r.naBase}/${r.total} na Base` : ""}`,
-      r.pendente ? "Devolução pendente" : "", r.divergente ? "Divergência: " + r.divergencias.join("; ") : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
-    const cls = ["apt", "ch-u", r.pendente ? "pend" : "", r.divergente ? "div" : "", r.aCadastrar ? "cad" : "", ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-chu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${bg};color:${s.texto};border-color:${s.borda}">${esc(host.casa() ? +a : a)}<i class="vb" style="background:${vc.bg};border-color:${vc.bd}"></i></button>`;
+    const st = u.situacao, s = M.SETORES[st.setor];
+    const tip = [u.titulo, st.setor === "sem" ? "Chave: sem status" : `Chave: ${s.label}${st.responsavel ? " com " + st.responsavel : ""}`, st.movimentadoEm ? `desde ${fmtDH(st.movimentadoEm)}` : ""].filter(Boolean).join(" · ");
+    const cls = ["apt", "ch-u", ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-chu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.cor};color:${s.texto};border-color:${s.borda}">${esc(host.casa() ? +a : a)}</button>`;
   };
   const g = host.grid();
   let h;
@@ -175,10 +142,28 @@ function pintarMapa() {
     h = `<div class="gridscroll"><table class="mx ch-mx"><thead><tr><th class="corner">PAV</th>${g.grupos.map((b) => `<th class="blkh">${esc(b)}</th>`).join("")}</tr></thead><tbody>` +
       g.pavs.map((p) => `<tr><td class="pavh">${esc(g.pavLabel[p].toUpperCase())}</td>${g.grupos.map((b) => `<td class="cell"><div class="apts">${g.apts.map((a) => btn(b, p, a)).join("")}</div></td>`).join("")}</tr>`).join("") + "</tbody></table></div>";
   }
-  root.querySelector("#chGrid").innerHTML = h;
+  return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.SETORES[s].cor};border-color:${M.SETORES[s].borda}"></span>${M.SETORES[s].label}</div>`).join("")}<div class="lg ch-lg-dica">Toque na unidade para ver, transferir ou consultar o histórico</div></div>`;
 }
 
-/* ── popup ── */
+function htmlLista(vis) {
+  if (!vis.length) return `<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>`;
+  const pode = podeTransferir(), g = host.grid(), gi = (b) => (g.grupos || []).indexOf(b), pi = (p) => -(g.pavs || []).indexOf(p);
+  // lista: bloco a bloco, do térreo para cima (o mapa mostra o 6º pavimento no topo)
+  vis = [...vis].sort((x, y) => gi(x.b) - gi(y.b) || pi(x.p) - pi(y.p) || String(x.a).localeCompare(String(y.a), "pt-BR", { numeric: true }));
+  const linha = (u) => {
+    const st = u.situacao, vc = host.vistoriaCor(u.vistoria), attrs = `data-chu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`;
+    return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}">
+      <td class="ch-c-un"><b>${esc(host.casa() ? `Conj. ${u.b} · Casa ${+u.a}` : `Bloco ${u.b} · ${u.codigo}`)}</b><span class="ch-vst" style="--c:${vc.bd}">${esc(host.vistoriaLabel(u.vistoria))}</span></td>
+      <td class="ch-c-st">${pill(st.setor)}</td>
+      <td class="ch-c-resp">${esc(st.responsavel) || '<span class="ch-mut">—</span>'}</td>
+      <td class="ch-c-dt">${st.movimentadoEm ? `${fmtDH(st.movimentadoEm)}${st.movimentadoPor ? `<small>${esc(st.movimentadoPor)}</small>` : ""}` : '<span class="ch-mut">—</span>'}</td>
+      <td class="ch-c-ac">${pode ? `<button type="button" class="btn p ch-mini" ${attrs} data-acao="transferir">Transferir</button>` : ""}<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
+    </tr>`;
+  };
+  return `<div class="gridscroll ch-tblw"><table class="ctbl ch-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Setor atual</th><th class="th-cli">Responsável</th><th>Última movimentação</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+}
+
+/* ── painel da unidade ── */
 function garantirPopup() {
   if (pop) return;
   fundo = document.createElement("div"); fundo.className = "pop-backdrop ch-backdrop"; document.body.appendChild(fundo);
@@ -186,12 +171,13 @@ function garantirPopup() {
   document.body.appendChild(pop);
   fundo.addEventListener("click", () => fechar());
   pop.addEventListener("click", cliquePopup);
-  pop.addEventListener("input", (e) => { if (e.target.closest(".ch-form")) aviso = ""; });
-  pop.addEventListener("change", mudancaPopup);
+  const editou = (e) => { if (!e.target.closest(".ch-form") || ocupado) return; aviso = null; const m = pop.querySelector(".ch-msg"); if (m) { m.textContent = ""; m.className = "pp-hint ch-msg"; } mostrarResumo(); };
+  pop.addEventListener("input", editou);
+  pop.addEventListener("change", editou);
   pop.addEventListener("submit", (e) => { e.preventDefault(); enviar(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop.classList.contains("open") && !document.querySelector(".ch-dlg[open]")) fechar(); });
-  // clique fora fecha (pelo caminho do evento: o alvo pode ter sido redesenhado dentro do popup)
-  document.addEventListener("click", (e) => { const path = e.composedPath(); if (pop.classList.contains("open") && !path.includes(pop) && !path.some((n) => n.matches?.("[data-chu],.ch-dlg,.toast")) && !fundo.classList.contains("show")) fechar(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop.classList.contains("open")) fechar(); });
+  // clique fora fecha (pelo caminho do evento: o alvo pode ter sido redesenhado dentro do painel)
+  document.addEventListener("click", (e) => { const path = e.composedPath(); if (pop.classList.contains("open") && !path.includes(pop) && !path.some((n) => n.matches?.("[data-chu],.toast")) && !fundo.classList.contains("show")) fechar(); });
   addEventListener("resize", () => posicionar());
 }
 const folha = () => matchMedia("(max-width:720px)").matches;
@@ -199,39 +185,35 @@ function posicionar(ancora) {
   if (!pop?.classList.contains("open")) return;
   const sheet = folha(); pop.classList.toggle("sheet", sheet); fundo.classList.toggle("show", sheet);
   if (sheet) { pop.style.left = ""; pop.style.top = ""; return; }
-  const t = ancora && ancora.isConnected ? ancora : root.querySelector(`[data-chu][data-b="${CSS.escape(cur.b)}"][data-p="${CSS.escape(cur.p)}"][data-a="${CSS.escape(cur.a)}"]`);
+  const t = ancora && ancora.isConnected ? ancora : root.querySelector(`.ch-u[data-b="${CSS.escape(cur.b)}"][data-p="${CSS.escape(cur.p)}"][data-a="${CSS.escape(cur.a)}"]`);
   const pw = pop.offsetWidth, ph = pop.offsetHeight;
   let x = (innerWidth - pw) / 2, y = (innerHeight - ph) / 2;
   if (t) { const r = t.getBoundingClientRect(); x = r.left; y = r.bottom + 6; if (x + pw > innerWidth - 8) x = innerWidth - pw - 8; if (y + ph > innerHeight - 8) y = r.top - ph - 6; if (y < 8) y = Math.max(8, innerHeight - ph - 8); }
   pop.style.left = Math.max(8, x) + "px"; pop.style.top = Math.max(8, y) + "px";
 }
-function abrir(b, p, a, ancora) {
-  if (cur && dirty() && !confirm("Há um registro em andamento nesta unidade. Descartar?")) return;
+const preenchendo = () => painel === "transferir" && !!pop?.querySelector(".ch-form")?.dataset.dirty;
+function abrir(b, p, a, ancora, acao = "") {
+  if (cur && preenchendo() && !(cur.b === b && cur.p === p && cur.a === a) && !confirm("Descartar a transferência em andamento?")) return;
   garantirPopup();
   const u = todasUnidades().find((x) => x.b === b && x.p === p && x.a === a);
   if (!u) return;
-  cur = { b, p, a, unitId: u.unitId }; sel = new Set(); hist = null; aviso = "";
-  aba = abaPadrao(u);
-  pintarPopup(true);
+  const mesma = cur?.unitId === u.unitId;
+  cur = { b, p, a, unitId: u.unitId };
+  if (!mesma) { hist = null; aviso = null; pedido = null; }
+  painel = acao === "transferir" && podeTransferir() ? "transferir" : acao === "historico" ? "historico" : mesma ? painel : "";
+  if (painel === "transferir" && !pedido) pedido = novoPedido();
+  pintarPopup();
   pop.classList.add("open"); posicionar(ancora);
-  root.querySelectorAll(".ch-u.is-sel").forEach((x) => x.classList.remove("is-sel")); ancora?.classList.add("is-sel");
-  if (!folha()) pop.focus({ preventScroll: true });
-  carregarHistorico();
+  root.querySelectorAll(".is-sel").forEach((x) => x.classList.remove("is-sel")); if (ancora?.classList.contains("ch-u")) ancora.classList.add("is-sel");
+  if (painel === "transferir") pop.querySelector('.ch-form input[name="setor"]:not(:disabled)')?.focus({ preventScroll: true });
+  else if (!folha()) pop.focus({ preventScroll: true });
+  if (painel === "historico") carregarHistorico();
 }
 function fechar() {
   if (!pop?.classList.contains("open")) return;
-  if (dirty() && !confirm("Há um registro em andamento nesta unidade. Descartar?")) return;
-  pop.classList.remove("open", "sheet"); fundo.classList.remove("show"); cur = null; sel = new Set();
-  root?.querySelectorAll(".ch-u.is-sel").forEach((x) => x.classList.remove("is-sel"));
-}
-const dirty = () => !!pop?.querySelector(".ch-form[data-dirty]");
-function abaPadrao(u) {
-  const r = u.resumo;
-  if ((r.aCadastrar || (!r.total && !r.extraviadas)) && pode.cadastrar()) return "cadastro";
-  if (r.fora && (r.pendente || !r.naBase)) return "devolver";
-  if (r.naBase) return "retirar";
-  if (r.fora) return "devolver";
-  return pode.cadastrar() ? "cadastro" : "historico";
+  if (preenchendo() && !confirm("Descartar a transferência em andamento?")) return;
+  pop.classList.remove("open", "sheet"); fundo.classList.remove("show"); cur = null; painel = ""; pedido = null; aviso = null;
+  root?.querySelectorAll(".is-sel").forEach((x) => x.classList.remove("is-sel"));
 }
 async function carregarHistorico() {
   const id = cur?.unitId; if (!id) return;
@@ -239,30 +221,17 @@ async function carregarHistorico() {
   catch (err) { if (cur?.unitId === id) { hist = { erro: err.message }; pintarHistorico(); } }
 }
 
-function pintarPopup(reset) {
+function pintarPopup() {
   if (!cur || !pop) return;
   const u = todasUnidades().find((x) => x.unitId === cur.unitId);
   if (!u) { fechar(); return; }
-  const r = u.resumo, s = M.SETORES[r.status], itens = M.itensDaUnidade(u.chaves);
+  const st = u.situacao, vc = host.vistoriaCor(u.vistoria);
   const lista = host.units(), i = lista.findIndex((x) => x.b === u.b && x.p === u.p && x.a === u.a);
-  const vc = host.vistoriaCor(u.vistoria), vi = host.vistoriaInfo(u.b, u.p, u.a);
-  const kicker = `${esc(host.project.name)} · ${host.casa() ? `Conjunto ${esc(u.b)}` : `Bloco ${esc(u.b)} · ${esc(host.grid().pavLabel[u.p] || u.p)}`}`;
-  const nome = host.casa() ? `Casa ${+u.a}` : `Apto ${esc(u.codigo)}`;
-  const tipoSel = pode.cadastrar() && !host.casa()
-    ? `<select class="ch-tipo-sel" data-tipologia aria-label="Tipologia"><option value=""${u.quartos ? "" : " selected"}>Não informada</option>${[1, 2, 3, 4].map((n) => `<option value="${n}"${u.quartos === n ? " selected" : ""}>${n} quarto${n > 1 ? "s" : ""}</option>`).join("")}</select>`
-    : `<b>${esc(M.tipologiaLabel(u.quartos))}</b>`;
-  const statusTxt = r.aCadastrar ? "Na Base · quantidades a cadastrar" : r.status === "sem" ? "Sem status (nenhuma chave cadastrada)"
-    : r.fora ? `${r.fora} de ${r.total} retirada${r.fora > 1 ? "s" : ""} · ${r.setoresFora.map((x) => M.SETORES[x].label).join(", ")}${r.responsaveis.length ? " com " + r.responsaveis.join(", ") : ""}`
-    : `${r.total} chave${r.total > 1 ? "s" : ""} na Base`;
-  const alertas = [
-    r.pendente ? `<div class="ch-warn"><b>Devolução pendente:</b> ${r.atrasadas} chave(s) com previsão vencida${r.proxPrevisao ? ` (desde ${fmtDH(r.proxPrevisao)})` : ""}.</div>` : "",
-    r.divergente ? `<div class="ch-warn div"><b>Divergência:</b> ${esc(r.divergencias.join("; "))}.</div>` : ""
-  ].join("");
-  const prevForm = !reset ? capturarForm() : null;
-  pop.setAttribute("aria-label", `${nome} · Controle de chaves`);
+  const prev = painel === "transferir" ? capturarForm() : null;
+  pop.setAttribute("aria-label", `${nomeUnidade(u)} · Controle de chaves`);
   pop.innerHTML = `
     <div class="pp-head">
-      <div class="pp-title"><small>${kicker}</small><strong>${nome}</strong></div>
+      <div class="pp-title"><small>${esc(host.project.name)} · ${esc(localUnidade(u))}</small><strong>${esc(nomeUnidade(u))}</strong></div>
       <div class="pp-tools">
         <button type="button" class="pp-icon" data-nav="-1" ${i <= 0 ? "disabled" : ""} aria-label="Unidade anterior">‹</button>
         <button type="button" class="pp-icon" data-nav="1" ${i >= lista.length - 1 ? "disabled" : ""} aria-label="Próxima unidade">›</button>
@@ -270,198 +239,111 @@ function pintarPopup(reset) {
       </div>
     </div>
     <div class="pp-body ch-body">
-      <div class="ch-id">
-        <div><span>Tipologia</span>${tipoSel}</div>
-        <div><span>Vistoria</span><b class="ch-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(u.vistoria))}</b>${vi?.data_vistoria ? `<small>${esc(host.fmtData(vi.data_vistoria))}</small>` : ""}</div>
-        <div class="ch-id-st"><span>Chaves</span><b class="ch-spill" style="background:${s.cor};color:${s.texto};border-color:${s.borda}">${s.label}${r.parcial ? " · parcial" : ""}</b><small>${esc(statusTxt)}</small></div>
+      <div class="ch-now">
+        <div class="ch-now-st"><span>Setor atual</span>${pill(st.setor, " lg")}</div>
+        <div><span>Responsável</span><b>${esc(st.responsavel) || "—"}</b></div>
+        <div><span>Última movimentação</span><b>${st.movimentadoEm ? fmtDH(st.movimentadoEm) : "—"}</b>${st.movimentadoPor ? `<small>por ${esc(st.movimentadoPor)}</small>` : ""}</div>
+        <div><span>Status da vistoria</span><b class="ch-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(u.vistoria))}</b></div>
       </div>
-      ${alertas}
-      <div class="pp-label">Chaves da unidade</div>
-      ${itens.length ? `<div class="ch-itens">${itens.map((it) => `<div class="ch-item ${it.situacao}"><span class="ch-item-n">${esc(it.rotulo)}</span><span class="ch-copias">${it.copias.map((k) => chipChave(k, null)).join("")}</span><span class="ch-item-s">${it.total ? `${it.base}/${it.total} na Base` : "extraviada"}</span></div>`).join("")}</div>`
-        : `<div class="ch-empty">${r.aCadastrar ? "O levantamento indica chaves na Base, mas as quantidades ainda não foram cadastradas." : "Nenhuma chave cadastrada para esta unidade."}${pode.cadastrar() ? " Use a aba Cadastro." : ""}</div>`}
-      ${painelAcoes(u, r)}
-      <details class="ch-hist" open><summary class="pp-label">Histórico de movimentações</summary><div id="chHist" class="ch-hist-body"></div></details>
+      <div class="ch-btns">
+        ${podeTransferir() ? `<button type="button" class="btn ${painel === "transferir" ? "p" : "g"} ch-act" data-painel="transferir" aria-pressed="${painel === "transferir"}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg>Transferir</button>` : ""}
+        <button type="button" class="btn ${painel === "historico" ? "p" : "g"} ch-act" data-painel="historico" aria-pressed="${painel === "historico"}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Histórico</button>
+      </div>
+      ${!podeTransferir() ? `<div class="pp-ro">Seu acesso a este condomínio é de consulta: as transferências são registradas por administradores e pela equipe de revistorias.</div>` : ""}
+      ${painel === "transferir" ? formTransferir(u) : ""}
+      ${painel === "historico" ? `<div class="ch-hist"><div class="pp-label">Histórico de movimentações</div><div id="chHist" class="ch-hist-body"></div></div>` : ""}
     </div>`;
-  if (prevForm) restaurarForm(prevForm);
-  pintarHistorico();
-  if (aviso) mostrarAviso(aviso);
+  if (prev) restaurarForm(prev);
+  if (painel === "transferir") mostrarResumo();
+  if (painel === "historico") pintarHistorico();
+  if (aviso) mostrarAviso(aviso.msg, aviso.tipo);
 }
-function chipChave(k, modo) {
-  const s = M.SETORES[k.situacao === "ativa" ? k.local : "sem"];
-  const tip = `${M.rotuloChave(k, true)} · ${k.situacao === "extraviada" ? "extraviada" : k.local === "base" ? "na Base" : `${s.label} com ${k.responsavel || "—"}${k.previsao_devolucao ? ` · devolução prevista ${fmtDH(k.previsao_devolucao)}` : ""}`}`;
-  const atras = k.local !== "base" && k.previsao_devolucao && new Date(k.previsao_devolucao) < new Date();
-  if (!modo) return `<span class="ch-chip${k.situacao === "extraviada" ? " lost" : ""}${atras ? " late" : ""}" title="${esc(tip)}" style="--c:${s.cor};--b:${s.borda};--t:${s.texto}">${k.copia}</span>`;
-  return `<label class="ch-pick${atras ? " late" : ""}" title="${esc(tip)}" style="--c:${s.cor};--b:${s.borda}"><input type="checkbox" value="${k.id}"${sel.has(k.id) ? " checked" : ""}><span>${esc(M.rotuloChave(k))}<small>${[k.copia > 1 || modo === "all" ? `cópia ${k.copia}` : "", k.local !== "base" ? `${M.SETORES[k.local].label}${k.responsavel ? " · " + esc(k.responsavel) : ""}` : ""].filter(Boolean).join(" · ")}</small></span></label>`;
-}
-function painelAcoes(u, r) {
-  if (!pode.mover()) return `<div class="pp-ro">Seu acesso a este condomínio é de consulta: retiradas e devoluções são registradas por administradores e pela equipe de revistorias.</div>`;
-  const ativas = u.chaves.filter((k) => k.situacao === "ativa").sort(M.ordenarChaves);
-  const naBase = ativas.filter((k) => k.local === "base"), fora = ativas.filter((k) => k.local !== "base");
-  const tabs = [["retirar", "Retirar", naBase.length], ["devolver", "Devolver", fora.length], ["transferir", "Transferir", fora.length], ["ocorrencia", "Ocorrência", true]];
-  if (pode.cadastrar()) tabs.push(["cadastro", "Cadastro", true]);
-  if (!tabs.some(([id, , ok]) => id === aba && ok)) aba = (tabs.find(([, , ok]) => ok) || ["ocorrencia"])[0];
-  const pick = (ks, modo) => ks.length ? `<div class="ch-picks"><button type="button" class="pp-chip ch-all" data-all>Selecionar todas</button>${ks.map((k) => chipChave(k, modo)).join("")}</div>` : "";
-  const setor = (nome = "setor") => `<div class="pp-f pp-full"><span>Setor de destino</span><div class="ch-setores" role="radiogroup">${M.SETORES_DESTINO.map((s) => `<label class="ch-setor" style="--c:${M.SETORES[s].cor}"><input type="radio" name="${nome}" value="${s}"><span><i></i>${M.SETORES[s].label}</span></label>`).join("")}</div></div>`;
-  const dl = `<datalist id="chNomes">${nomes.map((n) => `<option value="${esc(n)}"></option>`).join("")}</datalist>`;
-  const quando = (rotulo, nome = "data") => `<label class="pp-f"><span>${rotulo}</span><input type="datetime-local" name="${nome}" value="${localInput()}" max="${localInput(new Date(Date.now() + 5 * 60e3))}" required></label>`;
-  const obs = `<label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Motivo, combinados, ocorrências…"></textarea></label>`;
-  let corpo = "";
-  if (aba === "retirar") corpo = `<div class="pp-f pp-full"><span>Chaves a retirar (disponíveis na Base)</span>${pick(naBase, "base")}</div>${setor()}
-      <label class="pp-f pp-full"><span>Responsável pela retirada</span><input name="responsavel" list="chNomes" placeholder="Nome de quem retira" autocomplete="off" required>${dl}</label>
-      ${quando("Data e hora da retirada")}${quando("Previsão de devolução", "previsao").replace(` value="${localInput()}"`, "").replace(" required", "").replace(/ max="[^"]*"/, "")}${obs}`;
-  else if (aba === "devolver") corpo = `<div class="pp-f pp-full"><span>Chaves devolvidas</span>${pick(fora, "fora")}</div>
-      <label class="pp-f"><span>Recebido por</span><input name="recebido" list="chNomes" value="${esc(host.usuario().nome || "")}" autocomplete="off" required>${dl}</label>
-      ${quando("Data e hora da devolução")}${obs}`;
-  else if (aba === "transferir") corpo = `<div class="pp-f pp-full"><span>Chaves transferidas (sem voltar à Base)</span>${pick(fora, "fora")}</div>${setor()}
-      <label class="pp-f pp-full"><span>Novo responsável</span><input name="responsavel" list="chNomes" autocomplete="off" required>${dl}</label>
-      ${quando("Data e hora")}${quando("Previsão de devolução", "previsao").replace(` value="${localInput()}"`, "").replace(" required", "").replace(/ max="[^"]*"/, "")}${obs}`;
-  else if (aba === "ocorrencia") corpo = `<label class="pp-f pp-full"><span>Ocorrência</span><textarea name="texto" rows="3" placeholder="Ex.: cópia quebrada, chave não confere com a porta, extravio…" required></textarea></label>
-      ${ativas.length ? `<div class="pp-f pp-full"><span>Marcar como extraviadas (opcional)</span>${pick(ativas, "all")}</div>` : ""}`;
-  else if (aba === "cadastro") corpo = formCadastro(u);
-  const botao = { retirar: "Registrar retirada", devolver: "Registrar devolução", transferir: "Registrar transferência", ocorrencia: "Registrar ocorrência", cadastro: "Salvar cadastro" }[aba];
-  return `<div class="ch-acoes">
-      <div class="ch-tabs" role="tablist">${tabs.map(([id, l, okTab]) => `<button type="button" role="tab" class="ch-tab${aba === id ? " active" : ""}" data-aba="${id}" aria-selected="${aba === id}" ${okTab ? "" : "disabled"}>${l}${id === "devolver" && r.pendente ? ' <i class="ch-dot"></i>' : ""}</button>`).join("")}</div>
-      <form class="ch-form pp-form" data-aba="${aba}" novalidate>${corpo}
-        <div class="pp-actions pp-full"><span class="pp-hint ch-msg" role="status"></span><button type="submit" class="btn p"${ocupado ? " disabled" : ""}>${ocupado ? "Registrando…" : botao}</button></div>
-      </form></div>`;
-}
-function formCadastro(u) {
-  const sug = M.cadastroSugerido(u.quartos, u.chaves);
-  const q = sug.filter((x) => x.categoria === "quarto"), b = sug.filter((x) => x.categoria === "banheiro"), e = sug.find((x) => x.categoria === "entrada");
-  const linha = (x) => `<label class="ch-cad-l"><span>${esc(M.rotuloChave(x))}</span><input type="number" min="0" max="20" name="c-${x.categoria}-${x.comodo}" value="${x.copias}" inputmode="numeric" aria-label="Cópias de ${esc(M.rotuloChave(x))}"></label>`;
-  return `<div class="pp-full ch-cad">
-      <p class="ch-cad-h">Quantidade de cópias de cada chave. ${u.quartos ? `Tipologia: ${M.tipologiaLabel(u.quartos)}.` : "Tipologia não informada."} Só é possível alterar com todas as chaves na Base.</p>
-      <div class="ch-cad-g"><div class="ch-cad-col"><b>Entrada</b>${linha(e)}</div>
-        <div class="ch-cad-col"><b>Quartos <span class="ch-cad-n"><button type="button" data-cad="quarto" data-d="-1" aria-label="Menos um quarto">−</button><em>${q.length}</em><button type="button" data-cad="quarto" data-d="1" aria-label="Mais um quarto">+</button></span></b>${q.map(linha).join("")}</div>
-        <div class="ch-cad-col"><b>Banheiros <span class="ch-cad-n"><button type="button" data-cad="banheiro" data-d="-1" aria-label="Menos um banheiro">−</button><em>${b.length}</em><button type="button" data-cad="banheiro" data-d="1" aria-label="Mais um banheiro">+</button></span></b>${b.map(linha).join("")}</div></div>
-    </div><label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Ex.: conferido no claviculário em 24/10"></textarea></label>`;
+function formTransferir(u) {
+  const st = u.situacao;
+  return `<form class="ch-form" novalidate>
+      <div class="pp-f pp-full"><span>Setor de destino</span><div class="ch-setores" role="radiogroup" aria-label="Setor de destino">${M.SETORES_DESTINO.map((s) =>
+        `<label class="ch-setor" style="--c:${M.SETORES[s].cor}"><input type="radio" name="setor" value="${s}"><span><i></i>${M.SETORES[s].label}${st.setor === s ? "<small>atual</small>" : ""}</span></label>`).join("")}</div></div>
+      <label class="pp-f pp-full"><span>Responsável que está recebendo a chave</span><input name="responsavel" list="chNomes" placeholder="Nome de quem recebe" autocomplete="off" maxlength="80" required><datalist id="chNomes">${nomes.map((n) => `<option value="${esc(n)}"></option>`).join("")}</datalist></label>
+      <div class="ch-resumo pp-full" aria-live="polite"></div>
+      <div class="pp-actions pp-full"><span class="pp-hint ch-msg" role="status"></span><button type="button" class="btn g" data-painel="">Cancelar</button><button type="submit" class="btn p"${ocupado ? " disabled" : ""}>${ocupado ? "Registrando…" : "Confirmar transferência"}</button></div>
+    </form>`;
 }
 function capturarForm() {
-  const f = pop?.querySelector(".ch-form"); if (!f || !f.dataset.dirty) return null;
-  const v = {}; f.querySelectorAll("input,textarea,select").forEach((el) => { if (!el.name) return; v[el.name + (el.type === "radio" ? ":" + el.value : "")] = el.type === "radio" || el.type === "checkbox" ? el.checked : el.value; });
-  return { aba: f.dataset.aba, v };
+  const f = pop?.querySelector(".ch-form"); if (!f) return null;
+  return { setor: f.querySelector('input[name="setor"]:checked')?.value || "", responsavel: f.elements.responsavel?.value || "", dirty: !!f.dataset.dirty };
 }
 function restaurarForm(s) {
-  const f = pop.querySelector(".ch-form"); if (!f || f.dataset.aba !== s.aba) return;
-  f.querySelectorAll("input,textarea,select").forEach((el) => { const k = el.name + (el.type === "radio" ? ":" + el.value : ""); if (!(k in s.v)) return; if (el.type === "radio" || el.type === "checkbox") el.checked = s.v[k]; else el.value = s.v[k]; });
-  f.dataset.dirty = "1";
+  const f = pop.querySelector(".ch-form"); if (!f) return;
+  if (s.setor) { const r = f.querySelector(`input[name="setor"][value="${s.setor}"]`); if (r) r.checked = true; }
+  f.elements.responsavel.value = s.responsavel; if (s.dirty) f.dataset.dirty = "1";
+}
+/** Resumo do que será gravado: "CX (Pedro) → Asstec (Ana)". */
+function mostrarResumo() {
+  const f = pop?.querySelector(".ch-form"), el = f?.querySelector(".ch-resumo"); if (!el) return;
+  const v = capturarForm(); if (v.setor || v.responsavel.trim()) f.dataset.dirty = "1";
+  const u = todasUnidades().find((x) => x.unitId === cur.unitId), st = u.situacao, nome = M.limparNome(v.responsavel);
+  el.innerHTML = `${pill(st.setor)}${st.responsavel ? `<em>${esc(st.responsavel)}</em>` : ""}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${v.setor ? pill(v.setor) : '<span class="ch-mut">setor de destino</span>'}${nome ? `<em>${esc(nome)}</em>` : '<span class="ch-mut">quem recebe</span>'}`;
 }
 function pintarHistorico() {
   const el = pop?.querySelector("#chHist"); if (!el) return;
   if (!hist) { el.innerHTML = '<div class="ch-hist-empty">Carregando…</div>'; return; }
   if (hist.erro) { el.innerHTML = `<div class="ch-hist-empty">Não foi possível carregar o histórico.</div>`; return; }
-  if (!hist.length) { el.innerHTML = '<div class="ch-hist-empty">Nenhuma movimentação registrada.</div>'; return; }
+  if (!hist.length) { el.innerHTML = '<div class="ch-hist-empty">Nenhuma movimentação registrada para esta unidade.</div>'; return; }
   el.innerHTML = `<ol class="ch-hist-l">${hist.map((m) => {
-    const s = m.setor ? M.SETORES[m.setor] : null;
-    const quem = m.tipo === "devolucao" ? `${m.responsavel ? esc(m.responsavel) + " → " : ""}recebido por <b>${esc(m.recebido_por)}</b>` : m.responsavel ? `<b>${esc(m.responsavel)}</b>` : "";
-    const ch = Array.isArray(m.chaves) && m.chaves.length ? M.resumoChaves(m.chaves) : "";
-    const extra = m.tipo === "transferencia" && m.chaves?.[0]?.de_setor ? ` (de ${M.SETORES[m.chaves[0].de_setor]?.label || ""})` : "";
-    return `<li class="t-${m.tipo}"><div class="ch-h1"><b>${M.TIPOS_MOV[m.tipo] || m.tipo}</b>${s && m.tipo !== "cadastro" ? `<span class="ch-hs" style="--c:${s.cor}">${s.label}${extra}</span>` : ""}<time>${fmtDH(m.data_hora)}</time></div>
-      ${quem || ch ? `<div class="ch-h2">${quem}${quem && ch ? " · " : ""}${esc(ch)}${m.quantidade > 1 ? ` <small>(${m.quantidade} chaves)</small>` : ""}</div>` : ""}
-      ${m.previsao_devolucao ? `<div class="ch-h3">Devolução prevista: ${fmtDH(m.previsao_devolucao)}</div>` : ""}
-      ${m.observacoes ? `<div class="ch-h3">${esc(m.observacoes)}</div>` : ""}
-      <div class="ch-h4">Registrado por ${esc(m.registrado_email || "sistema")} em ${fmtDH(m.registrado_em)}</div></li>`;
+    const d = M.descreverMov(m);
+    const rota = d.de ? `${pill(d.de)}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${pill(d.para)}` : d.para ? pill(d.para) : "";
+    const quem = [d.recebeu ? `Recebeu: <b>${esc(d.recebeu)}</b>` : "", d.anterior ? `Antes: ${esc(d.anterior)}` : ""].filter(Boolean).join(" · ");
+    return `<li style="--c:${(M.SETORES[d.para] || M.SETORES.sem).borda}"><div class="ch-h1"><b>${esc(d.titulo)}</b><span class="ch-rota">${rota}</span><time>${fmtDH(d.quando)}</time></div>
+      ${quem ? `<div class="ch-h2">${quem}</div>` : ""}${d.obs && m.tipo !== "transferencia" ? `<div class="ch-h3">${esc(d.obs)}</div>` : ""}
+      <div class="ch-h4">Registrado por ${esc(d.por)}</div></li>`;
   }).join("")}</ol>`;
 }
 function mostrarAviso(msg, tipo = "err") {
-  aviso = msg; const el = pop?.querySelector(".ch-msg"); if (el) { el.textContent = msg; el.className = `pp-hint ch-msg ${tipo}`; }
+  aviso = { msg, tipo }; const el = pop?.querySelector(".ch-msg"); if (el) { el.textContent = msg; el.className = `pp-hint ch-msg ${tipo}`; }
 }
 
 function cliquePopup(e) {
   const t = e.target;
   if (t.closest("[data-close]")) { fechar(); return; }
   const nav = t.closest("[data-nav]");
-  if (nav) { const l = host.units(), i = l.findIndex((x) => x.b === cur.b && x.p === cur.p && x.a === cur.a), n = l[i + Number(nav.dataset.nav)]; if (n) { if (dirty() && !confirm("Descartar o registro em andamento?")) return; pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); const anc = root.querySelector(`[data-chu][data-b="${CSS.escape(n.b)}"][data-p="${CSS.escape(n.p)}"][data-a="${CSS.escape(n.a)}"]`); abrir(n.b, n.p, n.a, anc); } return; }
-  const tab = t.closest("[data-aba]:not(form)");
-  if (tab && !tab.disabled) { if (dirty() && !confirm("Descartar o registro em andamento?")) return; aba = tab.dataset.aba; sel = new Set(); aviso = ""; pintarPopup(true); return; }
-  if (t.closest("[data-all]")) { const box = t.closest(".ch-picks"); const cbs = [...box.querySelectorAll("input[type=checkbox]")]; const todos = cbs.every((c) => c.checked); cbs.forEach((c) => { c.checked = !todos; c.checked ? sel.add(+c.value) : sel.delete(+c.value); }); marcarSujo(); return; }
-  const cad = t.closest("[data-cad]");
-  if (cad) { ajustarCadastro(cad.dataset.cad, Number(cad.dataset.d)); return; }
-}
-function marcarSujo() { pop.querySelector(".ch-form")?.setAttribute("data-dirty", "1"); }
-async function mudancaPopup(e) {
-  const t = e.target;
-  if (t.matches(".ch-pick input")) { t.checked ? sel.add(+t.value) : sel.delete(+t.value); }
-  if (t.closest(".ch-form")) marcarSujo();
-  if (t.matches("[data-tipologia]")) {
-    const n = t.value ? Number(t.value) : null, u = todasUnidades().find((x) => x.unitId === cur.unitId);
-    if (!(await confirmar("Alterar a tipologia?", `<p>${esc(host.titulo(u.b, u.p, u.a))}: de <b>${esc(M.tipologiaLabel(u.quartos))}</b> para <b>${esc(M.tipologiaLabel(n))}</b>.</p>`, "Alterar"))) { t.value = u.quartos || ""; return; }
-    try { await S.definirTipologia(host.sb, { unitIds: [cur.unitId], quartos: n }); idx.quartos.set(cur.unitId, n); host.toast("Tipologia atualizada"); pintarMapa(); pintarPopup(false); }
-    catch (err) { t.value = u.quartos || ""; host.toast(err.message); }
+  if (nav) {
+    const l = host.units(), i = l.findIndex((x) => x.b === cur.b && x.p === cur.p && x.a === cur.a), n = l[i + Number(nav.dataset.nav)];
+    if (n) { if (preenchendo() && !confirm("Descartar a transferência em andamento?")) return; painel = ""; const anc = root.querySelector(`.ch-u[data-b="${CSS.escape(n.b)}"][data-p="${CSS.escape(n.p)}"][data-a="${CSS.escape(n.a)}"]`); abrir(n.b, n.p, n.a, anc); }
+    return;
   }
-}
-function ajustarCadastro(cat, d) {
-  const f = pop.querySelector(".ch-form"); const col = [...f.querySelectorAll(".ch-cad-col")].find((c) => c.querySelector(`[data-cad="${cat}"]`));
-  const linhas = col.querySelectorAll(".ch-cad-l"); const n = linhas.length + d;
-  if (n < 0 || n > 9) return;
-  if (d < 0 && linhas.length) linhas[linhas.length - 1].remove();
-  if (d > 0) col.insertAdjacentHTML("beforeend", `<label class="ch-cad-l"><span>${cat === "quarto" ? "Quarto" : "Banheiro"} ${n}</span><input type="number" min="0" max="20" name="c-${cat}-${n}" value="1" inputmode="numeric"></label>`);
-  col.querySelector("em").textContent = n; marcarSujo();
+  const pn = t.closest("[data-painel]");
+  if (pn) {
+    const alvo = pn.dataset.painel === painel ? "" : pn.dataset.painel;
+    if (painel === "transferir" && alvo !== "transferir" && preenchendo() && !confirm("Descartar a transferência em andamento?")) return;
+    painel = alvo; aviso = null; pedido = painel === "transferir" ? novoPedido() : null;
+    pintarPopup(); posicionar();
+    if (painel === "historico") carregarHistorico();
+    if (painel === "transferir") pop.querySelector('.ch-form input[name="setor"]')?.focus({ preventScroll: true });
+  }
 }
 
-/* ── confirmação e envio ── */
-function confirmar(titulo, html, ok = "Confirmar") {
-  return new Promise((resolve) => {
-    const d = document.createElement("dialog"); d.className = "ch-dlg";
-    d.innerHTML = `<form method="dialog"><h3>${esc(titulo)}</h3>${html}<div class="ch-dlg-act"><button value="cancelar" class="btn g">Cancelar</button><button value="ok" class="btn p">${esc(ok)}</button></div></form>`;
-    document.body.appendChild(d);
-    d.addEventListener("close", () => { resolve(d.returnValue === "ok"); d.remove(); });
-    d.showModal(); d.querySelector('button[value="ok"]').focus();
-  });
-}
 async function enviar() {
-  if (ocupado || !cur) return;
-  const f = pop.querySelector(".ch-form"), fd = new FormData(f), u = todasUnidades().find((x) => x.unitId === cur.unitId);
-  const ids = [...sel].filter((id) => u.chaves.some((k) => k.id === id));
-  const chavesSel = u.chaves.filter((k) => ids.includes(k.id));
-  const lista = chavesSel.length ? `<p class="ch-dlg-l">${esc(M.resumoChaves(chavesSel))}</p>` : "";
-  const local = host.titulo(u.b, u.p, u.a);
-  let erro = "", titulo = "", html = "", fn = null, args = null, okMsg = "";
-  const base = { unitId: u.unitId, obs: fd.get("obs") || "" };
-  if (aba === "retirar" || aba === "transferir") {
-    args = { ...base, ids, setor: fd.get("setor"), responsavel: String(fd.get("responsavel") || "").trim(), dataHora: ISO(fd.get("data")), previsao: ISO(fd.get("previsao")) };
-    erro = M.validarSaida(args);
-    titulo = aba === "retirar" ? "Confirmar retirada?" : "Confirmar transferência?";
-    html = `<p>${esc(local)} → <b>${esc(M.SETORES[args.setor]?.label || "")}</b> com <b>${esc(args.responsavel)}</b>, ${fmtDH(args.dataHora)}${args.previsao ? `; devolução prevista ${fmtDH(args.previsao)}` : ""}.</p>${lista}`;
-    fn = aba === "retirar" ? S.retirar : S.transferir; okMsg = aba === "retirar" ? "Retirada registrada" : "Transferência registrada";
-  } else if (aba === "devolver") {
-    args = { ...base, ids, recebidoPor: String(fd.get("recebido") || "").trim(), dataHora: ISO(fd.get("data")) };
-    erro = M.validarDevolucao(args);
-    const resta = u.chaves.filter((k) => k.situacao === "ativa" && k.local !== "base").length - ids.length;
-    titulo = "Confirmar devolução?";
-    html = `<p>${esc(local)}: recebido por <b>${esc(args.recebidoPor)}</b> em ${fmtDH(args.dataHora)}.</p>${lista}${resta > 0 ? `<p class="ch-dlg-w">Devolução parcial: ${resta} chave(s) continuam fora.</p>` : ""}`;
-    fn = S.devolver; okMsg = resta > 0 ? "Devolução parcial registrada" : "Devolução registrada";
-  } else if (aba === "ocorrencia") {
-    args = { ...base, texto: String(fd.get("texto") || "").trim(), ids };
-    if (args.texto.length < 3) erro = "Descreva a ocorrência.";
-    titulo = "Registrar ocorrência?"; html = `<p>${esc(local)}: ${esc(args.texto)}</p>${ids.length ? `<p class="ch-dlg-w">Marcar como extraviadas: ${esc(M.resumoChaves(chavesSel))}</p>` : ""}`;
-    fn = S.ocorrencia; okMsg = "Ocorrência registrada";
-  } else if (aba === "cadastro") {
-    const itens = []; f.querySelectorAll(".ch-cad-l input").forEach((i) => { const [, cat, com] = i.name.split("-"); const n = Math.max(0, Math.min(20, parseInt(i.value, 10) || 0)); itens.push({ categoria: cat, comodo: Number(com), copias: n }); });
-    const total = itens.reduce((s, x) => s + x.copias, 0);
-    if (!itens.some((x) => x.categoria === "entrada" && x.copias > 0) && total > 0) erro = "Informe ao menos uma cópia da chave de entrada (ou zere tudo).";
-    args = { ...base, itens };
-    titulo = "Salvar cadastro das chaves?";
-    html = `<p>${esc(local)}: ${total} chave(s) — ${esc(itens.filter((x) => x.copias).map((x) => `${M.rotuloChave(x)} ×${x.copias}`).join(", ") || "nenhuma")}.</p>`;
-    fn = S.cadastrar; okMsg = "Cadastro das chaves salvo";
-  }
+  if (ocupado || !cur || painel !== "transferir") return;
+  const u = todasUnidades().find((x) => x.unitId === cur.unitId), v = capturarForm();
+  const erro = M.validarTransferencia(v, u.situacao);
   if (erro) { mostrarAviso(erro); return; }
-  if (!(await confirmar(titulo, html))) return;
-  // o mesmo pedido_id se repetir a tentativa: o banco não grava duas vezes
-  f.dataset.pedido = f.dataset.pedido || novoPedido(); args.pedido = f.dataset.pedido;
-  ocupado = true; mostrarAviso("Registrando…", "info"); f.querySelector("[type=submit]").disabled = true;
+  // o mesmo pedido em novas tentativas (clique duplo, rede instável): o banco não grava duas vezes
+  pedido = pedido || novoPedido();
+  ocupado = true; mostrarAviso("Registrando…", "info");
+  const f = pop.querySelector(".ch-form"); f.querySelector("[type=submit]").disabled = true; f.querySelector("[type=submit]").textContent = "Registrando…";
   try {
-    await fn(host.sb, args);
-    ocupado = false; sel = new Set(); aviso = "";
-    f.removeAttribute("data-dirty");
-    host.toast(okMsg);
+    await S.transferir(host.sb, { unitId: u.unitId, setor: v.setor, responsavel: M.limparNome(v.responsavel), ultimaMov: u.situacao.ultimaMov, pedido });
+    ocupado = false; pedido = null; aviso = null; painel = "historico"; hist = null;
+    host.toast(`Chave transferida para ${M.setorLabel(v.setor)} · ${M.limparNome(v.responsavel)}`);
     await carregar(true);
-    hist = null; pintarPopup(true); carregarHistorico();
+    pintarPopup(); carregarHistorico();
   } catch (err) {
-    ocupado = false; f.querySelector("[type=submit]").disabled = false;
-    // a resposta do banco é a regra (ex.: chave já retirada por outro usuário): mostra e atualiza a tela
-    mostrarAviso(err.message || "Não foi possível registrar.");
-    if (!/fetch|network|rede/i.test(err.message || "")) { delete f.dataset.pedido; carregar(true); }
+    ocupado = false;
+    const rede = /fetch|network|rede|failed/i.test(err.message || "");
+    if (!rede) pedido = novoPedido();   // recusado pelo banco: a próxima tentativa é um novo pedido
+    mostrarAviso(err.message || "Não foi possível registrar a transferência.");
+    const b = pop.querySelector(".ch-form [type=submit]"); if (b) { b.disabled = false; b.textContent = "Confirmar transferência"; }
+    if (!rede) carregar(true);   // ex.: outra pessoa transferiu: mostra a situação atual
   }
 }
 
@@ -472,18 +354,18 @@ const api = {
     host = h; root = document.getElementById("chavesRoot");
     if (!root || !host.project) return;
     if (projId !== host.project.id) {
-      cancelar?.(); cancelar = null; dados = null; filt = FILTRO0(); nomes = []; projId = host.project.id; estado = "idle"; delete root.dataset.proj;
+      cancelar?.(); cancelar = null; dados = null; filt = FILTRO0(); nomes = []; projId = host.project.id; estado = "idle"; sit = new Map(); delete root.dataset.proj;
       if (pop?.classList.contains("open")) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); }
     }
     if (!cancelar && host.sb) { try { cancelar = S.assinar(host.sb, projId, agendarRecarga); } catch { cancelar = null; } }
     if (!dados) carregar(false); else { pintar(); carregar(true); }
   },
-  /** Esconde (troca de aba): fecha o popup sem perder o registro em andamento por engano. */
+  /** Esconde (troca de aba). */
   hide() { if (pop?.classList.contains("open")) fechar(); },
-  /** Status da vistoria mudou (tempo real das vistorias): atualiza cores e popup. */
-  vistoriaMudou() { if (dados && root?.isConnected && root.offsetParent) { pintarMapa(); if (cur) pintarPopup(false); } },
+  /** Status da vistoria mudou (tempo real das vistorias): atualiza lista, filtros e painel. */
+  vistoriaMudou() { if (dados && root?.isConnected && root.offsetParent) { pintarConteudo(); if (cur && !preenchendo()) pintarPopup(); } },
   /** Saiu do condomínio ou da conta. */
-  reset() { cancelar?.(); cancelar = null; dados = null; projId = null; if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
+  reset() { cancelar?.(); cancelar = null; dados = null; projId = null; sit = new Map(); if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
 };
 window.AmciChaves = api;
 export default api;

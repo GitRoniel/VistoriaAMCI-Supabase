@@ -97,6 +97,23 @@ A planilha só atualiza **Cliente, Data, Horário e Status** da vistoria. As col
 
 Origem de cada campo em `client_inspections.field_sources` / `updated_source` (MANUAL, PLANILHA, SISTEMA). Histórico em `importacoes_agendamentos` e `importacoes_agendamentos_itens`.
 
+### Revistorias da planilha (colunas K, L e M)
+
+A mesma importação lê as colunas de revistoria do Relatório 854 (opcionais; reconhecidas por "revistoria" no nome, inclusive o erro de digitação "REVSITORIA", e lidas antes das colunas da vistoria):
+
+| Coluna | Cabeçalho | Gravado em |
+|---|---|---|
+| K | STATUS DA REVISTORIA | `revistorias.status` (Agendada, Em revistoria, Aprovada, Reprovada) e o texto original em `status_planilha` |
+| L | DATA DA REVISTORIA | `revistorias.data` |
+| M | HORÁRIO DO AGENDAMENTO REVISTORIA | `revistorias.horario` |
+
+- Cada unidade pode ter várias revistorias (nº 1, 2…), na tabela `public.revistorias`. O **status da vistoria nunca muda** por causa da revistoria (coluna H continua indo só para `client_inspections.status`).
+- Sem duplicar: a linha é comparada com a revistoria mais recente da unidade. Agendada/Em revistoria → a mesma revistoria é atualizada (status, reagendamento). Reprovada + data posterior na planilha → revistoria nova (nº seguinte). Revistoria já Aprovada/Reprovada que a planilha altere → **conflito** (Manter sistema / Usar planilha). Importar de novo a mesma planilha não muda nada.
+- Planilha vazia nunca apaga. Status desconhecido, data ou horário inválidos são ignorados com aviso na linha, sem interromper a importação (o resto da linha é importado).
+- A **Data da revistoria** da unidade (`reinspection_date`, usada na lista, filtros, impressão e exportação) acompanha a revistoria quando está vazia ou igual à data anterior; se alguém a mudou no site, é mantida e registrada como "Mantido do sistema".
+- Onde aparece: canto colorido nas unidades do mapa (cor = status da revistoria), coluna **Revistoria** e filtro na lista, histórico no popup da unidade, indicadores no Resumo Geral, coluna na Visão Geral e colunas no fim da exportação.
+- Gravação só por `aplicar_importacao_agendamentos` (parâmetro `p_revistorias`, só administradores); leitura por RLS para quem tem acesso ao condomínio. Testes: `scripts/test-revistorias.mjs` (regras, no `pnpm check`) e `scripts/db-tests/revistorias/test.mjs` (banco local).
+
 ## Cadastro de condomínios
 
 Em **Configuração de Condomínios** (menu do usuário, administradores):
@@ -154,44 +171,34 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).
 - A busca filtra os cards de condomínios e relatórios, sem acento.
 
-## Controle de Chaves (claviculário)
+## Controle de Chaves
 
-Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). O mapa é o mesmo das vistorias. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
+Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). Mostra onde está a chave de cada unidade e quem é o responsável. Usa as unidades do Mapa das Vistorias, sem cadastro próprio. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
 
-- **Situação das chaves** (cor da unidade): Base (azul, no claviculário), CX (verde), Asstec (laranja), Produção (vermelho) e Sem status (cinza). Marcadores:
-  - bolinha vermelha = devolução pendente (previsão vencida);
-  - "!" amarelo = divergência;
-  - cor dividida = retirada parcial;
-  - borda tracejada = quantidades a cadastrar.
-- **Status da vistoria:** a barra na parte de baixo de cada unidade e o selo no popup mostram o status de `client_inspections`. O módulo só lê esse status, não grava nem copia.
-- **Indicadores:** unidades, todas as chaves na Base, com retiradas, devoluções pendentes, sem status e movimentações de hoje. Os alertas de pendência, divergência e "a cadastrar" filtram o mapa.
-- **Filtros:** condomínio, bloco ou conjunto, unidade, tipologia, status da vistoria, situação das chaves, setor, e os atalhos "Aprovadas com chaves disponíveis" e "Aguardando vistoria ou revistoria".
-- **Popup da unidade:**
-  - identificação: condomínio, bloco/apto, tipologia e vistoria;
-  - cada chave por categoria (Entrada, Quarto n, Banheiro n), com as cópias e onde cada uma está;
-  - abas Retirar, Devolver, Transferir, Ocorrência e Cadastro (admin);
-  - histórico completo da unidade.
-- **Regras:**
-  - retirada parcial permitida; só sai chave ativa e na Base;
-  - chave já retirada só muda de mãos por transferência;
-  - exige responsável, data/hora e as chaves movimentadas, e pede confirmação antes de gravar;
-  - data/hora e usuário são registrados automaticamente;
-  - o mesmo envio nunca grava duas vezes;
-  - duas retiradas simultâneas da mesma chave: a segunda é recusada;
-  - o cadastro só muda com todas as chaves na Base;
-  - o status da vistoria nunca é alterado pelo módulo.
-- **Permissões** (papel no condomínio): admin cadastra chaves e tipologia e movimenta; revistorias movimenta; visitante só consulta. Condomínio arquivado não aparece.
-- **Banco** (migration `20261024120000_controle_chaves.sql`, só aditiva):
-  - `units.quartos` guarda a tipologia. No Alto do Jerivá: finais 01, 04, 05 e 08 = 2 quartos; finais 02, 03, 06 e 07 = 3 quartos. Nos outros condomínios fica "não informada" até o admin definir.
-  - `chaves_unidades` guarda o cadastro da unidade no claviculário.
-  - `chaves` tem uma linha por cópia física, com o local atual.
-  - `chaves_movimentacoes` é o histórico imutável: nem o dono do banco altera; só sai em cascata se a unidade for apagada.
-  - Escrita só pelas funções `chaves_cadastrar`, `chaves_retirar`, `chaves_transferir`, `chaves_devolver`, `chaves_ocorrencia` e `chaves_definir_tipologia` (security definer, com trava das chaves e `pedido_id` contra duplicidade). Leitura por RLS, para membros do condomínio.
-- **Carga inicial:** planilha "Levantamento Inicial" do Alto do Jerivá, com 448 unidades. "Tem chave SIM" = chaves na Base (345); "NÃO" = sem status (103). A coluna "Qtd. Chaves" estava vazia, então as quantidades de cada unidade são cadastradas no popup. As observações "24.10" foram desconsideradas.
+- **Setor (cor da unidade):** Base (azul), CX (verde), Asstec (laranja), Produção (vermelho) e Sem status (cinza: nenhum registro). A chave é acompanhada por unidade, como um todo: sem quantidades nem conferência de cópias.
+- **Mapa e lista** (botões Mapa/Lista). A lista tem Unidade (com o status da vistoria), Setor atual, Responsável, Última movimentação e Ação (Transferir e Histórico). No celular, cada linha vira um cartão.
+- **Filtros:** condomínio, bloco/conjunto, unidade, status da vistoria e setor. Os indicadores de cada setor também filtram ao clicar.
+- **Painel da unidade:** setor atual, responsável, data e hora da última movimentação e quem a registrou, status da vistoria, e os botões **Transferir** e **Histórico**.
+- **Transferir para outro setor:** unidade → Transferir → setor de destino (Base, CX, Asstec ou Produção) → responsável que recebe → Confirmar transferência.
+  - Setor e responsável são obrigatórios. A mesma situação (mesmo setor e mesmo responsável) é recusada; mudar só o responsável dentro do setor é permitido.
+  - Data, hora e usuário são gravados automaticamente.
+  - Clique repetido ou nova tentativa de rede nunca grava duas vezes (`pedido_id`).
+  - Se outra pessoa transferiu a mesma chave enquanto a tela estava aberta, a transferência é recusada e a tela mostra a situação atual.
+- **Histórico:** cada transferência guarda a unidade, os setores de origem e de destino, o responsável anterior, quem recebeu, a data/hora e o usuário. Não pode ser alterado nem apagado (nem pelo dono do banco); só sai em cascata se a unidade for apagada.
+- **Permissões** (papel no condomínio): admin e revistorias transferem; visitante só consulta. Condomínio arquivado não aparece. O status da vistoria só é lido, nunca alterado.
+- **Banco:**
+  - `chaves_unidades`: situação atual (setor, responsável, `movimentado_em`, `movimentado_por`, `movimentacao_id`);
+  - `chaves_movimentacoes`: histórico (com `setor_origem` e `responsavel_anterior`);
+  - escrita só pela função `chaves_transferir` (security definer); leitura por RLS para membros do condomínio.
+  - Migrations: `20261024120000_controle_chaves.sql` (tabelas e levantamento inicial) e `20261103120000_chaves_transferencia_simples.sql` (simplificação).
+- **Simplificação (03/11/2026):**
+  - saíram o cadastro de cópias (entrada, quartos, banheiros), a retirada/devolução com conferência, as ocorrências e a tipologia, e as funções correspondentes;
+  - a tabela `chaves` (cópias) e a coluna `units.quartos` ficam guardadas, sem uso;
+  - a situação inicial vem do que já estava registrado: chave retirada → setor e responsável da retirada; levantamento "tem chave" (345 unidades do Jerivá) → Base; resto → sem status.
 - **Sem a migration aplicada**, a aba avisa que o módulo não está instalado; o resto das Vistorias continua igual.
 - **Testes:**
   - regras da tela: `scripts/test-chaves.mjs` (no `pnpm check`);
-  - banco (RLS, concorrência, histórico): `scripts/db-tests/chaves/` (Postgres local).
+  - banco: `scripts/db-tests/chaves/` (Postgres local; `reset.sh 20261024120000` e depois `test.mjs`, que aplica as migrations seguintes sobre dados do modelo anterior).
 
 ## Plataforma: Relatórios (Suprimentos e Contratos)
 
