@@ -2,30 +2,38 @@
 // As regras do banco (permissões, setor e responsável obrigatórios, concorrência, pedido repetido,
 // histórico imutável) ficam na função chaves_transferir e são testadas em scripts/db-tests/chaves.
 import assert from "node:assert/strict";
-import { situacao, passaFiltros, indicadores, validarTransferencia, descreverMov, limparNome, SETORES_DESTINO, setorLabel } from "../src/modules/chaves/model.js";
+import { situacao, passaFiltros, indicadores, validarTransferencia, validarRegularizacao, validarNome, descreverMov, limparNome, proximosPassos, SETORES_DESTINO, setorLabel, PERDIDAS_TODAS } from "../src/modules/chaves/model.js";
 
 // 1) Situação atual: sem linha ou sem setor = "Sem status".
 assert.equal(situacao(null).setor, "sem");
 assert.equal(situacao({ setor: null }).setor, "sem");
 assert.deepEqual(situacao({ setor: "cx", responsavel: "João", movimentado_em: "2026-11-03T13:00:00Z", movimentado_por: "a@x.com", movimentacao_id: 9 }),
-  { setor: "cx", responsavel: "João", movimentadoEm: "2026-11-03T13:00:00Z", movimentadoPor: "a@x.com", ultimaMov: 9 });
+  { setor: "cx", responsavel: "João", movimentadoEm: "2026-11-03T13:00:00Z", movimentadoPor: "a@x.com", ultimaMov: 9, perdida: null });
+// chave perdida: ocorrência aberta (regularizada não conta)
+assert.equal(situacao({ setor: null }, { etapa: "chaveiro_solicitado" }).perdida.etapa, "chaveiro_solicitado");
+assert.equal(situacao({ setor: "cx" }, { etapa: "regularizada" }).perdida, null);
 assert.deepEqual(SETORES_DESTINO, ["base", "cx", "asstec", "producao"]);
 assert.equal(setorLabel("producao"), "Produção"); assert.equal(setorLabel(null), "Sem status");
 
 // 2) Filtros: bloco, setor (vários), status da vistoria e busca da unidade.
-const u = (b, codigo, setor, vistoria = "ag") => ({ b, codigo, vistoria, situacao: situacao(setor ? { setor } : null) });
-const lista = [u("A", "101", "base"), u("A", "604", "cx", "ap"), u("B", "604", null), u("B", "102", "producao", "rv")];
+const u = (b, codigo, setor, vistoria = "ag", etapa = null) => ({ b, codigo, vistoria, situacao: situacao(setor ? { setor } : null, etapa ? { etapa } : null) });
+const lista = [u("A", "101", "base"), u("A", "604", "cx", "ap"), u("B", "604", null), u("B", "102", "producao", "rv"), u("C", "201", null, "ap", "perdida"), u("C", "202", null, "na", "copia_realizada")];
 const f = (o) => lista.filter((x) => passaFiltros(x, { bloco: "ALL", apto: "", setor: [], vistoria: "", ...o })).map((x) => x.b + x.codigo);
-assert.deepEqual(f({}), ["A101", "A604", "B604", "B102"]);
+assert.deepEqual(f({}), ["A101", "A604", "B604", "B102", "C201", "C202"]);
 assert.deepEqual(f({ bloco: "B" }), ["B604", "B102"]);
-assert.deepEqual(f({ setor: ["sem", "producao"] }), ["B604", "B102"]);
-assert.deepEqual(f({ vistoria: "ap" }), ["A604"]);
+assert.deepEqual(f({ setor: ["sem", "producao"] }), ["B604", "B102", "C201", "C202"]);
+// chave perdida independe do status da vistoria (aprovada e sem agendamento)
+assert.deepEqual(f({ perdida: PERDIDAS_TODAS }), ["C201", "C202"]);
+assert.deepEqual(f({ perdida: "copia_realizada" }), ["C202"]);
+assert.deepEqual(f({ perdida: PERDIDAS_TODAS, vistoria: "ap" }), ["C201"]);
+assert.deepEqual(f({ vistoria: "ap" }), ["A604", "C201"]);
 assert.deepEqual(f({ apto: "604" }), ["A604", "B604"]);
 assert.deepEqual(f({ apto: "a604" }), ["A604"]);
 assert.deepEqual(f({ apto: "B 102" }), ["B102"]);
 
 // 3) Indicadores por setor.
-assert.deepEqual(indicadores(lista, 3), { total: 4, hoje: 3, base: 1, cx: 1, asstec: 0, producao: 1, sem: 1 });
+assert.deepEqual(indicadores(lista, 3), { total: 6, hoje: 3, perdidas: 2, base: 1, cx: 1, asstec: 0, producao: 1, sem: 3,
+  perdida: 1, chaveiro_solicitado: 0, copia_realizada: 1, regularizada: 0 });
 
 // 4) Transferência: setor de destino e responsável obrigatórios; não repete a situação atual.
 assert.match(validarTransferencia({ setor: "", responsavel: "Ana" }), /setor de destino/);
@@ -36,6 +44,16 @@ assert.match(validarTransferencia({ setor: "cx", responsavel: " joão " }, situa
 assert.equal(validarTransferencia({ setor: "cx", responsavel: "Pedro" }, situacao({ setor: "cx", responsavel: "João" })), "");
 assert.equal(validarTransferencia({ setor: "base", responsavel: "Luciana" }, situacao(null)), "");
 assert.equal(limparNome("  Pedro   Silva "), "Pedro Silva");
+// chave perdida só volta a um setor pela regularização
+assert.match(validarTransferencia({ setor: "cx", responsavel: "Pedro" }, situacao(null, { etapa: "perdida" })), /Regularizar/);
+assert.match(validarRegularizacao({ setor: "", responsavel: "Pedro" }), /setor/);
+assert.match(validarRegularizacao({ setor: "cx", responsavel: " " }), /responsável/);
+assert.equal(validarRegularizacao({ setor: "base", responsavel: "Luciana" }), "");
+assert.match(validarNome("x", "quem solicitou o chaveiro"), /Informe quem solicitou o chaveiro/);
+assert.deepEqual(proximosPassos("perdida"), ["chaveiro", "regularizar"]);
+assert.deepEqual(proximosPassos("chaveiro_solicitado"), ["copia", "regularizar"]);
+assert.deepEqual(proximosPassos("copia_realizada"), ["regularizar"]);
+assert.deepEqual(proximosPassos("regularizada"), []);
 
 // 5) Histórico: transferência (origem → destino, quem recebeu, quem estava) e registros antigos.
 { const d = descreverMov({ tipo: "transferencia", setor_origem: "base", setor: "cx", responsavel: "Pedro", responsavel_anterior: "Luciana", data_hora: "t", registrado_email: "a@x.com" });
@@ -45,5 +63,11 @@ assert.equal(descreverMov({ tipo: "transferencia", setor_origem: null, setor: "b
   assert.deepEqual([d.titulo, d.de, d.para, d.por], ["Levantamento inicial", null, "base", "planilha de levantamento"]); }
 { const d = descreverMov({ tipo: "devolucao", setor: "base", responsavel: "João", recebido_por: "Luciana", registrado_email: "b@x.com" });
   assert.deepEqual([d.titulo, d.recebeu, d.anterior], ["Devolução", "Luciana", "João"]); }
+
+// 6) Histórico da chave perdida.
+{ const d = descreverMov({ tipo: "perda", setor: null, setor_origem: "asstec", responsavel: "Bruno", responsavel_anterior: "Rita", observacoes: "Quebrou", registrado_email: "b@x.com" });
+  assert.deepEqual([d.titulo, d.ocorrencia, d.de, d.para, d.quemRotulo, d.recebeu, d.anterior, d.obs], ["Chave perdida", true, "asstec", "sem", "Identificado por", "Bruno", "Rita", "Quebrou"]); }
+{ const d = descreverMov({ tipo: "chaveiro", responsavel: "Luciana", observacoes: "Chaveiro Silva" }); assert.deepEqual([d.titulo, d.de, d.quemRotulo, d.obs], ["Chaveiro solicitado", null, "Solicitado por", "Chaveiro Silva"]); }
+{ const d = descreverMov({ tipo: "regularizacao", setor: "cx", setor_origem: null, responsavel: "Pedro" }); assert.deepEqual([d.titulo, d.de, d.para, d.quemRotulo, d.recebeu], ["Chave regularizada", "sem", "cx", "Recebeu", "Pedro"]); }
 
 console.log("Regras do Controle de Chaves verificadas.");

@@ -16,5 +16,7 @@ seguintes (inclusive `20261103120000_chaves_transferencia_simples.sql`) e confer
 autenticado (como o PostgREST): situação inicial calculada sem apagar nada, permissões por papel
 (admin, revistorias, visitante, outro condomínio, sem acesso), escrita só pela função, setor e
 responsável obrigatórios, mesma situação recusada, clique repetido sem duplicar, tela desatualizada
-recusada, duas transferências simultâneas (só uma grava), histórico completo e imutável, casas do
-Buriti, condomínio arquivado e exclusão em cascata.
+recusada, duas transferências simultâneas (só uma grava), chave perdida (permissões, campos
+obrigatórios, uma ocorrência aberta por unidade, sem transferência até regularizar, chaveiro, cópia,
+regularização, chave encontrada, vistoria intacta), histórico completo e imutável, casas do Buriti,
+condomínio arquivado e exclusão em cascata.
