@@ -12,7 +12,8 @@ assert.deepEqual(situacao({ setor: "cx", responsavel: "João", movimentado_em: "
 // chave perdida: ocorrência aberta (regularizada não conta)
 assert.equal(situacao({ setor: null }, { etapa: "chaveiro_solicitado" }).perdida.etapa, "chaveiro_solicitado");
 assert.equal(situacao({ setor: "cx" }, { etapa: "regularizada" }).perdida, null);
-assert.deepEqual(SETORES_DESTINO, ["base", "cx", "asstec", "producao"]);
+assert.deepEqual(SETORES_DESTINO, ["base", "cx", "asstec", "producao", "cliente"]);
+assert.equal(setorLabel("cliente"), "Entregue para Cliente");
 assert.equal(setorLabel("producao"), "Produção"); assert.equal(setorLabel(null), "Sem status");
 
 // 2) Filtros: bloco, setor (vários), status da vistoria e busca da unidade.
@@ -32,7 +33,7 @@ assert.deepEqual(f({ apto: "a604" }), ["A604"]);
 assert.deepEqual(f({ apto: "B 102" }), ["B102"]);
 
 // 3) Indicadores por setor.
-assert.deepEqual(indicadores(lista, 3), { total: 6, hoje: 3, perdidas: 2, base: 1, cx: 1, asstec: 0, producao: 1, sem: 3,
+assert.deepEqual(indicadores(lista, 3), { total: 6, hoje: 3, perdidas: 2, base: 1, cx: 1, asstec: 0, producao: 1, cliente: 0, sem: 3,
   perdida: 1, chaveiro_solicitado: 0, copia_realizada: 1, regularizada: 0 });
 
 // 4) Transferência: setor de destino e responsável obrigatórios; não repete a situação atual.
