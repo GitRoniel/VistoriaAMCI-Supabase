@@ -1,6 +1,7 @@
 // Interface do Relatório de Contratos: mesmos componentes e padrão de interação do Relatório de Pedidos.
-// Hierarquia: Obra → Contrato (fornecedor/objeto, valores, status) → Itens/serviços (expansível).
-import { esc, fmtNum, fmtMoney, normText, debounce, highlight } from "../../../platform/core/utils.js";
+// Hierarquia: Obra → Contrato (fornecedor/objeto, valores, status) → Medições e itens/serviços (expansível).
+import { esc, fmtNum, fmtMoney, normText, debounce, highlight, fmtDateTime } from "../../../platform/core/utils.js";
+import { medTotals, medicaoHit, medFiltroAtivo, medStatusLabel, fmtPeriodo } from "./medicoes.js";
 import { createMultiSelect } from "../../../platform/ui/multiselect.js";
 import { attachAutocomplete } from "../../../platform/ui/autocomplete.js";
 import { statusLabel, totals } from "./model.js";
@@ -19,8 +20,13 @@ const situacaoBadge = (s) => {
 };
 const statusTone = (s) => { const n = normText(statusLabel(s)); return /nao aprov|reprov/.test(n) ? "t-red" : /aditivo/.test(n) ? "t-orange" : /aprov/.test(n) ? "t-green" : "t-muted"; };
 // Colunas da tabela de contratos (a linha de títulos é repetida no topo fixo de cada obra).
-const COLS = '<colgroup><col class="w-chev"><col class="w-ct"><col><col class="w-itens"><col class="w-val"><col class="w-med"><col class="w-val"><col class="w-st"></colgroup>';
-const HEAD = '<th aria-label="Expandir"></th><th class="l">Contrato</th><th class="l">Fornecedor · objeto</th><th class="r">Itens</th><th class="r">Valor do contrato</th><th class="l">Medido</th><th class="r">Saldo</th><th class="l">Status · tipo</th>';
+const COLS = '<colgroup><col class="w-chev"><col class="w-ct"><col><col class="w-itens"><col class="w-medn"><col class="w-val"><col class="w-med"><col class="w-val"><col class="w-st"></colgroup>';
+const HEAD = '<th aria-label="Expandir"></th><th class="l">Contrato</th><th class="l">Fornecedor · objeto</th><th class="r">Itens</th><th class="r" title="Medições importadas do UAU XT (Controle de Medições)">Medições</th><th class="r">Valor do contrato</th><th class="l">Medido</th><th class="r">Saldo</th><th class="l">Status · tipo</th>';
+const NCOLS = 9;
+const medBadge = (s) => {
+  const n = normText(medStatusLabel(s));
+  return `<span class="ct-mst ${/medida/.test(n) ? "t-green" : /aprov/.test(n) ? "t-blue" : "t-orange"}">${esc(medStatusLabel(s))}</span>`;
+};
 const money = (n, cls = "") => `<span class="ct-money${cls ? " " + cls : ""}">${fmtMoney(n)}</span>`;
 
 /**
@@ -28,7 +34,7 @@ const money = (n, cls = "") => `<span class="ct-money${cls ? " " + cls : ""}">${
  * @param {HTMLElement} root
  * @param {{contratos:Array}} data
  */
-export function mountContratos(root, { contratos }) {
+export function mountContratos(root, { contratos, semContrato = [], medInfo = { disponivel: false } }) {
   const f = emptyFilters();
   const servicos = [...new Set(contratos.flatMap((c) => c.itens.map((i) => i.servico)))].sort();
   const fornecedores = [...new Set(contratos.map((c) => c.fornecedor).filter(Boolean))].sort();
@@ -47,6 +53,12 @@ export function mountContratos(root, { contratos }) {
         <label class="fx-field ct-sel" id="ctStatusWrap"><span>Tipo</span><select id="ctStatus" aria-label="Tipo de contrato">${statusOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
         <label class="fx-field ct-sel" id="ctSituacaoWrap"><span>Status</span><select id="ctSituacao" aria-label="Status do contrato">${situacaoOptions(contratos).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>
       </div>
+      ${medInfo.disponivel ? `<div class="ct-line ct-line-med" aria-label="Filtros das medições">
+        <span class="ct-med-lbl">Medições</span>
+        <label class="fx-field ct-date" id="ctMedDeWrap"><span>De</span><input type="date" id="ctMedDe" aria-label="Período das medições: de"></label>
+        <label class="fx-field ct-date" id="ctMedAteWrap"><span>Até</span><input type="date" id="ctMedAte" aria-label="Período das medições: até"></label>
+        <label class="fx-search ct-mednum" id="ctMedNumWrap" title="Número da medição dentro do contrato">${SEARCH}<input type="search" id="ctMedNum" inputmode="numeric" placeholder="Nº medição" aria-label="Número da medição" autocomplete="off"></label>
+      </div>` : ""}
       <div class="ct-tools">
         <div class="fx-toggles">
           <label class="pf-switch"><input type="checkbox" id="ctSaldo"><b></b>Somente com saldo a medir</label>
@@ -60,7 +72,9 @@ export function mountContratos(root, { contratos }) {
       </div>
       <div class="pf-active" id="ctActive"></div>
     </section>
-    <main id="ctList" aria-live="polite"></main>`;
+    <div class="ct-med-info" id="ctMedInfo"></div>
+    <main id="ctList" aria-live="polite"></main>
+    <section id="ctSemContrato"></section>`;
 
   const $ = (id) => root.querySelector("#" + id);
 
@@ -85,6 +99,12 @@ export function mountContratos(root, { contratos }) {
   $("ctSituacao").addEventListener("change", (e) => { f.situacao = e.target.value; render(); });
   $("ctStatus").addEventListener("change", (e) => { f.status = e.target.value; render(); });
   $("ctSaldo").addEventListener("change", (e) => { f.comSaldo = e.target.checked; render(); });
+  if (medInfo.disponivel) {
+    $("ctMedDe").addEventListener("change", (e) => { f.medDe = e.target.value; render(); });
+    $("ctMedAte").addEventListener("change", (e) => { f.medAte = e.target.value; render(); });
+    $("ctMedNum").addEventListener("input", (e) => { f.medNum = e.target.value.replace(/\D/g, ""); live(); });
+    $("ctMedNum").addEventListener("search", (e) => { f.medNum = e.target.value.replace(/\D/g, ""); render(); });
+  }
   $("ctCompact").addEventListener("change", (e) => {
     document.body.classList.toggle("compact", e.target.checked);
     try { localStorage.setItem(COMPACT_KEY, e.target.checked ? "1" : "0"); } catch { /* ignora */ }
@@ -104,7 +124,9 @@ export function mountContratos(root, { contratos }) {
     forn: () => { f.fornecedor = ""; $("ctForn").value = ""; },
     status: () => { f.status = "todos"; $("ctStatus").value = "todos"; },
     situacao: () => { f.situacao = "todas"; $("ctSituacao").value = "todas"; },
-    saldo: () => { f.comSaldo = false; $("ctSaldo").checked = false; }
+    saldo: () => { f.comSaldo = false; $("ctSaldo").checked = false; },
+    medPer: () => { f.medDe = ""; f.medAte = ""; $("ctMedDe").value = ""; $("ctMedAte").value = ""; },
+    medNum: () => { f.medNum = ""; $("ctMedNum").value = ""; }
   };
   $("ctActive").addEventListener("click", (e) => {
     const k = e.target.closest("[data-af]")?.dataset.af; if (!k) return;
@@ -120,14 +142,18 @@ export function mountContratos(root, { contratos }) {
     if (f.contrato.trim()) add("num", "Contrato: " + f.contrato.trim());
     if (f.servico.trim()) add("serv", "Serviço: " + f.servico.trim());
     if (f.fornecedor.trim()) add("forn", "Fornecedor: " + f.fornecedor.trim());
+    const dBR = (d) => d.split("-").reverse().join("/");
+    if (f.medDe || f.medAte) add("medPer", "Medições: " + (f.medDe && f.medAte ? `${dBR(f.medDe)} a ${dBR(f.medAte)}` : f.medDe ? `a partir de ${dBR(f.medDe)}` : `até ${dBR(f.medAte)}`));
+    if (f.medNum) add("medNum", "Medição nº " + f.medNum);
     $("ctActive").innerHTML = chips.length ? `<span class="af-lbl">Filtros ativos:</span>${chips.join("")}` : "";
-    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctFornWrap", f.fornecedor.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"]]
-      .forEach(([id, on]) => $(id).classList.toggle("on", !!on));
+    [["ctNumWrap", f.contrato.trim()], ["ctServWrap", f.servico.trim()], ["ctFornWrap", f.fornecedor.trim()], ["ctStatusWrap", f.status !== "todos"], ["ctSituacaoWrap", f.situacao !== "abertas"],
+      ["ctMedDeWrap", f.medDe], ["ctMedAteWrap", f.medAte], ["ctMedNumWrap", f.medNum]]
+      .forEach(([id, on]) => $(id)?.classList.toggle("on", !!on));
   }
 
   function clearAll() {
     Object.assign(f, emptyFilters());
-    ["ctNum", "ctServ", "ctForn"].forEach((id) => ($(id).value = ""));
+    ["ctNum", "ctServ", "ctForn", "ctMedDe", "ctMedAte", "ctMedNum"].forEach((id) => { if ($(id)) $(id).value = ""; });
     $("ctSituacao").value = f.situacao; $("ctStatus").value = f.status; $("ctSaldo").checked = false;
     expanded.clear(); obrasMs.refresh(); render();
   }
@@ -136,18 +162,63 @@ export function mountContratos(root, { contratos }) {
   function renderKpis() {
     const k = totals(view);
     const card = (cls, label, v, title = "") => `<div class="pf-kpi ${cls}"${title ? ` title="${esc(title)}"` : ""}><div class="kl">${label}</div><div class="kv">${v}</div></div>`;
+    const m = medInfo.disponivel ? medTotals(view, f) : null;
     $("ctKpis").innerHTML = card("", "Contratos", k.contratos) +
       card("gold", "Valor contratado", fmtMoney(k.valor, true), fmtMoney(k.valor)) +
       card("ok", "Valor medido", fmtMoney(k.medido, true), fmtMoney(k.medido)) +
       card("warn", "Saldo a medir", fmtMoney(k.saldo, true), fmtMoney(k.saldo)) +
       card("blue", "% medido", k.pct + "%") +
+      (m ? card("", m.filtro ? "Medições no filtro" : "Medições", fmtNum(m.n), m.filtro ? `Medido nas medições do filtro: ${fmtMoney(m.bruto)}` : `${fmtNum(m.n)} medições importadas`) +
+        (m.filtro ? card("ok", "Medido no filtro", fmtMoney(m.bruto, true), fmtMoney(m.bruto)) : "") : "") +
       card("", "Fornecedores", k.fornecedores) + card("", "Obras", k.obras);
+    // data e horário da última atualização das medições + conferência com o 549
+    if (medInfo.disponivel) {
+      const quando = medInfo.exec?.finalizado_em ? fmtDateTime(medInfo.exec.finalizado_em) : "";
+      const dif = m.divergentes ? ` · <b class="t-orange">${m.divergentes} contrato(s)</b> com soma das medições diferente do medido do contrato` : "";
+      $("ctMedInfo").innerHTML = `<span>Medições do UAU XT (Controle de Medições)${quando ? ` atualizadas em <b>${esc(quando)}</b>` : ""} · ${fmtNum(medInfo.linhas)} medições${dif}${semContrato.length ? ` · ${semContrato.length} contrato(s) com medições sem cadastro no relatório 549` : ""}</span>`;
+    } else $("ctMedInfo").innerHTML = '<span>Medições ainda não importadas: o histórico por medição aparece aqui após a próxima atualização do robô.</span>';
+  }
+
+  /* ── Medições do contrato (expansível): resumo financeiro + histórico ── */
+  function medicoesHTML(c) {
+    if (!c.med?.fonte) return "";
+    const pct = c.pct;
+    const resumo = `<div class="ct-msum">
+      <div><span>Valor contratado</span><b>${fmtMoney(c.valor)}</b></div>
+      <div><span>Medido até o momento</span><b class="t-green">${fmtMoney(c.medido)}</b></div>
+      <div><span>Saldo restante</span><b class="${c.saldo < 0 ? "t-red" : "t-orange"}">${fmtMoney(c.saldo)}</b></div>
+      <div><span>% medido</span>${bar(pct)}</div>
+      <div><span>Medições</span><b>${c.med.n}</b></div></div>`;
+    if (c.med.situacao === "sem") return `${resumo}<div class="ct-mnote">Nenhuma medição importada para este contrato no período da extração (01/01/2025 a 31/12/2027). O valor medido acima é o do contrato no ERP.</div>`;
+    const nota = c.med.situacao === "dif"
+      ? `<div class="ct-mnote warn">A soma das medições importadas (${fmtMoney(c.med.bruto)}) difere do medido do contrato (${fmtMoney(c.medido)}) em <b>${fmtMoney(c.med.dif)}</b>. Provável medição fora do período importado; os valores não foram somados nem ajustados.</div>`
+      : `<div class="ct-mnote ok">Conferido: a soma das medições fecha com o valor medido do contrato.</div>`;
+    const ativo = medFiltroAtivo(f);
+    const linhas = c.medicoes.map((m) => {
+      const hit = ativo && medicaoHit(m, f);
+      const desc = m.descontos + m.desc_medicao;
+      return `<tr class="${hit ? "hit" : ""}${ativo && !hit ? " dim" : ""}">
+        <td class="m-n r">${String(m.medicao).padStart(2, "0")}</td>
+        <td class="m-per l" data-l="Período">${esc(fmtPeriodo(m.inicio, m.termino))}</td>
+        <td class="m-st l" data-l="Status">${medBadge(m.status)}</td>
+        <td class="m-v r" data-l="Valor medido">${money(m.subtotal, "strong")}</td>
+        <td class="m-v r" data-l="Descontos">${desc ? money(-desc) : '<span class="pd-nil">—</span>'}</td>
+        <td class="m-v r" data-l="Líquido">${money(m.total)}</td>
+        <td class="m-v r" data-l="Acumulado">${money(m.acumulado, "sub-i")}</td></tr>`;
+    }).join("");
+    const desc = c.med.descontos;
+    return `${resumo}${nota}
+      <table class="ct-med-tbl"><thead><tr>
+        <th class="r">Medição</th><th class="l">Período</th><th class="l">Status</th><th class="r">Valor medido</th><th class="r" title="Descontos e retenções da medição">Descontos</th><th class="r" title="Valor medido − descontos (+ acréscimos)">Líquido</th><th class="r" title="Soma do valor medido até esta medição (calculada)">Acumulado</th>
+      </tr></thead><tbody>${linhas}</tbody>
+      <tfoot><tr><td class="r"></td><td class="l" colspan="2"><b>Total</b> · ${c.med.n} medição(ões)</td><td class="r">${money(c.med.bruto, "strong")}</td><td class="r">${desc ? money(-desc) : "—"}</td><td class="r">${money(c.med.liquido, "strong")}</td><td></td></tr></tfoot></table>`;
   }
 
   /* ── Itens do contrato (expansível) ── */
   function itensHTML(c, words) {
     const head = c.retencao ? `<div class="ct-exp-h"><span class="ct-tag">${esc(c.retencao)}</span></div>` : "";
-    return `<div class="pd-exp-in">${head}
+    const med = medicoesHTML(c);
+    return `<div class="pd-exp-in">${med ? `<h3 class="ct-sec">Medições</h3>${med}<h3 class="ct-sec">Itens do contrato</h3>` : ""}${head}
       <table class="ct-it-tbl"><thead><tr>
         <th class="r">Item</th><th class="l">Serviço</th><th class="r">Qtde</th><th class="r">Preço</th><th class="r">Subtotal</th><th class="r">Medido</th><th class="r">A medir</th><th class="l">% medido</th>
       </tr></thead><tbody>${c.itens.map((i) => {
@@ -201,16 +272,29 @@ export function mountContratos(root, { contratos }) {
             <td class="c-ct l"><b class="ct-num" title="Contrato ${esc(c.contrato)}">${esc(c.contrato)}</b>${c.cod_fornecedor ? `<span class="ct-cod">Forn. ${esc(c.cod_fornecedor)}</span>` : ""}</td>
             <td class="c-desc l"><span class="ct-forn"${c.fornecedor ? ` title="${esc(c.fornecedor)}"` : ""}>${c.fornecedor ? esc(c.fornecedor) : "Fornecedor não informado"}</span><span class="ct-obj"${c.objeto ? ` title="${esc(c.objeto)}"` : ""}>${c.objeto ? esc(c.objeto) : "Sem objeto"}</span></td>
             <td class="c-itens r" data-l="Itens">${c.n_itens}</td>
+            <td class="c-medn r" data-l="Medições"${c.med?.situacao === "dif" ? ` title="Soma das medições difere do medido do contrato em ${esc(fmtMoney(c.med.dif))}"` : ""}>${!c.med?.fonte ? '<span class="pd-nil">—</span>' : `${c.med.n}${c.med.situacao === "dif" ? '<i class="ct-dot" aria-label="divergência"></i>' : ""}`}</td>
             <td class="c-val r" data-l="Valor">${money(c.valor, "strong")}</td>
             <td class="c-med l" data-l="Medido">${money(c.medido)}${bar(c.pct)}</td>
             <td class="c-saldo r" data-l="Saldo"${c.saldo_calc ? ' title="Contrato sem medição: saldo = valor do contrato − medido"' : ""}>${money(c.saldo, c.saldo < 0 ? "neg" : c.saldo > 0.005 ? "strong" : "")}</td>
             <td class="c-st l">${situacaoBadge(c.situacao)}<span class="ct-status ${statusTone(c.status)}">${esc(statusLabel(c.status))}</span></td>
-          </tr>${open ? `<tr class="ct-exp" data-exp="${esc(c.key)}"><td colspan="8">${itensHTML(c, words)}</td></tr>` : ""}`;
+          </tr>${open ? `<tr class="ct-exp" data-exp="${esc(c.key)}"><td colspan="${NCOLS}">${itensHTML(c, words)}</td></tr>` : ""}`;
         }).join("")}</tbody></table></div>
       </section>`;
     });
     list.innerHTML = html;
     syncExpandAll();
+    renderSemContrato();
+  }
+
+  /* ── Medições cujo contrato não está no relatório 549 (não são somadas a nenhum contrato) ── */
+  function renderSemContrato() {
+    const box = $("ctSemContrato");
+    const lista = semContrato.filter((s) => !f.obras.size || f.obras.has(s.obra));
+    if (!lista.length) { box.innerHTML = ""; return; }
+    box.innerHTML = `<section class="pf-card ct-orfas"><header class="ct-obra-h"><div class="ct-obra-t"><span class="ct-obra-k">Conferência</span><h2>Medições sem contrato no relatório 549</h2>
+      <span class="ct-obra-m">${lista.length} contrato(s): aparecem no Controle de Medições, mas não na lista de contratos (provavelmente encerrados ou de outro status). Os valores não entram nos totais acima.</span></div></header>
+      <div class="pf-table-wrap"><table class="ct-med-tbl ct-orf-tbl"><thead><tr><th class="l">Obra</th><th class="r">Contrato</th><th class="l">Contratado · objeto</th><th class="r">Medições</th><th class="r">Valor medido</th></tr></thead><tbody>${lista.map((s) => `
+        <tr><td class="l">${esc(s.obra)}</td><td class="r"><b>${esc(s.contrato)}</b></td><td class="l">${esc(s.contratado || s.fornecedor)}<small>${esc(s.objeto)}</small></td><td class="r">${s.medicoes.length}</td><td class="r">${money(s.medicoes.reduce((t, m) => t + m.subtotal, 0))}</td></tr>`).join("")}</tbody></table></div></section>`;
   }
 
   function syncExpandAll() {

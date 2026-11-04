@@ -44,3 +44,35 @@ export async function fetchContratoKeys(execucaoId) {
   if (!supabase || !execucaoId) return null;
   return fetchAllPages(() => supabase.from(SOURCE_TABLE).select("empresa,obra,contrato,item,chave_contrato").eq("execucao_id", execucaoId).order("id", { ascending: true }));
 }
+
+// ── Medições (UAU XT › Controle de Medições, relatório 9002 do robô) ──
+// View medicoes_registros_atual: só a última carga com sucesso. Uma linha = uma medição de um contrato.
+export const MEDICOES_VIEW = "medicoes_registros_atual";
+export const MEDICOES_REPORT_ID = 9002;
+const MED_COLUMNS = [
+  "id", "chave", "empresa", "obra", "contrato", "medicao", "objeto", "subtotal", "acrescimos", "excedente",
+  "descontos", "desc_medicao", "total", "contratado", "observacao", "status", "inicio_medicao", "termino_medicao",
+  "dt_aprovacao", "quem_aprovou", "cod_fornecedor", "fornecedor", "desc_empresa", "desc_obra"
+].join(",");
+
+/** Medições da última carga. null quando a tabela ainda não existe ou não pode ser lida (a aba segue sem elas). */
+export async function fetchMedicaoRows() {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  try {
+    return await fetchAllPages(() => supabase.from(MEDICOES_VIEW).select(MED_COLUMNS).order("id", { ascending: true }));
+  } catch {
+    return null;
+  }
+}
+
+/** Última carga de medições com sucesso (data e horário da atualização). */
+export async function fetchUltimaExecucaoMedicoes() {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase.from("pedidos_execucoes")
+    .select("id,finalizado_em,periodo_inicio,periodo_fim,linhas")
+    .eq("relatorio", MEDICOES_REPORT_ID).eq("status", "sucesso")
+    .order("iniciado_em", { ascending: false }).limit(1).maybeSingle();
+  return error ? null : data;
+}
