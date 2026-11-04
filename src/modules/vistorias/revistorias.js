@@ -11,13 +11,19 @@
 //   - a atual foi Reprovada e a planilha traz data     → revistoria nova (nº seguinte)
 //     posterior
 //   - a atual já terminou e a planilha a altera         → conflito: só muda se o usuário escolher a planilha
+//   - a atual foi Cancelada (aba Revistoria · Cliente)  → como Reprovada: data posterior = revistoria nova
 // Valor vazio na planilha nunca apaga dado. O status da vistoria (coluna H) nunca é tocado aqui.
+// A mesma tabela guarda os agendamentos feitos na aba Revistoria · Cliente (regras em
+// src/modules/revistoria-cliente/model.js, expostas aqui como `cliente` para a tela de Vistorias).
+export * as cliente from "../revistoria-cliente/model.js";
 
 export const REV_STATUS = [
   { key: "Agendada", label: "Agendada", cor: "#c99a1e", texto: "#3d2f06", fim: false },
   { key: "Em revistoria", label: "Em revistoria", cor: "#7b5cd6", texto: "#ffffff", fim: false },
   { key: "Aprovada", label: "Aprovada", cor: "#2f9e5b", texto: "#ffffff", fim: true },
-  { key: "Reprovada", label: "Reprovada", cor: "#d64545", texto: "#ffffff", fim: true }
+  { key: "Reprovada", label: "Reprovada", cor: "#d64545", texto: "#ffffff", fim: true },
+  // agendamento desmarcado ou remarcado na aba Revistoria · Cliente (fica no histórico)
+  { key: "Cancelada", label: "Cancelada", cor: "#8a948f", texto: "#ffffff", fim: true }
 ];
 export const SEM_STATUS = { key: "", label: "Sem status", cor: "#8a948f", texto: "#ffffff", fim: false };
 // Filtro da lista: os status acima + unidades sem nenhuma revistoria.
@@ -75,7 +81,7 @@ export function comparar(atual, sheet, dataUnidade = "") {
     return avisos.length ? { ...base, kind: "invalid", cur: rotulo(atual), next: "", message: avisos.join("; ") } : null;
   }
   const fim = !!atual && revInfo(atual.status).fim;
-  const nova = !atual || (atual.status === "Reprovada" && !!novo.data && (!atual.data || novo.data > atual.data));
+  const nova = !atual || (["Reprovada", "Cancelada"].includes(atual.status) && !!novo.data && (!atual.data || novo.data > atual.data));
   let kind, merged, rev;
   if (nova) {
     const numero = (atual?.numero || 0) + 1;

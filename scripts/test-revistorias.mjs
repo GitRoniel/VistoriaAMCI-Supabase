@@ -60,7 +60,7 @@ assert.equal(comparar({ numero: 1, status: "Aprovada", data: "2026-10-22", horar
 const lista = [{ numero: 1, status: "Reprovada" }, { numero: 2, status: "Agendada" }];
 assert.equal(ultima(lista).numero, 2);
 assert.deepEqual(resumo([lista, [{ numero: 1, status: "Aprovada" }], [], [{ numero: 1, status: null }]]),
-  { total: 3, semStatus: 1, Agendada: 1, "Em revistoria": 0, Aprovada: 1, Reprovada: 0 });
+  { total: 3, semStatus: 1, Agendada: 1, "Em revistoria": 0, Aprovada: 1, Reprovada: 0, Cancelada: 0 });
 assert.equal(codigoFiltro(lista), "Agendada"); assert.equal(codigoFiltro([]), SEM_REVISTORIA); assert.equal(codigoFiltro([{ numero: 1, status: null }]), "");
 assert.equal(rotulo({ numero: 2, status: "Aprovada", data: "2026-10-22", horario: "09:00:00" }), "nº 2 · Aprovada · 22/10/2026 · 09:00");
 

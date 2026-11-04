@@ -42,7 +42,7 @@ r = await rpc(U.rev_j, 'chaves_retirar', [A02, [k[0].id], 'cx', 'João Antigo', 
 const movAntes = await total(), chavesAntes = Number((await q(`select count(*) from chaves`)).rows[0].count);
 
 console.log('— Aplica as migrations seguintes (inclusive a simplificação)');
-for (const f of readdirSync(MIG).filter((f) => f > '20261024120000_controle_chaves.sql' && f.endsWith('.sql')).sort()) {
+for (const f of readdirSync(MIG).filter((f) => f > '20261024120000_controle_chaves.sql' && f.endsWith('.sql') && !/contratos_medicoes/.test(f)).sort()) {
   if (/rls_erp|somente_leitura_erp|pedidos_observacoes_rls/.test(f)) continue;
   await q(readFileSync(resolve(MIG, f), 'utf8')); console.log('   aplicada', f);
 }

@@ -63,6 +63,8 @@ const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], out
 // Controle de Chaves: aba das Vistorias (index.html), que expõe window.AmciChaves. O CSS fica no
 // index.html para o tema escuro ser gerado junto com o restante da tela.
 const chavesOptions = { ...buildOptions, entryPoints: ["./src/modules/chaves/index.js"], outfile: "www/chaves.js" };
+// Revistoria · Cliente: aba das Vistorias (index.html), que expõe window.AmciRevCliente (CSS no index.html, como o das Chaves).
+const revclienteOptions = { ...buildOptions, entryPoints: ["./src/modules/revistoria-cliente/index.js"], outfile: "www/revcliente.js" };
 // Revistorias da planilha: regras usadas pela importação, mapa, lista e popup (window.AmciRevistorias).
 // Carregado sem "defer": o script principal do index.html usa as regras desde o início.
 const revistoriasOptions = { ...buildOptions, entryPoints: ["./src/modules/vistorias/revistorias.js"], outfile: "www/revistorias.js", globalName: "AmciRevistorias" };
@@ -89,6 +91,7 @@ if (watch) {
   await ctx.watch();
   await (await context(xlsxOptions)).watch();
   await (await context(chavesOptions)).watch();
+  await (await context(revclienteOptions)).watch();
   await (await context(revistoriasOptions)).watch();
   for (const options of platformBuilds) await (await context(options)).watch();
   console.log("Build em observação. Pressione Ctrl+C para encerrar.");
@@ -96,6 +99,7 @@ if (watch) {
   await build(buildOptions);
   await build(xlsxOptions);
   await build(chavesOptions);
+  await build(revclienteOptions);
   await build(revistoriasOptions);
   await Promise.all(platformBuilds.map((options) => build(options)));
   // Mantém o index da raiz sincronizado para quem abrir o projeto localmente.
