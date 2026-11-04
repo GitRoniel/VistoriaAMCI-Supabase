@@ -64,3 +64,36 @@ Abaixo: "somente com saldo a medir", modo compacto e, à direita, a quantidade d
 | Obras | 12 |
 | Contratos com saldo a medir | 105 informados pelo ERP + 22 sem medição |
 | Saldo negativo | 2 contratos (exibidos em vermelho) |
+
+## Medições por contrato (UAU XT › Controle de Medições)
+
+**Fonte:** `public.medicoes_registros`, gravada pelo robô UAU-Sync (execução `relatorio = 9002`) a partir da grade
+**Medição** da tela *Controle de Medições* (todos os contratos, período 01/01/2025 a 31/12/2027, status Aberta,
+Aprovada e Medida). O app lê pela view `public.medicoes_registros_atual` (última carga com sucesso).
+Migration: `supabase/migrations/20261104120000_contratos_medicoes.sql` (só cria a tabela, a view e a função
+`medicoes_robo`; nada existente foi alterado). Leitura: módulo Contratos (RLS), como o 549.
+
+| O quê | Chave / campo | Regra |
+|---|---|---|
+| Medição | `chave` = `empresa-obra-contrato-medicao` | única em cada carga (`unique (execucao_id, chave)`); repetidas não entram duas vezes |
+| Contrato da medição | `empresa` + `obra` + `contrato` | a mesma chave do 549. Nunca pelo nome do fornecedor |
+| Nº da medição | `medicao` ("Código" no UAU) | número da medição dentro do contrato |
+| Período | `inicio_medicao` / `termino_medicao` | o filtro de período pega as medições cujo período se sobrepõe ao intervalo |
+| Valor medido | `subtotal` | valor **da medição** (não acumulado) |
+| Descontos | `descontos` + `desc_medicao` | retenções e descontos da medição |
+| Líquido | `total` | `subtotal + acréscimos + excedente − descontos − desc_medicao` (confere em todas as linhas) |
+| Acumulado | calculado na tela | soma do valor medido até a medição, na ordem do número; não vem do TXT e não é somado a nada |
+
+**Conferência com o 549 (carga completa de 04/11/2026):** 1.126 medições de 182 contratos. 173 contratos existem nos dois
+relatórios; em 168 a soma do `subtotal` das medições (todos os status) é igual ao `valor_medido` do contrato. Nos
+outros 5 o 549 é maior: medições anteriores ao período extraído. A tela mostra a diferença e não soma nem ajusta
+nada. 9 contratos têm medições mas não estão no 549 (que traz só os status 0 a 3): aparecem em
+"Medições sem contrato no relatório 549", fora dos totais. Contrato sem medição importada aparece como
+"sem medições importadas", nunca como medido = 0.
+
+**Tela:** coluna *Medições* (quantidade; ponto laranja = soma das medições diferente do medido do contrato).
+Ao abrir o contrato: resumo financeiro (valor contratado, medido até o momento, saldo, % medido, nº de
+medições), a conferência com o 549 e o histórico (medição, período, status, valor medido, descontos, líquido,
+acumulado, total). Filtros novos: período das medições (de/até) e nº da medição; o filtro de fornecedor também
+procura o contratado das medições. Indicador *Medições* (e *Medido no filtro* com filtro de medição ativo) e a
+data/horário da última carga das medições acima da lista.

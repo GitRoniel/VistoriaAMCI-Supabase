@@ -1,6 +1,7 @@
 // Filtros do Relatório de Contratos (puro: estado → lista filtrada).
 import { normText } from "../../../platform/core/utils.js";
 import { statusLabel } from "./model.js";
+import { medFiltroAtivo, medicaoHit } from "./medicoes.js";
 
 /** Situações encerradas no ERP (o restante conta como "em aberto"). */
 const isClosed = (c) => /conclu|cancel/.test(normText(statusLabel(c.situacao)));
@@ -11,7 +12,9 @@ export const emptyFilters = () => ({
   obras: new Set(), contratos: new Set(),
   status: "todos",
   situacao: "abertas",
-  comSaldo: false
+  comSaldo: false,
+  // medições: período (aaaa-mm-dd) e número da medição
+  medDe: "", medAte: "", medNum: ""
 });
 
 /** Opções de situação/status a partir dos dados reais (valor original do ERP → rótulo). */
@@ -47,7 +50,9 @@ export function applyFilters(contratos, f) {
     if (f.situacao !== "abertas" && f.situacao !== "todas" && c.situacao !== f.situacao) return false;
     if (f.comSaldo && !(c.saldo > 0.005)) return false;
     if (ct && !contratoMatches(c, ct)) return false;
-    if (forn && !normText(c.fornecedor).includes(forn)) return false;
+    // contratado(a): fornecedor do contrato ou contratado das medições
+    if (forn && !normText(c.fornecedor).includes(forn) && !(c.medicoes || []).some((m) => normText(m.contratado).includes(forn))) return false;
+    if (medFiltroAtivo(f) && !(c.medicoes || []).some((m) => medicaoHit(m, f))) return false;
     if (words.length && !c.itens.some((i) => itemHit(i, words))) return false;
     return true;
   });

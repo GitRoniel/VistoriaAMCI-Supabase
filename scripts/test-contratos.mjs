@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import { buildContratos, dedupeRows, totals, statusLabel } from "../src/modules/contratos/contratos/model.js";
 import { applyFilters, emptyFilters } from "../src/modules/contratos/contratos/filters.js";
+import { groupMedicoes, attachMedicoes, medTotals, medicaoNoPeriodo, fmtPeriodo } from "../src/modules/contratos/contratos/medicoes.js";
 
 const row = (o) => ({
   empresa: 18, desc_empresa: "ALTO DO BURITI - CONSTRUTORA", obra: "18PRE", desc_obra: "SERVICOS PRELIMINARES",
@@ -56,5 +57,43 @@ assert.equal(applyFilters(cs, { ...f, contrato: "1" }).length, 3, "número do co
 assert.equal(applyFilters(cs, { ...f, fornecedor: "concret" }).length, 1);
 assert.equal(applyFilters(cs, { ...f, situacao: "todas", comSaldo: true }).length, 3);
 assert.equal(applyFilters(cs, { ...f, obras: new Set(["16OBA"]) }).length, 1);
+
+// ── Medições (Controle de Medições do UAU XT) ──
+const med = (o) => ({ empresa: 18, obra: "18PRE", status: "2 - Medida", acrescimos: 0, excedente: 0, descontos: 0, desc_medicao: 0, contratado: "MANITUR", ...o,
+  chave: `${o.empresa ?? 18}-${o.obra ?? "18PRE"}-${o.contrato}-${o.medicao}` });
+const medRows = [
+  med({ id: 1, contrato: 11, medicao: 2, subtotal: 400, total: 380, descontos: 20, inicio_medicao: "2026-02-01", termino_medicao: "2026-02-28" }),
+  med({ id: 2, contrato: 11, medicao: 1, subtotal: 500, total: 475, descontos: 25, inicio_medicao: "2026-01-01", termino_medicao: "2026-01-31" }),
+  med({ id: 3, contrato: 11, medicao: 1, subtotal: 500, total: 475, descontos: 25, inicio_medicao: "2026-01-01", termino_medicao: "2026-01-31" }), // repetida
+  // mesmo número de contrato em outra obra: só entra no contrato dessa obra (e não fecha com o medido do 549)
+  med({ id: 4, empresa: 16, obra: "16OBA", contrato: 11, medicao: 1, subtotal: 200, total: 200, contratado: "CONCRETEIRA X", inicio_medicao: "2026-03-01", termino_medicao: "2026-03-31", status: "1 - Aprovada" }),
+  // contrato que não existe no 549
+  med({ id: 5, contrato: 99, medicao: 1, subtotal: 50, total: 50, inicio_medicao: "2026-01-10", termino_medicao: "2026-01-20" })
+];
+const cs2 = buildContratos(rows);
+const orfas = attachMedicoes(cs2, groupMedicoes(medRows));
+const m11 = cs2.find((x) => x.key === "18-18PRE-11");
+assert.deepEqual(m11.medicoes.map((m) => m.medicao), [1, 2], "medições por número, sem a repetida");
+assert.equal(m11.med.bruto, 900, "soma do valor medido das medições (não acumulado)");
+assert.equal(m11.med.liquido, 855);
+assert.equal(m11.medicoes[1].acumulado, 900, "acumulado calculado pela ordem das medições");
+assert.equal(m11.med.situacao, "ok", "soma das medições = medido do contrato no 549");
+const m16 = cs2.find((x) => x.key === "16-16OBA-11");
+assert.equal(m16.med.n, 1, "medição ligada pela empresa + obra + contrato, não pelo número sozinho");
+assert.equal(m16.med.situacao, "dif"); assert.equal(m16.med.dif, 50, "diferença mostrada, não somada");
+const m13 = cs2.find((x) => x.key === "18-18PRE-13");
+assert.equal(m13.med.situacao, "sem", "contrato sem medição importada não vira medido = 0");
+assert.equal(orfas.length, 1); assert.equal(orfas[0].key, "18-18PRE-99", "medição sem contrato no 549 fica separada");
+assert.equal(medTotals(cs2, emptyFilters()).n, 3, "medições dos contratos (a órfã fica fora)");
+const fm = { ...emptyFilters(), situacao: "todas" };
+assert.equal(applyFilters(cs2, { ...fm, medNum: "2" }).length, 1, "filtro pelo número da medição");
+assert.equal(applyFilters(cs2, { ...fm, medDe: "2026-03-01", medAte: "2026-03-31" }).length, 1, "filtro pelo período da medição");
+assert.equal(medTotals(cs2, { ...fm, medDe: "2026-01-01", medAte: "2026-01-31" }).bruto, 500, "medido no período");
+assert.equal(applyFilters(cs2, { ...fm, fornecedor: "concreteira" }).length, 1, "contratado(a)");
+assert.ok(medicaoNoPeriodo({ inicio: "2026-01-25", termino: "2026-02-05" }, "2026-02-01", "2026-02-28"), "período que se sobrepõe entra");
+assert.equal(fmtPeriodo("2026-09-01", "2026-09-30"), "set/2026");
+assert.equal(fmtPeriodo("2026-09-30", "2026-09-30"), "30/09/2026");
+assert.equal(fmtPeriodo("2026-09-03", "2026-09-25"), "03 a 25/09/2026");
+assert.equal(attachMedicoes(buildContratos(rows), null).length, 0, "sem a tabela de medições a aba segue igual");
 
 console.log("Regras do Relatório de Contratos verificadas.");

@@ -211,7 +211,8 @@ Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estat�
 
 - Página única `/relatorios`, com uma aba por módulo:
   - **Suprimentos:** o antigo "Relatório de Controle de Pedidos" (que lia a planilha do Google), agora lendo o Supabase (`pedidos_registros_1187`, pela view `pedidos_registros_atual`). O endereço antigo `/suprimentos/pedidos` abre esta aba.
-  - **Contratos:** contratos, medições e saldos por obra, lendo `contratos_registros_549` (view `contratos_registros_atual`). Hierarquia Obra → Contrato → itens/serviços (expansível).
+  - **Contratos:** contratos, medições e saldos por obra, lendo `contratos_registros_549` (view `contratos_registros_atual`). Hierarquia Obra → Contrato → medições e itens/serviços (expansível).
+    - **Medições por contrato** (desde 04/11/2026): histórico de cada medição (período, status, valor medido, descontos, líquido, acumulado) vindo do *Controle de Medições* do UAU XT (`medicoes_registros`, view `medicoes_registros_atual`), ligado ao contrato por empresa + obra + contrato, com conferência contra o valor medido do 549, filtros de período e nº da medição e a lista de medições sem contrato no 549. Sem a migration `20261104120000_contratos_medicoes.sql` a aba funciona como antes.
 - Layout no mesmo padrão do site de Vistorias, com tema claro/escuro, celular e impressão.
 - Acesso por módulo: cada usuário vê só as abas (e os cards no seletor de obras) dos módulos liberados, e só consegue ler esses dados (RLS). Os administradores do módulo liberam acessos em Liberações › Acesso aos módulos.
 - Arquitetura, segurança e como criar novos relatórios: [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
