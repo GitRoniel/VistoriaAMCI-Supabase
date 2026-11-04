@@ -111,7 +111,8 @@ assert.match(html, /data-theme-toggle/);
 assert.match(html, /const showRev=cur==="rf";/);
 // Revistoria: data e responsável próprios, obrigatórios para finalizar; visíveis na lista, impressão e exportação.
 assert.ok(html.includes('resp_revistoria:"reinspection_responsible"') && html.includes("reinspection_responsible"), "Responsável da revistoria precisa ter coluna própria.");
-assert.ok(html.includes('<th class="cw-d th-rev">Data revistoria</th>') && html.includes("function exportCliList") && html.includes("Responsável revistoria"), "Lista geral precisa mostrar e exportar data e responsável da revistoria.");
+// Data e responsável da revistoria saíram da lista da Vistoria (ficam na aba Revistoria · Cliente); a Visão Geral e a exportação continuam com eles.
+assert.ok(html.includes('<th class="cw-d th-rev">Data revistoria</th>') && html.includes("function exportCliList") && html.includes("Responsável revistoria"), "Visão Geral e exportação precisam manter data e responsável da revistoria.");
 assert.ok(!html.includes("pendingStatus") && !html.includes("Informe a data e o responsável pela revistoria"), "Revistoria Finalizada não exige data nem responsável.");
 // Excluir obra: exclusão lógica, confirmação por nome, só administradores, com log.
 assert.ok(html.includes('supabase.rpc("arquivar_condominio"') && html.includes("condArchiveMatch") && html.includes('supabase.rpc("restaurar_condominio"'), "Excluir obra precisa arquivar com confirmação e permitir restaurar.");
@@ -196,5 +197,24 @@ assert.match(revPlanilha, /coalesce\(private\.project_role\(p_project_id\) = 'ad
 assert.doesNotMatch(revPlanilha.slice(revPlanilha.indexOf("-- ── Revistorias ──")), /set\s+status\s*=\s*v_rec/, "Revistoria não altera o status da vistoria.");
 assert.ok(html.includes('<script src="./revistorias.js"></script>') && html.includes("p_revistorias") && html.includes("IMPORT_REV_COLUMNS"), "Importação e telas das revistorias.");
 await import("./test-revistorias.mjs");
+
+// Revistoria · Cliente: aba própria, colunas de revistoria fora da lista da Vistoria, etiquetas no Controle de Chaves.
+const revCli = await readFile(resolve(root, "supabase/migrations/20261105120000_revistoria_cliente.sql"), "utf8");
+assert.match(revCli, /alter table public\.revistorias_cliente enable row level security/);
+assert.match(revCli, /alter table public\.revistorias_eventos enable row level security/);
+assert.match(revCli, /grant select on table public\.revistorias_cliente, public\.revistorias_eventos to authenticated/);
+assert.doesNotMatch(revCli, /grant (insert|update|delete)[^;]*(revistorias_cliente|revistorias_eventos)/i, "Revistoria · Cliente: escrita só pelas funções do banco.");
+assert.doesNotMatch(revCli, /drop table|truncate|delete from public\.(revistorias|client_inspections)/i, "Revistoria · Cliente não apaga dados.");
+assert.match(revCli, /unit_id bigint not null unique references public\.units/, "Uma linha de acompanhamento por unidade (sem duplicar).");
+assert.match(revCli, /after insert or update of status on public\.client_inspections/, "Entrada automática pelo status da vistoria.");
+const listaCli = html.slice(html.indexOf("function renderCliList"), html.indexOf("function printCliList"));
+assert.ok(listaCli && !/Data revistoria|Resp\. revistoria|th-rvs/.test(listaCli), "Lista da Vistoria sem as colunas Data Revistoria, Resp. Revistoria e Revistoria.");
+assert.ok(html.includes('data-view="revcli"') && html.includes('id="revcliRoot"') && html.includes('<script src="./revcliente.js" defer></script>'), "Aba Revistoria · Cliente não encontrada.");
+assert.ok(html.indexOf('data-view="cliente"') < html.indexOf('data-view="revcli"') && html.indexOf('data-view="revcli"') < html.indexOf('data-view="stats"'), "Revistoria · Cliente fica logo depois da Vistoria.");
+assert.ok(html.includes('table:"revistorias_cliente"') && html.includes("RVC.passaFiltroRapido"), "Tempo real e filtro rápido da Revistoria · Cliente na Vistoria.");
+const revCliJs = await readFile(resolve(root, "www/revcliente.js"), "utf8").catch(() => "");
+assert.ok(revCliJs.includes("revistoria_agendar") && revCliJs.includes("revistoria_resultado") && revCliJs.includes("revistoria_reabrir") && !/\.from\("(revistorias_cliente|revistorias|client_inspections)"\)\.(insert|update|upsert|delete)/.test(revCliJs), "Aba Revistoria · Cliente grava só pelas funções do banco.");
+assert.ok(chavesJs.includes("rc-badge") && !/client_inspections"\)\.(update|insert)|revistoria_(agendar|resultado|cancelar|reabrir)/.test(chavesJs), "Controle de Chaves mostra a Revistoria · Cliente sem alterá-la.");
+await import("./test-revistoria-cliente.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

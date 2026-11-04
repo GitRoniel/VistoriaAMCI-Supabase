@@ -144,6 +144,7 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Ao escolher **Revistoria Finalizada**, o status é gravado na hora; data e responsável da revistoria aparecem no popup e são **opcionais**.
 - Cada unidade guarda a revistoria mais recente; as anteriores ficam no registro de logs.
 - Filtros da lista: período por data da vistoria, da revistoria ou ambas; ordenação por qualquer uma das duas. **Imprimir** e **Exportar** (CSV que abre no Excel) incluem as duas datas e os dois responsáveis.
+- **Desde 05/11/2026** as colunas Data revistoria, Resp. revistoria e Revistoria saíram da lista da Vistoria (e da impressão), e o período/ordenação da lista usam só a data da vistoria: a revistoria passou a ser acompanhada na aba **Revistoria · Cliente**. Os campos continuam no banco, no popup da unidade (Revistoria Finalizada), na Visão Geral e na exportação.
 
 ## Excluir obra
 
@@ -171,12 +172,40 @@ Banco: colunas `projects.kind`, `color`, `import_aliases`, `created_by` e funç�
 - Cada condomínio mostra uma barra compacta com os mesmos critérios do Resumo Geral: realizadas (aprovado + revistoria + revistoria finalizada), agendadas (agendado + remarcado) e a agendar (não agendado).
 - A busca filtra os cards de condomínios e relatórios, sem acento.
 
+## Revistoria · Cliente
+
+Aba do condomínio logo depois de Vistoria · Cliente ("Revistoria" na barra inferior do celular), para acompanhar as revistorias pedidas pelo cliente sem misturar com a vistoria inicial. Código em `src/modules/revistoria-cliente/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/revcliente.js`; o CSS fica no `www/index.html`.
+
+- **Entrada automática:** quando o status da vistoria passa a **Revistoria**, a unidade entra na aba como **Em andamento**, ligada à vistoria original (`client_inspections.id`), ao condomínio, bloco e unidade. Uma linha por unidade: sair e voltar para Revistoria não duplica. Se estava Aprovada, começa um ciclo novo.
+- **Situação:** Em andamento (amarelo: aguardando agendamento) → **Agendado** (azul: data e responsável definidos) → **Aprovado** (verde). Sem registro = cinza; "Em Revistoria" (laranja) no filtro = ainda não aprovado.
+- **Vários ciclos:** cada agendamento é um registro próprio (nº 1, 2, 3…) com data, horário, responsável, status do agendamento (agendado, realizado, cancelado), data da realização, resultado e observações. Nada é sobrescrito.
+  - **Agendar** (Em andamento → Agendado): data e responsável obrigatórios; horário e observação opcionais.
+  - **Remarcar** (Agendado): o agendamento anterior fica no histórico como **Cancelado** e um novo é criado.
+  - **Cancelar agendamento** (Agendado → Em andamento), com motivo opcional.
+  - **Registrar resultado** (Agendado): data da realização (não pode ser futura), responsável, observações.
+    - **Aprovada** → Aprovado, e a vistoria passa de Revistoria para **Revistoria Finalizada**, com a data e o responsável da revistoria (os mesmos campos de antes: Resumo Geral e Estatística continuam corretos).
+    - **Reprovada** (pendências obrigatórias) → **Em andamento** num ciclo novo, aguardando outro agendamento.
+  - **Reabrir** (Aprovado, novas pendências obrigatórias) → Em andamento num ciclo novo; a vistoria volta de Revistoria Finalizada para Revistoria.
+  - Quem finaliza a revistoria pela aba Vistoria (como antes) também deixa a unidade Aprovada aqui. A importação da planilha (colunas K, L e M) grava nos mesmos agendamentos e atualiza a situação, sem mudar o status da vistoria.
+- **Tela:** indicadores (em revistoria, em andamento, agendados, aprovados, revistorias realizadas, próximos 7 dias), filtros rápidos (Todos, Aprovados, Em Revistoria, Em andamento, Agendados), bloco/conjunto e busca por unidade ou cliente; **Lista** (situação, status da vistoria, próxima/última revistoria, responsável, nº de revistorias realizadas, ação) e **Mapa**. Painel da unidade com os agendamentos e o histórico (quem, quando, de/para, ciclo).
+- **Na aba Vistoria:** os mesmos filtros rápidos (Aprovados = vistoria aprovada ou revistoria aprovada; Em Revistoria = vistoria em Revistoria; Em andamento/Agendados = situação da revistoria), o canto colorido das unidades no mapa mostra a situação da Revistoria · Cliente e o Resumo Geral traz os números da aba.
+- **No Controle de Chaves:** colunas **Status vistoria** e **Revistoria · Cliente** (etiquetas) na lista, no painel e na dica do mapa, só para leitura: nada no Controle de Chaves altera a vistoria ou a revistoria.
+- **Permissões:** admin e revistorias agendam e registram; visitante só consulta. O banco confere de novo: permissão, campos, tela desatualizada (`versao`: duas pessoas ao mesmo tempo, só uma grava) e clique repetido (`pedido_id`).
+- **Banco** (`20261105120000_revistoria_cliente.sql`):
+  - `revistorias` (já existia, da planilha) passa a guardar cada agendamento: ganha `responsavel`, `observacoes`, `realizada_em`, `resultado_obs`, `ciclo`, o status `Cancelada` e as origens `SISTEMA`/`VISTORIA`;
+  - `revistorias_cliente`: situação por unidade (status, ciclo, agendamento atual, versão, quem alterou);
+  - `revistorias_eventos`: histórico imutável (não pode ser alterado nem apagado);
+  - escrita só pelas funções `revistoria_agendar`, `revistoria_cancelar`, `revistoria_resultado` e `revistoria_reabrir` (security definer) e pelos gatilhos de sincronização; leitura por RLS para membros do condomínio; tempo real nas duas tabelas novas;
+  - situação inicial sem apagar nada: unidades em Revistoria → Em andamento; em Revistoria Finalizada → Aprovado, com a revistoria registrada a partir da data e do responsável que já estavam na vistoria.
+- **Sem a migration aplicada**, a aba avisa que não está instalada; o resto das Vistorias continua igual.
+- **Testes:** regras da tela em `scripts/test-revistoria-cliente.mjs` (no `pnpm check`); banco em `scripts/db-tests/revistoria-cliente/` (`reset.sh 20261103180000` e depois `test.mjs`).
+
 ## Controle de Chaves
 
-Quarta aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). Mostra onde está a chave de cada unidade e quem é o responsável. Usa as unidades do Mapa das Vistorias, sem cadastro próprio. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
+Última aba do condomínio, ao lado de Resumo Geral, Vistoria · Cliente, Revistoria · Cliente e Estatística Geral ("Chaves" na barra inferior do celular). Mostra onde está a chave de cada unidade e quem é o responsável. Usa as unidades do Mapa das Vistorias, sem cadastro próprio. Código em `src/modules/chaves/` (`model.js` regras, `service.js` Supabase, `index.js` tela), compilado em `www/chaves.js`; o CSS fica no `www/index.html`.
 
 - **Setor (cor da unidade):** Base (azul), CX (verde), Asstec (laranja), Produção (vermelho), Entregue para Cliente (roxo) e Sem status (cinza: nenhum registro). A chave é acompanhada por unidade, como um todo: sem quantidades nem conferência de cópias.
-- **Mapa e lista** (botões Mapa/Lista). A lista tem Unidade (com o status da vistoria), Setor atual, Responsável, Última movimentação e Ação (Transferir e Histórico). No celular, cada linha vira um cartão.
+- **Mapa e lista** (botões Mapa/Lista). A lista tem Unidade, Status vistoria, Revistoria · Cliente, Setor atual, Responsável, Última movimentação e Ação (Transferir e Histórico). No celular, cada linha vira um cartão.
 - **Filtros:** condomínio, bloco/conjunto, unidade, status da vistoria e setor. Os indicadores de cada setor também filtram ao clicar.
 - **Painel da unidade:** setor atual, responsável, data e hora da última movimentação e quem a registrou, status da vistoria, e os botões **Transferir** e **Histórico**.
 - **Transferir para outro setor:** unidade → Transferir → setor de destino (Base, CX, Asstec, Produção ou Entregue para Cliente) → responsável que recebe → Confirmar transferência.

@@ -9,6 +9,7 @@
 //         unidade → Marcar chave perdida → Solicitar chaveiro → Registrar cópia → Regularizar chave
 import * as M from "./model.js";
 import * as S from "./service.js";
+import { info as rcInfo } from "../revistoria-cliente/model.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const FILTRO0 = () => ({ bloco: "ALL", apto: "", setor: [], vistoria: "", perdida: "" });
@@ -16,6 +17,9 @@ const pad = (n) => String(n).padStart(2, "0");
 const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const novoPedido = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)));
 const pill = (setor, extra = "") => { const s = M.SETORES[setor] || M.SETORES.sem; return `<span class="ch-spill${extra}" style="--c:${s.cor};--b:${s.borda};--t:${s.texto}">${esc(s.label)}</span>`; };
+// Status da Vistoria e da Revistoria · Cliente (só leitura: lidos das próprias tabelas pela tela de Vistorias).
+const vistBadge = (c) => { const vc = host.vistoriaCor(c); return `<span class="ch-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(c))}</span>`; };
+const revBadge = (st) => { if (!st) return '<span class="ch-mut">—</span>'; const i = rcInfo(st); return `<span class="rc-badge sm" style="--c:${i.cor};--b:${i.borda}">${esc(i.label)}</span>`; };
 const etapaPill = (etapa) => `<span class="ch-epill e-${etapa}">${esc(M.ETAPAS[etapa]?.label || etapa)}</span>`;
 const SETA = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
 const ICONE = {
@@ -63,7 +67,7 @@ function agendarRecarga() { clearTimeout(recarga); recarga = setTimeout(() => { 
 
 function unidade(u) {
   const unitId = host.unitId(u.b, u.p, u.a);
-  return { ...u, unitId, codigo: host.codigo(u.b, u.p, u.a), titulo: host.titulo(u.b, u.p, u.a), vistoria: host.vistoria(u.b, u.p, u.a), situacao: sit.get(unitId) || M.situacao(null) };
+  return { ...u, unitId, codigo: host.codigo(u.b, u.p, u.a), titulo: host.titulo(u.b, u.p, u.a), vistoria: host.vistoria(u.b, u.p, u.a), revistoria: host.revistoria?.(u.b, u.p, u.a) || "", situacao: sit.get(unitId) || M.situacao(null) };
 }
 const todasUnidades = () => host.units().filter((u) => host.unitId(u.b, u.p, u.a)).map(unidade);
 const podeMovimentar = () => ["admin", "revistorias"].includes(host?.papel());
@@ -162,7 +166,7 @@ function htmlMapa(lista, ok) {
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
     const st = u.situacao, s = M.SETORES[st.setor], o = st.perdida;
     const tip = [u.titulo, o ? `Chave perdida · ${M.ETAPAS[o.etapa].label}` : st.setor === "sem" ? "Chave: sem status" : `Chave: ${s.label}${st.responsavel ? " com " + st.responsavel : ""}`,
-      st.movimentadoEm ? `desde ${fmtDH(st.movimentadoEm)}` : ""].filter(Boolean).join(" · ");
+      st.movimentadoEm ? `desde ${fmtDH(st.movimentadoEm)}` : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`, u.revistoria ? `Revistoria · Cliente: ${rcInfo(u.revistoria).label}` : ""].filter(Boolean).join(" · ");
     const cls = ["apt", "ch-u", o ? `lost e-${o.etapa}` : "", ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
     return `<button type="button" class="${cls}" data-chu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.cor};color:${s.texto};border-color:${s.borda}">${esc(host.casa() ? +a : a)}</button>`;
   };
@@ -190,19 +194,21 @@ function htmlLista(vis) {
   // lista: bloco a bloco, do térreo para cima (o mapa mostra o 6º pavimento no topo)
   vis = [...vis].sort((x, y) => gi(x.b) - gi(y.b) || pi(x.p) - pi(y.p) || String(x.a).localeCompare(String(y.a), "pt-BR", { numeric: true }));
   const linha = (u) => {
-    const st = u.situacao, o = st.perdida, vc = host.vistoriaCor(u.vistoria), attrs = `data-chu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`;
+    const st = u.situacao, o = st.perdida, attrs = `data-chu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`;
     const ac = acoes(u);
     const principal = o ? (ac.length ? `<button type="button" class="btn p ch-mini ch-mini-lost" ${attrs} data-acao="${ac[0]}">${FORMS[ac[0]].botao}</button>` : "")
       : ac.includes("transferir") ? `<button type="button" class="btn p ch-mini" ${attrs} data-acao="transferir">Transferir</button>` : "";
     return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${o ? " lost" : ""}">
-      <td class="ch-c-un"><b>${esc(host.casa() ? `Conj. ${u.b} · Casa ${+u.a}` : `Bloco ${u.b} · ${u.codigo}`)}</b><span class="ch-vst" style="--c:${vc.bd}">${esc(host.vistoriaLabel(u.vistoria))}</span></td>
+      <td class="ch-c-un"><b>${esc(host.casa() ? `Conj. ${u.b} · Casa ${+u.a}` : `Bloco ${u.b} · ${u.codigo}`)}</b></td>
+      <td class="ch-c-vst">${vistBadge(u.vistoria)}</td>
+      <td class="ch-c-rc">${revBadge(u.revistoria)}</td>
       <td class="ch-c-st">${pill(st.setor)}${o ? etapaPill(o.etapa) : ""}</td>
       <td class="ch-c-resp">${o ? `<span class="ch-mut">${o.responsavel_anterior ? `antes: ${esc(o.responsavel_anterior)}` : "—"}</span>` : esc(st.responsavel) || '<span class="ch-mut">—</span>'}</td>
       <td class="ch-c-dt">${st.movimentadoEm ? `${fmtDH(st.movimentadoEm)}${st.movimentadoPor ? `<small>${esc(st.movimentadoPor)}</small>` : ""}` : '<span class="ch-mut">—</span>'}</td>
       <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
     </tr>`;
   };
-  return `<div class="gridscroll ch-tblw"><table class="ctbl ch-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Setor atual</th><th class="th-cli">Responsável</th><th>Última movimentação</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+  return `<div class="gridscroll ch-tblw"><table class="ctbl ch-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Status vistoria</th><th>Revistoria · Cliente</th><th>Setor atual</th><th class="th-cli">Responsável</th><th>Última movimentação</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
 }
 
 /* ── painel da unidade ── */
@@ -303,6 +309,7 @@ function pintarPopup() {
         <div><span>Responsável</span><b>${esc(st.responsavel) || "—"}</b></div>
         <div><span>Última movimentação</span><b>${st.movimentadoEm ? fmtDH(st.movimentadoEm) : "—"}</b>${st.movimentadoPor ? `<small>por ${esc(st.movimentadoPor)}</small>` : ""}</div>
         <div><span>Status da vistoria</span><b class="ch-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(u.vistoria))}</b></div>
+        ${host.revistoriaInstalada?.() ? `<div><span>Revistoria · Cliente</span>${revBadge(u.revistoria)}</div>` : ""}
       </div>
       <div class="ch-btns">${botoes}</div>
       ${!podeMovimentar() ? `<div class="pp-ro">Seu acesso a este condomínio é de consulta: transferências e chaves perdidas são registradas por administradores e pela equipe de revistorias.</div>` : ""}

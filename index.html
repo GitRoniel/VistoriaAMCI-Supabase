@@ -1575,13 +1575,13 @@ html{background-color:var(--status-top,var(--chrome-top))}
   .project-actions .project-theme{justify-self:start}
 }
 /* ── CONTROLE DE CHAVES (src/modules/chaves) ── mesmo padrão do Mapa das Vistorias ── */
-.vw-switch{grid-template-columns:repeat(4,minmax(0,1fr))}
-#v-chaves .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
-#v-chaves .sec-head .icn{width:30px;height:30px;border-radius:9px}
-#v-chaves .sec-head .icn svg{width:15px;height:15px}
-#v-chaves .sec-head h2{font-size:17px;white-space:nowrap}
-#v-chaves .sec-head .sh-flow{font-size:12px;min-width:0}
-#v-chaves .sec-body{padding:12px 14px}
+.vw-switch{grid-template-columns:repeat(5,minmax(0,1fr))}
+#v-chaves .sec-head,#v-revcli .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
+#v-chaves .sec-head .icn,#v-revcli .sec-head .icn{width:30px;height:30px;border-radius:9px}
+#v-chaves .sec-head .icn svg,#v-revcli .sec-head .icn svg{width:15px;height:15px}
+#v-chaves .sec-head h2,#v-revcli .sec-head h2{font-size:17px;white-space:nowrap}
+#v-chaves .sec-head .sh-flow,#v-revcli .sec-head .sh-flow{font-size:12px;min-width:0}
+#v-chaves .sec-body,#v-revcli .sec-body{padding:12px 14px}
 .ch-root{display:block}
 .ch-state{display:flex;flex-direction:column;align-items:center;gap:8px;padding:34px 16px;text-align:center;color:var(--muted);font-size:13px}
 .ch-state b{color:var(--ink);font-size:14px}
@@ -1726,12 +1726,12 @@ html{background-color:var(--status-top,var(--chrome-top))}
 .ch-h4{color:#8a958e;font-size:10.5px}
 @media(max-width:1100px){.ch-top{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:720px){
-  #v-chaves .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
-  #v-chaves .sec-head .icn{width:26px;height:26px;border-radius:8px}
-  #v-chaves .sec-head .icn svg{width:13px;height:13px}
-  #v-chaves .sec-head h2{font-size:15px}
-  #v-chaves .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
-  #v-chaves .sec-body{padding:8px}
+  #v-chaves .sec-head,#v-revcli .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
+  #v-chaves .sec-head .icn,#v-revcli .sec-head .icn{width:26px;height:26px;border-radius:8px}
+  #v-chaves .sec-head .icn svg,#v-revcli .sec-head .icn svg{width:13px;height:13px}
+  #v-chaves .sec-head h2,#v-revcli .sec-head h2{font-size:15px}
+  #v-chaves .sec-head .sh-flow,#v-revcli .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
+  #v-chaves .sec-body,#v-revcli .sec-body{padding:8px}
   .ch-top{gap:5px}
   .ch-kpi{padding:6px 7px}
   .ch-kpi b{font-size:16px}
@@ -1796,6 +1796,70 @@ html{background-color:var(--status-top,var(--chrome-top))}
 .rg-mini.rg-mini-rv{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:6px}
 .rg-mini-rv .m{border-top:3px solid var(--rvs)}
 @media(max-width:420px){.pp-revs li{grid-template-columns:auto 1fr}.pp-revs li span:last-child{grid-column:1/-1}}
+/* ── REVISTORIA · CLIENTE (src/modules/revistoria-cliente) ── reaproveita lista, mapa e painel do Controle de Chaves ── */
+.rc-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;border:1px solid var(--b);background:color-mix(in srgb,var(--c) 16%,#fff);color:var(--ink);font-size:11.5px;font-weight:700;white-space:nowrap;line-height:1.5}
+.rc-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px var(--b);flex:0 0 auto}
+.rc-badge.sm{font-size:10.5px;padding:1px 7px 1px 6px}
+.rc-badge.lg{font-size:13px;padding:3px 11px 3px 9px}
+.pp-revs .pp-label .rc-badge{margin:0 4px;vertical-align:1px}
+.rc-top{grid-template-columns:repeat(6,minmax(0,1fr))}
+.ch-kpi.k-info{cursor:default}
+.rc-tbl td small{display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px}
+.rc-tbl .rc-c-un small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.rc-tbl .rc-c-n{text-align:center!important;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rc-tbl .rc-c-dt b{font-weight:700;color:var(--ink)}
+.rc-tbl .rc-c-st,.rc-tbl .rc-c-vst,.ch-tbl .ch-c-vst,.ch-tbl .ch-c-rc{white-space:nowrap}
+.rc-vpill{font-size:11px!important}
+.rc-u.rc-sem{opacity:.6}
+.rc-u .rc-n{position:absolute;top:-5px;right:-5px;min-width:13px;height:13px;padding:0 2px;border-radius:7px;background:#1f4a3f;color:#fff;font-size:8.5px;font-style:normal;font-weight:800;line-height:13px;text-align:center;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+.rc-sw-n{display:inline-flex!important;align-items:center;justify-content:center;background:#1f4a3f!important;border-color:#1f4a3f!important;color:#fff;font-size:8.5px;font-weight:800;border-radius:7px!important}
+.ch-now .ch-now-st small{margin-top:1px}
+.rc-act-sec:not(.p){color:#5f6b64!important}
+.rc-btn-sec{background:#5f6b64!important;border-color:#5f6b64!important}
+.rc-form input[type=date],.rc-form input[type=time]{width:100%;min-width:0;height:40px;border:1.5px solid #d3ddd6;border-radius:9px;background:#fbfcfb;color:var(--ink);font-family:inherit;font-size:14px;padding:0 11px;box-sizing:border-box}
+.rc-form .pp-f>span small{text-transform:none;letter-spacing:0;font-weight:600}
+.rc-dh{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:10px}
+.rc-res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rc-opt{position:relative}
+.rc-opt input{position:absolute;opacity:0;pointer-events:none}
+.rc-opt span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:48px;padding:5px 8px;border-radius:11px;border:1.5px solid #dfe7e1;background:#fff;font-size:13px;font-weight:800;color:#52675d;cursor:pointer;text-align:center}
+.rc-opt small{font-size:10px;font-weight:600;color:var(--muted)}
+.rc-opt.ok input:checked+span{border-color:#2f9e5b;background:#eef8f1;color:#1d6b3c;box-shadow:0 0 0 1px #2f9e5b}
+.rc-opt.rep input:checked+span{border-color:#d64545;background:#fdf3f2;color:#9e2f25;box-shadow:0 0 0 1px #d64545}
+.rc-opt input:focus-visible+span{outline:2px solid #6b8040;outline-offset:2px}
+.rc-ags .pp-label{margin:0 0 6px}
+.rc-ags .pp-label small{text-transform:none;letter-spacing:0;font-weight:600}
+.rc-ags ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;max-height:300px;overflow:auto}
+.rc-ag{padding:6px 10px;border-left:3px solid #2459b5;border-radius:0 10px 10px 0;background:#f8faf8;font-size:12px;line-height:1.45}
+.rc-ag.ok{border-left-color:#2f9e5b} .rc-ag.rep{border-left-color:#d64545;background:#fdf8f7} .rc-ag.can{border-left-color:#b9c1bc;color:#6f7a74}
+.rc-ag1{display:flex;align-items:center;flex-wrap:wrap;gap:4px 9px}
+.rc-ag1 b{color:var(--ink)}
+.rc-ag1 span{font-variant-numeric:tabular-nums;color:#33463d;font-weight:600}
+.rc-ag1 .rc-ag-st{margin-left:auto;font-weight:700}
+.rc-ag.ok .rc-ag-st{color:#1d6b3c} .rc-ag.rep .rc-ag-st{color:#9e2f25} .rc-ag.ab .rc-ag-st{color:#2459b5}
+.rc-ag1 small{font-size:10px;color:var(--muted);font-weight:600}
+.rc-ag2{color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
+.rc-ag2 em{font-style:normal;color:#33463d}
+.ch-rota .rc-badge{font-size:10px;padding:0 6px 0 5px}
+@media(max-width:1100px){.rc-top{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){
+  .rc-top{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rc-tbl tr{grid-template-columns:minmax(0,1fr) auto}
+  .rc-tbl .rc-c-un small{max-width:none;white-space:normal}
+  .rc-tbl .rc-c-vst{grid-column:1;display:flex!important;align-items:center;gap:6px}
+  .rc-tbl .rc-c-vst::before{content:'Vistoria';font-size:11px;color:var(--muted)}
+  .rc-tbl .rc-c-n{grid-column:2;grid-row:2;align-self:center;font-size:12px}
+  .rc-tbl .rc-c-n::before{content:'Revistorias: ';font-weight:500;color:var(--muted)}
+  .rc-tbl .rc-c-n small{display:none}
+  .rc-tbl .rc-c-st{display:flex!important;flex-direction:column;align-items:flex-end}
+  .rc-tbl .ch-c-dt::before{content:'Revistoria: '}
+  .rc-tbl .ch-c-dt b,.rc-tbl .ch-c-dt small{display:inline;margin-left:4px}
+  .ch-tbl .ch-c-vst{grid-column:1}
+  .ch-tbl .ch-c-rc{grid-column:2;justify-self:end}
+  .rc-dh{grid-template-columns:1fr 1fr}
+  .rc-form input[type=date],.rc-form input[type=time]{font-size:16px}
+}
+@media print{.rc-filters,#rcPop{display:none!important}}
 /* TEMA ESCURO · gerado por scripts/theme-dark.mjs (não editar à mão) */
 :root[data-theme="dark"] body{background:#212522;color:#d3ddd6}
 :root[data-theme="dark"] button{border:none;background:none}
@@ -2580,6 +2644,37 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .pp-revs li b{color:#d3ddd6}
 :root[data-theme="dark"] .pp-revs li span:last-child{color:#b1c1b1}
 :root[data-theme="dark"] .rg-mini-rv .m{border-top:3px solid var(--rvs)}
+:root[data-theme="dark"] .rc-badge{border:1px solid var(--b);background:color-mix(in srgb,var(--c) 16%,#282828);color:#cfd9d7}
+:root[data-theme="dark"] .rc-badge::before{background:var(--c);box-shadow:inset 0 0 0 1px var(--b)}
+:root[data-theme="dark"] .rc-tbl td small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-tbl .rc-c-n{color:#cfd9d7}
+:root[data-theme="dark"] .rc-tbl .rc-c-dt b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-u .rc-n{background:#1f4a3f;color:#fff;box-shadow:0 0 0 1.5px #282828}
+:root[data-theme="dark"] .rc-sw-n{background:#1f4a3f!important;border-color:#1f4a3f!important;color:#fff}
+:root[data-theme="dark"] .rc-act-sec:not(.p){color:#aab3ae!important}
+:root[data-theme="dark"] .rc-btn-sec{background:#5f6b64!important;border-color:#5f6b64!important}
+:root[data-theme="dark"] .rc-form input[type=date],:root[data-theme="dark"] .rc-form input[type=time]{border:1.5px solid #444c47;background:#242924;color:#cfd9d7}
+:root[data-theme="dark"] .rc-opt span{border:1.5px solid #404942;background:#282828;color:#abbcb4}
+:root[data-theme="dark"] .rc-opt small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-opt.ok input:checked+span{border-color:#2f9e5b;background:#1c2920;color:#77da9e;box-shadow:0 0 0 1px rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .rc-opt.rep input:checked+span{border-color:#d64545;background:#2d1e1c;color:#de7b73;box-shadow:0 0 0 1px #d64545}
+:root[data-theme="dark"] .rc-opt input:focus-visible+span{outline:2px solid #6b8040}
+:root[data-theme="dark"] .rc-ag{border-left:3px solid #2459b5;background:#222822}
+:root[data-theme="dark"] .rc-ag.ok{border-left-color:#2f9e5b}
+:root[data-theme="dark"] .rc-ag.rep{border-left-color:#d64545;background:#2e201d}
+:root[data-theme="dark"] .rc-ag.can{border-left-color:#505451;color:#a1a9a5}
+:root[data-theme="dark"] .rc-ag1 b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-ag1 span{color:#c1cec8}
+:root[data-theme="dark"] .rc-ag.ok .rc-ag-st{color:#77da9e}
+:root[data-theme="dark"] .rc-ag.rep .rc-ag-st{color:#de7b73}
+:root[data-theme="dark"] .rc-ag.ab .rc-ag-st{color:#2459b5}
+:root[data-theme="dark"] .rc-ag1 small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-ag2{color:#a6b2ab}
+:root[data-theme="dark"] .rc-ag2 em{color:#c1cec8}
+@media(max-width:720px){
+  :root[data-theme="dark"] .rc-tbl .rc-c-vst::before{color:#a6b2ab}
+  :root[data-theme="dark"] .rc-tbl .rc-c-n::before{color:#a6b2ab}
+}
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -2632,6 +2727,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   <nav class="vw-switch" aria-label="Páginas do condomínio">
     <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Números e andamento das vistorias do condomínio</small></span></button>
     <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
+    <button type="button" class="vw-tab" data-view="revcli" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg></span><span class="vw-txt"><b>Revistoria · Cliente</b><small>Agendamentos, resultados e ciclos das revistorias</small></span></button>
     <button type="button" class="vw-tab" data-view="stats" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="vw-txt"><b>Estatística Geral</b><small>Aprovação e reprovação por vistoriador e acompanhamento técnico</small></span></button>
     <button type="button" class="vw-tab" data-view="chaves" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg></span><span class="vw-txt"><b>Controle de Chaves</b><small>Setor responsável, transferências e histórico</small></span></button>
   </nav>
@@ -2687,6 +2783,18 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
     </div>
   </section>
 
+  <!-- ====== REVISTORIA · CLIENTE (src/modules/revistoria-cliente → www/revcliente.js) ====== -->
+  <section class="view" id="v-revcli">
+    <div class="sec-head">
+      <span class="icn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg></span>
+      <h2>Revistoria · Cliente</h2>
+      <div class="sh-flow">Em andamento → <b>Agendado</b> → Aprovado · unidades em Revistoria entram automaticamente</div>
+    </div>
+    <div class="sec-body">
+      <div id="revcliRoot" class="ch-root rc-root"></div>
+    </div>
+  </section>
+
   <!-- ====== ESTATÍSTICA GERAL ====== -->
   <section class="view" id="v-stats">
     <div class="sec-head">
@@ -2716,6 +2824,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <nav class="botnav">
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
+  <button class="navbtn" data-view="revcli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg><span>Revistoria</span></button>
   <button class="navbtn" data-view="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Estatística</span></button>
   <button class="navbtn" data-view="chaves"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg><span>Chaves</span></button>
 </nav>
@@ -2961,6 +3070,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <script src="./supabase-client.js"></script>
 <script src="./revistorias.js"></script>
 <script src="./chaves.js" defer></script>
+<script src="./revcliente.js" defer></script>
 <script>
 const CONFIG=window.APP_CONFIG||{};
 /* App nativo (Capacitor): marca a página e evita o zoom automático do iOS ao focar campos. A versão WEB não muda. */
@@ -3133,7 +3243,7 @@ function norm(t){t=(t||"").toString().trim().toLowerCase();
 const SEED=[{"bloco": "A", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "5º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "4º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "3º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Liberado", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "2º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "1º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "A", "pav": "T", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Revistoria", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "6º", "acab": "Liberado p/ Vistoria", "inst": "Liberado p/ Vistoria", "qual": "Em Andamento", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "5º", "acab": "Em Andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "4º", "acab": "Em andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "3º", "acab": "Em andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "2º", "acab": "Em Andamento", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "1º", "acab": "Não Iniciado", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "C", "pav": "T", "acab": "Não Iniciado", "inst": "Liberado p/ Vistoria", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "E", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "G", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "H", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "F", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "D", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "6º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "5º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "4º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "3º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "2º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "1º", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}, {"bloco": "B", "pav": "T", "acab": "Não Iniciado", "inst": "Não Iniciado", "qual": "Não Iniciado", "astec": "Não Iniciado"}];
 
 const SEED_CRON=[["A","6º","","","","","2026-05-12","2026-05-12","",""],["A","5º","","","","","2026-05-18","2026-05-18","2026-06-22",""],["A","4º","","","","","2026-05-26","2026-05-26","2026-06-24",""],["A","3º","","","","","2026-05-28","2026-05-28","2026-06-26",""],["A","2º","","","","","2026-06-02","2026-06-02","2026-06-29",""],["A","1º","","","","","2026-06-05","2026-06-05","2026-07-01",""],["A","T","","","","","2026-06-09","2026-06-09","2026-07-03",""],["B","6º","2026-07-20","","2026-07-20","","2026-07-20","","2026-07-20",""],["B","5º","2026-07-20","","2026-07-20","","2026-07-21","","2026-07-21",""],["B","4º","2026-07-21","","2026-07-21","","2026-07-21","","2026-07-21",""],["B","3º","2026-07-21","","2026-07-21","","2026-07-22","","2026-07-22",""],["B","2º","2026-07-22","","2026-07-22","","2026-07-22","","2026-07-22",""],["B","1º","2026-07-22","","2026-07-22","","2026-07-23","","2026-07-23",""],["B","T","2026-07-23","","2026-07-23","","2026-07-24","","2026-07-24",""],["C","6º","2026-06-11","","2026-06-11","","2026-06-15","2026-07-01","2026-06-15",""],["C","5º","2026-06-12","","2026-06-12","","2026-06-16","","2026-06-16",""],["C","4º","2026-06-15","","2026-06-15","","2026-06-17","","2026-06-17",""],["C","3º","2026-06-16","","2026-06-16","","2026-06-17","","2026-06-17",""],["C","2º","2026-06-17","","2026-06-17","","2026-06-18","","2026-06-18",""],["C","1º","2026-06-18","","2026-06-18","","2026-06-19","","2026-06-19",""],["C","T","2026-06-19","","2026-06-19","","2026-06-22","","2026-06-22",""],["D","6º","2026-07-14","","2026-07-14","","2026-07-14","","2026-07-14",""],["D","5º","2026-07-14","","2026-07-14","","2026-07-15","","2026-07-15",""],["D","4º","2026-07-15","","2026-07-15","","2026-07-15","","2026-07-15",""],["D","3º","2026-07-15","","2026-07-15","","2026-07-16","","2026-07-16",""],["D","2º","2026-07-16","","2026-07-16","","2026-07-16","","2026-07-16",""],["D","1º","2026-07-16","","2026-07-16","","2026-07-17","","2026-07-17",""],["D","T","2026-07-17","","2026-07-17","","2026-07-20","","2026-07-20",""],["E","6º","2026-06-22","","2026-06-22","","2026-06-22","","2026-06-22",""],["E","5º","2026-06-22","","2026-06-22","","2026-06-23","","2026-06-23",""],["E","4º","2026-06-23","","2026-06-23","","2026-06-23","","2026-06-23",""],["E","3º","2026-06-23","","2026-06-23","","2026-06-24","","2026-06-24",""],["E","2º","2026-06-24","","2026-06-24","","2026-06-24","","2026-06-24",""],["E","1º","2026-06-24","","2026-06-24","","2026-06-25","","2026-06-25",""],["E","T","2026-06-25","","2026-06-25","","2026-06-26","","2026-06-26",""],["F","6º","2026-07-08","","2026-07-08","","2026-07-08","","2026-07-08",""],["F","5º","2026-07-08","","2026-07-08","","2026-07-09","","2026-07-09",""],["F","4º","2026-07-09","","2026-07-09","","2026-07-09","","2026-07-09",""],["F","3º","2026-07-09","","2026-07-09","","2026-07-10","","2026-07-10",""],["F","2º","2026-07-10","","2026-07-10","","2026-07-10","","2026-07-10",""],["F","1º","2026-07-10","","2026-07-10","","2026-07-13","","2026-07-13",""],["F","T","2026-07-13","","2026-07-13","","2026-07-14","","2026-07-14",""],["G","6º","2026-06-26","","2026-06-26","","2026-06-26","","2026-06-26",""],["G","5º","2026-06-26","","2026-06-26","","2026-06-29","","2026-06-29",""],["G","4º","2026-06-29","","2026-06-29","","2026-06-29","","2026-06-29",""],["G","3º","2026-06-29","","2026-06-29","","2026-06-30","","2026-06-30",""],["G","2º","2026-06-30","","2026-06-30","","2026-06-30","","2026-06-30",""],["G","1º","2026-06-30","","2026-06-30","","2026-07-01","","2026-07-01",""],["G","T","2026-07-01","","2026-07-01","","2026-07-02","","2026-07-02",""],["H","6º","2026-07-02","","2026-07-02","","2026-07-02","","2026-07-02",""],["H","5º","2026-07-02","","2026-07-02","","2026-07-03","","2026-07-03",""],["H","4º","2026-07-03","","2026-07-03","","2026-07-03","","2026-07-03",""],["H","3º","2026-07-03","","2026-07-03","","2026-07-06","","2026-07-06",""],["H","2º","2026-07-06","","2026-07-06","","2026-07-06","","2026-07-06",""],["H","1º","2026-07-06","","2026-07-06","","2026-07-07","","2026-07-07",""],["H","T","2026-07-07","","2026-07-07","","2026-07-08","","2026-07-08",""]];
-const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{},revs:{}};
+const state={obra:{},cli:{},obraPlan:{},obraLib:{},cliInfo:{},unitMeta:{},revs:{},rvc:{}};
 const emptyCliInfo=()=>({cliente:"",data_vistoria:"",horario_vistoria:"",responsavel:"",data_revistoria:"",resp_revistoria:"",obs:"",sale_stage:"",acomp:""});
 /* Acompanhamento técnico: um único campo (client_inspections.technical_escort) para Lista, Mapa e Visão Geral. */
 const ACOMP={engenheiro:"Engenheiro",arquiteto:"Arquiteto",nenhum:"Sem Acomp. Técnico"};
@@ -3156,6 +3266,14 @@ function applyRevRecord(r){
   const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;
   const list=revList(key).filter(x=>x.id!==r.id);list.push(r);list.sort((x,y)=>x.numero-y.numero);state.revs[key]=list;
 }
+/* Revistoria · Cliente (tabela revistorias_cliente): state.rvc[unidade] = situação (Em andamento, Agendado, Aprovado),
+   separada do status da vistoria. state.revs guarda os agendamentos (nº 1, 2…) de cada unidade.
+   Regras em src/modules/revistoria-cliente/model.js → window.AmciRevistorias.cliente; a aba fica em www/revcliente.js. */
+const RVC=REV.cliente;
+let rvcInstalled=false;
+const rvcStatus=k=>state.rvc[k]?.status||"";
+function applyRvcRecord(r){const key=dbIndex.unitKeyById.get(r.unit_id);if(!key||!(key in state.cli))return;state.rvc[key]=r;}
+function rvcBadge(st){const i=RVC.info(st);return `<span class="rc-badge sm" style="--c:${i.cor};--b:${i.borda}">${esc(i.label)}</span>`;}
 function initState(){
   Object.keys(state).forEach(group=>Object.keys(state[group]).forEach(key=>delete state[group][key]));
   const m={};
@@ -3170,8 +3288,9 @@ function initState(){
 
 /* state */
 let obraFrente="acab", obraBlk="ALL", cliBlk="ALL", obraMode="frente";
-/* dtTipo: qual data o período filtra (vistoria, revistoria ou qualquer das duas); ordem: data usada na ordenação. */
-const CLI_FILT0=()=>({status:[],rev:[],bloco:"ALL",dtIni:"",dtFim:"",dtTipo:"vist",ordem:"vist",hrSort:"asc",u:"",q:""});
+/* Período e ordenação pela data da vistoria (dtTipo/ordem fixos em "vist": data e responsável da revistoria
+   são acompanhados na aba Revistoria · Cliente). rapido: filtro rápido (Todos, Aprovados, Em Revistoria, Em andamento, Agendados). */
+const CLI_FILT0=()=>({status:[],rapido:"todos",bloco:"ALL",dtIni:"",dtFim:"",dtTipo:"vist",ordem:"vist",hrSort:"asc",u:"",q:""});
 let cliMode="mapa", cliFilt=CLI_FILT0();
 let cliListLastRows=[];
 let isMobile=matchMedia("(max-width:720px)").matches;
@@ -3185,9 +3304,10 @@ function buildGrid(kind,fr){
   const CLR = kind==="obra" ? CLR_O : CLR_C;
   const aptBtn=(b,p,a)=>{const c=codeOf(b,p,a),s=CLR[c];
     if(kind==="obra")return `<button class="apt" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${a}</button>`;
-    const k=kC(b,p,a),info=state.cliInfo[k]||{},pcd=state.unitMeta[k]?.pcd,rv=revLast(k);
-    const tip=unitTitle(b,p,a)+" · "+CLL[c]+(info.cliente?" · "+info.cliente:"")+(pcd?" · PCD":"")+(rv?" · Revistoria "+REV.rotulo(rv):"");
-    return `<button class="apt${pcd?" pcd":""}${rv?" rvs":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}${rv?";--rvs:"+REV.revInfo(rv.status).cor:""}">${LAYOUT.kind==="casa"?+a:a}</button>`;};
+    // canto colorido = situação na Revistoria · Cliente (Em andamento, Agendado, Aprovado)
+    const k=kC(b,p,a),info=state.cliInfo[k]||{},pcd=state.unitMeta[k]?.pcd,rc=rvcStatus(k);
+    const tip=unitTitle(b,p,a)+" · "+CLL[c]+(info.cliente?" · "+info.cliente:"")+(pcd?" · PCD":"")+(rc?" · Revistoria · Cliente: "+RVC.info(rc).label:"");
+    return `<button class="apt${pcd?" pcd":""}${rc?" rvs":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}${rc?";--rvs:"+RVC.info(rc).cor:""}">${LAYOUT.kind==="casa"?+a:a}</button>`;};
   if(kind==="cli"&&LAYOUT.kind==="casa"){
     if(single)return `<div class="casa-single"><div class="casa-single-head">Conjunto ${blk} · ${groupUnits(blk).length} casas</div><div class="casa-wrap">`+groupUnits(blk).map(u=>aptBtn(u.b,u.p,u.a)).join("")+`</div></div>`;
     const cols=Array.from({length:LAYOUT.maxHouses},(_,i)=>i+1);
@@ -3353,8 +3473,8 @@ function renderCli(){
   document.getElementById("cliGrid").innerHTML=buildGrid("cli");
   markSelectedUnit();
   const revLeg=document.getElementById("cliRevLegend");
-  if(revLeg){const has=Object.values(state.revs).some(l=>l.length);revLeg.hidden=!has;
-    if(has)revLeg.innerHTML='<span class="lg-rvs-t"><span class="rvs-corner" aria-hidden="true"></span>Revistoria (canto):</span>'+REV.REV_STATUS.map(x=>`<span class="lg-rvs-i" style="--rvs:${x.cor}"><i></i>${x.label}</span>`).join("");}
+  if(revLeg){const has=Object.keys(state.rvc).length>0;revLeg.hidden=!has;
+    if(has)revLeg.innerHTML='<span class="lg-rvs-t"><span class="rvs-corner" aria-hidden="true"></span>Revistoria · Cliente (canto):</span>'+RVC.STATUS_ORDEM.map(x=>`<span class="lg-rvs-i" style="--rvs:${RVC.STATUS[x].cor}"><i></i>${RVC.STATUS[x].label}</span>`).join("");}
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
@@ -3402,18 +3522,16 @@ function hrSortLabel(){return `${FX_ICON.clock}Horário ${cliFilt.hrSort==="asc"
 function ensureCliFilters(){
   const el=document.getElementById("cliFilters"); if(!el||el.dataset.built)return;
   el.dataset.built="1";el.classList.add("fx");el.classList.toggle("fx-open",cliFiltOpen);
-  const revFilterChip=c=>{const none=c===REV.SEM_REVISTORIA,info=REV.revInfo(c);
-    return `<button type="button" class="fchip${c==="ALL"?" fx-all":""}${(c==="ALL"?!cliFilt.rev.length:cliFilt.rev.includes(c))?" active":""}" data-frev="${esc(c)}" style="--c:${c==="ALL"?"#1f4a3f":none?"#9aa39a":info.cor}">${c==="ALL"?"Todas":"<i></i>"+(none?"Sem revistoria":info.label)}</button>`;};
+  // Filtro rápido (Revistoria · Cliente): Todos, Aprovados, Em Revistoria, Em andamento, Agendados — contexto da Vistoria.
+  const rapChip=f=>`<button type="button" class="fchip${f.key==="todos"?" fx-all":""}${cliFilt.rapido===f.key?" active":""}" data-frap="${f.key}" style="--c:${f.cor}">${f.key==="todos"?"Todos":"<i></i>"+esc(f.label)}</button>`;
   const statusChip=c=>`<button type="button" class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(cliFilt.status.length===0?" active":""):(cliFilt.status.includes(c)?" active":"")}" data-fstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`;
   el.innerHTML=`
     <div class="fx-row fx-main">
       <label class="fx-search${cliFilt.q?" on":""}">${FX_ICON.search}<input type="search" id="clifQ" placeholder="Buscar cliente" value="${esc(cliFilt.q)}" autocomplete="off" aria-label="Buscar cliente"></label>
       <div class="fx-adv" id="clifAdv">
         <label class="fx-field fx-unit${cliFilt.u?" on":""}"><span>Unid.</span><input type="text" id="clifU" placeholder="${LAYOUT.unitHint.replace("Ex.: ","")}" value="${esc(cliFilt.u)}" autocomplete="off" aria-label="Unidade"></label>
-        <label class="fx-field fx-sel${cliFilt.dtTipo!=="vist"?" on":""}"><span>Período</span><select id="clifDtTipo" aria-label="Data usada no período">${[["vist","Vistoria"],["rev","Revistoria"],["ambas","Ambas"]].map(([v,l])=>`<option value="${v}"${cliFilt.dtTipo===v?" selected":""}>${l}</option>`).join("")}</select></label>
         <label class="fx-field${cliFilt.dtIni?" on":""}"><span>De</span><input type="date" id="clifDtIni" value="${esc(cliFilt.dtIni)}" aria-label="Data a partir de"></label>
         <label class="fx-field${cliFilt.dtFim?" on":""}"><span>Até</span><input type="date" id="clifDtFim" value="${esc(cliFilt.dtFim)}" aria-label="Data até"></label>
-        <label class="fx-field fx-sel${cliFilt.ordem!=="vist"?" on":""}"><span>Ordenar</span><select id="clifOrdem" aria-label="Ordenar por">${[["vist","Vistoria"],["rev","Revistoria"]].map(([v,l])=>`<option value="${v}"${cliFilt.ordem===v?" selected":""}>${l}</option>`).join("")}</select></label>
         <button class="fx-btn" id="clifHrSort" type="button" aria-label="Ordenar horário">${hrSortLabel()}</button>
         <button class="fx-btn" id="clifPrint" type="button">${FX_ICON.print}Imprimir</button>
         <button class="fx-btn" id="clifExport" type="button" title="Exportar a lista filtrada (abre no Excel)">${FX_ICON.download}Exportar</button>
@@ -3425,7 +3543,7 @@ function ensureCliFilters(){
       </div>
     </div>
     <div class="fx-row"><span class="fx-lbl">Status</span><div class="fx-scroll" id="clifStatus">${["ALL",...CLI_FLOW].map(statusChip).join("")}</div></div>
-    ${revInstalled?`<div class="fx-row"><span class="fx-lbl">Revistoria</span><div class="fx-scroll" id="clifRev">${["ALL",...REV.REV_STATUS.map(x=>x.key),REV.SEM_REVISTORIA].map(revFilterChip).join("")}</div></div>`:""}
+    ${rvcInstalled?`<div class="fx-row"><span class="fx-lbl">Rápido</span><div class="fx-scroll" id="clifRap">${RVC.FILTROS.map(rapChip).join("")}</div></div>`:""}
     <div class="fx-row"><span class="fx-lbl">${LAYOUT.group}</span><div class="fx-scroll" id="clifBloco">${["ALL",...LAYOUT.groups].map(b=>
       `<button type="button" class="fchip blk${b==="ALL"?" fx-all":""}${cliFilt.bloco===b?" active":""}" data-fbloco="${b}" style="--c:#1f4a3f">${b==="ALL"?"Todos":b}</button>`).join("")}</div></div>`;
   el.querySelectorAll("[data-fstatus]").forEach(b=>b.onclick=()=>{
@@ -3441,10 +3559,9 @@ function ensureCliFilters(){
     });
     renderCliList();
   });
-  el.querySelectorAll("[data-frev]").forEach(b=>b.onclick=()=>{
-    const c=b.dataset.frev;
-    if(c==="ALL")cliFilt.rev=[];else{const i=cliFilt.rev.indexOf(c);if(i>=0)cliFilt.rev.splice(i,1);else cliFilt.rev.push(c);}
-    el.querySelectorAll("[data-frev]").forEach(x=>x.classList.toggle("active",x.dataset.frev==="ALL"?!cliFilt.rev.length:cliFilt.rev.includes(x.dataset.frev)));
+  el.querySelectorAll("[data-frap]").forEach(b=>b.onclick=()=>{
+    cliFilt.rapido=b.dataset.frap===cliFilt.rapido?"todos":b.dataset.frap;
+    el.querySelectorAll("[data-frap]").forEach(x=>x.classList.toggle("active",x.dataset.frap===cliFilt.rapido));
     renderCliList();
   });
   el.querySelectorAll("[data-fbloco]").forEach(b=>b.onclick=()=>{cliFilt.bloco=b.dataset.fbloco;el.querySelectorAll("[data-fbloco]").forEach(x=>x.classList.toggle("active",x===b));renderCliList();});
@@ -3456,15 +3573,13 @@ function ensureCliFilters(){
   el.querySelector("#clifClear").onclick=()=>{cliFilt=CLI_FILT0();el.dataset.built="";ensureCliFilters();renderCliList();};
   el.querySelector("#clifPrint").onclick=printCliList;
   el.querySelector("#clifExport").onclick=exportCliList;
-  el.querySelector("#clifDtTipo").onchange=e=>{cliFilt.dtTipo=e.target.value;renderCliList();};
-  el.querySelector("#clifOrdem").onchange=e=>{cliFilt.ordem=e.target.value;renderCliList();};
   el.querySelector("#clifMore").onclick=e=>{cliFiltOpen=!cliFiltOpen;el.classList.toggle("fx-open",cliFiltOpen);e.currentTarget.setAttribute("aria-expanded",String(cliFiltOpen));};
 }
 /* Destaca só o que está filtrando e mostra "Limpar" quando há filtro ativo. */
 function syncCliFilterUI(){
   const el=document.getElementById("cliFilters");if(!el||!el.dataset.built)return;
   const adv=[cliFilt.u,cliFilt.dtIni,cliFilt.dtFim,cliFilt.dtTipo!=="vist",cliFilt.ordem!=="vist"].filter(Boolean).length;
-  const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.rev.length?1:0)+(cliFilt.bloco!=="ALL"?1:0);
+  const total=adv+(cliFilt.q?1:0)+(cliFilt.status.length?1:0)+(cliFilt.rapido!=="todos"?1:0)+(cliFilt.bloco!=="ALL"?1:0);
   const clear=el.querySelector("#clifClear"),badge=el.querySelector("#clifBadge");
   if(clear)clear.hidden=!total;if(badge){badge.textContent=adv;badge.hidden=!adv;}
   [["#clifQ",cliFilt.q],["#clifU",cliFilt.u],["#clifDtIni",cliFilt.dtIni],["#clifDtFim",cliFilt.dtFim],["#clifDtTipo",cliFilt.dtTipo!=="vist"],["#clifOrdem",cliFilt.ordem!=="vist"]].forEach(([id,v])=>el.querySelector(id)?.closest("label")?.classList.toggle("on",!!v));
@@ -3474,10 +3589,10 @@ function renderCliList(){
   syncCliFilterUI();
   let rows=[];
   LAYOUT.units.forEach(({b,p,a})=>{
-    const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd,rev:revLast(k),revCode:REV.codigoFiltro(revList(k))});
+    const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd,rev:revLast(k),rvc:rvcStatus(k)});
   });
   if(cliFilt.status.length) rows=rows.filter(r=>cliFilt.status.includes(r.code));
-  if(cliFilt.rev.length) rows=rows.filter(r=>cliFilt.rev.includes(r.revCode));
+  if(cliFilt.rapido!=="todos") rows=rows.filter(r=>RVC.passaFiltroRapido(cliFilt.rapido,{vistoria:r.code,revistoria:r.rvc},"vistoria"));
   if(cliFilt.bloco!=="ALL") rows=rows.filter(r=>r.b===cliFilt.bloco);
   if(cliFilt.dtIni||cliFilt.dtFim){
     const inRange=d=>!!d&&(!cliFilt.dtIni||d>=cliFilt.dtIni)&&(!cliFilt.dtFim||d<=cliFilt.dtFim);
@@ -3501,7 +3616,7 @@ function renderCliList(){
   cliListLastRows=rows;
   const cnt=document.getElementById("clifCount"); if(cnt)cnt.textContent=rows.length+" unidade(s)";
   if(!rows.length){ wrap.innerHTML='<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>'; return; }
-  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-d th-rev">Data revistoria</th><th class="th-rev">Resp. revistoria</th><th class="cw-s">Status</th><th class="th-rvs">Revistoria</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
+  let h=`<div class="gridscroll"><table class="ctbl"><thead><tr><th class="cw-b">${LAYOUT.group}</th><th class="cw-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th>`+'<th class="th-cli">Cliente</th><th class="cw-d">Data vistoria</th><th class="cw-h">Horário</th><th>Responsável</th><th class="cw-s">Status</th><th class="th-obs">Obs.</th><th class="th-acomp">Acomp. Técnico</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const s=CLR_C[r.code]||CLR_C.na, i=r.info;
     h+=`<tr>
@@ -3511,10 +3626,7 @@ function renderCliList(){
       <td>${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td>
       <td>${esc(i.horario_vistoria)||"—"}</td>
       <td>${esc(i.responsavel)||"—"}</td>
-      <td class="crev">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td>
-      <td class="crev">${esc(i.resp_revistoria)||"—"}</td>
       <td class="cstat" data-k="cli" data-b="${r.b}" data-p="${r.p}" data-a="${r.a}" style="background:${s.bg};color:${s.tx}"><span class="cs-l">${CLL[r.code]}</span></td>
-      <td class="crvs">${revCell(r.rev)}</td>
       <td class="clif-obs" title="${esc(i.obs)}">${i.obs?(esc(i.obs).slice(0,28)+(i.obs.length>28?"…":"")):"—"}</td>
       <td class="cacomp">${canEditCli()?acompSelect(i.acomp||"",`class="acomp-sel${i.acomp?" set":""}" data-acomp="1" data-b="${esc(r.b)}" data-p="${esc(r.p)}" data-a="${esc(r.a)}" aria-label="Acomp. Técnico · ${esc(unitTitle(r.b,r.p,r.a))}"`,"—"):(ACOMP[i.acomp]?`<span class="tag stage">${ACOMP[i.acomp]}</span>`:"—")}</td>
     </tr>`;
@@ -3543,10 +3655,10 @@ function printCliList(){
   </style></head><body>
     <h1>${esc(projectExperience(appProject).title)} · Vistoria Cliente</h1>
     <div class="sub">Lista filtrada — gerado em ${now} — ${rows.length} unidade(s)</div>
-    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data vistoria</th><th class="w-h">Horário</th><th>Responsável</th><th class="w-d">Data revistoria</th><th>Resp. revistoria</th><th>Status</th><th>Revistoria</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
+    <table><thead><tr><th class="w-b">${LAYOUT.group}</th><th class="w-u">${LAYOUT.kind==="casa"?"Casa":"Unidade"}</th><th class="w-cli">Cliente</th><th class="w-d">Data vistoria</th><th class="w-h">Horário</th><th>Responsável</th><th>Status</th><th>Acomp. Técnico</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const i=r.info;
-    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td class="w-d">${i.data_revistoria?fmtDate(i.data_revistoria):"—"}</td><td>${esc(i.resp_revistoria)||"—"}</td><td>${esc(CLL[r.code]||"")}</td><td>${esc(REV.rotulo(r.rev))||"—"}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
+    body+=`<tr><td class="w-b">${esc(r.b)}</td><td class="w-u">${unitCode(r.b,r.p,r.a)}</td><td class="w-cli">${esc(i.cliente)||"—"}</td><td class="w-d">${i.data_vistoria?fmtDate(i.data_vistoria):"—"}</td><td class="w-h">${esc(i.horario_vistoria)||"—"}</td><td>${esc(i.responsavel)||"—"}</td><td>${esc(CLL[r.code]||"")}</td><td>${ACOMP[i.acomp]||"—"}</td></tr>`;
   });
   body+='</tbody></table></body></html>';
   const w=window.open("","_blank");
@@ -3564,7 +3676,7 @@ function downloadCsv(name,header,rows){
 }
 const csvDate=d=>d?fmtDate(d):"";
 // Colunas da revistoria mais recente, no fim da exportação (as colunas anteriores ficam na mesma ordem).
-const REV_CSV_HEAD=["Status revistoria (planilha)","Data revistoria (planilha)","Horário revistoria","Nº revistoria"];
+const REV_CSV_HEAD=["Último agendamento de revistoria (status)","Data do agendamento","Horário do agendamento","Nº do agendamento"];
 const revCsv=rv=>rv?[rv.status||"",csvDate(rv.data),String(rv.horario||"").slice(0,5),rv.numero]:["","","",""];
 const fileStamp=()=>todayISO();
 function exportCliList(){
@@ -3572,8 +3684,8 @@ function exportCliList(){
   if(!rows||!rows.length){ toast("Nada para exportar com esses filtros"); return; }
   const slug=(appProject?.slug||"condominio");
   downloadCsv(`vistorias-${slug}-${fileStamp()}.csv`,
-    [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações",...REV_CSV_HEAD],
-    rows.map(r=>{const i=r.info;return [r.b,unitCode(r.b,r.p,r.a),i.cliente,csvDate(i.data_vistoria),i.horario_vistoria,i.responsavel,csvDate(i.data_revistoria),i.resp_revistoria,CLL[r.code]||"",ACOMP[i.acomp]||"",i.obs,...revCsv(r.rev)];}));
+    [LAYOUT.group,LAYOUT.kind==="casa"?"Casa":"Unidade","Cliente","Data vistoria","Horário","Responsável","Data revistoria","Responsável revistoria","Status","Acomp. Técnico","Observações","Revistoria · Cliente",...REV_CSV_HEAD],
+    rows.map(r=>{const i=r.info;return [r.b,unitCode(r.b,r.p,r.a),i.cliente,csvDate(i.data_vistoria),i.horario_vistoria,i.responsavel,csvDate(i.data_revistoria),i.resp_revistoria,CLL[r.code]||"",ACOMP[i.acomp]||"",i.obs,r.rvc||"",...revCsv(r.rev)];}));
   toast(rows.length+" unidade(s) exportada(s)");
 }
 
@@ -3667,7 +3779,9 @@ function renderCliPop(){
   // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (opcionais); os valores salvos são mantidos.
   const showRev=cur==="rf";
   const revs=revList(key).slice().reverse();
-  const revHist=revs.length?`<div class="pp-revs"><div class="pp-label">Revistorias <small>· planilha</small></div><ul>${revs.map(r=>`<li>${revChip(r)}<b>${r.numero}ª revistoria</b><span>${esc(revWhen(r))||"Sem data"}</span></li>`).join("")}</ul></div>`:"";
+  // Revistoria · Cliente: situação e agendamentos (registrados na aba Revistoria · Cliente ou pela planilha).
+  const rcSt=rvcStatus(key);
+  const revHist=revs.length||rcSt?`<div class="pp-revs"><div class="pp-label">Revistoria · Cliente ${rcSt?rvcBadge(rcSt):""}<small>· agende e registre o resultado na aba Revistoria · Cliente</small></div>${revs.length?`<ul>${revs.map(r=>`<li>${revChip(r)}<b>Agendamento nº ${r.numero}</b><span>${esc(revWhen(r))||"Sem data"}${r.responsavel?" · "+esc(r.responsavel):""}</span></li>`).join("")}</ul>`:""}</div>`:"";
   const dateField=(field,label)=>`<label class="pp-f"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
   const revBlock=showRev?`<div class="pp-rev pp-full">
           <div class="pp-rev-t">Revistoria finalizada <small>(opcional)</small></div>
@@ -3827,7 +3941,43 @@ function chavesHost(){
     // status da vistoria: só leitura (client_inspections), nunca alterado pelo módulo
     vistoria:(b,p,a)=>state.cli[kC(b,p,a)]||"na", vistoriaCodigos:()=>CLI_FLOW,
     vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na, vistoriaInfo:(b,p,a)=>state.cliInfo[kC(b,p,a)],
+    // Revistoria · Cliente (revistorias_cliente): só leitura; "" = sem registro
+    revistoria:(b,p,a)=>rvcStatus(kC(b,p,a)), revistoriaInstalada:()=>rvcInstalled,
     fmtData:fmtDate, papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
+  };
+}
+
+/* ── REVISTORIA · CLIENTE: contexto que a tela de Vistorias entrega ao módulo (www/revcliente.js) ── */
+// Situação (state.rvc) e agendamentos (state.revs) vêm da carga e do tempo real desta tela; o módulo só
+// grava pelas funções revistoria_* do banco e lê o histórico (revistorias_eventos).
+async function rvcRecarregar(res){
+  if(!SUPABASE_READY||!appProject)return;
+  const projectId=appProject.id;
+  try{
+    const [revs,acs]=await Promise.all([fetchAll("revistorias","*",q=>q.eq("project_id",projectId)),
+      fetchAll("revistorias_cliente","id,unit_id,inspection_id,status,ciclo,revistoria_id,entrou_em,atualizado_em,atualizado_email,versao",q=>q.eq("project_id",projectId))]);
+    if(appProject?.id!==projectId)return;
+    Object.keys(state.revs).forEach(k=>delete state.revs[k]);Object.keys(state.rvc).forEach(k=>delete state.rvc[k]);
+    revs.forEach(applyRevRecord);acs.forEach(applyRvcRecord);
+    // aprovar/reabrir muda a vistoria (Revistoria ⇄ Revistoria Finalizada): relê a da unidade alterada
+    const uid=res?.acompanhamento?.unit_id;
+    if(uid){const {data}=await supabase.from("client_inspections").select("*").eq("unit_id",uid);(data||[]).forEach(applyClientRecord);}
+    renderCli();renderResumo();window.AmciChaves?.vistoriaMudou();
+  }catch(e){console.error(e);}
+}
+function revcliHost(){
+  const unitKey=id=>dbIndex.unitKeyById.get(id);
+  return {
+    sb:SUPABASE_READY?supabase:null, project:appProject, instalado:()=>rvcInstalled,
+    units:()=>LAYOUT.units, unitId:(b,p,a)=>dbIndex.unitByKey.get(kC(b,p,a))?.id,
+    codigo:(b,p,a)=>unitCode(b,p,a), titulo:(b,p,a)=>unitTitle(b,p,a),
+    casa:()=>LAYOUT.kind==="casa", grupo:()=>LAYOUT.group, grupos:()=>LAYOUT.groups,
+    grid:()=>LAYOUT.kind==="casa"?{grupos:LAYOUT.groups,maxCasas:LAYOUT.maxHouses,counts:LAYOUT.counts,pavLabel:PAVL}:{grupos:BLOCOS,pavs:PAVS,apts:APTS,pavLabel:PAVL},
+    vistoria:(b,p,a)=>state.cli[kC(b,p,a)]||"na", vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na,
+    cliente:(b,p,a)=>state.cliInfo[kC(b,p,a)]?.cliente||"",
+    acompanhamento:id=>{const k=unitKey(id);return k?state.rvc[k]||null:null;}, agendamentos:id=>{const k=unitKey(id);return k?revList(k):[];},
+    recarregar:rvcRecarregar, hoje:todayISO,
+    papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
   };
 }
 
@@ -3845,6 +3995,7 @@ function switchView(v){
   if(v==="stats")renderStats();
   // Controle de Chaves: módulo à parte (www/chaves.js), com o contexto desta tela.
   if(v==="chaves")window.AmciChaves?.show(chavesHost());else window.AmciChaves?.hide();
+  if(v==="revcli")window.AmciRevCliente?.show(revcliHost());else window.AmciRevCliente?.hide();
 
   animateView(v);
   scrollTo(0,0);
@@ -3965,14 +4116,17 @@ async function load(silent){
   try{
     // Todas as consultas ficam restritas ao condomínio selecionado (via units.project_id).
     const projectId=appProject.id,byProject=q=>q.eq("units.project_id",projectId);
-    const [units,stages,clients,schedules,revistorias]=await Promise.all([
+    const [units,stages,clients,schedules,revistorias,acompanhamentos]=await Promise.all([
       fetchAll("units","id,project_id,bloco,pav,apto,kind,pcd",q=>q.eq("project_id",projectId)),
       fetchAll("unit_stage_status","*,units!inner(project_id)",byProject),
       fetchAll("client_inspections","*,units!inner(project_id)",byProject),
       fetchAll("floor_schedule","*",q=>q.eq("project_id",projectId)),
       // Sem a tabela de revistorias (migration ainda não aplicada) o restante funciona igual.
-      fetchAll("revistorias","id,unit_id,numero,status,status_planilha,data,horario,atualizado_em",q=>q.eq("project_id",projectId))
-        .then(r=>{revInstalled=true;return r;},()=>{revInstalled=false;return [];})
+      fetchAll("revistorias","*",q=>q.eq("project_id",projectId))
+        .then(r=>{revInstalled=true;return r;},()=>{revInstalled=false;return [];}),
+      // Revistoria · Cliente: sem a migration a aba mostra o aviso de instalação e o restante funciona igual.
+      fetchAll("revistorias_cliente","id,unit_id,inspection_id,status,ciclo,revistoria_id,entrou_em,atualizado_em,atualizado_email,versao",q=>q.eq("project_id",projectId))
+        .then(r=>{rvcInstalled=true;return r;},()=>{rvcInstalled=false;return [];})
     ]);
     if(!appProject||appProject.id!==projectId)return;
     if(LAYOUT.kind==="casa"&&units.length){
@@ -3981,21 +4135,24 @@ async function load(silent){
     }
     initState();Object.values(dbIndex).forEach(index=>index.clear());
     units.forEach(r=>{const key=kC(_blk(r.bloco),_pav(r.pav),_apt(r.apto));dbIndex.unitByKey.set(key,r);dbIndex.unitKeyById.set(r.id,key);if(state.unitMeta[key])state.unitMeta[key].pcd=!!r.pcd;});
-    stages.forEach(applyStageRecord);clients.forEach(applyClientRecord);schedules.forEach(applyScheduleRecord);revistorias.forEach(applyRevRecord);
-    const fx=document.getElementById("cliFilters");if(fx&&fx.dataset.built&&!!fx.querySelector("#clifRev")!==revInstalled){fx.dataset.built="";fx.innerHTML="";}
+    stages.forEach(applyStageRecord);clients.forEach(applyClientRecord);schedules.forEach(applyScheduleRecord);revistorias.forEach(applyRevRecord);acompanhamentos.forEach(applyRvcRecord);
+    const fx=document.getElementById("cliFilters");if(fx&&fx.dataset.built&&!!fx.querySelector("#clifRap")!==rvcInstalled){fx.dataset.built="";fx.innerHTML="";}
     renderObra();renderCli();renderResumo();window.scrollTo(0,_sy);setSync("ok");
     if(document.getElementById("v-chaves")?.classList.contains("active"))window.AmciChaves?.show(chavesHost());
+    if(document.getElementById("v-revcli")?.classList.contains("active"))window.AmciRevCliente?.show(revcliHost());
   }catch(e){setSync("err");if(!silent)toast("Falha ao carregar os dados");throw e;}
 }
 function startRealtime(){
   if(!SUPABASE_READY||!appProject)return;stopRealtime();
   let channel=supabase.channel("vistorias-"+appProject.id)
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"unit_stage_status"},p=>{applyStageRecord(p.new);renderObra();renderResumo();})
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"client_inspections"},p=>{applyClientRecord(p.new);renderCli();renderResumo();window.AmciChaves?.vistoriaMudou();})
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"client_inspections"},p=>{applyClientRecord(p.new);renderCli();renderResumo();window.AmciChaves?.vistoriaMudou();window.AmciRevCliente?.dadosMudaram();})
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"floor_schedule",filter:"project_id=eq."+appProject.id},p=>{applyScheduleRecord(p.new);renderObra();renderResumo();});
   // Só assina a tabela de revistorias quando ela existe (uma tabela inexistente derrubaria o canal todo).
   if(revInstalled)channel=channel.on("postgres_changes",{event:"*",schema:"public",table:"revistorias",filter:"project_id=eq."+appProject.id},p=>{
-    if(p.new?.id)applyRevRecord(p.new);renderCli();renderResumo();if(ctx&&ctx.k==="cli"&&!ctx.dirty)renderPop();});
+    if(p.new?.id)applyRevRecord(p.new);renderCli();renderResumo();if(ctx&&ctx.k==="cli"&&!ctx.dirty)renderPop();window.AmciRevCliente?.dadosMudaram();});
+  if(rvcInstalled)channel=channel.on("postgres_changes",{event:"*",schema:"public",table:"revistorias_cliente",filter:"project_id=eq."+appProject.id},p=>{
+    if(p.new?.unit_id)applyRvcRecord(p.new);renderCli();renderResumo();window.AmciChaves?.vistoriaMudou();window.AmciRevCliente?.dadosMudaram();});
   realtimeChannel=channel.subscribe(status=>{if(status==="SUBSCRIBED")setSync("ok");else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")setSync("err");});
 }
 function stopRealtime(){if(realtimeChannel&&supabase)supabase.removeChannel(realtimeChannel);realtimeChannel=null;}
@@ -5031,7 +5188,7 @@ async function selectProject(projectId){
 function chooseAnotherProject(){
   if(pendingWrites){toast("Aguarde a conclusão das alterações antes de trocar de obra.");return;}
   if(!confirmDiscard())return;closePop(true);
-  stopRealtime();window.AmciChaves?.reset();appProject=null;currentUser.nivel="";initState();setSync("");updateProjectBrand();updateAuthUI();showProjectChooser();
+  stopRealtime();window.AmciChaves?.reset();window.AmciRevCliente?.reset();appProject=null;currentUser.nivel="";initState();setSync("");updateProjectBrand();updateAuthUI();showProjectChooser();
 }
 async function doLogin(){
   const u=document.getElementById("loginU").value.trim(), p=document.getElementById("loginP").value;
@@ -5298,10 +5455,12 @@ function renderResumo(){
   h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na-inad}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
   const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]];
   h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
-  // Revistorias da planilha (revistoria mais recente de cada unidade); não mudam os números da vistoria acima.
-  const rs=REV.resumo(Object.values(state.revs));
-  if(rs.total)h+=`<div class="rg-sub rg-sub-rv">Revistorias · ${rs.total} unidade(s)</div><div class="rg-mini rg-mini-rv">`+
-    REV.REV_STATUS.map(x=>`<div class="m" style="--rvs:${x.cor}"><div class="mn">${rs[x.key]}</div><div class="ml">${x.label}</div></div>`).join("")+`</div>`;
+  // Revistoria · Cliente (situação de cada unidade em acompanhamento); não muda os números da vistoria acima.
+  const rcs=Object.values(state.rvc),rcN=st=>rcs.filter(a=>a.status===st).length;
+  const rcFeitas=Object.values(state.revs).reduce((n,l)=>n+l.filter(r=>RVC.REALIZADAS.includes(r.status)).length,0);
+  if(rcs.length)h+=`<div class="rg-sub rg-sub-rv">Revistoria · Cliente · ${rcs.length} unidade(s)</div><div class="rg-mini rg-mini-rv">`+
+    RVC.STATUS_ORDEM.map(x=>`<div class="m" style="--rvs:${RVC.STATUS[x].borda}"><div class="mn">${rcN(x)}</div><div class="ml">${RVC.STATUS[x].label}</div></div>`).join("")+
+    `<div class="m" style="--rvs:#6b8040"><div class="mn">${rcFeitas}</div><div class="ml">Revistorias realizadas</div></div></div>`;
   h+=`</div><div class="rg-col">`;
   h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
   h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-fin"></i>Revistorias finalizadas</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
