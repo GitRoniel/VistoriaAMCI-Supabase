@@ -84,9 +84,9 @@ Migration: `supabase/migrations/20261104120000_contratos_medicoes.sql` (só cria
 | Líquido | `total` | `subtotal + acréscimos + excedente − descontos − desc_medicao` (confere em todas as linhas) |
 | Acumulado | calculado na tela | soma do valor medido até a medição, na ordem do número; não vem do TXT e não é somado a nada |
 
-**Conferência com o 549 (dados de 03/11/2026):** 1.126 medições de 182 contratos. 173 contratos existem nos dois
-relatórios; em 167 a soma do `subtotal` das medições (todos os status) é igual ao `valor_medido` do contrato. Nos
-outros 6 o 549 é maior: medições anteriores ao período extraído. A tela mostra a diferença e não soma nem ajusta
+**Conferência com o 549 (carga completa de 04/11/2026):** 1.126 medições de 182 contratos. 173 contratos existem nos dois
+relatórios; em 168 a soma do `subtotal` das medições (todos os status) é igual ao `valor_medido` do contrato. Nos
+outros 5 o 549 é maior: medições anteriores ao período extraído. A tela mostra a diferença e não soma nem ajusta
 nada. 9 contratos têm medições mas não estão no 549 (que traz só os status 0 a 3): aparecem em
 "Medições sem contrato no relatório 549", fora dos totais. Contrato sem medição importada aparece como
 "sem medições importadas", nunca como medido = 0.
