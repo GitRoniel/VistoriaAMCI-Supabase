@@ -185,4 +185,38 @@ assert.equal(rel.realizado, "2026-09-10"); assert.equal(rel.naoConformidades, 2)
 assert.deepEqual(rel.apontamentos.map((a) => a.texto), ["COZINHA · REVESTIMENTO - PISO: Peça oca 3 pontos (NC 71)", "QUARTO · ESQUADRIAS - PORTAS: regulagem da porta (NC 72)"]);
 assert.equal(mesmaUnidade(rel.unidade, "C", "204"), true); assert.equal(mesmaUnidade(rel.unidade, "C", "205"), false); assert.equal(mesmaUnidade(null, "C", "204"), null);
 
+// Execução: botões de filtro rápido (um por vez; clicar de novo limpa) — não atribuem nada.
+assert.deepEqual(M.BOTOES_EXECUCAO.map((b) => b.label), ["M.O.P – Felipe", "M.O.P – Renato", "EMP – Oscar", "EMP – Nilson"]);
+assert.equal(M.alternarExecucao("", "EMP_OSCAR"), "EMP_OSCAR");
+assert.equal(M.alternarExecucao("EMP_OSCAR", "EMP_OSCAR"), "");
+assert.equal(M.alternarExecucao("EMP_OSCAR", "MOP_FELIPE"), "MOP_FELIPE");
+assert.equal(M.passaExecucao("EMP_OSCAR", "EMP_OSCAR"), true); assert.equal(M.passaExecucao("EMP_OSCAR", "EMP_NILSON"), false); assert.equal(M.passaExecucao("", null), true);
+
+// Apontamentos: fonte única (relatório individual e Lista), sem repetidos, sem 100% quando vazio.
+{
+  const rels = [{ id: 1, unit_id: 9, enviado_em: "2026-11-01T10:00:00Z" }, { id: 2, unit_id: 9, enviado_em: "2026-11-08T10:00:00Z" },
+    { id: 3, unit_id: 9, enviado_em: "2026-11-09T10:00:00Z", removido_em: "2026-11-09T11:00:00Z" }];
+  const aps = [
+    { id: 10, unit_id: 9, relatorio_id: 1, ordem: 1, texto: "Sala · piso oco", concluido: true },
+    { id: 11, unit_id: 9, relatorio_id: 1, ordem: 2, texto: "Cozinha · rejunte", concluido: false },
+    { id: 20, unit_id: 9, relatorio_id: 2, ordem: 1, texto: "  COZINHA ·  Rejunte ", concluido: true },  // repetido: vale o mais recente
+    { id: 21, unit_id: 9, relatorio_id: 2, ordem: 2, texto: "Quarto · porta", concluido: false },
+    { id: 30, unit_id: 9, relatorio_id: 3, ordem: 1, texto: "Banheiro · ralo", concluido: false }       // relatório removido: fora
+  ];
+  const ck = M.checklistUnidade(aps, rels);
+  assert.deepEqual(ck.map((a) => a.id), [10, 20, 21]);
+  assert.deepEqual(M.resumoApontamentos(ck), { total: 3, resolvidas: 2, pct: 67 });
+  assert.deepEqual(M.resumoApontamentos([]), { total: 0, resolvidas: 0, pct: null });
+  const pu = M.resumoPorUnidade([...aps, { id: 40, unit_id: 5, relatorio_id: 4, ordem: 1, texto: "x", concluido: true }],
+    [...rels, { id: 4, unit_id: 5, enviado_em: "2026-11-02T10:00:00Z" }, { id: 6, unit_id: 7, enviado_em: "2026-11-02T10:00:00Z" }]);
+  assert.deepEqual(pu.get(9), { relatorios: 2, total: 3, resolvidas: 2, pct: 67 });
+  assert.deepEqual(pu.get(5), { relatorios: 1, total: 1, resolvidas: 1, pct: 100 });
+  assert.deepEqual(pu.get(7), { relatorios: 1, total: 0, resolvidas: 0, pct: null });   // relatório sem apontamentos: "—"
+  assert.equal(pu.has(8), false);                                                          // sem relatório: "—"
+  // Novo PDF: os itens já existentes não duplicam e mantêm a resolução; repetidos no próprio PDF entram uma vez.
+  const conf = M.conferirExtraidos(["sala · PISO oco", "Varanda · guarda-corpo", "Varanda · guarda-corpo", ""], ck);
+  assert.deepEqual(conf.map((c) => [c.usar, !!c.existente, c.repetido]), [[false, true, false], [true, false, false], [false, false, true], [false, false, false]]);
+  assert.equal(conf[0].existente.concluido, true);
+}
+
 console.log("Regras da Revistoria · Cliente verificadas.");

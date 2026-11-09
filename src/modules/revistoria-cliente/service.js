@@ -52,19 +52,41 @@ export async function relatorios(sb, unitId) {
   if (error) throw error;
   return (data || []).filter((r) => !r.removido_em);
 }
-/** Unidades do condomínio que têm relatório (para o botão Relatório da lista). */
-export async function unidadesComRelatorio(sb, projectId) {
-  const { data, error } = await sb.from("revistorias_relatorios").select("id,unit_id,removido_em").eq("project_id", projectId).limit(5000);
-  if (error) throw error;
-  return new Set((data || []).filter((r) => !r.removido_em).map((r) => r.unit_id));
+/** Lê todas as páginas de uma consulta (a API devolve no máximo 1.000 linhas por vez). */
+async function todas(consulta, tamanho = 1000) {
+  const out = [];
+  for (let de = 0; ; de += tamanho) {
+    const { data, error } = await consulta().range(de, de + tamanho - 1);
+    if (error) throw error;
+    out.push(...(data || []));
+    if (!data || data.length < tamanho) return out;
+  }
 }
-export async function apontamentos(sb, relatorioId) {
+/** Relatórios ativos do condomínio (botão Relatório e quantitativos da lista). */
+export async function relatoriosCondominio(sb, projectId) {
+  const rels = await todas(() => sb.from("revistorias_relatorios").select("id,unit_id,enviado_em,removido_em").eq("project_id", projectId).order("id", { ascending: true }));
+  return rels.filter((r) => !r.removido_em);
+}
+/** Apontamentos do condomínio: a mesma base do checklist do relatório (quantitativos da lista). */
+export const apontamentosCondominio = (sb, projectId) =>
+  todas(() => sb.from("revistorias_apontamentos").select("id,unit_id,relatorio_id,ordem,texto,concluido").eq("project_id", projectId).order("id", { ascending: true }));
+/** Apontamentos da unidade (todos os relatórios; o checklist filtra os ativos e tira os repetidos). */
+export async function apontamentosUnidade(sb, unitId) {
   const { data, error } = await sb.from("revistorias_apontamentos")
-    .select("id,relatorio_id,ordem,texto,concluido,concluido_em,concluido_email").eq("relatorio_id", relatorioId).order("ordem", { ascending: true });
+    .select("id,unit_id,relatorio_id,ordem,texto,concluido,concluido_em,concluido_email").eq("unit_id", unitId).order("id", { ascending: true });
   if (error) throw error;
   return data || [];
 }
-/** Envia o PDF ao Storage (sem sobrescrever) e registra os metadados; se o registro falhar, apaga o arquivo enviado. */
+/** Tempo real dos relatórios e apontamentos do condomínio (quantitativos da lista em todos os aparelhos). */
+export function assinarRelatorios(sb, projectId, aoMudar) {
+  if (!sb?.channel) return () => {};
+  const filtro = `project_id=eq.${projectId}`;
+  const canal = sb.channel(`rev-aps-${projectId}-${Date.now()}`)
+    .on("postgres_changes", { event: "*", schema: "public", table: "revistorias_apontamentos", filter: filtro }, aoMudar)
+    .on("postgres_changes", { event: "*", schema: "public", table: "revistorias_relatorios", filter: filtro }, aoMudar)
+    .subscribe();
+  return () => sb.removeChannel(canal);
+}
 export async function enviarRelatorio(sb, a) {
   const up = await sb.storage.from(BUCKET).upload(a.caminho, a.arquivo, { contentType: "application/pdf", upsert: false, cacheControl: "3600" });
   if (up.error) { const e = new Error(/exceeded|too large|size/i.test(up.error.message || "") ? "Arquivo grande demais (máximo de 25 MB)." : up.error.message || "Não foi possível enviar o arquivo."); throw e; }

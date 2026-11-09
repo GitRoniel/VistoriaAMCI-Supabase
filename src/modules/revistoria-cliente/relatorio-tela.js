@@ -1,6 +1,9 @@
 // Relatório da unidade (aba Revistoria · Cliente): cabeçalho, checklist de apontamentos e o PDF original.
 // O PDF fica no Storage privado e é aberto por URL assinada e temporária; o checklist é só acompanhamento
 // (revistorias_apontamentos) e nunca altera o PDF. pdf.js (www/pdfjs) é carregado só quando a tela abre.
+// O checklist é o da UNIDADE: apontamentos de todos os relatórios ativos, sem repetidos (M.checklistUnidade),
+// a mesma regra das colunas Qtd. Apontamentos / Qtd. Resolvidas da Lista. Enviar outro PDF não apaga nada:
+// os itens já existentes mantêm o registro de resolução e só os novos entram, depois da conferência.
 import * as M from "./model.js";
 import * as S from "./service.js";
 import { extrair, mesmaUnidade } from "./relatorio.js";
@@ -53,7 +56,7 @@ function el() {
  */
 export async function abrirRelatorio(ctx) {
   const ov = el();
-  st = { ...ctx, rels: null, rel: null, aps: [], doc: null, pagina: 1, zoom: 1, erro: "", extraidos: null, enviando: "", canal: null };
+  st = { ...ctx, rels: null, rel: null, aps: [], apsTodos: [], doc: null, pagina: 1, zoom: 1, erro: "", extraidos: null, enviando: "", canal: null };
   ov.classList.add("open"); document.body.classList.add("rv-aberto");
   ov.querySelector("#rvKick").textContent = `${ctx.host.project.name} · ${ctx.host.casa() ? `Conjunto ${ctx.u.b}` : `Bloco ${ctx.u.b}`}`;
   ov.querySelector("#rvTit").textContent = `Relatório · ${ctx.host.casa() ? `Casa ${+ctx.u.a}` : `Apto ${ctx.u.codigo}`}`;
@@ -63,7 +66,7 @@ export async function abrirRelatorio(ctx) {
 }
 export function fechar() {
   const ov = document.getElementById("rvRelOv"); if (!ov?.classList.contains("open")) return;
-  if (st?.extraidos?.length && !confirm("Os apontamentos lidos do PDF ainda não foram salvos no checklist. Fechar mesmo assim?")) return;
+  if (st?.extraidos?.some((x) => x.usar && !x.existente && !x.repetido) && !confirm("Os apontamentos lidos do PDF ainda não foram salvos no checklist. Fechar mesmo assim?")) return;
   ov.classList.remove("open"); document.body.classList.remove("rv-aberto");
   try { st?.canal?.(); } catch { /* sem tempo real */ }
   st?.doc?.destroy?.(); st = null;
@@ -72,7 +75,7 @@ function assinar() {
   const sb = st.host.sb; if (!sb?.channel) return;
   const filtro = `unit_id=eq.${st.u.unitId}`, me = st;
   const ch = sb.channel(`rev-rel-${st.u.unitId}-${Date.now()}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "revistorias_apontamentos", filter: filtro }, () => { if (st === me && st.rel) recarregarApontamentos(); })
+    .on("postgres_changes", { event: "*", schema: "public", table: "revistorias_apontamentos", filter: filtro }, () => { if (st === me) recarregarApontamentos(); })
     .on("postgres_changes", { event: "*", schema: "public", table: "revistorias_relatorios", filter: filtro }, () => { if (st === me) carregar(true); })
     .subscribe();
   st.canal = () => sb.removeChannel(ch);
@@ -90,18 +93,23 @@ async function carregar(manterPdf = false) {
   } catch (err) { if (st === me) { st.erro = S.naoInstalado(err) ? "Os relatórios ainda não foram instalados no banco." : err.message || "Não foi possível carregar."; pintar(); } }
 }
 async function recarregarApontamentos(repintar = true) {
-  if (!st?.rel) { if (st) st.aps = []; return; }
-  const me = st, id = st.rel.id;
-  const aps = await S.apontamentos(st.host.sb, id).catch(() => null);
-  if (st !== me || st.rel?.id !== id || !aps) return;
-  st.aps = aps; if (repintar) pintarChecklist();
+  if (!st) return;
+  if (!st.rels?.length) { st.aps = []; st.apsTodos = []; return; }
+  const me = st;
+  const aps = await S.apontamentosUnidade(st.host.sb, st.u.unitId).catch(() => null);
+  if (st !== me || !aps) return;
+  st.apsTodos = aps; st.aps = M.checklistUnidade(aps, st.rels);
+  if (repintar) { pintarChecklist(); pintarCabecalho(); }
 }
+/** Lista, mapa e outros aparelhos: os quantitativos vêm dos mesmos registros (tempo real cobre os demais aparelhos). */
+const avisar = () => { try { st?.aoMudar?.(); } catch { /* sem lista aberta */ } };
+function pintarCabecalho() { const c = document.querySelector("#rvBody .rv-cab"); if (c) c.outerHTML = cabecalho(); }
 
 /* ── tela ── */
 function cabecalho() {
   const u = st.u, s = u.situacao, ag = M.agendaRevistoria(s), resumo = st.rel?.resumo || {};
   const resp = (s.aberto || s.ultima)?.responsavel || resumo.responsavel || "";
-  const feitos = st.aps.filter((a) => a.concluido).length;
+  const q = M.resumoApontamentos(st.aps);
   const campo = (rot, val) => `<div><span>${esc(rot)}</span><b>${val || "—"}</b></div>`;
   return `<div class="rv-cab">
       ${campo("Condomínio", esc(st.host.project.name))}
@@ -110,7 +118,7 @@ function cabecalho() {
       ${campo("Data da revistoria", esc([fmtD(ag.data), ag.hora].filter(Boolean).join(" · ")) || (resumo.realizado ? esc(fmtD(resumo.realizado)) + " <small>(relatório)</small>" : ""))}
       ${campo("Responsável pela vistoria", esc(resp))}
       <div><span>Status da revistoria</span>${s.status ? `<span class="rc-badge" style="--c:${M.info(s.status).cor};--b:${M.info(s.status).borda}">${esc(M.info(s.status).label)}</span>` : "<b>Sem registro</b>"}</div>
-      ${campo("Apontamentos", st.rel ? `${st.aps.length}${st.aps.length ? ` <small>· ${feitos} concluído(s)</small>` : ""}${resumo.naoConformidades != null ? ` <small>· ${esc(resumo.naoConformidades)} NC no relatório</small>` : ""}` : "")}
+      ${campo("Apontamentos", st.rel ? `${q.total ? `${q.total} <small>· ${q.resolvidas} resolvido(s) · ${q.pct}%</small>` : "—"}${resumo.naoConformidades != null ? ` <small>· ${esc(resumo.naoConformidades)} NC no relatório</small>` : ""}` : "")}
     </div>`;
 }
 function pintar() {
@@ -134,14 +142,19 @@ function pintar() {
 function pintarChecklist() {
   const c = document.getElementById("rvCheck"); if (!c || !st) return;
   if (!st.rel) { c.innerHTML = ""; return; }
-  const ed = st.podeEditar;
-  const lista = st.aps.length ? `<ol class="rv-list">${st.aps.map((a, i) => `<li class="${a.concluido ? "ok" : ""}"><label><input type="checkbox" data-ap="${a.id}" ${a.concluido ? "checked" : ""} ${ed ? "" : "disabled"}><span class="rv-n">${i + 1}</span><span class="rv-t">${esc(a.texto)}${a.concluido && a.concluido_email ? `<small>concluído ${esc(fmtDH(a.concluido_em))} · ${esc(a.concluido_email)}</small>` : ""}</span></label>${ed ? `<button type="button" class="rv-x" data-aprm="${a.id}" aria-label="Remover apontamento">×</button>` : ""}</li>`).join("")}</ol>`
+  const ed = st.podeEditar, varios = st.rels.length > 1, relDe = new Map(st.rels.map((r) => [r.id, r]));
+  const origem = (a) => (varios ? `<em class="rv-orig">relatório de ${esc(fmtDH(relDe.get(a.relatorio_id)?.enviado_em).slice(0, 10))}</em>` : "");
+  const lista = st.aps.length ? `<ol class="rv-list">${st.aps.map((a, i) => `<li class="${a.concluido ? "ok" : ""}"><label><input type="checkbox" data-ap="${a.id}" ${a.concluido ? "checked" : ""} ${ed ? "" : "disabled"}><span class="rv-n">${i + 1}</span><span class="rv-t">${esc(a.texto)}${origem(a)}${a.concluido && a.concluido_email ? `<small>resolvido ${esc(fmtDH(a.concluido_em))} · ${esc(a.concluido_email)}</small>` : ""}</span></label>${ed ? `<button type="button" class="rv-x" data-aprm="${a.id}" aria-label="Remover apontamento">×</button>` : ""}</li>`).join("")}</ol>`
     : `<p class="rv-nada">Nenhum apontamento no checklist.</p>`;
   const ex = st.extraidos;
-  const preview = ex ? `<div class="rv-ext"><div class="rv-ext-h"><b>${ex.length} apontamento(s) lido(s) do PDF</b><span>Confira e desmarque o que não deve entrar no checklist.</span></div>
-      ${ex.length ? `<ol class="rv-list rv-ext-l">${ex.map((a, i) => `<li><label><input type="checkbox" data-ext="${i}" ${a.usar ? "checked" : ""}><span class="rv-t">${esc(a.texto)}</span></label></li>`).join("")}</ol>` : `<p class="rv-nada">Nenhum item reprovado encontrado no PDF. Adicione os apontamentos manualmente, se houver.</p>`}
-      <div class="rv-ext-a"><button type="button" class="btn g" data-rv="descartar">Descartar</button>${ex.length ? `<button type="button" class="btn p" data-rv="salvarext">Adicionar ao checklist</button>` : ""}</div></div>` : "";
-  c.innerHTML = `<div class="rv-sec-h"><b>Apontamentos · checklist</b><span class="rv-meta">${st.aps.filter((a) => a.concluido).length} de ${st.aps.length} concluído(s)</span></div>
+  const novos = ex ? ex.filter((a) => !a.existente && !a.repetido) : [], ja = ex ? ex.filter((a) => a.existente) : [];
+  const preview = ex ? `<div class="rv-ext"><div class="rv-ext-h"><b>${ex.length} apontamento(s) lido(s) do PDF</b><span>Confira antes de salvar: só os itens marcados entram no checklist. ${ja.length ? "Os que já estão no checklist não são duplicados e mantêm o registro de resolução." : ""}</span></div>
+      ${novos.length ? `<ol class="rv-list rv-ext-l">${ex.map((a, i) => (a.existente || a.repetido ? "" : `<li><label><input type="checkbox" data-ext="${i}" ${a.usar ? "checked" : ""}><span class="rv-t">${esc(a.texto)}</span></label></li>`)).join("")}</ol>` : ""}
+      ${ja.length ? `<div class="rv-ext-ja"><b>${ja.length} já no checklist</b><ul>${ja.map((a) => `<li class="${a.existente.concluido ? "ok" : ""}"><span>${esc(a.texto)}</span><em>${a.existente.concluido ? "resolvido · mantido" : "pendente · mantido"}</em></li>`).join("")}</ul></div>` : ""}
+      ${!ex.length ? `<p class="rv-nada">Nenhum item reprovado encontrado no PDF. Adicione os apontamentos manualmente, se houver.</p>` : ""}
+      <div class="rv-ext-a"><button type="button" class="btn g" data-rv="descartar">${novos.length ? "Descartar" : "Fechar conferência"}</button>${novos.length ? `<button type="button" class="btn p" data-rv="salvarext">Adicionar ao checklist</button>` : ""}</div></div>` : "";
+  const q = M.resumoApontamentos(st.aps);
+  c.innerHTML = `<div class="rv-sec-h"><b>Apontamentos · checklist</b><span class="rv-meta">${q.total ? `${q.resolvidas} de ${q.total} resolvido(s) · ${q.pct}%` : "sem apontamentos"}${varios ? ` · ${st.rels.length} relatórios` : ""}</span></div>
     ${preview}${lista}
     ${ed ? `<div class="rv-add">${!ex ? `<button type="button" class="btn g" data-rv="ler">Ler apontamentos do PDF</button>` : ""}<details><summary>Adicionar manualmente</summary><textarea id="rvNovo" rows="3" maxlength="6000" placeholder="Um apontamento por linha"></textarea><button type="button" class="btn p" data-rv="addman">Adicionar</button></details></div>` : ""}`;
 }
@@ -200,42 +213,50 @@ async function clique(e) {
     return;
   }
   if (a === "remover") {
-    if (!confirm(`Remover o relatório "${st.rel.nome_arquivo || "PDF"}" desta unidade? O arquivo é apagado e o checklist dele sai junto.`)) return;
-    try { await S.removerRelatorio(st.host.sb, st.rel.id); st.host.toast("Relatório removido"); st.rel = null; await carregar(); st.aoMudar?.(); }
+    const dele = st.aps.filter((x) => x.relatorio_id === st.rel.id), res = dele.filter((x) => x.concluido).length;
+    const aviso = dele.length ? `\n\nConferência: ${dele.length} apontamento(s) deste relatório (${res} resolvido(s)) saem do checklist e dos quantitativos da Lista. O registro fica guardado no histórico do banco.` : "";
+    if (!confirm(`Remover o relatório "${st.rel.nome_arquivo || "PDF"}" desta unidade? O arquivo é apagado.${aviso}`)) return;
+    try { await S.removerRelatorio(st.host.sb, st.rel.id); st.host.toast("Relatório removido"); st.rel = null; await carregar(); avisar(); }
     catch (err) { st.host.toast(err.message); }
     return;
   }
   if (a === "ler") return lerDoPdf();
   if (a === "descartar") { st.extraidos = null; return pintarChecklist(); }
   if (a === "salvarext") {
-    const textos = st.extraidos.filter((x) => x.usar).map((x) => x.texto);
+    const textos = st.extraidos.filter((x) => x.usar && !x.existente && !x.repetido).map((x) => x.texto);
     if (!textos.length) { st.host.toast("Nenhum apontamento selecionado"); return; }
     return salvarTextos(textos, () => { st.extraidos = null; });
   }
   if (a === "addman") {
-    const textos = String(document.getElementById("rvNovo")?.value || "").split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
-    if (!textos.length) { st.host.toast("Escreva um apontamento por linha"); return; }
-    return salvarTextos(textos, () => {});
+    const linhas = String(document.getElementById("rvNovo")?.value || "").split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+    if (!linhas.length) { st.host.toast("Escreva um apontamento por linha"); return; }
+    const conf = M.conferirExtraidos(linhas, st.aps), textos = conf.filter((x) => x.usar).map((x) => x.texto), pulados = linhas.length - textos.length;
+    if (!textos.length) { st.host.toast("Esses apontamentos já estão no checklist"); return; }
+    return salvarTextos(textos, () => {}, pulados);
   }
   const rm = t.dataset.aprm;
   if (rm) {
     if (!confirm("Remover este apontamento do checklist?")) return;
-    try { await S.removerApontamento(st.host.sb, Number(rm)); await recarregarApontamentos(); pintar(); } catch (err) { st.host.toast(err.message); }
+    try { await S.removerApontamento(st.host.sb, Number(rm)); await recarregarApontamentos(); pintar(); avisar(); } catch (err) { st.host.toast(err.message); }
   }
 }
-async function salvarTextos(textos, depois) {
-  try { const r = await S.adicionarApontamentos(st.host.sb, st.rel.id, textos); depois(); st.host.toast(`${r?.adicionados || textos.length} apontamento(s) no checklist`); await recarregarApontamentos(false); pintar(); }
+async function salvarTextos(textos, depois, pulados = 0) {
+  try {
+    const r = await S.adicionarApontamentos(st.host.sb, st.rel.id, textos); depois();
+    st.host.toast(`${r?.adicionados || textos.length} apontamento(s) no checklist${pulados ? ` · ${pulados} já existia(m)` : ""}`);
+    await recarregarApontamentos(false); pintar(); avisar();
+  }
   catch (err) { st.host.toast(err.message); }
 }
 async function mudou(e) {
   if (!st) return;
   const t = e.target;
-  if (t.dataset.rv === "sel") { st.rel = st.rels.find((r) => String(r.id) === t.value) || st.rel; st.extraidos = null; st.doc?.destroy?.(); st.doc = null; await recarregarApontamentos(false); pintar(); abrirPdf(); return; }
+  if (t.dataset.rv === "sel") { st.rel = st.rels.find((r) => String(r.id) === t.value) || st.rel; st.extraidos = null; st.doc?.destroy?.(); st.doc = null; pintar(); abrirPdf(); return; }
   if (t.dataset.rv === "arquivo") { const f = t.files?.[0]; t.value = ""; if (f) enviar(f); return; }
   if (t.dataset.ext != null) { st.extraidos[Number(t.dataset.ext)].usar = t.checked; return; }
   if (t.dataset.ap) {
     const id = Number(t.dataset.ap), ok = t.checked; t.disabled = true;
-    try { await S.marcarApontamento(st.host.sb, id, ok); await recarregarApontamentos(false); pintar(); }
+    try { await S.marcarApontamento(st.host.sb, id, ok); await recarregarApontamentos(false); pintar(); avisar(); }
     catch (err) { t.checked = !ok; t.disabled = false; st.host.toast(err.message); }
   }
 }
@@ -244,8 +265,7 @@ async function lerDoPdf() {
     const lib = await pdfjs();
     const doc = st.doc || await lib.getDocument({ url: await S.urlRelatorio(st.host.sb, st.rel.caminho), isEvalSupported: false }).promise;
     const r = extrair(await lerTexto(doc));
-    const ja = new Set(st.aps.map((a) => a.texto));
-    st.extraidos = r.apontamentos.map((a) => ({ texto: a.texto, usar: !ja.has(a.texto) }));
+    st.extraidos = M.conferirExtraidos(r.apontamentos.map((a) => a.texto), st.aps);
     pintarChecklist();
   } catch (err) { console.error(err); st.host.toast("Não foi possível ler o PDF"); }
 }
@@ -274,7 +294,7 @@ async function enviar(arq) {
     st.rel = r.relatorio; st.doc?.destroy?.(); st.doc = null;
     await carregar(true);
     if (!st) return;
-    st.extraidos = aps.map((a) => ({ texto: a.texto, usar: true }));
-    pintarChecklist(); st.aoMudar?.();
+    st.extraidos = M.conferirExtraidos(aps.map((a) => a.texto), st.aps);
+    pintarChecklist(); avisar();
   } catch (err) { if (st) { st.enviando = ""; pintar(); } host.toast(err.message || "Não foi possível enviar"); }
 }
