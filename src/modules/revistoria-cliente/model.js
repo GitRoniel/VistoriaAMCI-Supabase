@@ -67,8 +67,7 @@ export const reprovada = (s) => !!s?.status && s.status !== "Aprovado" && s.ulti
 /** Última reprovação da unidade (a revistoria realizada com resultado Reprovada mais recente). */
 export const ultimaReprovacao = (s) => (s?.lista || []).filter((r) => r.status === "Reprovada").at(-1) || null;
 
-// Status da chave (Controle de Chaves): selo neutro com a letra do setor, separado das cores de status e de execução.
-export const CHAVE_MARCA = { base: "B", cx: "C", asstec: "A", producao: "P", cliente: "E" };
+// Status da chave (Controle de Chaves): no mapa, canto inferior esquerdo na cor do setor (mesmo formato do canto da aba Vistoria).
 export const FILTRO_CHAVE = [
   { key: "", label: "Todas" }, { key: "base", label: "Base" }, { key: "cx", label: "CX" }, { key: "asstec", label: "Asstec" },
   { key: "producao", label: "Produção" }, { key: "cliente", label: "Entregue para Cliente" }, { key: "sem", label: "Sem status" },

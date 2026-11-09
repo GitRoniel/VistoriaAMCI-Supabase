@@ -213,10 +213,11 @@ function htmlMapa(lista, ok) {
       s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
-    const km = chavesOk && s.status ? (u.chave.perdida ? "!" : M.CHAVE_MARCA[u.chave.setor] || "") : "";
+    // chave: canto inferior esquerdo, no mesmo formato do canto da aba Vistoria, na cor do setor (Controle de Chaves)
+    const km = chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
     const ex = M.execInfo(s.execucao);
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "!" ? " lost" : ""}" aria-hidden="true">${km}</i>` : ""}</button>`;
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
   };
   const g = host.grid();
   let h;
@@ -237,7 +238,7 @@ function htmlMapa(lista, ok) {
     <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
     ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}
     <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
-    ${chavesOk ? `<div class="lg rc-lg-key"><span class="sw rc-sw-key">B</span>Chave: B Base · C CX · A Asstec · P Produção · E Entregue p/ cliente · <b class="rc-sw-key lost">!</b> perdida · sem selo = sem status</div>` : ""}
+    ${chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
 }
 
