@@ -40,6 +40,10 @@ if (themed !== page) await writeFile(pagePath, themed, "utf8");
 await cp(resolve(root, "assets"), resolve(www, "assets"), { recursive: true });
 // Navegadores pedem /favicon.ico automaticamente.
 await copyFile(resolve(root, "assets/icons/favicon.ico"), resolve(www, "favicon.ico"));
+// pdf.js (visualizador e leitura dos relatórios da Revistoria · Cliente): versão legacy, carregada sob demanda.
+await mkdir(resolve(www, "pdfjs"), { recursive: true });
+// Copiados com extensão .js (módulos ES): servidores e o app iOS entregam .js com o tipo de JavaScript.
+for (const f of ["pdf.min", "pdf.worker.min"]) await copyFile(resolve(root, "node_modules/pdfjs-dist/legacy/build", f + ".mjs"), resolve(www, "pdfjs", f + ".js"));
 await writeFile(
   resolve(www, "config.js"),
   `window.APP_CONFIG = Object.freeze(${JSON.stringify(config)});\n`,

@@ -1906,7 +1906,125 @@ html{background-color:var(--status-top,var(--chrome-top))}
   .rc-f-lib,.rc-f-exe{min-width:0!important;overflow:hidden}
   .rc-f-lib select,.rc-f-exe select{min-width:0!important;width:100%;flex:1 1 auto}
 }
-@media print{.rc-filters,#rcPop{display:none!important}}
+/* Vistoria · Cliente: Reagendar Vistoria no popup (histórico dos reagendamentos) */
+.pp-reag{margin:-6px 0 14px;padding:9px 11px;border:1px solid var(--border);border-radius:11px;background:#f7f9f6;display:grid;gap:8px}
+.pp-reag[hidden]{display:none}
+.pp-reag-t{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;font-size:12.5px;color:var(--text)}
+.pp-reag-btn{margin-left:auto;min-height:32px!important;height:32px;padding:0 12px!important;font-size:12.5px!important}
+.pp-reag-f{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.pp-reag-f input{width:100%;box-sizing:border-box}
+.pp-reag-a{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.pp-reag-msg{flex:1;font-size:12px;font-weight:700;color:#b33636}
+.pp-reag-conf p{margin:0;font-size:13px;line-height:1.5;color:var(--text)}
+.pp-reag-conf .pp-reag-n{font-size:11.5px;color:var(--text-light);margin:4px 0 8px}
+.pp-reag-h:empty{display:none}
+.pp-reag-h ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:5px}
+.pp-reag-h li{display:flex;flex-direction:column;gap:1px;font-size:12px;padding:5px 8px;border-left:3px solid #ff9e57;background:#fff;border-radius:0 8px 8px 0}
+.pp-reag-h li span{font-size:10.5px;color:var(--text-light)}
+.pp-reag-h li em{font-style:normal;color:#52675d;font-size:11.5px}
+@media(max-width:420px){.pp-reag-f{grid-template-columns:1fr}.pp-reag-f input{font-size:16px}}
+/* Revistoria · Cliente: data, horário, chave, Rev. Reprovada e relatório */
+.rc-line2 .fx-field{flex:0 1 auto}
+.rc-f-data{position:relative;gap:6px}
+.rc-f-data input{border:0;background:transparent;font:inherit;color:var(--ink);min-width:0;width:132px;padding:0}
+.rc-f-data input:focus{outline:none}
+.rc-f-x{border:0;background:#e9eeea;color:#52675d;width:20px;height:20px;border-radius:50%;font-size:14px;line-height:20px;padding:0;cursor:pointer;flex:0 0 auto}
+.rc-hr{display:inline-flex;align-items:center;gap:6px}
+.rc-hr svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.rc-semh{font-size:10px;font-weight:600;color:#9aa39a}
+.rc-u.rc-rep{box-shadow:0 0 0 2px #fff,0 0 0 4px #d64545}
+.rc-sw-rep{background:#fff!important;border:2px solid #d64545!important;box-shadow:0 0 0 1px #fff inset}
+.rc-tbl tr.rc-tr-rep td:first-child{box-shadow:inset 3px 0 0 #d64545}
+.rc-rep-tag{display:inline-block;margin-left:5px;padding:1px 6px;border-radius:999px;border:1px solid #f0c9c3;background:#fdf3f2;color:#9e2f25;font-size:10px;font-weight:800;white-space:nowrap}
+.rc-u .rc-mk-key{position:absolute;bottom:-5px;left:-5px;min-width:13px;height:13px;padding:0 1px;border-radius:3px;background:#fff;color:#1f2b25;border:1px solid #33463d;font-size:8.5px;font-style:normal;font-weight:900;line-height:11px;text-align:center;box-shadow:0 0 0 1px #fff;pointer-events:none}
+.rc-u .rc-mk-key.lost{color:#b33636;border-color:#b33636}
+.rc-sw-key{display:inline-flex!important;align-items:center;justify-content:center;background:#fff!important;border:1px solid #33463d!important;color:#1f2b25;font-size:8.5px;font-weight:900;border-radius:3px!important;min-width:13px;height:13px;padding:0 2px}
+.rc-sw-key.lost{color:#b33636;border-color:#b33636!important}
+.rc-lg-key{flex-wrap:wrap}
+.rc-key.lost{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;border:1px solid #f0c9c3;background:#fdf3f2;color:#9e2f25;font-size:11px;font-weight:800;white-space:nowrap}
+.rc-key-pill.sm,.rc-key.sm{font-size:10.5px;padding:1px 7px 1px 6px}
+.rc-tbl .rc-c-key{white-space:nowrap}
+.rc-tem-rel{border-color:#9fb6a6!important;color:#1f4a3f!important;font-weight:800!important}
+.rc-repcard{padding:9px 11px;border:1px solid #f0c9c3;border-left:4px solid #d64545;border-radius:12px;background:#fdf6f5;font-size:12px;line-height:1.45}
+.rc-rep-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.rc-rep-h b{color:#9e2f25;font-size:13px}
+.rc-rep-h span{color:#7a4b45;font-weight:600}
+.rc-rep-t{margin-top:3px;color:#33463d}.rc-rep-t span{font-weight:700}
+.rc-rep-d{margin-top:2px;color:var(--muted);font-size:11px}
+.rc-keybox{padding:9px 11px;border:1px solid #e3e9e4;border-radius:12px;background:#fff;display:grid;gap:6px}
+.rc-key-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px}
+.rc-key-h svg{width:16px;height:16px;stroke:#33463d;fill:none;stroke-width:2;flex:0 0 auto}
+.rc-key-h b{font-size:12.5px;color:var(--ink)}
+.rc-key-h .ch-mini{margin-left:auto}
+.rc-key-d{font-size:12px;color:#52675d;line-height:1.45}
+.rc-keyform{border:0;padding:4px 0 0}
+.rc-keyform .pp-actions{margin:2px 0 0;padding:8px 0 0;background:none}
+/* Tela do relatório */
+body.rv-aberto{overflow:hidden}
+.rv-ov{position:fixed;inset:0;z-index:2000;display:none;align-items:flex-start;justify-content:center;background:rgba(15,28,24,.55);overflow:auto;padding:24px 16px}
+.rv-ov.open{display:flex}
+.rv-box{width:min(980px,100%);background:var(--bg,#f4f6f3);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.25);overflow:hidden}
+.rv-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(145deg,#244e42,#17362f);color:#fff}
+.rv-tit{display:flex;flex-direction:column;min-width:0;flex:1}
+.rv-tit small{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#dccb91}
+.rv-tit strong{font-size:19px}
+.rv-body{padding:14px 16px 18px;display:grid;gap:12px}
+.rv-cab{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;padding:12px 14px;border:1px solid #e3e9e4;border-radius:14px;background:#fff}
+.rv-cab>div{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:flex-start}
+.rv-cab span:first-child{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.rv-cab b{font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
+.rv-cab small{font-size:11px;color:var(--muted);font-weight:600}
+.rv-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.rv-sel select{max-width:320px}
+.rv-up{cursor:pointer}.rv-up.disabled{opacity:.6;pointer-events:none}
+.rv-rm{margin-left:auto;color:#9e2f25!important}
+.rv-sec{padding:12px 14px;border:1px solid #e3e9e4;border-radius:14px;background:#fff;display:grid;gap:9px}
+.rv-sec:empty{display:none}
+.rv-sec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.rv-sec-h b{font-size:14px;color:var(--ink)}
+.rv-meta{font-size:11.5px;color:var(--muted)}
+.rv-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.rv-list li{display:flex;align-items:flex-start;gap:6px;padding:8px 10px;border:1px solid #e3e9e4;border-radius:10px;background:#fbfcfb}
+.rv-list li.ok{background:#f1f8f3;border-color:#cfe6d6}
+.rv-list li.ok .rv-t{color:#6f7a74;text-decoration:line-through;text-decoration-color:#9fb6a6}
+.rv-list label{display:flex;align-items:flex-start;gap:9px;flex:1;cursor:pointer;min-width:0}
+.rv-list input[type=checkbox]{width:20px;height:20px;margin:1px 0 0;accent-color:#1f4a3f;flex:0 0 auto}
+.rv-n{flex:0 0 auto;min-width:20px;font-size:11px;font-weight:800;color:#7d8c84;padding-top:2px}
+.rv-t{font-size:13px;color:var(--ink);line-height:1.45;overflow-wrap:anywhere}
+.rv-t small{display:block;font-size:10.5px;color:var(--muted);text-decoration:none;font-weight:600}
+.rv-x{border:0;background:none;color:#9aa39a;font-size:18px;line-height:1;cursor:pointer;padding:0 2px}
+.rv-x:hover{color:#b33636}
+.rv-nada{margin:0;font-size:12.5px;color:var(--muted)}
+.rv-ext{padding:10px;border:1px dashed #9fb6a6;border-radius:12px;background:#f6faf7;display:grid;gap:8px}
+.rv-ext-h{display:flex;flex-direction:column;gap:2px}.rv-ext-h b{font-size:13px}.rv-ext-h span{font-size:11.5px;color:var(--muted)}
+.rv-ext-a{display:flex;justify-content:flex-end;gap:8px}
+.rv-add{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px}
+.rv-add details{flex:1 1 260px}
+.rv-add summary{cursor:pointer;font-size:12.5px;font-weight:700;color:#1f4a3f;padding:8px 0}
+.rv-add textarea{width:100%;box-sizing:border-box;border:1.5px solid #d3ddd6;border-radius:9px;padding:8px 10px;font:inherit;font-size:13px;margin-bottom:6px;resize:vertical}
+.rv-pdfbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.rv-pdfbar .btn{min-height:32px!important;height:32px;padding:0 11px!important;font-size:12.5px!important}
+.rv-pdfbar span[id]{min-width:52px;text-align:center;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.rv-sep{width:1px;height:20px;background:#dbe4dd;margin:0 2px}
+.rv-pdf{overflow:auto;max-height:78vh;border:1px solid #e3e9e4;border-radius:10px;background:#e9ecea;-webkit-overflow-scrolling:touch}
+.rv-pdf canvas{display:block;margin:0 auto;background:#fff}
+@media(max-width:720px){
+  .rc-line2 .fx-field{flex:1 1 calc(50% - 6px)}
+  .rc-f-data{flex:1 1 calc(50% - 6px)!important}
+  .rc-f-data input{width:100%;font-size:16px}
+  .rc-hr{flex:1 1 calc(50% - 6px);justify-content:center}
+  .rc-f-key{min-width:0!important;overflow:hidden}.rc-f-key select{min-width:0!important;width:100%}
+  .rc-tbl .rc-c-key{grid-column:1/-1}
+  .rc-tbl .rc-c-key::before{content:'Chave: ';font-size:11.5px;color:var(--muted)}
+  .rc-tbl .rc-c-key small{display:inline;margin-left:5px}
+  .rv-ov{padding:0}
+  .rv-box{border-radius:0;min-height:100%}
+  .rv-cab{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rv-body{padding:10px}
+  .rv-pdf{max-height:70vh}
+  .rv-rm{margin-left:0}
+}
+@media print{.rc-filters,#rcPop,.rv-ov{display:none!important}}
 /* TEMA ESCURO · gerado por scripts/theme-dark.mjs (não editar à mão) */
 :root[data-theme="dark"] body{background:#212522;color:#d3ddd6}
 :root[data-theme="dark"] button{border:none;background:none}
@@ -2745,6 +2863,71 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rc-exe-opt.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,#282828);box-shadow:0 0 0 1px var(--c)}
 :root[data-theme="dark"] .rc-exe-none{color:#a1a9a5}
 :root[data-theme="dark"] .rc-op-msg{color:#2459b5}
+:root[data-theme="dark"] .pp-reag{border:1px solid #414a43;background:#232821}
+:root[data-theme="dark"] .pp-reag-t{color:#d3ddd6}
+:root[data-theme="dark"] .pp-reag-msg{color:#b33636}
+:root[data-theme="dark"] .pp-reag-conf p{color:#d3ddd6}
+:root[data-theme="dark"] .pp-reag-conf .pp-reag-n{color:#b1c1b1}
+:root[data-theme="dark"] .pp-reag-h li{border-left:3px solid #665447;background:#282828}
+:root[data-theme="dark"] .pp-reag-h li span{color:#b1c1b1}
+:root[data-theme="dark"] .pp-reag-h li em{color:#abbcb4}
+:root[data-theme="dark"] .rc-f-data input{border:0;background:transparent;color:#cfd9d7}
+:root[data-theme="dark"] .rc-f-data input:focus{outline:none}
+:root[data-theme="dark"] .rc-f-x{border:0;background:#1e211e;color:#abbcb4}
+:root[data-theme="dark"] .rc-hr svg{stroke:currentColor;fill:none}
+:root[data-theme="dark"] .rc-semh{color:#9aa39a}
+:root[data-theme="dark"] .rc-u.rc-rep{box-shadow:0 0 0 2px #282828,0 0 0 4px #d64545}
+:root[data-theme="dark"] .rc-sw-rep{background:#282828!important;border:2px solid #d64545!important;box-shadow:0 0 0 1px #282828 inset}
+:root[data-theme="dark"] .rc-tbl tr.rc-tr-rep td:first-child{box-shadow:inset 3px 0 0 #d64545}
+:root[data-theme="dark"] .rc-rep-tag{border:1px solid #553e3b;background:#2d1e1c;color:#de7b73}
+:root[data-theme="dark"] .rc-u .rc-mk-key{background:#282828;color:#d1dbd6;border:1px solid #33463d;box-shadow:0 0 0 1px #282828}
+:root[data-theme="dark"] .rc-u .rc-mk-key.lost{color:#b33636;border-color:#b33636}
+:root[data-theme="dark"] .rc-sw-key{background:#282828!important;border:1px solid #33463d!important;color:#d1dbd6}
+:root[data-theme="dark"] .rc-sw-key.lost{color:#b33636;border-color:#b33636!important}
+:root[data-theme="dark"] .rc-key.lost{border:1px solid #553e3b;background:#2d1e1c;color:#de7b73}
+:root[data-theme="dark"] .rc-tem-rel{border-color:#515c55!important;color:#c7d3d0!important}
+:root[data-theme="dark"] .rc-repcard{border:1px solid #553e3b;border-left:4px solid #d64545;background:#2d1f1d}
+:root[data-theme="dark"] .rc-rep-h b{color:#de7b73}
+:root[data-theme="dark"] .rc-rep-h span{color:#bbaba9}
+:root[data-theme="dark"] .rc-rep-t{color:#c1cec8}
+:root[data-theme="dark"] .rc-rep-d{color:#a6b2ab}
+:root[data-theme="dark"] .rc-keybox{border:1px solid #404741;background:#282828}
+:root[data-theme="dark"] .rc-key-h svg{stroke:#c1cec8;fill:none}
+:root[data-theme="dark"] .rc-key-h b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-key-d{color:#abbcb4}
+:root[data-theme="dark"] .rc-keyform{border:0}
+:root[data-theme="dark"] .rc-keyform .pp-actions{background:none}
+:root[data-theme="dark"] .rv-ov{background:rgba(15,28,24,.55)}
+:root[data-theme="dark"] .rv-box{background:var(--bg,#222521);box-shadow:0 24px 60px rgba(0,0,0,0.45)}
+:root[data-theme="dark"] .rv-head{background:linear-gradient(145deg,#244e42,#17362f);color:#fff}
+:root[data-theme="dark"] .rv-tit small{color:#dccb91}
+:root[data-theme="dark"] .rv-cab{border:1px solid #404741;background:#282828}
+:root[data-theme="dark"] .rv-cab span:first-child{color:#a6b2ab}
+:root[data-theme="dark"] .rv-cab b{color:#cfd9d7}
+:root[data-theme="dark"] .rv-cab small{color:#a6b2ab}
+:root[data-theme="dark"] .rv-rm{color:#de7b73!important}
+:root[data-theme="dark"] .rv-sec{border:1px solid #404741;background:#282828}
+:root[data-theme="dark"] .rv-sec-h b{color:#cfd9d7}
+:root[data-theme="dark"] .rv-meta{color:#a6b2ab}
+:root[data-theme="dark"] .rv-list li{border:1px solid #404741;background:#242924}
+:root[data-theme="dark"] .rv-list li.ok{background:#1e2821;border-color:#3d5243}
+:root[data-theme="dark"] .rv-list li.ok .rv-t{color:#a1a9a5;text-decoration-color:#9fb6a6}
+:root[data-theme="dark"] .rv-n{color:#98a49e}
+:root[data-theme="dark"] .rv-t{color:#cfd9d7}
+:root[data-theme="dark"] .rv-t small{color:#a6b2ab}
+:root[data-theme="dark"] .rv-x{border:0;background:none;color:#9aa39a}
+:root[data-theme="dark"] .rv-x:hover{color:#b33636}
+:root[data-theme="dark"] .rv-nada{color:#a6b2ab}
+:root[data-theme="dark"] .rv-ext{border:1px dashed #515c55;background:#202922}
+:root[data-theme="dark"] .rv-ext-h span{color:#a6b2ab}
+:root[data-theme="dark"] .rv-add summary{color:#c7d3d0}
+:root[data-theme="dark"] .rv-add textarea{border:1.5px solid #444c47}
+:root[data-theme="dark"] .rv-sep{background:#262b27}
+:root[data-theme="dark"] .rv-pdf{border:1px solid #404741;background:#1e201f}
+:root[data-theme="dark"] .rv-pdf canvas{background:#282828}
+@media(max-width:720px){
+  :root[data-theme="dark"] .rc-tbl .rc-c-key::before{color:#a6b2ab}
+}
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -3799,7 +3982,7 @@ function gotoUnit(delta){
   if(!ctx||ctx.k!=="cli"||!confirmDiscard())return;
   const i=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a),next=LAYOUT.units[i+delta];
   if(!next)return;
-  ctx={...ctx,b:next.b,p:next.p,a:next.a,draft:null,dirty:false};
+  ctx={...ctx,b:next.b,p:next.p,a:next.a,draft:null,dirty:false,reag:null};
   popAnchor=document.querySelector(unitSelector(ctx));
   if(popAnchor&&!sheetMode())popAnchor.scrollIntoView({block:"nearest",inline:"nearest"});
   renderPop();positionPop();markSelectedUnit();
@@ -3872,6 +4055,7 @@ function renderCliPop(){
       <div class="pp-label">Status da vistoria</div>
       <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       ${revHist}
+      ${reagHtml(key,cur)}
       <form class="pp-form" novalidate>
         <label class="pp-f pp-full"><span>Cliente</span><input name="cliente" value="${val("cliente")}" placeholder="Nome do cliente" autocomplete="off" ${dis}></label>
         ${dateField("data_vistoria","Data da vistoria"+(cur==="rm"?" (remarcada)":""))}
@@ -3887,6 +4071,7 @@ function renderCliPop(){
     </div>`;
   pop.setAttribute("tabindex","-1");pop.setAttribute("role","dialog");pop.setAttribute("aria-label",name+" · "+kicker);
   pop.querySelectorAll(".pp-st").forEach(b=>b.onclick=()=>setStatus(b.dataset.code));
+  bindReag(key);
   const form=pop.querySelector(".pp-form");
   form.addEventListener("input",e=>{const f=e.target.name;if(!CLI_FIELDS.includes(f))return;ctx.draft={...(ctx.draft||{}),[f]:e.target.value};refreshPopActions();});
   form.addEventListener("submit",e=>{e.preventDefault();saveCliDraft();});
@@ -3896,6 +4081,61 @@ function renderCliPop(){
     if(a==="prev")gotoUnit(-1);else if(a==="next")gotoUnit(1);else if(a==="close")requestClosePop();
     else if(a==="discard"){ctx.draft=null;ctx.dirty=false;renderPop();}});
   refreshPopActions();
+}
+/* ── Reagendar Vistoria (popup): muda só a data/horário da VISTORIA (client_inspections), status → Remarcado,
+   e guarda o agendamento anterior em vistorias_reagendamentos (função vistoria_reagendar). Não toca na revistoria. ── */
+const reagCache=new Map();
+async function reagCarregar(unitId){
+  if(!SUPABASE_READY)return;
+  const {data,error}=await supabase.from("vistorias_reagendamentos").select("id,status_anterior,data_anterior,horario_anterior,data_nova,horario_nova,observacao,registrado_email,registrado_em").eq("unit_id",unitId).order("registrado_em",{ascending:false}).limit(20);
+  reagCache.set(unitId,error?{erro:true}:(data||[]));
+  if(ctx&&ctx.k==="cli"&&dbIndex.unitByKey.get(kC(ctx.b,ctx.p,ctx.a))?.id===unitId){const box=pop.querySelector("#ppReagHist");if(box)box.innerHTML=reagHistHtml(unitId);}
+}
+function reagHistHtml(unitId){
+  const h=reagCache.get(unitId);if(!h)return "";if(h.erro||!h.length)return "";
+  const q=(d,t)=>[d?fmtDate(dstr(d)):"",String(t||"").slice(0,5)].filter(Boolean).join(" ")||"sem data";
+  return `<div class="pp-label">Reagendamentos <small>· ${h.length}</small></div><ul>${h.map(r=>`<li><b>${esc(q(r.data_anterior,r.horario_anterior))} → ${esc(q(r.data_nova,r.horario_nova))}</b><span>${esc(new Date(r.registrado_em).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}))} · ${esc(r.registrado_email||"")}</span>${r.observacao?`<em>${esc(r.observacao)}</em>`:""}</li>`).join("")}</ul>`;
+}
+function reagHtml(key,cur){
+  const unitId=dbIndex.unitByKey.get(key)?.id;if(!unitId)return "";
+  if(!reagCache.has(unitId))reagCarregar(unitId).catch(()=>{});
+  const pode=(cur==="ag"||cur==="rm")&&canEditCli(),r=ctx.reag;
+  const info=state.cliInfo[key]||emptyCliInfo(),atual=[info.data_vistoria?fmtDate(info.data_vistoria):"",info.horario_vistoria].filter(Boolean).join(" às ")||"sem data";
+  let corpo="";
+  if(pode&&r){
+    if(r.etapa==="confirmar")corpo=`<div class="pp-reag-conf"><p>Reagendar a vistoria de <b>${esc(atual)}</b> para <b>${esc(fmtDate(r.data))}${r.hora?" às "+esc(r.hora):""}</b>?${r.obs?`<br><small>Justificativa: ${esc(r.obs)}</small>`:""}</p>
+      <p class="pp-reag-n">O status passa para Remarcado e o agendamento anterior fica no histórico. A revistoria não é alterada.</p>
+      <div class="pp-reag-a"><button type="button" class="btn g" data-reag="voltar">Voltar</button><button type="button" class="btn p" data-reag="confirmar"${r.salvando?" disabled":""}>${r.salvando?"Salvando…":"Confirmar reagendamento"}</button></div></div>`;
+    else corpo=`<div class="pp-reag-f"><label class="pp-f"><span>Nova data</span><input type="date" data-reagf="data" value="${esc(r.data||"")}"></label>
+      <label class="pp-f"><span>Novo horário</span><input type="time" step="900" data-reagf="hora" value="${esc(r.hora||"")}"></label>
+      <label class="pp-f pp-full"><span>Observação / justificativa (opcional)</span><input data-reagf="obs" maxlength="500" value="${esc(r.obs||"")}" placeholder="Ex.: cliente pediu outro dia"></label>
+      <div class="pp-reag-a pp-full"><span class="pp-reag-msg">${esc(r.msg||"")}</span><button type="button" class="btn g" data-reag="fechar">Cancelar</button><button type="button" class="btn p" data-reag="revisar">Confirmar reagendamento</button></div></div>`;
+  }
+  const hist=`<div class="pp-reag-h" id="ppReagHist">${reagHistHtml(unitId)}</div>`;
+  if(!pode)return reagCache.get(unitId)?.length?`<div class="pp-reag">${hist}</div>`:`<div class="pp-reag" hidden>${hist}</div>`;
+  return `<div class="pp-reag"><div class="pp-reag-t"><span>Vistoria agendada: <b>${esc(atual)}</b></span>${r?"":`<button type="button" class="btn g pp-reag-btn" data-reag="abrir">Reagendar Vistoria</button>`}</div>${corpo}${hist}</div>`;
+}
+function bindReag(key){
+  pop.querySelectorAll("[data-reagf]").forEach(i=>i.oninput=()=>{if(ctx.reag){ctx.reag[i.dataset.reagf]=i.value;ctx.reag.msg="";}});
+  pop.querySelectorAll("[data-reag]").forEach(b=>b.onclick=async()=>{
+    const a=b.dataset.reag,info=state.cliInfo[key]||emptyCliInfo();
+    if(a==="abrir"){if(ctx.dirty){toast("Salve ou descarte as alterações da vistoria antes de reagendar");return;}ctx.reag={etapa:"form",data:"",hora:info.horario_vistoria||"",obs:""};renderPop();pop.querySelector('[data-reagf="data"]')?.focus();return;}
+    if(a==="fechar"){ctx.reag=null;renderPop();return;}
+    if(a==="voltar"){ctx.reag.etapa="form";renderPop();return;}
+    if(a==="revisar"){const r=ctx.reag;
+      r.msg=!r.data?"Informe a nova data":r.hora&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.hora)?"Horário inválido":(r.data===info.data_vistoria&&(r.hora||"")===(info.horario_vistoria||""))?"A nova data e o horário são iguais aos atuais":"";
+      if(r.msg){renderPop();return;}r.etapa="confirmar";renderPop();return;}
+    if(a==="confirmar"){
+      const r=ctx.reag,snap=ctx,unitId=dbIndex.unitByKey.get(key)?.id,rec=dbIndex.clientByUnit.get(unitId);r.salvando=true;renderPop();
+      try{
+        const {data,error}=await supabase.rpc("vistoria_reagendar",{p_unit_id:unitId,p_data:r.data,p_horario:r.hora||"",p_observacao:r.obs||"",p_version:rec?.version??null});
+        if(error)throw error;
+        if(data?.vistoria)applyClientRecord(data.vistoria);
+        toast(`Vistoria reagendada para ${fmtDate(r.data)}${r.hora?" às "+r.hora:""}`);
+        if(ctx===snap)ctx.reag=null;reagCache.delete(unitId);renderCli();renderResumo();if(ctx===snap)renderPop();window.AmciChaves?.vistoriaMudou();
+      }catch(e){if(ctx===snap){r.salvando=false;r.etapa="form";r.msg=String(e.message||"").replace(/^.*?ERROR:\s*/i,"")||"Não foi possível reagendar";renderPop();}load(true).catch(()=>{});}
+    }
+  });
 }
 async function saveAcomp(select){
   const {b,p,a}=select.dataset,key=kC(b,p,a),info=state.cliInfo[key];
@@ -4047,6 +4287,8 @@ function revcliHost(){
     cliente:(b,p,a)=>state.cliInfo[kC(b,p,a)]?.cliente||"",
     acompanhamento:id=>{const k=unitKey(id);return k?state.rvc[k]||null:null;}, agendamentos:id=>{const k=unitKey(id);return k?revList(k):[];},
     recarregar:rvcRecarregar, hoje:todayISO,
+    // importação da planilha só de revistorias (mesmo importador da Visão Geral; só administradores)
+    podeImportar:()=>adminProjects().some(p=>String(p.id)===String(appProject?.id)), importarRevistorias:()=>startImport("rev"),
     papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
   };
 }
@@ -4739,7 +4981,7 @@ const impColLetter=i=>{let s="";for(i++;i>0;i=Math.floor((i-1)/26))s=String.from
 function impCell(v){if(v==null)return "";if(typeof v==="object"&&"serial" in v)return String(v.serial);return impClean(v);}
 
 /* 1) Estrutura: acha o cabeçalho por nome e confere as colunas obrigatórias. */
-function impFindColumns(sheets){
+function impFindColumns(sheets,modo="vist"){
   let best=null;
   for(const sheet of sheets){
     for(let r=0;r<Math.min(sheet.rows.length,15);r++){
@@ -4748,6 +4990,9 @@ function impFindColumns(sheets){
         const t=typeof c==="string"?impNorm(c):"";if(!t||!impIsRevHeader(t))return;
         const col=IMPORT_REV_COLUMNS.find(x=>map[x.key]==null&&x.test(t));if(col){map[col.key]=idx;used.add(idx);}
       });
+      // Relatório 855: o horário da revistoria (coluna O) vem como "HORÁRIO DO AGENDAMENTO", logo depois de
+      // "DATA DA REVISTORIA" (N); é reconhecido pela posição para não ser confundido com o horário da vistoria (L).
+      if(map.rev_data!=null&&map.rev_hora==null){const nx=cells[map.rev_data+1];if(typeof nx==="string"&&/\b(horario|hora)\b/.test(impNorm(nx))){map.rev_hora=map.rev_data+1;used.add(map.rev_data+1);}}
       for(const col of IMPORT_COLUMNS){
         for(const alias of col.aliases){
           const i=cells.findIndex((c,idx)=>!used.has(idx)&&typeof c==="string"&&(impNorm(c)===alias||(alias.length>=6&&impNorm(c).startsWith(alias+" "))));
@@ -4759,6 +5004,13 @@ function impFindColumns(sheets){
     }
   }
   if(!best||best.score<2)return {error:"Não encontrei o cabeçalho da planilha. A primeira linha deve ter os nomes das colunas (Condomínio, Unidade, Cliente, Data da vistoria, Horário…)."};
+  // Importação só de revistorias (aba Revistoria · Cliente): bastam condomínio, unidade e as colunas da revistoria.
+  if(modo==="rev"){
+    const falta=["condominio","unidade"].filter(k=>best.map[k]==null).map(k=>IMPORT_COLUMNS.find(c=>c.key===k).label);
+    if(falta.length)return {error:"Coluna obrigatória não encontrada: "+falta.join(", ")+"."};
+    if(best.map.rev_status==null&&best.map.rev_data==null)return {error:'Colunas da revistoria não encontradas: a planilha precisa de "STATUS DA REVISTORIA" e/ou "DATA DA REVISTORIA" (colunas M, N e O do Relatório).'};
+    return best;
+  }
   const missing=IMPORT_COLUMNS.filter(c=>c.required&&best.map[c.key]==null);
   if(missing.length)return {error:"Coluna obrigatória não encontrada: "+missing.map(c=>`"${c.label}" (nomes aceitos: ${c.aliases.map(a=>a.toUpperCase()).join(", ")})`).join("; ")+".",missing};
   return best;
@@ -4804,8 +5056,20 @@ async function impLoadSystem(projectIds){
 }
 
 /* 3) Comparação campo a campo (nada é gravado aqui). */
-function impCompare(sys,sheet,revOpt){
+function impCompare(sys,sheet,revOpt,modo="vist"){
   const items=[],src=sys.field_sources||{};
+  if(modo==="rev"){ // só a revistoria: cliente, data/horário e status da vistoria nem são lidos
+    if(!revOpt?.ok)return items;
+    const it=REV.comparar(REV.ultima(revOpt.byUnit.get(sys.unit_id)),{status:sheet.revStatus,statusOriginal:sheet.revStatusOriginal,statusInvalido:sheet.revStatusInvalido,
+      data:sheet.revData,dataInvalida:sheet.revDataInvalida,hora:sheet.revHora,horaInvalida:sheet.revHoraInvalida},"");
+    if(it){
+      const NOME={status:"status",data:"data",horario:"horário"};
+      it.label=it.kind==="invalid"?"Divergência":it.kind==="same"?"Sem alteração":it.rev?.acao==="nova"?"Novo registro":"Alteração de "+(it.rev?.campos||[]).map(c=>NOME[c]||c).join(", ");
+      it.nota=it.rev?.acao==="nova"&&it.rev.numero?`Nova revistoria (nº ${it.rev.numero+1}); a anterior fica no histórico`:"";
+      items.push(it);
+    }
+    return items;
+  }
   const text=(key,label,db,sheetVal)=>{
     const cur=impClean(sys[db]),next=impClean(sheetVal);if(!next)return;
     if(!cur)items.push({key,label,kind:"fill",cur:"",next,changes:[{field:db,old:sys[db]||"",new:next}]});
@@ -4845,8 +5109,8 @@ function impCompare(sys,sheet,revOpt){
   return items;
 }
 
-async function impAnalyze(file,sheets){
-  const cols=impFindColumns(sheets);if(cols.error)throw new Error(cols.error);
+async function impAnalyze(file,sheets,modo="vist"){
+  const cols=impFindColumns(sheets,modo);if(cols.error)throw new Error(cols.error);
   const admins=new Set(adminProjects().map(p=>String(p.id)));
   if(!admins.size)throw new Error("Somente administradores podem importar agendamentos.");
   const matchProject=impProjectMatcher(),get=(row,k)=>cols.map[k]==null?null:row[cols.map[k]];
@@ -4898,7 +5162,8 @@ async function impAnalyze(file,sheets){
   // Comparação com o banco.
   for(const rec of records){
     if(rec.error||rec.dup||rec.blocked)continue;
-    const cur=rec.current;rec.items=impCompare(cur,rec.sheet,revOpt);
+    const cur=rec.current;rec.items=impCompare(cur,rec.sheet,revOpt,modo);
+    if(modo==="rev"){const it=rec.items[0];rec.cls=!it||it.kind==="same"?"same":it.kind==="conflict"?"conflict":it.kind==="invalid"?"conflict":it.rev?.acao==="nova"?"new":"update";continue;}
     rec.items.forEach(it=>{if(it.kind!=="invalid")(it.avisos||[]).forEach(w=>rec.warnings.push(w));});
     const clientConflict=rec.items.some(it=>it.key==="cliente"&&it.kind==="conflict");
     if(clientConflict){ // cliente incompatível: nada desta unidade é preenchido sem decisão.
@@ -4918,7 +5183,12 @@ async function impAnalyze(file,sheets){
   const inSheet=new Set(records.filter(r=>r.unitId).map(r=>r.unitId));
   const notInSheet=[...sys.byUnit.values()].filter(r=>!inSheet.has(r.unit_id)).map(r=>{const u=r.units,ou=ovUnit(u),p=availableProjects.find(x=>String(x.id)===String(u.project_id));
     return {cls:"notinsheet",unitId:r.unit_id,project:p,projectName:p?(projectExperience(p).title||p.name):"",label:`${ou.groupLabel} · ${ou.unitLabel}`,cliente:r.client_name||"",items:[],warnings:[]};});
-  return {file:file.name,records,notInSheet,projectIds,decisions:new Map(),revCols,revMissingDb:!!revCols.length&&!sys.revOk};
+  if(modo==="rev"){ // aba Revistoria: só unidades que aparecem com revistoria na planilha; as demais nem entram na conferência
+    const temRev=r=>r.sheet&&(r.sheet.revStatus||r.sheet.revData||r.sheet.revHora||r.sheet.revStatusInvalido||r.sheet.revDataInvalida||r.sheet.revHoraInvalida);
+    const lidas=records.filter(r=>r.error?(temRev(r)&&!/Sem permissão/.test(r.error)):temRev(r));
+    return {modo,file:file.name,records:lidas,notInSheet:[],projectIds,decisions:new Map(),revCols,revMissingDb:!!revCols.length&&!sys.revOk,ignoradas:records.length-lidas.length};
+  }
+  return {modo,file:file.name,records,notInSheet,projectIds,decisions:new Map(),revCols,revMissingDb:!!revCols.length&&!sys.revOk};
 }
 
 /* Resumo e montagem do que será enviado. */
@@ -4938,6 +5208,7 @@ function impBuildPayload(st){
     r.items.forEach((it,i)=>{
       const dec=st.decisions.get(impDecisionKey(r,i));
       if(it.key==="revistoria"){ // vai em p_revistorias (cria a nova ou atualiza a atual, sem duplicar)
+        if((it.kind==="fill"||it.kind==="update")&&dec==="skip"){items.push({...base(r),field:"revistoria",old:it.cur,new:it.next,action:"ignorado",message:"Ignorado na conferência"});return;}
         if(it.kind==="fill"||it.kind==="update"||(it.kind==="conflict"&&dec==="sheet")){
           const {acao,numero,esperado,novo}=it.rev;revs.push({...base(r),acao,numero,esperado,novo});units.add(r.unitId);if(it.kind==="conflict")fromConflicts++;
         }else if(it.kind==="conflict")items.push({...base(r),field:"revistoria",old:it.cur,new:it.next,action:dec==="keep"?"mantido_sistema":"conflito_pendente",message:it.note||it.nota||""});
@@ -4965,19 +5236,21 @@ function loadImportReader(){
   if(window.readSpreadsheet)return Promise.resolve();
   return impReaderPromise||(impReaderPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src="./xlsx-reader.js";s.onload=()=>res();s.onerror=()=>{impReaderPromise=null;rej(new Error("Não foi possível carregar o leitor de planilhas. Verifique a conexão."));};document.head.appendChild(s);}));
 }
-function startImport(){
+let impModo="vist";
+function startImport(modo){
+  impModo=modo==="rev"?"rev":"vist";
   if(!adminProjects().length){toast("Somente administradores podem importar agendamentos");return;}
   const input=document.getElementById("impFile");input.value="";input.click();
 }
 async function onImportFile(file){
   if(!file)return;
-  impState=null;impOpen();impSetTitle("Atualizar agendamentos","Analisando planilha");
+  impState=null;impOpen();impSetTitle(impModo==="rev"?"Atualizar revistorias":"Atualizar agendamentos","Analisando planilha");
   impBody(`<div class="imp-busy"><span class="imp-spin"></span><b>Lendo ${esc(file.name)}…</b><small>Nada será alterado no sistema até você confirmar.</small></div>`);
   try{
     if(!/\.(xlsx|xls)$/i.test(file.name))throw new Error("Envie um arquivo .xlsx ou .xls.");
     await loadImportReader();
     const sheets=window.readSpreadsheet(await file.arrayBuffer());
-    impState=await impAnalyze(file,sheets);impState.tab="all";impState.q="";impState.field="";impState.limit=300;
+    impState=await impAnalyze(file,sheets,impModo);impState.tab="all";impState.q="";impState.field="";impState.limit=300;
     renderImportPreview();
   }catch(e){
     impSetTitle("Atualizar agendamentos","Não foi possível importar");
@@ -5004,6 +5277,8 @@ function impActionCell(st,r,it,i){
   if(r.blocked)return `<span class="imp-tag r">${esc(r.blocked)}</span>`;
   if(r.dup||!it)return '<span class="imp-tag y">Sem alteração</span>';
   if(it.kind==="same")return '<span class="imp-tag y">Sem alteração</span>';
+  if(st.modo==="rev"&&(it.kind==="fill"||it.kind==="update")){const k=impDecisionKey(r,i),d=st.decisions.get(k);
+    return `<div class="imp-dec" role="radiogroup" aria-label="Decisão"><button type="button" class="${d!=="skip"?"on":""}" data-dec="${k}" data-v="apply" aria-pressed="${d!=="skip"}">Aplicar planilha</button><button type="button" class="${d==="skip"?"on":""}" data-dec="${k}" data-v="skip" aria-pressed="${d==="skip"}">Ignorar</button></div>`;}
   if(it.kind==="fill")return `<span class="imp-tag ${r.cls==="new"?"b":"g"}">${r.cls==="new"?"Novo dado":"Preencher"}</span>`;
   if(it.kind==="invalid")return `<span class="imp-tag n">Ignorado · ${esc(it.message)}</span>`;
   if(it.kind==="update")return '<span class="imp-tag g">Atualizar</span>';
@@ -5011,26 +5286,28 @@ function impActionCell(st,r,it,i){
   return `<div class="imp-dec" role="radiogroup" aria-label="Decisão do conflito">${it.note?`<small>${esc(it.note)}</small>`:""}<button type="button" class="${d==="keep"?"on":""}" data-dec="${k}" data-v="keep" aria-pressed="${d==="keep"}">Manter sistema</button><button type="button" class="${d==="sheet"?"on":""}" data-dec="${k}" data-v="sheet" aria-pressed="${d==="sheet"}">Usar planilha</button></div>`;
 }
 function renderImportPreview(){
-  const st=impState,s=impSummary(st),rows=impRows(st),shown=rows.slice(0,st.limit);
-  impSetTitle("Atualizar agendamentos","Resultado da importação");
+  const st=impState,s=impSummary(st),rows=impRows(st),shown=rows.slice(0,st.limit),rv=st.modo==="rev";
+  impSetTitle(rv?"Atualizar revistorias":"Atualizar agendamentos",rv?"Conferência das revistorias":"Resultado da importação");
   const tabCount={all:s.total,update:s.updated,same:s.unchanged,new:s.new,conflict:s.conflictRecords,missing:s.notFound+s.notInSheet};
   const projNames=st.projectIds.map(id=>{const p=availableProjects.find(x=>String(x.id)===id);return p?(projectExperience(p).title||p.name):"";}).filter(Boolean).join(", ");
   const payload=impBuildPayload(st);
   let h=`<div class="imp-head">
     <div class="imp-file"><span>Arquivo</span><b>${esc(st.file)}</b><small>${esc(projNames||"Nenhum condomínio identificado")} · ${s.total} linha(s) analisada(s)${st.revCols.length?` · revistorias: coluna(s) ${st.revCols.join(", ")}`:""}</small></div>
     <div class="imp-kpis">
-      <div class="imp-kpi g"><b>${s.updated}</b><span>Atualizações</span></div>
+      <div class="imp-kpi g"><b>${s.updated}</b><span>${rv?"Alterações":"Atualizações"}</span></div>
       <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alterações</span></div>
-      <div class="imp-kpi b"><b>${s.new}</b><span>Novos dados</span></div>
-      <div class="imp-kpi r"><b>${s.conflictRecords}</b><span>Conflitos${s.conflicts?` · ${s.resolved}/${s.conflicts} campo(s) decidido(s)`:""}</span></div>
+      <div class="imp-kpi b"><b>${s.new}</b><span>${rv?"Novos registros":"Novos dados"}</span></div>
+      <div class="imp-kpi r"><b>${s.conflictRecords}</b><span>${rv?"Divergências":"Conflitos"}${s.conflicts?` · ${s.resolved}/${s.conflicts} campo(s) decidido(s)`:""}</span></div>
       <div class="imp-kpi n"><b>${s.notFound}</b><span>Não encontrados</span></div>
     </div></div>
   <div class="imp-bar">
-    <div class="modetog imp-tabs" role="tablist">${IMP_TABS.map(([k,l])=>`<button type="button" role="tab" data-imptab="${k}" class="${st.tab===k?"active":""}" aria-selected="${st.tab===k}">${l}<small>${tabCount[k]}</small></button>`).join("")}</div>
-    <select class="imp-field" id="impField" aria-label="Filtrar por campo"><option value="">Todos os campos</option>${IMPORT_FIELDS.map(f=>`<option value="${f.key}"${st.field===f.key?" selected":""}>${f.label}</option>`).join("")}</select>
+    <div class="modetog imp-tabs" role="tablist">${IMP_TABS.map(([k,l])=>`<button type="button" role="tab" data-imptab="${k}" class="${st.tab===k?"active":""}" aria-selected="${st.tab===k}">${rv?({update:"Alterações",new:"Novos registros",conflict:"Divergências"}[k]||l):l}<small>${tabCount[k]}</small></button>`).join("")}</div>
+    <select class="imp-field" id="impField"${rv?" hidden":""} aria-label="Filtrar por campo"><option value="">Todos os campos</option>${IMPORT_FIELDS.map(f=>`<option value="${f.key}"${st.field===f.key?" selected":""}>${f.label}</option>`).join("")}</select>
     <label class="fx-search imp-q">${FX_ICON.search}<input type="search" id="impQ" placeholder="Buscar unidade ou cliente" value="${esc(st.q)}" autocomplete="off" aria-label="Buscar unidade ou cliente"></label>
+    ${rv&&(st.tab==="update"||st.tab==="new"||st.tab==="all")&&(s.updated+s.new)?`<div class="imp-bulk"><button type="button" class="btn g" data-bulk="apply">Aplicar ${st.q?"os filtrados":"todos desta aba"}</button><button type="button" class="btn g" data-bulk="skip">Ignorar ${st.q?"os filtrados":"todos desta aba"}</button></div>`:""}
     ${st.tab==="conflict"&&s.conflicts?`<div class="imp-bulk"><button type="button" class="btn g" data-bulk="keep">Manter sistema${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button><button type="button" class="btn g" data-bulk="sheet">Usar planilha${st.field?" · "+esc(IMPORT_FIELDS.find(f=>f.key===st.field).label):" em todos"}</button></div>`:""}
   </div>`;
+  if(rv)h+=`<p class="imp-note">Somente as colunas da revistoria (${st.revCols.join(", ")||"—"}) são lidas: status, data e horário. Nada da vistoria, da execução, da liberação ou das chaves é alterado.${st.ignoradas?` ${st.ignoradas} linha(s) sem revistoria na planilha foram desconsideradas.`:""}</p>`;
   if(st.revMissingDb)h+=`<p class="imp-note">As colunas de revistoria (${st.revCols.join(", ")}) foram encontradas, mas o banco ainda não tem a estrutura de revistorias: elas serão ignoradas nesta importação.</p>`;
   if(st.tab==="missing"&&s.notInSheet)h+=`<p class="imp-note">${s.notInSheet} unidade(s) do sistema não aparecem na planilha. Elas não serão excluídas nem alteradas.</p>`;
   if(!rows.length)h+='<div class="clif-empty">Nenhum registro nesta aba.</div>';
@@ -5074,6 +5351,7 @@ async function impApply(){
     const clean=o=>{const x={...o};if(x.unit_id==null)delete x.unit_id;if(x.project_id==null)delete x.project_id;return x;};
     const args={p_file:st.file,p_summary:{...s,conflicts:s.conflicts,records:p.records},p_changes:p.changes.map(clean),p_items:p.items.map(clean)};
     if(p.revs.length)args.p_revistorias=p.revs; // só quando há revistorias: a chamada sem elas é a mesma de antes
+    if(st.modo==="rev"){args.p_changes=[];args.p_revistorias=p.revs;args.p_sincronizar_data=false;} // só revistorias: a vistoria fica intacta
     const {data,error}=await supabase.rpc("aplicar_importacao_agendamentos",args);
     if(error)throw error;
     box.hidden=true;st.result={...data,summary:s,payload:p};
@@ -5087,6 +5365,19 @@ async function impApply(){
 function renderImportReport(){
   const {summary:s,applied,skipped,records:vist,import_id,revistorias_novas:rn=0,revistorias_atualizadas:ru=0,revistorias_puladas:rp=0,unidades_atualizadas}=impState.result;
   const records=unidades_atualizadas??vist; // vistoria e/ou revistoria alterada
+  if(impState.modo==="rev"){ // resumo da importação só de revistorias
+    const ign=impState.result.payload.items.filter(x=>x.action==="ignorado"||x.action==="mantido_sistema"||x.action==="conflito_pendente").length;
+    impSetTitle("Atualizar revistorias","Importação concluída");
+    impBody(`<div class="imp-done"><div class="imp-done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <p><b>${s.total}</b> unidade(s) com revistoria na planilha · arquivo <b>${esc(impState.file)}</b></p>
+      <div class="imp-kpis"><div class="imp-kpi g"><b>${ru}</b><span>Revistorias atualizadas</span></div><div class="imp-kpi b"><b>${rn}</b><span>Novos registros</span></div>
+        <div class="imp-kpi y"><b>${s.unchanged}</b><span>Sem alteração</span></div><div class="imp-kpi n"><b>${ign}</b><span>Ignorados / mantidos</span></div>
+        <div class="imp-kpi r"><b>${s.conflictRecords+s.notFound}</b><span>Divergências${s.notFound?` · ${s.notFound} não encontrada(s)`:""}</span></div></div>
+      ${rp?`<p class="imp-pend">${rp} revistoria(s) mudaram durante a revisão e não foram alteradas.</p>`:""}
+      <p class="imp-note">A vistoria, a execução, a liberação e as chaves não foram alteradas. Importação registrada com data, hora e usuário.</p>
+      <div class="imp-actions"><button type="button" class="btn g" data-imp="details" data-id="${import_id}">Ver detalhes da importação</button><button type="button" class="btn p" data-imp="close">Concluir</button></div></div>`);
+    return;
+  }
   impSetTitle("Atualizar agendamentos","Importação concluída");
   impBody(`<div class="imp-done">
     <div class="imp-done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -5133,18 +5424,20 @@ async function openImportDetails(id){
       <td><span class="imp-tag ${/preenchido|usado/.test(r.action)?"g":/mantido/.test(r.action)?"y":/pendente|nao_enc|alterado/.test(r.action)?"r":"n"}">${IMP_ACTION[r.action]||r.action}</span>${r.message?`<small class="imp-msg">${esc(r.message)}</small>`:""}</td></tr>`).join("")+"</tbody></table></div>"));
 }
 document.getElementById("impFile").addEventListener("change",e=>onImportFile(e.target.files?.[0]));
-document.getElementById("ovImport").onclick=startImport;
+document.getElementById("ovImport").onclick=()=>startImport("vist");
 document.getElementById("ovHistory").onclick=openImportHistory;
 document.getElementById("importBack").onclick=()=>{document.getElementById("impConfirm").hidden=true;impClose();};
 document.getElementById("importOv").addEventListener("click",e=>{
   const st=impState,t=e.target;
   const dec=t.closest("[data-dec]");if(dec&&st){const cur=st.decisions.get(dec.dataset.dec);if(cur===dec.dataset.v)st.decisions.delete(dec.dataset.dec);else st.decisions.set(dec.dataset.dec,dec.dataset.v);renderImportPreview();return;}
   const tab=t.closest("[data-imptab]");if(tab&&st){st.tab=tab.dataset.imptab;st.limit=300;renderImportPreview();return;}
-  const bulk=t.closest("[data-bulk]");if(bulk&&st){impRows(st).forEach(({r,it,i})=>{if(it&&it.kind==="conflict")st.decisions.set(impDecisionKey(r,i),bulk.dataset.bulk);});renderImportPreview();return;}
+  const bulk=t.closest("[data-bulk]");if(bulk&&st){const v=bulk.dataset.bulk;impRows(st).forEach(({r,it,i})=>{if(!it)return;
+    if(v==="apply"||v==="skip"){if(it.kind==="fill"||it.kind==="update")st.decisions.set(impDecisionKey(r,i),v);}
+    else if(it.kind==="conflict")st.decisions.set(impDecisionKey(r,i),v);});renderImportPreview();return;}
   const a=t.closest("[data-imp]");if(!a)return;
   const act=a.dataset.imp;
   if(act==="close"){document.getElementById("impConfirm").hidden=true;impClose();}
-  else if(act==="pick")startImport();
+  else if(act==="pick")startImport(impModo);
   else if(act==="more"&&st){st.limit+=300;renderImportPreview();}
   else if(act==="confirm"&&st)impConfirm();
   else if(act==="cancel-apply")document.getElementById("impConfirm").hidden=true;

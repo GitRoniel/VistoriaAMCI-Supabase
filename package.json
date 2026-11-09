@@ -30,7 +30,8 @@
     "@capacitor/splash-screen": "^6.0.2",
     "@capacitor/status-bar": "^6.0.1",
     "@supabase/supabase-js": "2.115.0",
-    "fflate": "0.8.3"
+    "fflate": "0.8.3",
+    "pdfjs-dist": "4.10.38"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",

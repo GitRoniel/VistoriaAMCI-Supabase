@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 const cfg = { host: process.env.PGHOST || '/var/tmp', port: Number(process.env.PGPORT || 55432), user: 'postgres', database: 'amci' };
 const MIG = resolve(import.meta.dirname, '../../../supabase/migrations/20261105120000_revistoria_cliente.sql');
+const MIG3 = resolve(import.meta.dirname, '../../../supabase/migrations/20261110120000_revistoria_relatorios_reagendamento.sql');
 const MIG2 = resolve(import.meta.dirname, '../../../supabase/migrations/20261109120000_revistoria_liberacao_execucao.sql');
 const admin = new pg.Client(cfg); await admin.connect();
 let fail = 0; const ok = (c, m) => { console.log((c ? '✔' : '✘') + ' ' + m); if (!c) fail++; };
@@ -40,7 +41,7 @@ const amanha = (await q(`select ((now() at time zone 'America/Sao_Paulo')::date 
 
 // ── Antes da migration: dados como em produção ──
 await q(`insert into client_inspections (unit_id) select id from units where project_id=$1 on conflict (unit_id) do nothing`, [PJ]);
-const A102 = await unit('A', '1º', '02'), A103 = await unit('A', '1º', '03'), A104 = await unit('A', '1º', '04'),
+const A101 = await unit('A', '1º', '01'), A102 = await unit('A', '1º', '02'), A103 = await unit('A', '1º', '03'), A104 = await unit('A', '1º', '04'),
   A105 = await unit('A', '1º', '05'), A106 = await unit('A', '1º', '06'), A107 = await unit('A', '1º', '07'), A108 = await unit('A', '1º', '08');
 await q(`update client_inspections set status='Revistoria', client_name='Cliente Teste' where unit_id = any($1)`, [[A102, A105, A106, A107]]);
 await q(`update client_inspections set status='Revistoria Finalizada', reinspection_date='2026-10-20', reinspection_responsible='Bruno' where unit_id=$1`, [A103]);
@@ -54,6 +55,7 @@ console.log('— Migration e situação inicial');
 await q(readFileSync(MIG, 'utf8'));
 await q(readFileSync(MIG, 'utf8')); // de novo: não duplica nada
 await q(readFileSync(MIG2, 'utf8')); await q(readFileSync(MIG2, 'utf8'));
+await q(readFileSync(MIG3, 'utf8')); await q(readFileSync(MIG3, 'utf8'));
 ok((await q(`select count(*)::int n from client_inspections`)).rows[0].n === antes.insp, 'vistorias preservadas');
 let a = await acomp(A102); ok(a?.status === 'Em andamento' && a.ciclo === 1, '9) A-102 (vistoria Revistoria) → Em andamento, ciclo 1');
 ok(a.inspection_id === (await q(`select id from client_inspections where unit_id=$1`, [A102])).rows[0].id, 'ligada à vistoria original (client_inspections.id)');
@@ -80,7 +82,7 @@ r = await q(`delete from revistorias_eventos where unit_id=$1`, [A102]).catch((e
 
 console.log('— Validações');
 r = await agendar(U.rev_j, A102, null, 'Carla', await ver(A102)); ok(/data/.test(r.error), 'data obrigatória');
-r = await agendar(U.rev_j, A102, amanha, ' ', await ver(A102)); ok(/responsável/.test(r.error), 'responsável obrigatório');
+r = await agendar(U.rev_j, A102, amanha, 'x'.repeat(81), await ver(A102)); ok(/longo/.test(r.error), 'responsável (opcional) com nome longo demais recusado');
 r = await agendar(U.rev_j, A102, amanha, 'Carla', await ver(A102), { hora: '25:00' }); ok(/Horário/.test(r.error), 'horário inválido recusado');
 r = await agendar(U.rev_j, A102, amanha, 'Carla', 999); ok(/outra pessoa/.test(r.error), 'tela desatualizada (versão) recusada');
 r = await agendar(U.rev_j, A108, amanha, 'Carla', 1); ok(/não está na Revistoria/.test(r.error), 'unidade fora da aba recusada');
@@ -120,7 +122,7 @@ r = await agendar(U.rev_j, A102, amanha, 'Carla', await ver(A102)); ok(/já foi 
 console.log('— Reabrir (novas pendências) e mudanças vindas da vistoria');
 r = await rpc(U.rev_j, 'revistoria_reabrir', [A102, '', await ver(A102), null]); ok(/pendências/.test(r.error), 'reabrir exige as pendências');
 r = await rpc(U.rev_j, 'revistoria_reabrir', [A102, 'Infiltração na varanda', await ver(A102), null]);
-a = await acomp(A102); ok(r.r?.ok && a.status === 'Em andamento' && a.ciclo === 3, 'reaberta → Em andamento, ciclo 3 (revistorias pode reabrir)');
+a = await acomp(A102); if (r.error) console.log('   erro:', r.error); ok(r.r?.ok && a.status === 'Em andamento' && a.ciclo === 3, 'reaberta → Em andamento, ciclo 3 (revistorias pode reabrir)');
 ok((await insp(A102)).status === 'Revistoria', 'vistoria: Revistoria Finalizada → Revistoria');
 r = await as(U.rev_j, `update client_inspections set status='Aprovado' where unit_id=$1`, [A102]); ok(/só pode finalizar/.test(r.error), 'papel Revistorias continua sem mudar status direto na vistoria');
 r = await as(U.rev_j, `update client_inspections set status='Revistoria Finalizada' where unit_id=$1`, [A105]); ok(!r.error, 'papel Revistorias finaliza pela aba Vistoria (como antes)');
@@ -182,8 +184,70 @@ r = await as(U.vis_j, `select count(*)::int n from revistorias_cliente where lib
 r = await agendar(U.rev_j, A107, amanha, 'Fábio', await ver(A107)); ok(!r.error || /aprovada/.test(r.error), 'agendamentos seguem funcionando: ' + (r.error || 'ok'));
 ok((await q(`select count(*)::int n from revistorias_cliente`)).rows[0].n === (await q(`select count(distinct unit_id)::int n from revistorias_cliente`)).rows[0].n, 'sem linha duplicada por unidade');
 
+console.log('— Agendamento sem vistoriador, reagendamento da vistoria, relatórios (20261110120000)');
+r = await rpc(U.rev_j, 'revistoria_cancelar', [A107, '', await ver(A107), null]);
+r = await agendar(U.rev_j, A107, amanha, '', await ver(A107), { hora: '10:00' });
+g = await ags(A107); ok(r.r?.ok && g.at(-1).status === 'Agendada' && g.at(-1).responsavel === '', '1) agendamento sem vistoriador');
+ok((await evs(A107)).at(-1).descricao.includes('sem vistoriador'), 'histórico registra "sem vistoriador definido"');
+// reagendar a vistoria
+await q(`update client_inspections set status='Agendado', inspection_date='2026-11-20', inspection_time='09:00' where unit_id=$1`, [A101]);
+const verCi = async (uid) => Number((await q(`select version from client_inspections where unit_id=$1`, [uid])).rows[0].version);
+const reag = (user, uid, d, h, obs, v) => rpc(user, 'vistoria_reagendar', [uid, d, h, obs, v]);
+r = await reag(U.rev_j, A101, '2026-11-25', '14:00', '', await verCi(A101)); ok(/administradores/.test(r.error), 'revistorias não reagenda a vistoria (permissão de sempre)');
+r = await reag(U.vis_j, A101, '2026-11-25', '14:00', '', await verCi(A101)); ok(/administradores/.test(r.error), 'visitante não reagenda');
+r = await reag(U.adm_j, A101, '2026-11-25', '14:00', '', 999); ok(/outra pessoa/.test(r.error), 'tela desatualizada recusada');
+r = await reag(U.adm_j, A101, '2026-11-20', '09:00', '', await verCi(A101)); ok(/iguais/.test(r.error), 'mesma data e horário recusados');
+r = await reag(U.adm_j, A104, '2026-11-25', '14:00', '', await verCi(A104)); ok(/agendada ou remarcada/.test(r.error), 'vistoria não agendada não é reagendada');
+const revAntes = JSON.stringify(await ags(A101));
+r = await reag(U.adm_j, A101, '2026-11-25', '14:00', 'Cliente pediu outro dia', await verCi(A101));
+i = (await q(`select status, inspection_date::text d, left(inspection_time::text,5) h from client_inspections where unit_id=$1`, [A101])).rows[0];
+let hr = (await q(`select status_anterior, data_anterior::text da, left(horario_anterior::text,5) ha, data_nova::text dn, left(horario_nova::text,5) hn, observacao, registrado_email from vistorias_reagendamentos where unit_id=$1`, [A101])).rows;
+ok(r.r?.ok && i.status === 'Remarcado' && i.d === '2026-11-25' && i.h === '14:00', '7) vistoria reagendada: Remarcado, 25/11 14:00');
+ok(hr.length === 1 && hr[0].da === '2026-11-20' && hr[0].ha === '09:00' && hr[0].dn === '2026-11-25' && hr[0].observacao === 'Cliente pediu outro dia' && /adm_j/.test(hr[0].registrado_email), 'histórico do reagendamento (de/para, justificativa, usuário)');
+ok(JSON.stringify(await ags(A101)) === revAntes, 'reagendar a vistoria não mexe nas revistorias');
+r = await as(U.vis_j, `select count(*)::int n from vistorias_reagendamentos`); ok(r.rows?.[0].n === 1, 'visitante lê o histórico de reagendamentos');
+r = await as(U.adm_b, `select count(*)::int n from vistorias_reagendamentos`); ok(r.rows?.[0].n === 0, 'outro condomínio não lê');
+// relatórios no Storage
+ok((await q(`select public, allowed_mime_types from storage.buckets where id='revistorias-relatorios'`)).rows[0]?.public === false, 'bucket privado, só PDF');
+const cam = `${PJ}/A/107/teste.pdf`;
+r = await as(U.vis_j, `insert into storage.objects (bucket_id,name) values ('revistorias-relatorios',$1)`, [cam]); ok(/row-level security|permission/.test(r.error || ''), 'visitante não envia PDF');
+r = await as(U.adm_b, `insert into storage.objects (bucket_id,name) values ('revistorias-relatorios',$1)`, [cam]); ok(/row-level security|permission/.test(r.error || ''), 'admin de outro condomínio não envia');
+r = await as(U.rev_j, `insert into storage.objects (bucket_id,name) values ('revistorias-relatorios',$1)`, [`${PJ}/A/107/teste.txt`]); ok(/row-level security/.test(r.error || ''), 'só arquivo .pdf');
+r = await as(U.rev_j, `insert into storage.objects (bucket_id,name) values ('revistorias-relatorios',$1)`, [cam]); ok(!r.error, 'revistorias envia o PDF ao Storage');
+r = await as(U.vis_j, `select count(*)::int n from storage.objects where bucket_id='revistorias-relatorios'`); ok(r.rows?.[0].n === 1, 'visitante do condomínio lê o PDF (URL assinada)');
+r = await as(U.adm_b, `select count(*)::int n from storage.objects where bucket_id='revistorias-relatorios'`); ok(r.rows?.[0].n === 0, 'outro condomínio não lê o PDF');
+const reg = (user, uid, c) => rpc(user, 'revistoria_relatorio_registrar', [uid, c, 'BL A - APT 107.pdf', 1200000, 9]);
+r = await reg(U.rev_j, A107, `${PB}/A/107/teste.pdf`); ok(/Caminho/.test(r.error), 'caminho de outro condomínio recusado');
+r = await reg(U.rev_j, A107, `${PJ}/A/107/nao-existe.pdf`); ok(/não foi encontrado/.test(r.error), 'arquivo inexistente recusado');
+r = await reg(U.vis_j, A107, cam); ok(/não permite/.test(r.error), 'visitante não registra');
+r = await reg(U.rev_j, A107, cam); const relId = r.r?.relatorio?.id; ok(r.r?.ok && relId, 'relatório registrado (metadados)');
+r = await reg(U.rev_j, A107, cam); ok(r.r?.repetido, 'mesmo arquivo não duplica');
+ok((await evs(A107)).some((x) => x.tipo === 'relatorio'), 'histórico: relatório anexado');
+ok((await q(`select count(*)::int n from information_schema.columns where table_name='revistorias_relatorios' and data_type='bytea'`)).rows[0].n === 0, 'nenhum PDF dentro do banco');
+r = await rpc(U.rev_j, 'revistoria_apontamentos_adicionar', [relId, JSON.stringify(['COZINHA · Revestimento: cerâmica oca', '  ', 'QUARTO · Porta: regulagem'])]);
+ok(r.r?.adicionados === 2, 'checklist: 2 apontamentos (linha vazia ignorada)');
+r = await rpc(U.vis_j, 'revistoria_apontamentos_adicionar', [relId, JSON.stringify(['x'])]); ok(/não permite/.test(r.error), 'visitante não edita o checklist');
+const apId = (await q(`select id from revistorias_apontamentos where relatorio_id=$1 order by ordem limit 1`, [relId])).rows[0].id;
+r = await rpc(U.rev_j, 'revistoria_apontamento_marcar', [apId, true]);
+let ap = (await q(`select concluido, concluido_email from revistorias_apontamentos where id=$1`, [apId])).rows[0]; ok(ap.concluido && /rev_j/.test(ap.concluido_email), 'marca item (quem marcou)');
+await rpc(U.rev_j, 'revistoria_apontamento_marcar', [apId, false]); ok(!(await q(`select concluido from revistorias_apontamentos where id=$1`, [apId])).rows[0].concluido, 'desmarca item');
+r = await rpc(U.rev_j, 'revistoria_apontamento_remover', [apId]); ok(r.r?.ok && (await q(`select count(*)::int n from revistorias_apontamentos where relatorio_id=$1`, [relId])).rows[0].n === 1, 'remove item');
+r = await as(U.adm_b, `select count(*)::int n from revistorias_apontamentos`); ok(r.rows?.[0].n === 0, 'outro condomínio não vê o checklist');
+r = await rpc(U.rev_j, 'revistoria_relatorio_remover', [relId]); ok(r.r?.caminho === cam, 'retira o relatório (devolve o caminho para apagar do Storage)');
+r = await as(U.rev_j, `delete from storage.objects where bucket_id='revistorias-relatorios' and name=$1`, [cam]); ok(!r.error, 'apaga o arquivo do Storage');
+// importação só de revistorias: não mexe na vistoria
+await q(`update client_inspections set reinspection_date=null where unit_id=$1`, [A108]);
+const ci0 = (await q(`select status, reinspection_date, version from client_inspections where unit_id=$1`, [A108])).rows[0];
+const n108 = (await ags(A108)).length;
+r = await as(U.adm_j, `select public.aplicar_importacao_agendamentos($1,$2,$3,$4,$5,false) r`, ['revistorias.xlsx', '{}', '[]', '[]',
+  JSON.stringify([{ unit_id: A108, row: 3, label: 'A-108', client: 'X', acao: 'nova', numero: n108, novo: { status: 'Agendada', status_planilha: 'AGENDADA', data: '2026-11-30', horario: '16:30' } }])]);
+const ci1 = (await q(`select status, reinspection_date, version from client_inspections where unit_id=$1`, [A108])).rows[0];
+ok(!r.error && (await ags(A108)).length === n108 + 1, '5) importação só de revistorias cria o agendamento: ' + (r.error || ''));
+ok(ci1.status === ci0.status && ci1.reinspection_date === null && Number(ci1.version) === Number(ci0.version), 'vistoria intacta (nem a data da revistoria da unidade)');
+ok((await acomp(A108)).status === 'Agendado', 'situação na Revistoria · Cliente atualizada');
+
 console.log('— Dados antigos e cascata');
-ok((await q(`select count(*)::int n from revistorias where origem='PLANILHA'`)).rows[0].n === antes.revs, 'revistoria antiga da planilha preservada');
+ok((await q(`select count(*)::int n from revistorias where unit_id=$1 and numero=1 and origem='PLANILHA'`, [A106])).rows[0].n === antes.revs, 'revistoria antiga da planilha preservada');
 ok((await q(`select count(*)::int n from audit_log`)).rows[0].n > antes.audit, 'mudanças na vistoria continuam no registro de logs');
 const pTmp = (await q(`insert into projects (slug,name) values ('tmp-rvc','Tmp') returning id`)).rows[0].id;
 const uTmp = (await q(`insert into units (project_id,bloco,pav,apto) values ($1,'A','T','01') returning id`, [pTmp])).rows[0].id;

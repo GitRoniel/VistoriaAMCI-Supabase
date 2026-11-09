@@ -56,6 +56,52 @@ export const FILTROS = [
   { key: "em_andamento", label: "Em andamento", cor: STATUS["Em andamento"].borda },
   { key: "agendados", label: "Agendados", cor: STATUS.Agendado.borda }
 ];
+// Aba Revistoria · Cliente: os mesmos filtros rápidos + "Rev. Reprovada" (só nesta aba).
+export const REPROVADA = { key: "reprovada", label: "Rev. Reprovada", cor: "#d64545", borda: "#b33636" };
+export const FILTROS_REVISTORIA = [...FILTROS, { key: REPROVADA.key, label: REPROVADA.label, cor: REPROVADA.borda }];
+/**
+ * Rev. Reprovada: a última revistoria REALIZADA teve resultado Reprovada e a unidade ainda não foi aprovada
+ * (está em novo ciclo, Em andamento ou já com nova data). Em andamento sem revistoria realizada não conta.
+ */
+export const reprovada = (s) => !!s?.status && s.status !== "Aprovado" && s.ultima?.status === "Reprovada";
+/** Última reprovação da unidade (a revistoria realizada com resultado Reprovada mais recente). */
+export const ultimaReprovacao = (s) => (s?.lista || []).filter((r) => r.status === "Reprovada").at(-1) || null;
+
+// Status da chave (Controle de Chaves): selo neutro com a letra do setor, separado das cores de status e de execução.
+export const CHAVE_MARCA = { base: "B", cx: "C", asstec: "A", producao: "P", cliente: "E" };
+export const FILTRO_CHAVE = [
+  { key: "", label: "Todas" }, { key: "base", label: "Base" }, { key: "cx", label: "CX" }, { key: "asstec", label: "Asstec" },
+  { key: "producao", label: "Produção" }, { key: "cliente", label: "Entregue para Cliente" }, { key: "sem", label: "Sem status" },
+  { key: "perdida", label: "Chave perdida" }
+];
+/** chave = {setor: base|cx|asstec|producao|cliente|sem, perdida: ocorrência aberta ou null} */
+export function passaChave(chave, k) {
+  if (!chave) return true;
+  if (chave === "perdida") return !!k?.perdida;
+  return (k?.setor || "sem") === chave && !k?.perdida;
+}
+
+/** Data (e horário) da revistoria considerada nos filtros: o agendamento em aberto ou o último não cancelado. */
+export function agendaRevistoria(s) {
+  const r = s?.aberto || [...(s?.lista || [])].filter((x) => x.status !== "Cancelada").at(-1) || null;
+  return { data: r?.data ? String(r.data).slice(0, 10) : "", hora: r?.horario ? String(r.horario).slice(0, 5) : "" };
+}
+/**
+ * Ordem da lista (igual à aba Vistoria): data da revistoria (mais cedo primeiro; sem data no fim) e, no mesmo dia,
+ * horário do mais cedo para o mais tarde ("asc") ou o inverso ("desc"); sem horário fica depois dos com horário.
+ */
+export function compararAgenda(x, y, hrSort = "asc", ordemUnidade = () => 0) {
+  const ax = agendaRevistoria(x.situacao), ay = agendaRevistoria(y.situacao);
+  const dx = ax.data || "9999-99-99", dy = ay.data || "9999-99-99";
+  if (dx !== dy) return dx < dy ? -1 : 1;
+  if (ax.hora !== ay.hora) {
+    if (!ax.hora) return 1;
+    if (!ay.hora) return -1;
+    return hrSort === "desc" ? (ax.hora < ay.hora ? 1 : -1) : (ax.hora < ay.hora ? -1 : 1);
+  }
+  return ordemUnidade(x, y);
+}
+
 /**
  * Filtro rápido.
  * @param chave     key de FILTROS
@@ -145,9 +191,12 @@ const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toL
 /** Filtros da aba: bloco, busca (unidade ou cliente), filtro rápido, liberado e execução (todos juntos). */
 export function passaFiltros(u, f) {
   if (f.bloco && f.bloco !== "ALL" && u.b !== f.bloco) return false;
+  if (f.rapido === REPROVADA.key) { if (!reprovada(u.situacao)) return false; }
+  else if (!passaFiltroRapido(f.rapido, { vistoria: u.vistoria, revistoria: u.situacao?.status }, "revistoria")) return false;
+  if (!passaChave(f.chave, u.chave)) return false;
+  if (f.data && agendaRevistoria(u.situacao).data !== f.data) return false;
   if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
   if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
-  if (!passaFiltroRapido(f.rapido, { vistoria: u.vistoria, revistoria: u.situacao?.status }, "revistoria")) return false;
   const q = norm(f.busca).replace(/\s/g, "");
   if (q) {
     const cod = norm(u.codigo), comBloco = norm(u.b) + cod;
@@ -170,7 +219,8 @@ export function validarAgendamento(v, hoje = "") {
   if (!dataOk(v.data) || v.data < "2020-01-01") return "Data da revistoria inválida";
   if (hoje && v.data > somaDias(hoje, 730)) return "Data da revistoria inválida";
   if (v.horario && !/^([01]\d|2[0-3]):[0-5]\d$/.test(v.horario)) return "Horário inválido (use HH:MM)";
-  const n = validarNome(v.responsavel); if (n) return n;
+  // vistoriador opcional: a equipe de revistorias agenda sem precisar definir quem fará a revistoria
+  if (limparNome(v.responsavel)) { const n = validarNome(v.responsavel); if (n) return n; }
   if (String(v.obs || "").trim().length > 500) return "Observação muito longa (máximo de 500 caracteres)";
   return "";
 }
@@ -205,7 +255,7 @@ export function acoes(status, podeEditar) {
 const TITULOS = {
   entrada: "Entrou na Revistoria · Cliente", agendamento: "Revistoria agendada", remarcacao: "Revistoria remarcada",
   cancelamento: "Agendamento cancelado", reabertura: "Reaberta: novas pendências", vistoria: "Mudança na aba Vistoria",
-  planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução"
+  planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução", relatorio: "Relatório"
 };
 export function descreverEvento(e) {
   let titulo = TITULOS[e.tipo] || e.tipo;
@@ -213,7 +263,7 @@ export function descreverEvento(e) {
   if (e.tipo === "liberacao") titulo = /retirada/i.test(e.descricao || "") ? "Liberação retirada" : "Liberada para execução";
   const por = e.registrado_email === "migração" ? "situação inicial" : e.registrado_email || "sistema";
   return { titulo, de: e.status_anterior || "", para: e.status_novo || "", ciclo: e.ciclo || 1, texto: e.descricao || "", quando: e.registrado_em, por,
-    mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao",
+    mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao" || e.tipo === "relatorio",
     cor: e.tipo === "resultado" && e.status_novo !== "Aprovado" ? "#d64545" : e.tipo === "cancelamento" ? "#8a948f"
       : e.tipo === "liberacao" ? "#0f3b31" : e.tipo === "execucao" ? "#7b4fc9" : info(e.status_novo).borda };
 }

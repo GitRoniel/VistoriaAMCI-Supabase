@@ -220,6 +220,13 @@ assert.match(revLib, /alter table public\.revistorias_cliente\s+add column if no
 assert.doesNotMatch(revLib, /create table|grant (insert|update|delete)|drop table|delete from/i, "Liberação/execução: sem tabela nova, sem escrita direta, sem apagar dados.");
 assert.ok(revCliJs.includes("revistoria_liberar") && revCliJs.includes("revistoria_execucao"), "Aba Revistoria · Cliente grava liberação e execução pelas funções do banco.");
 assert.ok(html.includes('show(revcliHost(),true)'), "Revistoria · Cliente abre no Mapa ao entrar na aba.");
+const revRel = await readFile(resolve(root, "supabase/migrations/20261110120000_revistoria_relatorios_reagendamento.sql"), "utf8");
+assert.match(revRel, /'revistorias-relatorios', 'revistorias-relatorios', false/, "Bucket dos relatórios precisa ser privado.");
+assert.doesNotMatch(revRel, /bytea|base64/i, "PDF nunca dentro do banco (nem Base64).");
+assert.match(revRel, /p_sincronizar_data boolean default true/, "Importação só de revistorias não toca na vistoria.");
+assert.ok(!/getPublicUrl/.test(revCliJs) && revCliJs.includes("createSignedUrl"), "Relatórios só por URL assinada (sem link público).");
+assert.ok(html.includes('supabase.rpc("vistoria_reagendar"') && html.includes("Reagendar Vistoria"), "Reagendar Vistoria no popup.");
+assert.ok(html.includes('startImport("rev")') && html.includes("args.p_sincronizar_data=false"), "Importação só de revistorias (aba Revistoria).");
 await import("./test-revistoria-cliente.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");
