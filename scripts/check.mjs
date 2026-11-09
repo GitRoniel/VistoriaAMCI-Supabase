@@ -215,6 +215,11 @@ assert.ok(html.includes('table:"revistorias_cliente"') && html.includes("RVC.pas
 const revCliJs = await readFile(resolve(root, "www/revcliente.js"), "utf8").catch(() => "");
 assert.ok(revCliJs.includes("revistoria_agendar") && revCliJs.includes("revistoria_resultado") && revCliJs.includes("revistoria_reabrir") && !/\.from\("(revistorias_cliente|revistorias|client_inspections)"\)\.(insert|update|upsert|delete)/.test(revCliJs), "Aba Revistoria · Cliente grava só pelas funções do banco.");
 assert.ok(chavesJs.includes("rc-badge") && !/client_inspections"\)\.(update|insert)|revistoria_(agendar|resultado|cancelar|reabrir)/.test(chavesJs), "Controle de Chaves mostra a Revistoria · Cliente sem alterá-la.");
+const revLib = await readFile(resolve(root, "supabase/migrations/20261109120000_revistoria_liberacao_execucao.sql"), "utf8");
+assert.match(revLib, /alter table public\.revistorias_cliente\s+add column if not exists liberado/, "Liberação na própria linha da unidade (sem tabela nova).");
+assert.doesNotMatch(revLib, /create table|grant (insert|update|delete)|drop table|delete from/i, "Liberação/execução: sem tabela nova, sem escrita direta, sem apagar dados.");
+assert.ok(revCliJs.includes("revistoria_liberar") && revCliJs.includes("revistoria_execucao"), "Aba Revistoria · Cliente grava liberação e execução pelas funções do banco.");
+assert.ok(html.includes('show(revcliHost(),true)'), "Revistoria · Cliente abre no Mapa ao entrar na aba.");
 await import("./test-revistoria-cliente.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

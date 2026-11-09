@@ -55,7 +55,7 @@ const lista = [
   { b: "D", situacao: M.situacao({ status: "Agendado" }, [{ numero: 1, status: "Reprovada" }, { numero: 2, status: "Agendada", data: "2026-11-05" }]) },
   { b: "E", situacao: M.situacao(null, []) }
 ];
-assert.deepEqual(M.indicadores(lista, "2026-11-04"), { total: 4, "Em andamento": 1, Agendado: 2, Aprovado: 1, realizadas: 2, hoje: 0, semana: 1 });
+assert.deepEqual(M.indicadores(lista, "2026-11-04"), { total: 4, "Em andamento": 1, Agendado: 2, Aprovado: 1, realizadas: 2, hoje: 0, semana: 1, liberados: 0 });
 assert.deepEqual([...lista].sort((x, y) => M.comparar(x, y)).map((u) => u.b), ["D", "B", "C", "A", "E"]);
 
 // 5) Filtros da aba: bloco, unidade/cliente e rápido.
@@ -96,5 +96,29 @@ assert.equal(M.descreverEvento({ tipo: "entrada", status_novo: "Em andamento", r
 assert.equal(revInfo("Cancelada").label, "Cancelada");
 const it = compararPlanilha({ numero: 2, status: "Cancelada", data: "2026-10-10" }, { status: "Agendada", statusOriginal: "AGENDADA", data: "2026-11-12", hora: "" });
 assert.equal(it.rev.acao, "nova"); assert.equal(it.rev.numero, 2);
+
+// 9) Liberação e execução: filtros combinados (rápido + liberado + execução) e cores próprias.
+assert.deepEqual(M.EXECUCOES.map((e) => `${e.equipe}/${e.responsavel}`), ["M.O.P/Felipe", "M.O.P/Renato", "EMP/Oscar", "EMP/Nilson"]);
+assert.ok(M.EXECUCOES.every((e) => !Object.values(M.STATUS).some((st) => st.cor === e.cor) && e.cor !== M.EM_REVISTORIA.cor), "cores de execução diferentes das de status");
+assert.equal(new Set(M.EXECUCOES.map((e) => e.cor)).size, 4);
+const ue = (id, st, liberado, execucao) => ({ b: "A", codigo: id, cliente: "", vistoria: "rv", situacao: M.situacao({ status: st, liberado, execucao }, []) });
+const ues = [ue("1", "Em andamento", true, "MOP_FELIPE"), ue("2", "Em andamento", false, "MOP_RENATO"), ue("3", "Agendado", true, "EMP_OSCAR"),
+  ue("4", "Agendado", true, null), ue("5", "Aprovado", false, "EMP_NILSON"), ue("6", "Em andamento", true, "XYZ")];
+const fe = (o) => ues.filter((x) => M.passaFiltros(x, { bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "", ...o })).map((x) => x.codigo).join(",");
+assert.equal(fe({ liberado: "sim" }), "1,3,4,6");
+assert.equal(fe({ liberado: "nao" }), "2,5");
+assert.equal(fe({ execucao: "MOP_FELIPE" }), "1");
+assert.equal(fe({ execucao: "MOP_RENATO" }), "2");
+assert.equal(fe({ execucao: "EMP_OSCAR" }), "3");
+assert.equal(fe({ execucao: "EMP_NILSON" }), "5");
+assert.equal(fe({ execucao: "equipe:M.O.P" }), "1,2");
+assert.equal(fe({ execucao: "equipe:EMP" }), "3,5");
+assert.equal(fe({ execucao: "sem" }), "4,6");                 // valor desconhecido conta como sem execução
+assert.equal(fe({ liberado: "sim", execucao: "equipe:EMP", rapido: "agendados" }), "3");   // filtros juntos, sem conflito
+assert.equal(fe({ liberado: "nao", rapido: "em_andamento" }), "2");
+assert.equal(M.indicadores(ues).liberados, 4);
+assert.equal(M.execRotulo("EMP_OSCAR"), "EMP · Oscar"); assert.equal(M.execRotulo(null), "Sem execução");
+assert.equal(M.descreverEvento({ tipo: "liberacao", descricao: "Liberada para a execução dos serviços", status_novo: "Agendado" }).titulo, "Liberada para execução");
+assert.equal(M.descreverEvento({ tipo: "liberacao", descricao: "Liberação para execução retirada", status_novo: "Agendado" }).titulo, "Liberação retirada");
 
 console.log("Regras da Revistoria · Cliente verificadas.");

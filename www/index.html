@@ -1859,6 +1859,53 @@ html{background-color:var(--status-top,var(--chrome-top))}
   .rc-dh{grid-template-columns:1fr 1fr}
   .rc-form input[type=date],.rc-form input[type=time]{font-size:16px}
 }
+/* Revistoria · Cliente: liberação e execução (selos no mapa com cores próprias, separadas das cores de status) */
+.rc-top{grid-template-columns:repeat(7,minmax(0,1fr))}
+.rc-f-lib select{min-width:96px}
+.rc-f-exe select{min-width:130px}
+.rc-lib{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:999px;border:1px solid #d3ddd6;background:#f6f8f6;color:#6f7a74;font-size:10.5px;font-weight:700;white-space:nowrap;line-height:1.6}
+.rc-lib.on{background:#0f3b31;border-color:#0f3b31;color:#fff}
+.rc-exec{display:inline-flex;align-items:center;gap:5px;padding:1px 8px 1px 2px;border-radius:999px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);color:var(--ink);font-size:10.5px;font-weight:700;white-space:nowrap;line-height:1.6}
+.rc-exec i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--c);color:#fff;font-size:9px;font-style:normal;font-weight:800}
+.rc-exec.lg{font-size:12px;padding:2px 10px 2px 3px}
+.rc-exec.lg i{width:18px;height:18px;font-size:10px}
+.rc-u .rc-mk-lib{position:absolute;top:-5px;left:-5px;width:13px;height:13px;border-radius:50%;background:#0f3b31;color:#fff;font-size:8.5px;font-style:normal;font-weight:900;line-height:13px;text-align:center;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+.rc-u .rc-mk-exe{position:absolute;bottom:-5px;right:-5px;min-width:13px;height:13px;border-radius:4px;background:var(--c);color:#fff;font-size:8.5px;font-style:normal;font-weight:800;line-height:13px;text-align:center;box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+.rc-sw-lib{display:inline-flex!important;align-items:center;justify-content:center;background:#0f3b31!important;border-color:#0f3b31!important;color:#fff;font-size:8.5px;font-weight:900;border-radius:50%!important}
+.rc-sw-exe{display:inline-flex!important;align-items:center;justify-content:center;background:var(--c)!important;border-color:var(--c)!important;color:#fff;font-size:8.5px;font-weight:800;border-radius:4px!important}
+.rc-tbl .rc-c-lib,.rc-tbl .rc-c-exe{white-space:nowrap}
+.rc-loc{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.7fr) minmax(0,.8fr);gap:8px;padding:0 2px}
+.rc-loc>div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.rc-loc span{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.rc-loc b{font-size:13px;color:var(--ink);overflow-wrap:anywhere}
+.rc-op{display:grid;gap:9px;padding:10px 12px;border:1px solid #e3e9e4;border-radius:12px;background:#fff}
+.rc-op-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.rc-op-t{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);min-width:96px}
+.rc-tog{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 12px 0 6px;border-radius:999px;border:1.5px solid #d3ddd6;background:#f6f8f6;color:#52675d;font-family:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+.rc-tog i{position:relative;width:30px;height:18px;border-radius:999px;background:#c3cac5;transition:background .15s}
+.rc-tog i::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s}
+.rc-tog.on{border-color:#0f3b31;background:#e8f1ee;color:#0f3b31}
+.rc-tog.on i{background:#0f3b31}
+.rc-tog.on i::after{left:14px}
+.rc-exe-opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;flex:1 1 260px}
+.rc-exe-opt{display:flex;align-items:center;gap:6px;min-height:40px;padding:4px 7px;border-radius:10px;border:1.5px solid #dfe7e1;background:#fff;color:#33463d;font-family:inherit;font-size:12px;font-weight:800;text-align:left;cursor:pointer;min-width:0}
+.rc-exe-opt i{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:var(--c);color:#fff;font-size:10.5px;font-style:normal}
+.rc-exe-opt span{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.rc-exe-opt small{font-size:9.5px;font-weight:700;color:var(--muted)}
+.rc-exe-opt.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);box-shadow:0 0 0 1px var(--c)}
+.rc-exe-none{grid-column:1/-1;justify-content:center;min-height:30px;color:#6f7a74;font-weight:700}
+.rc-tog:disabled,.rc-exe-opt:disabled{opacity:.55;cursor:wait}
+.rc-op-msg{font-size:11.5px;font-weight:700;color:#2459b5}
+@media(max-width:1100px){.rc-top{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:720px){
+  .rc-top{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .rc-tbl .rc-c-lib{grid-column:1}
+  .rc-tbl .rc-c-exe{grid-column:2;justify-self:end}
+  .rc-exe-opts{grid-template-columns:repeat(2,minmax(0,1fr));flex-basis:100%}
+  .rc-op-t{min-width:0;flex-basis:100%}
+  .rc-f-lib,.rc-f-exe{min-width:0!important;overflow:hidden}
+  .rc-f-lib select,.rc-f-exe select{min-width:0!important;width:100%;flex:1 1 auto}
+}
 @media print{.rc-filters,#rcPop{display:none!important}}
 /* TEMA ESCURO · gerado por scripts/theme-dark.mjs (não editar à mão) */
 :root[data-theme="dark"] body{background:#212522;color:#d3ddd6}
@@ -2675,6 +2722,29 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   :root[data-theme="dark"] .rc-tbl .rc-c-vst::before{color:#a6b2ab}
   :root[data-theme="dark"] .rc-tbl .rc-c-n::before{color:#a6b2ab}
 }
+:root[data-theme="dark"] .rc-lib{border:1px solid #444c47;background:#222622;color:#a1a9a5}
+:root[data-theme="dark"] .rc-lib.on{background:#0f3b31;border-color:#0f3b31;color:#fff}
+:root[data-theme="dark"] .rc-exec{border:1px solid var(--c);background:color-mix(in srgb,var(--c) 10%,#282828);color:#cfd9d7}
+:root[data-theme="dark"] .rc-exec i{background:var(--c);color:#fff}
+:root[data-theme="dark"] .rc-u .rc-mk-lib{background:#0f3b31;color:#fff;box-shadow:0 0 0 1.5px #282828}
+:root[data-theme="dark"] .rc-u .rc-mk-exe{background:var(--c);color:#fff;box-shadow:0 0 0 1.5px #282828}
+:root[data-theme="dark"] .rc-sw-lib{background:#0f3b31!important;border-color:#0f3b31!important;color:#fff}
+:root[data-theme="dark"] .rc-sw-exe{background:var(--c)!important;border-color:var(--c)!important;color:#fff}
+:root[data-theme="dark"] .rc-loc span{color:#a6b2ab}
+:root[data-theme="dark"] .rc-loc b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-op{border:1px solid #404741;background:#282828}
+:root[data-theme="dark"] .rc-op-t{color:#a6b2ab}
+:root[data-theme="dark"] .rc-tog{border:1.5px solid #444c47;background:#222622;color:#abbcb4}
+:root[data-theme="dark"] .rc-tog i{background:#3d413e}
+:root[data-theme="dark"] .rc-tog i::after{background:#282828}
+:root[data-theme="dark"] .rc-tog.on{border-color:#0f3b31;background:#1c2321;color:#75dcc4}
+:root[data-theme="dark"] .rc-tog.on i{background:#0f3b31}
+:root[data-theme="dark"] .rc-exe-opt{border:1.5px solid #404942;background:#282828;color:#c1cec8}
+:root[data-theme="dark"] .rc-exe-opt i{background:var(--c);color:#fff}
+:root[data-theme="dark"] .rc-exe-opt small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-exe-opt.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,#282828);box-shadow:0 0 0 1px var(--c)}
+:root[data-theme="dark"] .rc-exe-none{color:#a1a9a5}
+:root[data-theme="dark"] .rc-op-msg{color:#2459b5}
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -3955,7 +4025,7 @@ async function rvcRecarregar(res){
   const projectId=appProject.id;
   try{
     const [revs,acs]=await Promise.all([fetchAll("revistorias","*",q=>q.eq("project_id",projectId)),
-      fetchAll("revistorias_cliente","id,unit_id,inspection_id,status,ciclo,revistoria_id,entrou_em,atualizado_em,atualizado_email,versao",q=>q.eq("project_id",projectId))]);
+      fetchAll("revistorias_cliente","*",q=>q.eq("project_id",projectId))]);
     if(appProject?.id!==projectId)return;
     Object.keys(state.revs).forEach(k=>delete state.revs[k]);Object.keys(state.rvc).forEach(k=>delete state.rvc[k]);
     revs.forEach(applyRevRecord);acs.forEach(applyRvcRecord);
@@ -3995,7 +4065,7 @@ function switchView(v){
   if(v==="stats")renderStats();
   // Controle de Chaves: módulo à parte (www/chaves.js), com o contexto desta tela.
   if(v==="chaves")window.AmciChaves?.show(chavesHost());else window.AmciChaves?.hide();
-  if(v==="revcli")window.AmciRevCliente?.show(revcliHost());else window.AmciRevCliente?.hide();
+  if(v==="revcli")window.AmciRevCliente?.show(revcliHost(),true);else window.AmciRevCliente?.hide();
 
   animateView(v);
   scrollTo(0,0);
@@ -4125,7 +4195,7 @@ async function load(silent){
       fetchAll("revistorias","*",q=>q.eq("project_id",projectId))
         .then(r=>{revInstalled=true;return r;},()=>{revInstalled=false;return [];}),
       // Revistoria · Cliente: sem a migration a aba mostra o aviso de instalação e o restante funciona igual.
-      fetchAll("revistorias_cliente","id,unit_id,inspection_id,status,ciclo,revistoria_id,entrou_em,atualizado_em,atualizado_email,versao",q=>q.eq("project_id",projectId))
+      fetchAll("revistorias_cliente","*",q=>q.eq("project_id",projectId))
         .then(r=>{rvcInstalled=true;return r;},()=>{rvcInstalled=false;return [];})
     ]);
     if(!appProject||appProject.id!==projectId)return;
