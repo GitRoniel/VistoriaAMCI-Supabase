@@ -36,11 +36,11 @@ const ICONE = {
   relogio: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`
 };
 const FORMS = {
-  agendar: { botao: "Agendar revistoria", ok: "Confirmar agendamento" },
-  remarcar: { botao: "Remarcar", ok: "Confirmar nova data" },
-  resultado: { botao: "Registrar resultado", ok: "Registrar resultado" },
-  cancelar: { botao: "Cancelar agendamento", ok: "Cancelar agendamento" },
-  reabrir: { botao: "Reabrir", ok: "Reabrir revistoria" }
+  agendar: { botao: "Agendar revistoria", curto: "Agendar", ok: "Confirmar agendamento" },
+  remarcar: { botao: "Remarcar", curto: "Remarcar", ok: "Confirmar nova data" },
+  resultado: { botao: "Registrar resultado", curto: "Resultado", ok: "Registrar resultado" },
+  cancelar: { botao: "Cancelar agendamento", curto: "Cancelar", ok: "Cancelar agendamento" },
+  reabrir: { botao: "Reabrir", curto: "Reabrir", ok: "Reabrir revistoria" }
 };
 
 // Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
@@ -226,7 +226,7 @@ function celulasApontamentos(unitId) {
   }
   const cls = r.resolvidas === r.total ? " ok" : r.resolvidas ? "" : " zero";
   return `<td class="rc-c-ap" title="${r.total} apontamento(s) no checklist"><b>${r.total}</b></td>
-      <td class="rc-c-res${cls}" title="${r.resolvidas} de ${r.total} resolvido(s) (${r.pct}%)"><span class="rc-res"><b>${r.resolvidas}/${r.total}</b><span class="rc-prog" aria-hidden="true"><i style="width:${r.pct}%"></i></span><small>${r.pct}%</small></span></td>`;
+      <td class="rc-c-res${cls}" title="${r.resolvidas} de ${r.total} resolvido(s) (${r.pct}%)"><span class="rc-resq"><b>${r.resolvidas}/${r.total}</b><span class="rc-prog" aria-hidden="true"><i style="width:${r.pct}%"></i></span><small>${r.pct}%</small></span></td>`;
 }
 
 function htmlMapa(lista, ok) {
@@ -348,40 +348,43 @@ function pintarPopup() {
   const lista = host.units(), i = lista.findIndex((x) => x.b === u.b && x.p === u.p && x.a === u.a);
   const prev = FORMS[painel] ? capturarForm() : null;
   pop.setAttribute("aria-label", `${nomeUnidade(u)} · Revistoria · Cliente`);
-  const botoes = s.status ? [...ac.map((a) => `<button type="button" class="btn ${painel === a ? "p" : "g"} ch-act${a === "cancelar" || a === "reabrir" ? " rc-act-sec" : ""}" data-painel="${a}" aria-pressed="${painel === a}">${ICONE[a]}${FORMS[a].botao}</button>`),
-    `<button type="button" class="btn ${painel === "historico" ? "p" : "g"} ch-act" data-painel="historico" aria-pressed="${painel === "historico"}">${ICONE.historico}Histórico</button>`,
-    `<button type="button" class="btn g ch-act" data-relatorio>${ICONE.relatorio}Relatório</button>`].join("") : "";
-  const prox = s.aberto ? `<b>${esc(quandoAg(s.aberto)) || "Sem data"}</b><small>${esc(s.aberto.responsavel || "")}</small>`
-    : s.ultima ? `<b>${esc(fmtD(s.ultima.realizada_em || s.ultima.data))}</b><small>última · ${esc(M.agendamento(s.ultima).resultado.toLowerCase())}${s.ultima.responsavel ? ` · ${esc(s.ultima.responsavel)}` : ""}</small>` : "<b>—</b>";
+  const botoes = s.status ? [...ac.map((a) => `<button type="button" class="btn ${painel === a ? "p" : "g"} ch-act${a === "cancelar" || a === "reabrir" ? " rc-act-sec" : ""}" data-painel="${a}" aria-pressed="${painel === a}" title="${FORMS[a].botao}">${ICONE[a]}<span>${FORMS[a].curto}</span></button>`),
+    `<button type="button" class="btn ${painel === "historico" ? "p" : "g"} ch-act" data-painel="historico" aria-pressed="${painel === "historico"}">${ICONE.historico}<span>Histórico</span></button>`,
+    `<button type="button" class="btn g ch-act" data-relatorio>${ICONE.relatorio}<span>Relatório</span></button>`].join("") : "";
+  const prox = s.aberto ? { rot: "Próxima revistoria", val: esc(quandoAg(s.aberto)) || "Sem data", sub: s.aberto.responsavel ? esc(s.aberto.responsavel) : "sem vistoriador definido" }
+    : s.ultima ? { rot: "Última revistoria", val: esc(fmtD(s.ultima.realizada_em || s.ultima.data)) || "—", sub: [esc(M.agendamento(s.ultima).resultado.toLowerCase()), esc(s.ultima.responsavel || "")].filter(Boolean).join(" · ") }
+    : { rot: "Próxima revistoria", val: "—", sub: "aguardando agendamento" };
+  const info = (rot, val, sub = "", cls = "") => `<div class="rc-i${cls}"><span>${rot}</span><b>${val}</b>${sub ? `<small>${sub}</small>` : ""}</div>`;
+  const rep = M.reprovada(s);
+  // Painel (formulário ou histórico) logo abaixo das ações; agendamentos no fim.
+  const area = FORMS[painel] ? htmlForm(u, painel)
+    : painel === "historico" ? `<div class="ch-hist rc-area"><div class="pp-label">Histórico da revistoria</div><div id="rcHist" class="ch-hist-body"></div></div>` : "";
   pop.innerHTML = `
     <div class="pp-head">
-      <div class="pp-title"><small>${esc(host.project.name)} · ${esc(localUnidade(u))}</small><strong>${esc(nomeUnidade(u))}</strong></div>
+      <div class="pp-title"><small>${esc(host.project.name)} · ${esc(localUnidade(u))}</small><strong>${esc(nomeUnidade(u))}</strong>${u.cliente ? `<em class="rc-pp-cli" title="Cliente">${esc(u.cliente)}</em>` : ""}</div>
       <div class="pp-tools">
         <button type="button" class="pp-icon" data-nav="-1" ${i <= 0 ? "disabled" : ""} aria-label="Unidade anterior">‹</button>
         <button type="button" class="pp-icon" data-nav="1" ${i >= lista.length - 1 ? "disabled" : ""} aria-label="Próxima unidade">›</button>
         <button type="button" class="pp-icon" data-close aria-label="Fechar">×</button>
       </div>
     </div>
-    <div class="pp-body ch-body">
-      <div class="rc-loc"><div><span>Condomínio</span><b>${esc(host.project.name)}</b></div><div><span>${esc(host.grupo())}</span><b>${esc(u.b)}</b></div><div><span>${host.casa() ? "Casa" : "Apartamento"}</span><b>${esc(host.casa() ? +u.a : u.codigo)}</b></div></div>
-      <div class="ch-now">
-        <div class="ch-now-st"><span>Revistoria · Cliente</span>${badge(s.status, " lg")}${s.status ? `<small>${s.ciclo}º ciclo</small>` : ""}</div>
-        <div><span>Status da vistoria</span>${vistPill(u.vistoria)}</div>
-        ${s.status ? `<div><span>Liberação</span>${libPill(s.liberado)}${s.liberadoEm ? `<small>${fmtDH(s.liberadoEm)}${s.liberadoPor ? ` · ${esc(s.liberadoPor)}` : ""}</small>` : ""}</div>
-        <div><span>Execução · equipe / responsável</span>${s.execucao ? `${execPill(s.execucao, " lg")}<small>Equipe ${esc(M.execInfo(s.execucao).equipe)} · Responsável ${esc(M.execInfo(s.execucao).responsavel)}</small>` : "<b>Não definida</b>"}</div>` : ""}
-        <div><span>Cliente</span><b>${esc(u.cliente) || "—"}</b></div>
-        <div><span>Revistorias realizadas</span><b>${s.realizadas}</b>${s.lista.length ? `<small>${s.lista.length} agendamento(s)</small>` : ""}</div>
-        <div class="rc-now-prox"><span>${s.aberto ? "Próxima revistoria" : "Última revistoria"}</span>${prox}</div>
-        <div><span>Última alteração</span><b>${s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—"}</b>${s.atualizadoPor ? `<small>por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}</small>` : ""}</div>
+    <div class="pp-body ch-body rc-pbody">
+      <div class="rc-strip">
+        <div class="rc-strip-st">${badge(s.status, " lg")}${s.status ? `<span class="rc-ciclo">${s.ciclo}º ciclo</span>` : ""}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}</div>
+        <div class="rc-strip-v"><span class="rc-strip-l">Vistoria</span>${vistPill(u.vistoria)}</div>
       </div>
-      ${htmlReprovacao(s)}
-      ${htmlChave(u)}
       ${!s.status ? `<div class="pp-ro">Esta unidade não está na Revistoria · Cliente. Ela entra automaticamente, como <b>Em andamento</b>, quando o status da vistoria passa a <b>Revistoria</b>.</div>` : ""}
-      ${s.status && podeEditar() ? htmlOperacao(s) : ""}
-      ${botoes ? `<div class="ch-btns">${botoes}</div>` : ""}
-      ${s.status && !podeEditar() ? `<div class="pp-ro">Seu acesso a este condomínio é de consulta: agendamentos e resultados são registrados por administradores e pela equipe de revistorias.</div>` : ""}
-      ${FORMS[painel] ? htmlForm(u, painel) : ""}
-      ${painel === "historico" ? `<div class="ch-hist"><div class="pp-label">Histórico da revistoria</div><div id="rcHist" class="ch-hist-body"></div></div>` : htmlAgendamentos(s)}
+      ${botoes ? `<div class="ch-btns rc-btns">${botoes}</div>` : ""}
+      ${area}
+      ${s.status ? `<div class="ch-now rc-info">
+        ${info(prox.rot, prox.val, prox.sub, " rc-i-prox")}
+        ${info("Revistorias", `${s.realizadas} realizada(s)`, s.lista.length ? `${s.lista.length} agendamento(s)` : "nenhum agendamento")}
+        ${info("Última alteração", s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—", s.atualizadoPor ? `por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}` : "")}
+      </div>` : ""}
+      ${htmlReprovacao(s)}
+      ${s.status || chavesOk ? `<div class="rc-opcard">${s.status ? htmlOperacao(s) : ""}${htmlChave(u)}</div>` : ""}
+      ${s.status && !podeEditar() ? `<div class="pp-ro rc-ro">Acesso de consulta: agendamentos e resultados são registrados por administradores e pela equipe de revistorias.</div>` : ""}
+      ${painel === "historico" ? "" : htmlAgendamentos(s)}
     </div>`;
   if (prev && prev.tipo === painel) restaurarForm(prev);
   if (painel === "resultado") ajustarResultado();
@@ -405,23 +408,26 @@ function htmlChave(u) {
         `<label class="ch-setor" style="--c:${CM.SETORES[st].cor}"><input type="radio" name="setor" value="${st}"><span><i></i>${CM.SETORES[st].label}${k.setor === st ? "<small>atual</small>" : ""}</span></label>`).join("")}</div></div>
       <label class="pp-f pp-full"><span>Responsável que está recebendo a chave</span><input name="responsavel" placeholder="Nome" autocomplete="off" maxlength="80"></label>
       <div class="pp-actions pp-full"><span class="pp-hint ch-msg" role="status"></span><button type="button" class="btn g" data-painel="">Voltar</button><button type="submit" class="btn p">Transferir chave</button></div></form>` : "";
-  return `<div class="rc-keybox"><div class="rc-key-h">${ICONE.chave}<b>Status da chave</b>${chavePill(k)}${pode ? `<button type="button" class="btn g ch-mini" data-painel="chave">Transferir chave</button>` : ""}</div>
-    <div class="rc-key-d">${o ? `Chave perdida desde ${fmtDH(o.registrado_em)}${o.identificado_por ? ` · identificado por ${esc(o.identificado_por)}` : ""} · etapa: <b>${esc(CM.ETAPAS[o.etapa]?.label || o.etapa)}</b>. Trate a ocorrência na aba Controle de Chaves.`
-      : k.setor === "sem" ? "Sem status: nenhum setor com a chave registrado no Controle de Chaves."
-      : `Com <b>${esc(CM.setorLabel(k.setor))}</b>${k.responsavel ? ` · responsável <b>${esc(k.responsavel)}</b>` : ""}${k.movimentadoEm ? ` · desde ${fmtDH(k.movimentadoEm)}` : ""}${k.movimentadoPor ? ` · registrado por ${esc(k.movimentadoPor)}` : ""}`}</div>${form}</div>`;
+  const det = o ? `perdida desde ${fmtDH(o.registrado_em)} · etapa <b>${esc(CM.ETAPAS[o.etapa]?.label || o.etapa)}</b> · trate na aba Controle de Chaves`
+    : k.setor === "sem" ? "nenhum setor registrado no Controle de Chaves"
+    : [k.responsavel ? `com <b>${esc(k.responsavel)}</b>` : "", k.movimentadoEm ? `desde ${fmtDH(k.movimentadoEm)}` : "", k.movimentadoPor ? `por ${esc(k.movimentadoPor)}` : ""].filter(Boolean).join(" · ");
+  return `<div class="rc-or rc-or-key"><span class="rc-or-t">${ICONE.chave}Chave</span>
+      <div class="rc-or-v"><span class="rc-sr">Status da chave</span>${chavePill(k, " sm")}${pode ? `<button type="button" class="btn g ch-mini rc-or-btn${painel === "chave" ? " on" : ""}" data-painel="chave">Transferir</button>` : ""}</div>
+      ${det ? `<div class="rc-or-d">${det}</div>` : ""}${form}</div>`;
 }
 
-/** Controles de liberação e execução (gravam na hora, sem formulário). */
+/** Liberação e execução: controles para admin/revistorias (gravam na hora); consulta para os demais. */
 function htmlOperacao(s) {
-  const dis = salvando ? " disabled" : "";
-  return `<div class="rc-op">
-      <div class="rc-op-row"><span class="rc-op-t">Liberado para execução</span>
-        <button type="button" class="rc-tog${s.liberado ? " on" : ""}" role="switch" aria-checked="${s.liberado}" data-lib="${!s.liberado}"${dis}><i></i>${s.liberado ? "Liberado" : "Não liberado"}</button></div>
-      <div class="rc-op-row rc-op-exe"><span class="rc-op-t">Execução</span>
-        <div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.EXECUCOES.map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}
-        ${s.execucao ? `<button type="button" class="rc-exe-opt rc-exe-none" data-exe=""${dis}><span>Remover</span></button>` : ""}</div></div>
-      ${salvando ? `<div class="rc-op-msg">Salvando…</div>` : ""}
-    </div>`;
+  const dis = salvando ? " disabled" : "", ed = podeEditar(), ex = M.execInfo(s.execucao);
+  const quemLib = s.liberadoEm ? `${fmtDH(s.liberadoEm)}${s.liberadoPor ? ` · ${esc(s.liberadoPor)}` : ""}` : "";
+  const lib = ed ? `<button type="button" class="rc-tog${s.liberado ? " on" : ""}" role="switch" aria-checked="${s.liberado}" data-lib="${!s.liberado}"${dis}><i></i>${s.liberado ? "Liberado" : "Não liberado"}</button>` : libPill(s.liberado);
+  const exe = ed ? `<div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.EXECUCOES.map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}" title="${esc(e.equipe)} · ${esc(e.responsavel)}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}</div>
+      ${s.execucao ? `<button type="button" class="rc-exe-none" data-exe=""${dis}>Remover execução</button>` : ""}`
+    : ex ? execPill(s.execucao) : '<b class="rc-mut">Não definida</b>';
+  return `<div class="rc-or rc-or-lib"><span class="rc-or-t">Liberação</span><div class="rc-or-v">${lib}${quemLib ? `<small class="rc-or-q">${quemLib}</small>` : ""}</div></div>
+    <div class="rc-or rc-or-ex"><span class="rc-or-t">Execução</span><div class="rc-or-v rc-or-exe">${exe}</div>
+      ${!ed && ex ? `<div class="rc-or-d">Equipe ${esc(ex.equipe)} · Responsável ${esc(ex.responsavel)}</div>` : ""}</div>
+    ${salvando ? `<div class="rc-op-msg">Salvando…</div>` : ""}`;
 }
 async function salvarOperacao(tipo, valor) {
   if (salvando || !cur) return;
