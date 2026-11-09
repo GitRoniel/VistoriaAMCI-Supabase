@@ -17,6 +17,7 @@ export function vistoriasHmBarHTML() {
       '<button class="hm-btn hm-icon" id="btnLogin" type="button" title="Entrar para editar" aria-label="Entrar para editar" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>'
     ].join(""), false),
     group("overview", hmBtnHTML({ id: "overviewBack", label: "Início", icon: HM_ICON.home, title: "Voltar à tela inicial" })),
+    group("central", hmBtnHTML({ id: "centralBack", label: "Início", icon: HM_ICON.home, title: "Voltar à tela inicial" })),
     group("import", hmBtnHTML({ id: "importBack", label: "Visão Geral", icon: HM_ICON.back, title: "Voltar à Visão Geral" })),
     group("admin", hmBtnHTML({ id: "adminBack", label: "Início", icon: HM_ICON.home, title: "Voltar à tela inicial" }))
   ].join("\n      ");

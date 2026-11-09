@@ -228,5 +228,6 @@ assert.ok(!/getPublicUrl/.test(revCliJs) && revCliJs.includes("createSignedUrl")
 assert.ok(html.includes('supabase.rpc("vistoria_reagendar"') && html.includes("Reagendar Vistoria"), "Reagendar Vistoria no popup.");
 assert.ok(html.includes('startImport("rev")') && html.includes("args.p_sincronizar_data=false"), "Importação só de revistorias (aba Revistoria).");
 await import("./test-revistoria-cliente.mjs");
+await import("./test-central.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

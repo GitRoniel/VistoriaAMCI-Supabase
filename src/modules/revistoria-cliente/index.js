@@ -365,6 +365,7 @@ function pintarPopup() {
       <div class="pp-tools">
         <button type="button" class="pp-icon" data-nav="-1" ${i <= 0 ? "disabled" : ""} aria-label="Unidade anterior">‹</button>
         <button type="button" class="pp-icon" data-nav="1" ${i >= lista.length - 1 ? "disabled" : ""} aria-label="Próxima unidade">›</button>
+        ${window.AmciCentral ? `<button type="button" class="pp-icon pp-central" data-central aria-label="Histórico completo da unidade" title="Histórico completo da unidade (Central de Unidades)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button>` : ""}
         <button type="button" class="pp-icon" data-close aria-label="Fechar">×</button>
       </div>
     </div>
@@ -521,6 +522,7 @@ function cliquePopup(e) {
   const t = e.target;
   if (t.closest("[data-close]")) { fechar(); return; }
   if (t.closest("[data-relatorio]")) { const c = cur; if (c) abrirRel(c.b, c.p, c.a); return; }
+  if (t.closest("[data-central]")) { const c = cur; if (c) window.AmciCentral?.abrirUnidade(c.unitId); return; }
   const lb = t.closest("[data-lib]");
   if (lb && !lb.disabled) { salvarOperacao("liberacao", lb.dataset.lib === "true"); return; }
   const ex = t.closest("[data-exe]");
@@ -640,6 +642,14 @@ const api = {
     carregarChaves();
   },
   hide() { if (pop?.classList.contains("open")) fechar(); },
+  /** Abre o painel de uma unidade pelo id (vindo da Central Operacional). */
+  abrirUnidade(unitId) {
+    if (!host || !root) return;
+    const u = todasUnidades().find((x) => x.unitId === Number(unitId)); if (!u) return;
+    const anc = root.querySelector(`.rc-u[data-b="${CSS.escape(u.b)}"][data-p="${CSS.escape(u.p)}"][data-a="${CSS.escape(u.a)}"]`);
+    anc?.scrollIntoView({ block: "center", inline: "center" });
+    abrir(u.b, u.p, u.a, anc);
+  },
   /** Situação, agendamentos ou status da vistoria mudaram (carga, tempo real ou outra aba). */
   dadosMudaram() {
     if (!host || !root?.isConnected || !root.offsetParent) return;
