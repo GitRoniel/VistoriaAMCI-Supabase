@@ -9,3 +9,11 @@ create function auth.jwt() returns jsonb language sql stable as $$ select coales
 grant usage on schema auth, extensions to anon, authenticated, service_role;
 grant execute on function auth.uid(), auth.jwt() to anon, authenticated;
 create publication supabase_realtime;
+-- Storage (só o necessário para as políticas dos relatórios da revistoria)
+create schema if not exists storage;
+create table storage.buckets (id text primary key, name text, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
+create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets (id), name text not null,
+  owner uuid, metadata jsonb default '{}'::jsonb, created_at timestamptz default now(), unique (bucket_id, name));
+alter table storage.objects enable row level security;
+grant usage on schema storage to authenticated, anon;
+grant select, insert, delete on storage.objects to authenticated;

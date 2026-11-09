@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import * as M from "../src/modules/revistoria-cliente/model.js";
 import { comparar as compararPlanilha, revInfo } from "../src/modules/vistorias/revistorias.js";
+import { extrair, mesmaUnidade } from "../src/modules/revistoria-cliente/relatorio.js";
 
 // 1) Cores padronizadas.
 assert.equal(M.info("Aprovado").cor, "#2f9e5b");      // verde
@@ -73,7 +74,8 @@ assert.deepEqual(ff({ rapido: "aprovados" }), ["B101"]);
 const hoje = "2026-11-04";
 assert.match(M.validarAgendamento({ data: "", responsavel: "Ana" }, hoje), /data/);
 assert.match(M.validarAgendamento({ data: "2026-02-31", responsavel: "Ana" }, hoje), /inválida/);
-assert.match(M.validarAgendamento({ data: "2026-11-10", responsavel: " " }, hoje), /responsável/);
+assert.equal(M.validarAgendamento({ data: "2026-11-10", responsavel: " " }, hoje), "");   // vistoriador opcional
+assert.match(M.validarAgendamento({ data: "2026-11-10", responsavel: "x".repeat(81) }, hoje), /longo/);
 assert.match(M.validarAgendamento({ data: "2026-11-10", horario: "9h", responsavel: "Ana" }, hoje), /Horário/);
 assert.equal(M.validarAgendamento({ data: "2026-11-10", horario: "09:30", responsavel: "Ana" }, hoje), "");
 assert.match(M.validarResultado({ resultado: "", realizada: hoje }, hoje), /resultado/);
@@ -120,5 +122,67 @@ assert.equal(M.indicadores(ues).liberados, 4);
 assert.equal(M.execRotulo("EMP_OSCAR"), "EMP · Oscar"); assert.equal(M.execRotulo(null), "Sem execução");
 assert.equal(M.descreverEvento({ tipo: "liberacao", descricao: "Liberada para a execução dos serviços", status_novo: "Agendado" }).titulo, "Liberada para execução");
 assert.equal(M.descreverEvento({ tipo: "liberacao", descricao: "Liberação para execução retirada", status_novo: "Agendado" }).titulo, "Liberação retirada");
+
+// 10) Rev. Reprovada: só quem teve revistoria realizada reprovada e ainda não foi aprovado (em andamento sem revistoria não conta).
+const sit = (st, lista) => M.situacao({ status: st }, lista);
+const rep1 = sit("Em andamento", [{ numero: 1, status: "Reprovada", realizada_em: "2026-10-01", resultado_obs: "Rejunte" }]);
+const rep2 = sit("Agendado", [{ numero: 1, status: "Reprovada" }, { numero: 2, status: "Agendada", data: "2026-11-20" }]);
+assert.equal(M.reprovada(rep1), true); assert.equal(M.reprovada(rep2), true);
+assert.equal(M.reprovada(sit("Em andamento", [])), false);
+assert.equal(M.reprovada(sit("Aprovado", [{ numero: 1, status: "Reprovada" }, { numero: 2, status: "Aprovada" }])), false);
+assert.equal(M.reprovada(sit("Em andamento", [{ numero: 1, status: "Cancelada" }])), false);
+assert.equal(M.ultimaReprovacao(rep1).resultado_obs, "Rejunte");
+assert.ok(M.FILTROS_REVISTORIA.some((f) => f.key === "reprovada") && !M.FILTROS.some((f) => f.key === "reprovada"), "Rev. Reprovada só na aba Revistoria");
+
+// 11) Data da revistoria, ordem por horário (igual à Vistoria) e status da chave, combinados com os demais filtros.
+const uu = (id, st, lista, chave, extra = {}) => ({ b: "A", codigo: id, cliente: "", vistoria: "rv", chave, situacao: M.situacao({ status: st, ...extra }, lista) });
+const lst = [
+  uu("1", "Agendado", [{ numero: 1, status: "Agendada", data: "2026-11-20", horario: "14:00:00" }], { setor: "base" }, { liberado: true }),
+  uu("2", "Agendado", [{ numero: 1, status: "Agendada", data: "2026-11-20", horario: "08:30:00" }], { setor: "cx" }),
+  uu("3", "Agendado", [{ numero: 1, status: "Agendada", data: "2026-11-20" }], { setor: "sem" }),
+  uu("4", "Agendado", [{ numero: 1, status: "Agendada", data: "2026-11-18", horario: "16:00:00" }], { setor: "base", perdida: { etapa: "perdida" } }),
+  uu("5", "Em andamento", [{ numero: 1, status: "Reprovada", data: "2026-11-01", realizada_em: "2026-11-01" }], { setor: "cliente" }),
+  uu("6", "Em andamento", [], { setor: "sem" })
+];
+const ordem = (hr) => [...lst].sort((x, y) => M.compararAgenda(x, y, hr)).map((u) => u.codigo).join(",");
+assert.equal(ordem("asc"), "5,4,2,1,3,6");    // por data; no mesmo dia cedo → tarde; sem horário depois; sem data no fim
+assert.equal(ordem("desc"), "5,4,1,2,3,6");
+assert.deepEqual(M.agendaRevistoria(lst[4].situacao), { data: "2026-11-01", hora: "" });
+const fl = (o) => lst.filter((x) => M.passaFiltros(x, { bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "", chave: "", data: "", ...o })).map((x) => x.codigo).join(",");
+assert.equal(fl({ data: "2026-11-20" }), "1,2,3");
+assert.equal(fl({ data: "2026-11-20", chave: "base" }), "1");
+assert.equal(fl({ chave: "base" }), "1");                 // a chave perdida não conta como Base
+assert.equal(fl({ chave: "perdida" }), "4");
+assert.equal(fl({ chave: "sem" }), "3,6");
+assert.equal(fl({ rapido: "reprovada" }), "5");
+assert.equal(fl({ rapido: "reprovada", chave: "cliente" }), "5");
+assert.equal(fl({ data: "2026-11-20", liberado: "sim", rapido: "agendados" }), "1");
+
+// 12) Relatório da unidade (PDF do sistema da construtora): apontamentos = itens Reprovados, com ambiente,
+//     observação (texto quebrado juntado pela coluna) e nº da não conformidade. Dados fictícios.
+const tx = (str, x, y, w = 60) => ({ str, x, y, w });
+const pags = [
+  { itens: [tx("RELATÓRIO DE ENTREGA DA UNIDADE", 8, 812), tx("BL C - APT 204 (TESTE >> BLOCO C >> 2º PAVIMENTO)", 9, 793),
+    tx("Realizado", 34, 367), tx("10/09/2026 09:16", 78, 367), tx("Não Conformidades 2", 276, 367),
+    tx("COZINHA", 12, 305), tx("Vistoria do Cliente | CHECKLIST VISTORIA CLIENTE", 12, 293),
+    tx("Nr", 14, 271), tx("Descrição", 161, 271), tx("Resposta", 392, 271), tx("Observação", 492, 271),
+    tx("1", 12, 246), tx("10/09/2026", 77, 246), tx("REVESTIMENTO - PISO", 161, 246), tx("Reprovado", 392, 247), tx("Peça oca 3", 490, 247), tx("pontos", 490, 235),
+    tx("2", 12, 220), tx("10/09/2026", 77, 220), tx("SISTEMA ELÉTRICO - TOMADAS", 161, 220), tx("Aprovado", 392, 221),
+    tx("Gerado:", 8, 39)] },
+  { itens: [tx("Não Conformidade 71", 25, 763), tx("Descrição", 27, 690),
+    tx("Não Conformidade criada automaticamente a partir do item REVESTIMENTO - PISO, do Formulário CHECKLIST VISTORIA CLIENTE.", 27, 679), tx("Peça oca", 27, 668),
+    tx("Resumo das Ações", 27, 652),
+    tx("QUARTO", 12, 471), tx("Vistoria do Cliente | CHECKLIST VISTORIA CLIENTE", 12, 459),
+    tx("1", 12, 412), tx("10/09/2026", 77, 412), tx("ESQUADRIAS - PORTAS", 161, 412), tx("Reprovado", 392, 413),
+    tx("Não Conformidade 72", 25, 380), tx("Descrição", 27, 360),
+    tx("Não Conformidade criada automaticamente a partir do item ESQUADRIAS - PORTAS, do Formulário CHECKLIST VISTORIA CLIENTE localizado na", 27, 349),
+    tx("QUARTO regulagem da porta", 27, 338), tx("Resumo das Ações", 27, 320),
+    tx("Fulano de Tal", 101, 295, 120), tx("Responsável", 139, 284, 45), tx("Cliente", 418, 284, 30)] }
+];
+const rel = extrair(pags);
+assert.deepEqual(rel.unidade, { bloco: "C", apto: "204", texto: "BL C - APT 204" });
+assert.equal(rel.realizado, "2026-09-10"); assert.equal(rel.naoConformidades, 2); assert.equal(rel.responsavel, "Fulano de Tal");
+assert.deepEqual(rel.apontamentos.map((a) => a.texto), ["COZINHA · REVESTIMENTO - PISO: Peça oca 3 pontos (NC 71)", "QUARTO · ESQUADRIAS - PORTAS: regulagem da porta (NC 72)"]);
+assert.equal(mesmaUnidade(rel.unidade, "C", "204"), true); assert.equal(mesmaUnidade(rel.unidade, "C", "205"), false); assert.equal(mesmaUnidade(null, "C", "204"), null);
 
 console.log("Regras da Revistoria · Cliente verificadas.");

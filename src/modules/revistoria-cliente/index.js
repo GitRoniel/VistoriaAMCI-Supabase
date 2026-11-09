@@ -10,9 +10,13 @@
 //        Agendado → Remarcar (o anterior fica no histórico) / Cancelar · Aprovado → Reabrir (novas pendências)
 import * as M from "./model.js";
 import * as S from "./service.js";
+import { abrirRelatorio } from "./relatorio-tela.js";
+// Status da chave: mesmos dados e regras do Controle de Chaves (chaves_unidades / chaves_ocorrencias e chaves_transferir).
+import * as CM from "../chaves/model.js";
+import * as CS from "../chaves/service.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "" });
+const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "", chave: "", data: "", hrSort: "asc" });
 const pad = (n) => String(n).padStart(2, "0");
 const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const fmtD = (d) => { const p = String(d || "").slice(0, 10).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
@@ -25,7 +29,10 @@ const ICONE = {
   resultado: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>`,
   cancelar: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`,
   reabrir: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>`,
-  historico: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>`
+  historico: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>`,
+  relatorio: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13l2 2 4-4M8 18h8"/></svg>`,
+  chave: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg>`,
+  relogio: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`
 };
 const FORMS = {
   agendar: { botao: "Agendar revistoria", ok: "Confirmar agendamento" },
@@ -38,13 +45,16 @@ const FORMS = {
 // Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
 let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", nomes = [], salvando = "";
 let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null;
+// chaves: unitId → situação da chave (CM.situacao); comRelatorio: unidades com relatório enviado
+let chaves = new Map(), chavesOk = false, chavesProj = null, cancelarChaves = null, recargaChaves = null, comRelatorio = new Set();
 
 const hoje = () => host?.hoje?.() || new Date().toISOString().slice(0, 10);
 const podeEditar = () => ["admin", "revistorias"].includes(host?.papel());
 function unidade(u) {
   const unitId = host.unitId(u.b, u.p, u.a);
   return { ...u, unitId, codigo: host.codigo(u.b, u.p, u.a), titulo: host.titulo(u.b, u.p, u.a), vistoria: host.vistoria(u.b, u.p, u.a),
-    cliente: host.cliente(u.b, u.p, u.a), situacao: M.situacao(host.acompanhamento(unitId), host.agendamentos(unitId)) };
+    cliente: host.cliente(u.b, u.p, u.a), situacao: M.situacao(host.acompanhamento(unitId), host.agendamentos(unitId)),
+    chave: chaves.get(unitId) || CM.situacao(null) };
 }
 const todasUnidades = () => host.units().filter((u) => host.unitId(u.b, u.p, u.a)).map(unidade);
 const nomeUnidade = (u) => (host.casa() ? `Casa ${+u.a}` : `Apto ${u.codigo}`);
@@ -54,6 +64,12 @@ const vistPill = (c) => { const vc = host.vistoriaCor(c); return `<span class="c
 // Liberação e execução (selos no mapa, colunas na lista, controles no painel).
 const execPill = (key, extra = "") => { const e = M.execInfo(key); return e ? `<span class="rc-exec${extra}" style="--c:${e.cor}"><i>${esc(e.sigla)}</i>${esc(e.equipe)} · ${esc(e.responsavel)}</span>` : '<span class="ch-mut">—</span>'; };
 const libPill = (lib) => (lib ? '<span class="rc-lib on">✓ Liberado</span>' : '<span class="rc-lib">Não liberado</span>');
+// Chave: pílula com a cor do setor (como no Controle de Chaves) e selo neutro com a letra no mapa.
+const chavePill = (k, extra = "") => {
+  if (k?.perdida) return `<span class="rc-key lost${extra}">! ${esc(CM.ETAPAS[k.perdida.etapa]?.label || "Chave perdida")}</span>`;
+  const st = CM.SETORES[k?.setor || "sem"] || CM.SETORES.sem;
+  return `<span class="ch-spill rc-key-pill${extra}" style="--c:${st.cor};--b:${st.borda};--t:${st.texto}">${esc(st.label)}</span>`;
+};
 const quandoAg = (r) => (r ? [fmtD(r.data), hhmm(r.horario)].filter(Boolean).join(" · ") : "");
 
 /* ── tela ── */
@@ -64,13 +80,19 @@ function casca() {
       <div class="ch-line">
         <label class="fx-field fx-sel"><span>${esc(host.grupo())}</span><select id="rcBloco" aria-label="${esc(host.grupo())}"><option value="ALL">Todos</option>${host.grupos().map((b) => `<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select></label>
         <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="rcBusca" type="search" placeholder="${host.casa() ? "Casa ou cliente" : "Unidade (ex.: 604 ou A604) ou cliente"}" aria-label="Buscar unidade ou cliente" autocomplete="off"></label>
-        <label class="fx-field fx-sel rc-f-lib"><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
-        <label class="fx-field fx-sel rc-f-exe"><span>Execução</span><select id="rcExe" aria-label="Execução">${M.FILTRO_EXECUCAO.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+        <label class="fx-field rc-f-data"><span>Data</span><input type="date" id="rcData" aria-label="Data da revistoria"><button type="button" class="rc-f-x" id="rcDataX" aria-label="Limpar data" hidden>×</button></label>
+        <button class="fx-btn rc-hr" id="rcHr" type="button" aria-label="Ordenar por horário">${ICONE.relogio}<span>Horário ↑</span></button>
         <div class="modetog ch-modo" role="tablist" aria-label="Visualização"><button type="button" data-modo="mapa">Mapa</button><button type="button" data-modo="lista">Lista</button></div>
       </div>
+      <div class="ch-line rc-line2">
+        <label class="fx-field fx-sel rc-f-lib"><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
+        <label class="fx-field fx-sel rc-f-exe"><span>Execução</span><select id="rcExe" aria-label="Execução">${M.FILTRO_EXECUCAO.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+        <label class="fx-field fx-sel rc-f-key"><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+      </div>
       <div class="ch-line ch-chips">
-        ${M.FILTROS.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
+        ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
         <span class="ch-count" id="rcCount"></span>
+        ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)">Importar planilha</button>` : ""}
         <button type="button" class="btn g ch-clear" id="rcLimpar">Limpar</button>
       </div>
     </div>
@@ -81,20 +103,31 @@ function casca() {
   q("#rcBusca").addEventListener("input", (e) => { filt.busca = e.target.value; pintarConteudo(); });
   q("#rcLib").addEventListener("change", (e) => { filt.liberado = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcExe").addEventListener("change", (e) => { filt.execucao = e.target.value; sincronizarFiltros(); pintarConteudo(); });
-  q("#rcLimpar").addEventListener("click", () => { filt = FILTRO0(); sincronizarFiltros(); pintarConteudo(); });
+  q("#rcChave").addEventListener("change", (e) => { filt.chave = e.target.value; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcData").addEventListener("input", (e) => { filt.data = e.target.value; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcDataX").addEventListener("click", () => { filt.data = ""; sincronizarFiltros(); pintarConteudo(); });
+  // Ordenação por horário (igual à aba Vistoria): cedo → tarde ou o inverso; sem horário fica depois
+  q("#rcHr").addEventListener("click", () => { filt.hrSort = filt.hrSort === "asc" ? "desc" : "asc"; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
+  q("#rcLimpar").addEventListener("click", () => { const hr = filt.hrSort; filt = FILTRO0(); filt.hrSort = hr; sincronizarFiltros(); pintarConteudo(); });
   if (!root.dataset.ouvindo) { root.addEventListener("click", cliqueRaiz); root.dataset.ouvindo = "1"; }
 }
 function sincronizarFiltros() {
   const q = (id) => root.querySelector(id); if (!q("#rcBloco")) return;
   q("#rcBloco").value = filt.bloco; if (q("#rcBusca").value !== filt.busca) q("#rcBusca").value = filt.busca;
-  q("#rcLib").value = filt.liberado; q("#rcExe").value = filt.execucao;
+  q("#rcLib").value = filt.liberado; q("#rcExe").value = filt.execucao; q("#rcChave").value = filt.chave;
+  if (q("#rcData").value !== filt.data) q("#rcData").value = filt.data;
+  q("#rcDataX").hidden = !filt.data; q("#rcData").closest("label").classList.toggle("on", !!filt.data);
+  q("#rcChave").closest("label").classList.toggle("on", !!filt.chave);
+  q("#rcHr span").textContent = `Horário ${filt.hrSort === "asc" ? "↑" : "↓"}`;
   q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado); q("#rcExe").closest("label").classList.toggle("on", !!filt.execucao);
   root.querySelectorAll(".rc-fr").forEach((b) => b.classList.toggle("active", filt.rapido === b.dataset.fr));
   root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
-  q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos" && !filt.liberado && !filt.execucao;
+  q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos" && !filt.liberado && !filt.execucao && !filt.chave && !filt.data;
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-rcu]");
+  if (u && u.dataset.acao === "relatorio") { e.stopPropagation(); abrirRel(u.dataset.b, u.dataset.p, u.dataset.a); return; }
   if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u, u.dataset.acao || ""); return; }
   const kl = e.target.closest("[data-kpi-lib]");
   if (kl) { filt.liberado = filt.liberado === "sim" ? "" : "sim"; sincronizarFiltros(); pintarConteudo(); return; }
@@ -143,27 +176,30 @@ function htmlLista(vis, total) {
   if (!total) return `<div class="clif-empty">Nenhuma unidade em revistoria neste condomínio. As unidades entram aqui automaticamente quando o status da vistoria passa a <b>Revistoria</b>.</div>`;
   if (!vis.length) return `<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>`;
   const ord = ordemUnidade();
-  vis = [...vis].sort((x, y) => M.comparar(x, y, ord));
+  vis = [...vis].sort((x, y) => M.compararAgenda(x, y, filt.hrSort, ord));
   const linha = (u) => {
     const s = u.situacao, attrs = `data-rcu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`, ac = M.acoes(s.status, podeEditar());
-    const quando = s.aberto ? `<b>${esc(quandoAg(s.aberto)) || "Sem data"}</b><small>agendada</small>`
+    const rep = M.reprovada(s);
+    const ag = M.agendaRevistoria(s);
+    const quando = s.aberto ? `<b>${esc(fmtD(ag.data)) || "Sem data"}${ag.hora ? ` · ${esc(ag.hora)}` : ' <span class="rc-semh">sem horário</span>'}</b><small>agendada</small>`
       : s.status === "Aprovado" && s.ultima ? `<b>${esc(fmtD(s.ultima.realizada_em || s.ultima.data)) || "—"}</b><small>aprovada</small>`
       : s.ultima ? `<span class="ch-mut">aguardando</span><small>última: ${esc(fmtD(s.ultima.realizada_em || s.ultima.data))} · ${esc(M.agendamento(s.ultima).resultado.toLowerCase())}</small>` : '<span class="ch-mut">aguardando agendamento</span>';
     const resp = (s.aberto || s.ultima)?.responsavel;
     const principal = ac.length ? `<button type="button" class="btn p ch-mini" ${attrs} data-acao="${ac[0]}">${ac[0] === "agendar" ? "Agendar" : ac[0] === "resultado" ? "Resultado" : "Reabrir"}</button>` : "";
-    return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}">
+    return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">
       <td class="ch-c-un rc-c-un"><b>${esc(rotuloLista(u))}</b>${u.cliente ? `<small>${esc(u.cliente)}</small>` : ""}</td>
-      <td class="rc-c-st">${badge(s.status)}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>
+      <td class="rc-c-st">${badge(s.status)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>
       <td class="rc-c-vst">${vistPill(u.vistoria)}</td>
       <td class="rc-c-lib">${libPill(s.liberado)}</td>
       <td class="rc-c-exe">${execPill(s.execucao)}</td>
       <td class="ch-c-dt rc-c-dt">${quando}</td>
       <td class="ch-c-resp rc-c-resp">${esc(resp) || '<span class="ch-mut">—</span>'}</td>
       <td class="rc-c-n" title="Revistorias realizadas">${s.realizadas}${s.lista.length > s.realizadas ? `<small>${s.lista.length} agend.</small>` : ""}</td>
-      <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
+      <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
+      <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini${comRelatorio.has(u.unitId) ? " rc-tem-rel" : ""}" ${attrs} data-acao="relatorio" title="${comRelatorio.has(u.unitId) ? "Relatório enviado" : "Sem relatório enviado"}">Relatório</button><button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
     </tr>`;
   };
-  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Chave</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
 }
 
 function htmlMapa(lista, ok) {
@@ -174,10 +210,13 @@ function htmlMapa(lista, ok) {
     const s = u.situacao, i = s.info;
     const tip = [u.titulo, s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
       s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
-      s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
+      s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
+      chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
+      `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
+    const km = chavesOk && s.status ? (u.chave.perdida ? "!" : M.CHAVE_MARCA[u.chave.setor] || "") : "";
     const ex = M.execInfo(s.execucao);
-    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}</button>`;
+    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "!" ? " lost" : ""}" aria-hidden="true">${km}</i>` : ""}</button>`;
   };
   const g = host.grid();
   let h;
@@ -197,6 +236,8 @@ function htmlMapa(lista, ok) {
     <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
     <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
     ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}
+    <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
+    ${chavesOk ? `<div class="lg rc-lg-key"><span class="sw rc-sw-key">B</span>Chave: B Base · C CX · A Asstec · P Produção · E Entregue p/ cliente · <b class="rc-sw-key lost">!</b> perdida · sem selo = sem status</div>` : ""}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
 }
 
@@ -211,7 +252,7 @@ function garantirPopup() {
   const editou = (e) => { const f = e.target.closest(".ch-form"); if (!f || ocupado) return; f.dataset.dirty = "1"; aviso = null; const m = pop.querySelector(".ch-msg"); if (m) { m.textContent = ""; m.className = "pp-hint ch-msg"; } if (e.target.name === "resultado") ajustarResultado(); };
   pop.addEventListener("input", editou);
   pop.addEventListener("change", editou);
-  pop.addEventListener("submit", (e) => { e.preventDefault(); enviar(); });
+  pop.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.dataset.tipo === "chave") transferirChave(e.target); else enviar(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop.classList.contains("open")) fechar(); });
   document.addEventListener("click", (e) => { const path = e.composedPath(); if (pop.classList.contains("open") && !path.includes(pop) && !path.some((n) => n.matches?.("[data-rcu],.toast")) && !fundo.classList.contains("show")) fechar(); });
   addEventListener("resize", () => posicionar());
@@ -280,7 +321,8 @@ function pintarPopup() {
   const prev = FORMS[painel] ? capturarForm() : null;
   pop.setAttribute("aria-label", `${nomeUnidade(u)} · Revistoria · Cliente`);
   const botoes = s.status ? [...ac.map((a) => `<button type="button" class="btn ${painel === a ? "p" : "g"} ch-act${a === "cancelar" || a === "reabrir" ? " rc-act-sec" : ""}" data-painel="${a}" aria-pressed="${painel === a}">${ICONE[a]}${FORMS[a].botao}</button>`),
-    `<button type="button" class="btn ${painel === "historico" ? "p" : "g"} ch-act" data-painel="historico" aria-pressed="${painel === "historico"}">${ICONE.historico}Histórico</button>`].join("") : "";
+    `<button type="button" class="btn ${painel === "historico" ? "p" : "g"} ch-act" data-painel="historico" aria-pressed="${painel === "historico"}">${ICONE.historico}Histórico</button>`,
+    `<button type="button" class="btn g ch-act" data-relatorio>${ICONE.relatorio}Relatório</button>`].join("") : "";
   const prox = s.aberto ? `<b>${esc(quandoAg(s.aberto)) || "Sem data"}</b><small>${esc(s.aberto.responsavel || "")}</small>`
     : s.ultima ? `<b>${esc(fmtD(s.ultima.realizada_em || s.ultima.data))}</b><small>última · ${esc(M.agendamento(s.ultima).resultado.toLowerCase())}${s.ultima.responsavel ? ` · ${esc(s.ultima.responsavel)}` : ""}</small>` : "<b>—</b>";
   pop.innerHTML = `
@@ -304,6 +346,8 @@ function pintarPopup() {
         <div class="rc-now-prox"><span>${s.aberto ? "Próxima revistoria" : "Última revistoria"}</span>${prox}</div>
         <div><span>Última alteração</span><b>${s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—"}</b>${s.atualizadoPor ? `<small>por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}</small>` : ""}</div>
       </div>
+      ${htmlReprovacao(s)}
+      ${htmlChave(u)}
       ${!s.status ? `<div class="pp-ro">Esta unidade não está na Revistoria · Cliente. Ela entra automaticamente, como <b>Em andamento</b>, quando o status da vistoria passa a <b>Revistoria</b>.</div>` : ""}
       ${s.status && podeEditar() ? htmlOperacao(s) : ""}
       ${botoes ? `<div class="ch-btns">${botoes}</div>` : ""}
@@ -315,6 +359,28 @@ function pintarPopup() {
   if (painel === "resultado") ajustarResultado();
   if (painel === "historico") pintarHistorico();
   if (aviso) mostrarAviso(aviso.msg, aviso.tipo);
+}
+
+/** Última reprovação (pendências que motivaram), quando a unidade está em Rev. Reprovada. */
+function htmlReprovacao(s) {
+  if (!M.reprovada(s)) return "";
+  const r = M.ultimaReprovacao(s);
+  return `<div class="rc-repcard" role="status"><div class="rc-rep-h"><b>Revistoria reprovada</b>${r ? `<span>nº ${r.numero} · ${esc(fmtD(r.realizada_em || r.data))}${r.responsavel ? ` · ${esc(r.responsavel)}` : ""}</span>` : ""}</div>
+    ${r?.resultado_obs ? `<div class="rc-rep-t"><span>Apontamentos:</span> ${esc(r.resultado_obs)}</div>` : ""}<div class="rc-rep-d">Veja o relatório da unidade para o checklist completo.</div></div>`;
+}
+/** Status da chave (Controle de Chaves): consulta e, para admin/revistorias, transferência rápida. */
+function htmlChave(u) {
+  if (!chavesOk) return "";
+  const k = u.chave, o = k.perdida, pode = podeEditar() && !o;
+  const form = painel === "chave" && pode ? `<form class="ch-form rc-keyform" data-tipo="chave" novalidate>
+      <div class="pp-f pp-full"><span>Setor de destino</span><div class="ch-setores" role="radiogroup" aria-label="Setor de destino">${CM.SETORES_DESTINO.map((st) =>
+        `<label class="ch-setor" style="--c:${CM.SETORES[st].cor}"><input type="radio" name="setor" value="${st}"><span><i></i>${CM.SETORES[st].label}${k.setor === st ? "<small>atual</small>" : ""}</span></label>`).join("")}</div></div>
+      <label class="pp-f pp-full"><span>Responsável que está recebendo a chave</span><input name="responsavel" placeholder="Nome" autocomplete="off" maxlength="80"></label>
+      <div class="pp-actions pp-full"><span class="pp-hint ch-msg" role="status"></span><button type="button" class="btn g" data-painel="">Voltar</button><button type="submit" class="btn p">Transferir chave</button></div></form>` : "";
+  return `<div class="rc-keybox"><div class="rc-key-h">${ICONE.chave}<b>Status da chave</b>${chavePill(k)}${pode ? `<button type="button" class="btn g ch-mini" data-painel="chave">Transferir chave</button>` : ""}</div>
+    <div class="rc-key-d">${o ? `Chave perdida desde ${fmtDH(o.registrado_em)}${o.identificado_por ? ` · identificado por ${esc(o.identificado_por)}` : ""} · etapa: <b>${esc(CM.ETAPAS[o.etapa]?.label || o.etapa)}</b>. Trate a ocorrência na aba Controle de Chaves.`
+      : k.setor === "sem" ? "Sem status: nenhum setor com a chave registrado no Controle de Chaves."
+      : `Com <b>${esc(CM.setorLabel(k.setor))}</b>${k.responsavel ? ` · responsável <b>${esc(k.responsavel)}</b>` : ""}${k.movimentadoEm ? ` · desde ${fmtDH(k.movimentadoEm)}` : ""}${k.movimentadoPor ? ` · registrado por ${esc(k.movimentadoPor)}` : ""}`}</div>${form}</div>`;
 }
 
 /** Controles de liberação e execução (gravam na hora, sem formulário). */
@@ -357,7 +423,7 @@ function htmlForm(u, tipo) {
   if (tipo === "agendar" || tipo === "remarcar") {
     corpo = `<div class="rc-dh pp-full"><label class="pp-f"><span>Data da revistoria</span><input type="date" name="data" required></label>
         <label class="pp-f"><span>Horário <small>(opcional)</small></span><input type="time" name="horario" step="900"></label></div>
-      ${campoResp("Responsável pela revistoria", tipo === "remarcar" ? ab?.responsavel || "" : "")}
+      ${campoResp("Vistoriador / responsável (opcional)", tipo === "remarcar" ? ab?.responsavel || "" : "", false)}
       ${obs("Observações (opcional)", "Ex.: cliente pediu período da manhã, levar chave da CX…")}`;
     nota = tipo === "remarcar" ? `O agendamento atual (${esc(quandoAg(ab)) || "sem data"}) fica no histórico como <b>Cancelado</b> e a unidade continua <b>Agendado</b> na nova data.`
       : `A unidade passa para <b>Agendado</b>. Cada agendamento fica guardado no histórico.`;
@@ -420,6 +486,7 @@ function mostrarAviso(msg, tipo = "err") {
 function cliquePopup(e) {
   const t = e.target;
   if (t.closest("[data-close]")) { fechar(); return; }
+  if (t.closest("[data-relatorio]")) { const c = cur; if (c) abrirRel(c.b, c.p, c.a); return; }
   const lb = t.closest("[data-lib]");
   if (lb && !lb.disabled) { salvarOperacao("liberacao", lb.dataset.lib === "true"); return; }
   const ex = t.closest("[data-exe]");
@@ -472,6 +539,37 @@ async function enviar() {
   }
 }
 
+/* ── chaves e relatórios (dados do condomínio) ── */
+async function carregarChaves() {
+  if (!host?.sb || !host.project) return;
+  const pid = host.project.id;
+  try {
+    const d = await CS.carregarCondominio(host.sb, pid);
+    if (host?.project?.id !== pid) return;
+    const oc = new Map(d.ocorrencias.map((o) => [o.unit_id, o]));
+    chaves = new Map(d.unidades.map((r) => [r.unit_id, CM.situacao(r, oc.get(r.unit_id))])); chavesOk = true;
+  } catch (err) { console.warn("Revistoria: status da chave indisponível", err); chavesOk = false; }
+  try { comRelatorio = await S.unidadesComRelatorio(host.sb, pid); } catch { comRelatorio = new Set(); }
+  if (root?.isConnected) { pintarConteudo(); if (cur && !preenchendo() && !ocupado) pintarPopup(); }
+}
+function agendarChaves() { clearTimeout(recargaChaves); recargaChaves = setTimeout(carregarChaves, 400); }
+function abrirRel(b, p, a) {
+  const u = todasUnidades().find((x) => x.b === b && x.p === p && x.a === a); if (!u) return;
+  abrirRelatorio({ host, u, podeEditar: podeEditar(), aoMudar: () => agendarChaves() });
+}
+async function transferirChave(f) {
+  const u = todasUnidades().find((x) => x.unitId === cur?.unitId); if (!u) return;
+  const setor = f.querySelector('input[name="setor"]:checked')?.value || "", resp = CM.limparNome(f.elements.responsavel.value);
+  const erro = CM.validarTransferencia({ setor, responsavel: resp }, u.chave);
+  const msg = f.querySelector(".ch-msg");
+  if (erro) { msg.textContent = erro; msg.className = "pp-hint ch-msg err"; return; }
+  const b = f.querySelector("[type=submit]"); b.disabled = true; b.textContent = "Transferindo…";
+  try {
+    await CS.transferir(host.sb, { unitId: u.unitId, setor, responsavel: resp, ultimaMov: u.chave.ultimaMov, pedido: novoPedido() });
+    host.toast(`Chave transferida para ${CM.setorLabel(setor)} · ${resp}`); painel = ""; await carregarChaves();
+  } catch (err) { msg.textContent = err.message || "Não foi possível transferir"; msg.className = "pp-hint ch-msg err"; b.disabled = false; b.textContent = "Transferir chave"; agendarChaves(); }
+}
+
 /* ── API para a tela de Vistorias ── */
 const api = {
   /** Mostra a aba. */
@@ -481,9 +579,16 @@ const api = {
     if (!root || !host.project) return;
     if (projId !== host.project.id) {
       filt = FILTRO0(); nomes = []; projId = host.project.id; delete root.dataset.proj;
+      chaves = new Map(); chavesOk = false; comRelatorio = new Set();
       if (pop?.classList.contains("open")) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); }
     }
     pintar();
+    // status da chave e relatórios: carregados ao abrir a aba e atualizados em tempo real (Controle de Chaves)
+    if (chavesProj !== host.project.id) {
+      cancelarChaves?.(); cancelarChaves = null; chavesProj = host.project.id;
+      if (host.sb) { try { cancelarChaves = CS.assinar(host.sb, chavesProj, agendarChaves); } catch { cancelarChaves = null; } }
+    }
+    carregarChaves();
   },
   hide() { if (pop?.classList.contains("open")) fechar(); },
   /** Situação, agendamentos ou status da vistoria mudaram (carga, tempo real ou outra aba). */
@@ -492,7 +597,7 @@ const api = {
     if (root.dataset.proj !== String(host.project?.id)) { pintar(); return; }
     pintarConteudo(); if (cur && !preenchendo() && !ocupado) pintarPopup();
   },
-  reset() { projId = null; nomes = []; if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
+  reset() { cancelarChaves?.(); cancelarChaves = null; chavesProj = null; chaves = new Map(); chavesOk = false; projId = null; nomes = []; if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
 };
 window.AmciRevCliente = api;
 export default api;
