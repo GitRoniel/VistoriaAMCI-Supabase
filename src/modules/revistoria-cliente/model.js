@@ -30,14 +30,10 @@ export const EXECUCOES = [
 export const EQUIPES = ["M.O.P", "EMP"];
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
-/** Opções do filtro Execução: todas, por equipe, por responsável e sem execução. */
-export const FILTRO_EXECUCAO = [
-  { key: "", label: "Todas" },
-  ...EQUIPES.map((q) => ({ key: "equipe:" + q, label: `Equipe ${q}` })),
-  ...EXECUCOES.map((e) => ({ key: e.key, label: `${e.responsavel} (${e.equipe})` })),
-  { key: "sem", label: "Sem execução" }
-];
 export const FILTRO_LIBERADO = [{ key: "", label: "Todos" }, { key: "sim", label: "Liberados" }, { key: "nao", label: "Não liberados" }];
+/** Filtro rápido de Execução (botões da aba): um responsável por vez; vazio = todas as equipes. */
+export const BOTOES_EXECUCAO = EXECUCOES.map((e) => ({ key: e.key, label: `${e.equipe} – ${e.responsavel}`, sigla: e.sigla, cor: e.cor }));
+export const alternarExecucao = (atual, clicado) => (atual === clicado ? "" : clicado);
 export function passaExecucao(chave, execucao) {
   if (!chave) return true;
   if (chave === "sem") return !execucao;
@@ -265,4 +261,48 @@ export function descreverEvento(e) {
     mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao" || e.tipo === "relatorio",
     cor: e.tipo === "resultado" && e.status_novo !== "Aprovado" ? "#d64545" : e.tipo === "cancelamento" ? "#8a948f"
       : e.tipo === "liberacao" ? "#0f3b31" : e.tipo === "execucao" ? "#7b4fc9" : info(e.status_novo).borda };
+}
+
+// ── Apontamentos da revistoria (checklist do relatório) ──
+// Fonte única para a Lista (Qtd. Apontamentos / Qtd. Resolvidas) e para o relatório individual:
+// os apontamentos (revistorias_apontamentos) dos relatórios ativos da unidade, sem repetidos.
+// Repetido = mesmo texto (sem diferença de maiúsculas, acentos ou espaços); vale a cópia mais recente
+// (relatório enviado por último), com o registro de resolução dela. Nada é guardado em campos de total:
+// os quantitativos são sempre calculados destes registros.
+export const chaveApontamento = (texto) => norm(texto);
+const tempo = (r) => Date.parse(r?.enviado_em || "") || 0;
+/** Checklist da unidade: relatório mais antigo primeiro e, em cada um, a ordem do checklist. */
+export function checklistUnidade(aps, rels) {
+  const rel = new Map((rels || []).filter((r) => !r.removido_em).map((r) => [r.id, r]));
+  const vivos = (aps || []).filter((a) => rel.has(a.relatorio_id) && chaveApontamento(a.texto));
+  const cmp = (x, y) => tempo(rel.get(x.relatorio_id)) - tempo(rel.get(y.relatorio_id)) || x.relatorio_id - y.relatorio_id ||
+    (x.ordem ?? 0) - (y.ordem ?? 0) || x.id - y.id;
+  vivos.sort(cmp);
+  const vale = new Map();
+  for (const a of vivos) vale.set(chaveApontamento(a.texto), a);   // o último (mais recente) prevalece
+  return vivos.filter((a) => vale.get(chaveApontamento(a.texto)) === a);
+}
+/** Quantitativos do checklist: total, resolvidas e % (null sem apontamentos: nunca "100%" sem itens). */
+export function resumoApontamentos(lista) {
+  const total = (lista || []).length, resolvidas = (lista || []).filter((a) => a.concluido).length;
+  return { total, resolvidas, pct: total ? Math.round((resolvidas / total) * 100) : null };
+}
+/** Quantitativos por unidade a partir dos apontamentos e relatórios do condomínio (mesma regra do relatório). */
+export function resumoPorUnidade(aps, rels) {
+  const relsU = new Map(), apsU = new Map();
+  for (const r of rels || []) { if (r.removido_em) continue; if (!relsU.has(r.unit_id)) relsU.set(r.unit_id, []); relsU.get(r.unit_id).push(r); }
+  for (const a of aps || []) { if (!apsU.has(a.unit_id)) apsU.set(a.unit_id, []); apsU.get(a.unit_id).push(a); }
+  const out = new Map();
+  for (const [unit, rs] of relsU) out.set(unit, { relatorios: rs.length, ...resumoApontamentos(checklistUnidade(apsU.get(unit) || [], rs)) });
+  return out;
+}
+/** Separa os apontamentos lidos de um PDF entre novos e já existentes no checklist (conferência antes de salvar). */
+export function conferirExtraidos(textos, checklist) {
+  const ja = new Map((checklist || []).map((a) => [chaveApontamento(a.texto), a]));
+  const vistos = new Set();
+  return (textos || []).map((texto) => {
+    const k = chaveApontamento(texto), existente = ja.get(k) || null, repetido = !existente && vistos.has(k);
+    vistos.add(k);
+    return { texto, existente, repetido, usar: !existente && !repetido && !!k };
+  });
 }

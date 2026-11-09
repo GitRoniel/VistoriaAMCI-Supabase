@@ -45,8 +45,10 @@ const FORMS = {
 // Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
 let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", nomes = [], salvando = "";
 let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null;
-// chaves: unitId → situação da chave (CM.situacao); comRelatorio: unidades com relatório enviado
+// chaves: unitId → situação da chave (CM.situacao); comRelatorio: unidades com relatório enviado;
+// apont: unitId → { total, resolvidas, pct } do checklist (mesma regra do relatório individual: M.checklistUnidade)
 let chaves = new Map(), chavesOk = false, chavesProj = null, cancelarChaves = null, recargaChaves = null, comRelatorio = new Set();
+let apont = new Map(), apontOk = false, cancelarRel = null, recargaRel = null;
 
 const hoje = () => host?.hoje?.() || new Date().toISOString().slice(0, 10);
 const podeEditar = () => ["admin", "revistorias"].includes(host?.papel());
@@ -86,8 +88,12 @@ function casca() {
       </div>
       <div class="ch-line rc-line2">
         <label class="fx-field fx-sel rc-f-lib"><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
-        <label class="fx-field fx-sel rc-f-exe"><span>Execução</span><select id="rcExe" aria-label="Execução">${M.FILTRO_EXECUCAO.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
         <label class="fx-field fx-sel rc-f-key"><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+      </div>
+      <div class="ch-line rc-exe-fil" role="group" aria-label="Filtrar por execução">
+        <span class="rc-exe-fil-t">Execução</span>
+        ${M.BOTOES_EXECUCAO.map((e) => `<button type="button" class="rc-exe-b" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i>${esc(e.sigla)}</i>${esc(e.label)}</button>`).join("")}
+        <button type="button" class="rc-exe-x" id="rcExeX" aria-label="Limpar filtro de execução" title="Mostrar todas as equipes" hidden>× Todas as equipes</button>
       </div>
       <div class="ch-line ch-chips">
         ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
@@ -102,7 +108,9 @@ function casca() {
   q("#rcBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; pintarConteudo(); });
   q("#rcBusca").addEventListener("input", (e) => { filt.busca = e.target.value; pintarConteudo(); });
   q("#rcLib").addEventListener("change", (e) => { filt.liberado = e.target.value; sincronizarFiltros(); pintarConteudo(); });
-  q("#rcExe").addEventListener("change", (e) => { filt.execucao = e.target.value; sincronizarFiltros(); pintarConteudo(); });
+  // Execução: filtro rápido (um responsável por vez; clicar de novo mostra todas). Não atribui nada.
+  root.querySelectorAll("[data-exe-f]").forEach((b) => b.addEventListener("click", () => { filt.execucao = M.alternarExecucao(filt.execucao, b.dataset.exeF); sincronizarFiltros(); pintarConteudo(); }));
+  q("#rcExeX").addEventListener("click", () => { filt.execucao = ""; sincronizarFiltros(); pintarConteudo(); });
   q("#rcChave").addEventListener("change", (e) => { filt.chave = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcData").addEventListener("input", (e) => { filt.data = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcDataX").addEventListener("click", () => { filt.data = ""; sincronizarFiltros(); pintarConteudo(); });
@@ -115,12 +123,14 @@ function casca() {
 function sincronizarFiltros() {
   const q = (id) => root.querySelector(id); if (!q("#rcBloco")) return;
   q("#rcBloco").value = filt.bloco; if (q("#rcBusca").value !== filt.busca) q("#rcBusca").value = filt.busca;
-  q("#rcLib").value = filt.liberado; q("#rcExe").value = filt.execucao; q("#rcChave").value = filt.chave;
+  q("#rcLib").value = filt.liberado; q("#rcChave").value = filt.chave;
+  root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = b.dataset.exeF === filt.execucao; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  q("#rcExeX").hidden = !filt.execucao;
   if (q("#rcData").value !== filt.data) q("#rcData").value = filt.data;
   q("#rcDataX").hidden = !filt.data; q("#rcData").closest("label").classList.toggle("on", !!filt.data);
   q("#rcChave").closest("label").classList.toggle("on", !!filt.chave);
   q("#rcHr span").textContent = `Horário ${filt.hrSort === "asc" ? "↑" : "↓"}`;
-  q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado); q("#rcExe").closest("label").classList.toggle("on", !!filt.execucao);
+  q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado);
   root.querySelectorAll(".rc-fr").forEach((b) => b.classList.toggle("active", filt.rapido === b.dataset.fr));
   root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
   q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos" && !filt.liberado && !filt.execucao && !filt.chave && !filt.data;
@@ -196,10 +206,24 @@ function htmlLista(vis, total) {
       <td class="ch-c-resp rc-c-resp">${esc(resp) || '<span class="ch-mut">—</span>'}</td>
       <td class="rc-c-n" title="Revistorias realizadas">${s.realizadas}${s.lista.length > s.realizadas ? `<small>${s.lista.length} agend.</small>` : ""}</td>
       <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
+      ${celulasApontamentos(u.unitId)}
       <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini${comRelatorio.has(u.unitId) ? " rc-tem-rel" : ""}" ${attrs} data-acao="relatorio" title="${comRelatorio.has(u.unitId) ? "Relatório enviado" : "Sem relatório enviado"}">Relatório</button><button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
     </tr>`;
   };
-  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Chave</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Chave</th><th title="Apontamentos no checklist do relatório da unidade">Qtd. Apont.</th><th title="Apontamentos marcados como resolvidos no checklist">Qtd. Resolvidas</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+}
+
+/** Qtd. Apontamentos e Qtd. Resolvidas (com progresso): "—" sem relatório ou sem apontamentos, nunca 100% vazio. */
+function celulasApontamentos(unitId) {
+  const r = apont.get(unitId);
+  if (!apontOk) return `<td class="rc-c-ap"><span class="ch-mut">…</span></td><td class="rc-c-res"><span class="ch-mut">…</span></td>`;
+  if (!r || !r.total) {
+    const t = r ? "Relatório sem apontamentos no checklist" : "Sem relatório enviado";
+    return `<td class="rc-c-ap" title="${t}"><span class="ch-mut">—</span></td><td class="rc-c-res" title="${t}"><span class="ch-mut">—</span></td>`;
+  }
+  const cls = r.resolvidas === r.total ? " ok" : r.resolvidas ? "" : " zero";
+  return `<td class="rc-c-ap" title="${r.total} apontamento(s) no checklist"><b>${r.total}</b></td>
+      <td class="rc-c-res${cls}" title="${r.resolvidas} de ${r.total} resolvido(s) (${r.pct}%)"><span class="rc-res"><b>${r.resolvidas}/${r.total}</b><span class="rc-prog" aria-hidden="true"><i style="width:${r.pct}%"></i></span><small>${r.pct}%</small></span></td>`;
 }
 
 function htmlMapa(lista, ok) {
@@ -550,13 +574,25 @@ async function carregarChaves() {
     const oc = new Map(d.ocorrencias.map((o) => [o.unit_id, o]));
     chaves = new Map(d.unidades.map((r) => [r.unit_id, CM.situacao(r, oc.get(r.unit_id))])); chavesOk = true;
   } catch (err) { console.warn("Revistoria: status da chave indisponível", err); chavesOk = false; }
-  try { comRelatorio = await S.unidadesComRelatorio(host.sb, pid); } catch { comRelatorio = new Set(); }
+  await carregarRelatorios(false);
   if (root?.isConnected) { pintarConteudo(); if (cur && !preenchendo() && !ocupado) pintarPopup(); }
 }
+/** Relatórios e apontamentos do condomínio → botão Relatório e colunas Qtd. Apontamentos / Qtd. Resolvidas. */
+async function carregarRelatorios(repintar = true) {
+  if (!host?.sb || !host.project) return;
+  const pid = host.project.id;
+  try {
+    const [rels, aps] = await Promise.all([S.relatoriosCondominio(host.sb, pid), S.apontamentosCondominio(host.sb, pid)]);
+    if (host?.project?.id !== pid) return;
+    comRelatorio = new Set(rels.map((r) => r.unit_id)); apont = M.resumoPorUnidade(aps, rels); apontOk = true;
+  } catch (err) { console.warn("Revistoria: apontamentos indisponíveis", err); if (host?.project?.id === pid) { comRelatorio = new Set(); apont = new Map(); apontOk = true; } }
+  if (repintar && root?.isConnected) pintarConteudo();
+}
+function agendarRelatorios() { clearTimeout(recargaRel); recargaRel = setTimeout(() => carregarRelatorios(), 300); }
 function agendarChaves() { clearTimeout(recargaChaves); recargaChaves = setTimeout(carregarChaves, 400); }
 function abrirRel(b, p, a) {
   const u = todasUnidades().find((x) => x.b === b && x.p === p && x.a === a); if (!u) return;
-  abrirRelatorio({ host, u, podeEditar: podeEditar(), aoMudar: () => agendarChaves() });
+  abrirRelatorio({ host, u, podeEditar: podeEditar(), aoMudar: () => agendarRelatorios() });
 }
 async function transferirChave(f) {
   const u = todasUnidades().find((x) => x.unitId === cur?.unitId); if (!u) return;
@@ -580,7 +616,7 @@ const api = {
     if (!root || !host.project) return;
     if (projId !== host.project.id) {
       filt = FILTRO0(); nomes = []; projId = host.project.id; delete root.dataset.proj;
-      chaves = new Map(); chavesOk = false; comRelatorio = new Set();
+      chaves = new Map(); chavesOk = false; comRelatorio = new Set(); apont = new Map(); apontOk = false;
       if (pop?.classList.contains("open")) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); }
     }
     pintar();
@@ -588,6 +624,9 @@ const api = {
     if (chavesProj !== host.project.id) {
       cancelarChaves?.(); cancelarChaves = null; chavesProj = host.project.id;
       if (host.sb) { try { cancelarChaves = CS.assinar(host.sb, chavesProj, agendarChaves); } catch { cancelarChaves = null; } }
+      // apontamentos marcados/desmarcados em qualquer aparelho atualizam a Lista
+      cancelarRel?.(); cancelarRel = null;
+      if (host.sb) { try { cancelarRel = S.assinarRelatorios(host.sb, chavesProj, agendarRelatorios); } catch { cancelarRel = null; } }
     }
     carregarChaves();
   },
@@ -598,7 +637,7 @@ const api = {
     if (root.dataset.proj !== String(host.project?.id)) { pintar(); return; }
     pintarConteudo(); if (cur && !preenchendo() && !ocupado) pintarPopup();
   },
-  reset() { cancelarChaves?.(); cancelarChaves = null; chavesProj = null; chaves = new Map(); chavesOk = false; projId = null; nomes = []; if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
+  reset() { cancelarChaves?.(); cancelarChaves = null; cancelarRel?.(); cancelarRel = null; chavesProj = null; chaves = new Map(); chavesOk = false; apont = new Map(); apontOk = false; projId = null; nomes = []; if (pop) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); } if (root) { root.innerHTML = ""; delete root.dataset.proj; } }
 };
 window.AmciRevCliente = api;
 export default api;
