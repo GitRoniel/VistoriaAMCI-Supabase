@@ -37,3 +37,7 @@ export const cancelar = (sb, a) => rpc(sb, "revistoria_cancelar", { p_unit_id: a
 export const resultado = (sb, a) => rpc(sb, "revistoria_resultado", { p_unit_id: a.unitId, p_resultado: a.resultado, p_realizada_em: a.realizada,
   p_responsavel: a.responsavel || "", p_observacoes: a.obs || "", p_versao: a.versao, p_pedido: a.pedido });
 export const reabrir = (sb, a) => rpc(sb, "revistoria_reabrir", { p_unit_id: a.unitId, p_motivo: a.obs || "", p_versao: a.versao, p_pedido: a.pedido });
+/** Libera (true) ou retira a liberação (false) para a execução dos serviços. */
+export const liberar = (sb, a) => rpc(sb, "revistoria_liberar", { p_unit_id: a.unitId, p_liberado: a.liberado, p_pedido: a.pedido });
+/** Define quem executa (null = remove); anterior = o que a tela mostrava. */
+export const execucao = (sb, a) => rpc(sb, "revistoria_execucao", { p_unit_id: a.unitId, p_execucao: a.execucao || null, p_anterior: a.anterior || null, p_pedido: a.pedido });

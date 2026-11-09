@@ -19,6 +19,35 @@ export const EM_REVISTORIA = { key: "em_revistoria", label: "Em Revistoria", cor
 export const STATUS_ORDEM = ["Em andamento", "Agendado", "Aprovado"];
 export const info = (status) => STATUS[status] || SEM_REGISTRO;
 
+// Execução dos serviços (revistorias_cliente.execucao): equipe e responsável. Cores próprias, diferentes
+// das cores de status (o status pinta a unidade; a execução aparece como selo com a inicial).
+export const EXECUCOES = [
+  { key: "MOP_FELIPE", equipe: "M.O.P", responsavel: "Felipe", sigla: "F", cor: "#7b4fc9" },
+  { key: "MOP_RENATO", equipe: "M.O.P", responsavel: "Renato", sigla: "R", cor: "#c2185b" },
+  { key: "EMP_OSCAR", equipe: "EMP", responsavel: "Oscar", sigla: "O", cor: "#00838f" },
+  { key: "EMP_NILSON", equipe: "EMP", responsavel: "Nilson", sigla: "N", cor: "#8d5524" }
+];
+export const EQUIPES = ["M.O.P", "EMP"];
+export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
+export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
+/** Opções do filtro Execução: todas, por equipe, por responsável e sem execução. */
+export const FILTRO_EXECUCAO = [
+  { key: "", label: "Todas" },
+  ...EQUIPES.map((q) => ({ key: "equipe:" + q, label: `Equipe ${q}` })),
+  ...EXECUCOES.map((e) => ({ key: e.key, label: `${e.responsavel} (${e.equipe})` })),
+  { key: "sem", label: "Sem execução" }
+];
+export const FILTRO_LIBERADO = [{ key: "", label: "Todos" }, { key: "sim", label: "Liberados" }, { key: "nao", label: "Não liberados" }];
+export function passaExecucao(chave, execucao) {
+  if (!chave) return true;
+  if (chave === "sem") return !execucao;
+  if (chave.startsWith("equipe:")) return execInfo(execucao)?.equipe === chave.slice(7);
+  return execucao === chave;
+}
+export function passaLiberado(chave, liberado) {
+  return !chave || (chave === "sim" ? !!liberado : !liberado);
+}
+
 // Filtros rápidos (iguais nas abas Vistoria e Revistoria · Cliente, cada uma no seu contexto).
 export const FILTROS = [
   { key: "todos", label: "Todos", cor: "#1f4a3f" },
@@ -70,12 +99,15 @@ const ordNum = (x, y) => (x.numero || 0) - (y.numero || 0);
 export function situacao(a, ags = []) {
   const lista = [...(ags || [])].sort(ordNum);
   const realizadas = lista.filter((r) => REALIZADAS.includes(r.status));
-  if (!a) return { status: "", info: SEM_REGISTRO, lista, realizadas: realizadas.length, aberto: null, ultima: realizadas.at(-1) || null, ciclo: 0, versao: null };
+  if (!a) return { status: "", info: SEM_REGISTRO, lista, realizadas: realizadas.length, aberto: null, ultima: realizadas.at(-1) || null, ciclo: 0, versao: null,
+    liberado: false, execucao: null };
   const aberto = a.status === "Agendado" ? lista.filter((r) => ABERTOS.includes(r.status)).at(-1) || null : null;
   return {
     status: a.status, info: info(a.status), ciclo: a.ciclo || 1, versao: a.versao ?? null, lista,
     realizadas: realizadas.length, aberto, ultima: realizadas.at(-1) || null,
-    entrouEm: a.entrou_em || "", atualizadoEm: a.atualizado_em || "", atualizadoPor: a.atualizado_email || ""
+    entrouEm: a.entrou_em || "", atualizadoEm: a.atualizado_em || "", atualizadoPor: a.atualizado_email || "",
+    liberado: !!a.liberado, liberadoEm: a.liberado_em || "", liberadoPor: a.liberado_por || "",
+    execucao: execInfo(a.execucao) ? a.execucao : null, execucaoEm: a.execucao_em || "", execucaoPor: a.execucao_por || ""
   };
 }
 
@@ -84,11 +116,11 @@ export const proxima = (s) => (s?.aberto?.data ? String(s.aberto.data).slice(0, 
 
 /** Indicadores da aba. */
 export function indicadores(unidades, hoje = "") {
-  const out = { total: 0, "Em andamento": 0, Agendado: 0, Aprovado: 0, realizadas: 0, hoje: 0, semana: 0 };
+  const out = { total: 0, "Em andamento": 0, Agendado: 0, Aprovado: 0, realizadas: 0, hoje: 0, semana: 0, liberados: 0 };
   const fim = hoje ? somaDias(hoje, 7) : "";
   for (const u of unidades) {
     const s = u.situacao; if (!s?.status) continue;
-    out.total++; out[s.status]++; out.realizadas += s.realizadas;
+    out.total++; out[s.status]++; out.realizadas += s.realizadas; if (s.liberado) out.liberados++;
     const d = proxima(s);
     if (d && hoje && d === hoje) out.hoje++;
     if (d && hoje && d >= hoje && d <= fim) out.semana++;
@@ -110,9 +142,11 @@ export function comparar(x, y, ordemUnidade = () => 0) {
 }
 
 const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
-/** Filtros da aba: bloco, busca (unidade ou cliente) e filtro rápido. */
+/** Filtros da aba: bloco, busca (unidade ou cliente), filtro rápido, liberado e execução (todos juntos). */
 export function passaFiltros(u, f) {
   if (f.bloco && f.bloco !== "ALL" && u.b !== f.bloco) return false;
+  if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
+  if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
   if (!passaFiltroRapido(f.rapido, { vistoria: u.vistoria, revistoria: u.situacao?.status }, "revistoria")) return false;
   const q = norm(f.busca).replace(/\s/g, "");
   if (q) {
@@ -171,12 +205,15 @@ export function acoes(status, podeEditar) {
 const TITULOS = {
   entrada: "Entrou na Revistoria · Cliente", agendamento: "Revistoria agendada", remarcacao: "Revistoria remarcada",
   cancelamento: "Agendamento cancelado", reabertura: "Reaberta: novas pendências", vistoria: "Mudança na aba Vistoria",
-  planilha: "Planilha de vistorias"
+  planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução"
 };
 export function descreverEvento(e) {
   let titulo = TITULOS[e.tipo] || e.tipo;
   if (e.tipo === "resultado") titulo = e.status_novo === "Aprovado" ? "Revistoria aprovada" : "Revistoria reprovada";
+  if (e.tipo === "liberacao") titulo = /retirada/i.test(e.descricao || "") ? "Liberação retirada" : "Liberada para execução";
   const por = e.registrado_email === "migração" ? "situação inicial" : e.registrado_email || "sistema";
   return { titulo, de: e.status_anterior || "", para: e.status_novo || "", ciclo: e.ciclo || 1, texto: e.descricao || "", quando: e.registrado_em, por,
-    cor: e.tipo === "resultado" && e.status_novo !== "Aprovado" ? "#d64545" : e.tipo === "cancelamento" ? "#8a948f" : info(e.status_novo).borda };
+    mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao",
+    cor: e.tipo === "resultado" && e.status_novo !== "Aprovado" ? "#d64545" : e.tipo === "cancelamento" ? "#8a948f"
+      : e.tipo === "liberacao" ? "#0f3b31" : e.tipo === "execucao" ? "#7b4fc9" : info(e.status_novo).borda };
 }

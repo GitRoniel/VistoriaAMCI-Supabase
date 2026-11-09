@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 const cfg = { host: process.env.PGHOST || '/var/tmp', port: Number(process.env.PGPORT || 55432), user: 'postgres', database: 'amci' };
 const MIG = resolve(import.meta.dirname, '../../../supabase/migrations/20261105120000_revistoria_cliente.sql');
+const MIG2 = resolve(import.meta.dirname, '../../../supabase/migrations/20261109120000_revistoria_liberacao_execucao.sql');
 const admin = new pg.Client(cfg); await admin.connect();
 let fail = 0; const ok = (c, m) => { console.log((c ? '✔' : '✘') + ' ' + m); if (!c) fail++; };
 const q = (sql, p) => admin.query(sql, p);
@@ -52,6 +53,7 @@ const antes = { insp: (await q(`select count(*)::int n from client_inspections`)
 console.log('— Migration e situação inicial');
 await q(readFileSync(MIG, 'utf8'));
 await q(readFileSync(MIG, 'utf8')); // de novo: não duplica nada
+await q(readFileSync(MIG2, 'utf8')); await q(readFileSync(MIG2, 'utf8'));
 ok((await q(`select count(*)::int n from client_inspections`)).rows[0].n === antes.insp, 'vistorias preservadas');
 let a = await acomp(A102); ok(a?.status === 'Em andamento' && a.ciclo === 1, '9) A-102 (vistoria Revistoria) → Em andamento, ciclo 1');
 ok(a.inspection_id === (await q(`select id from client_inspections where unit_id=$1`, [A102])).rows[0].id, 'ligada à vistoria original (client_inspections.id)');
@@ -151,6 +153,34 @@ r = await as(U.adm_j, `select public.aplicar_importacao_agendamentos($1,$2,$3,$4
 a = await acomp(A106); ok(!r.error && a.status === 'Aprovado', 'planilha marca Aprovada → Aprovado: ' + (r.error || ''));
 ok((await insp(A106)).status === 'Revistoria', 'importação não muda o status da vistoria');
 ok((await evs(A106)).some((x) => x.tipo === 'planilha'), 'evento "planilha" no histórico');
+
+console.log('— Liberação e execução (20261109120000)');
+const lib = (user, uid, v, pedido = null) => rpc(user, 'revistoria_liberar', [uid, v, pedido]);
+const exe = (user, uid, v, ant, pedido = null) => rpc(user, 'revistoria_execucao', [uid, v, ant, pedido]);
+a = await acomp(A107); ok(a.liberado === false && a.execucao === null, 'unidades começam não liberadas e sem execução');
+r = await lib(U.vis_j, A107, true); ok(/não permite/.test(r.error), 'visitante não libera');
+r = await exe(U.adm_b, A107, 'MOP_FELIPE', null); ok(/não permite/.test(r.error), 'admin de outro condomínio não define execução');
+r = await as(U.adm_j, `update revistorias_cliente set liberado=true where unit_id=$1`, [A107]); ok(/permission denied/.test(r.error), 'update direto da liberação bloqueado');
+r = await lib(U.rev_j, A104, true); ok(/não está na Revistoria/.test(r.error), 'unidade fora da aba recusada');
+const vAntes = await ver(A107);
+const pl = '22222222-2222-4222-8222-222222222222';
+r = await lib(U.rev_j, A107, true, pl); a = await acomp(A107);
+ok(r.r?.ok && a.liberado === true && /@rvc\.teste$/.test(a.liberado_por) && a.liberado_em, 'revistorias libera: liberado, com quem e quando');
+ok(Number(a.versao) === vAntes && a.status === 'Agendado', 'liberar não muda a situação nem a versão dos agendamentos');
+r = await lib(U.rev_j, A107, true, pl); ok(r.r?.repetido, 'pedido repetido não duplica');
+r = await lib(U.adm_j, A107, true); ok(r.r?.sem_mudanca, 'liberar o que já está liberado: nada a gravar');
+r = await exe(U.adm_j, A107, 'XYZ', null); ok(/opções/.test(r.error), 'execução fora da lista recusada');
+r = await exe(U.adm_j, A107, 'MOP_FELIPE', null); a = await acomp(A107); ok(r.r?.ok && a.execucao === 'MOP_FELIPE', 'execução: M.O.P · Felipe');
+r = await exe(U.rev_j, A107, 'EMP_OSCAR', null); ok(/outra pessoa/.test(r.error) && (await acomp(A107)).execucao === 'MOP_FELIPE', 'tela desatualizada (anterior diferente) recusada');
+r = await exe(U.rev_j, A107, 'EMP_OSCAR', 'MOP_FELIPE'); ok((await acomp(A107)).execucao === 'EMP_OSCAR', 'troca para EMP · Oscar');
+r = await exe(U.rev_j, A107, null, 'EMP_OSCAR'); ok((await acomp(A107)).execucao === null, 'remove a execução');
+await exe(U.rev_j, A107, 'EMP_NILSON', null); await lib(U.rev_j, A107, false);
+a = await acomp(A107); ok(a.liberado === false && a.execucao === 'EMP_NILSON', 'retira a liberação; execução continua');
+e = await evs(A107); const ev2 = e.filter((x) => ['liberacao', 'execucao'].includes(x.tipo));
+ok(ev2.length === 6 && ev2.some((x) => /antes: M\.O\.P · Felipe/.test(x.descricao)), 'histórico com cada liberação/execução: ' + ev2.length);
+r = await as(U.vis_j, `select count(*)::int n from revistorias_cliente where liberado or execucao is not null`); ok(r.rows?.[0].n === 1, 'visitante lê liberação e execução');
+r = await agendar(U.rev_j, A107, amanha, 'Fábio', await ver(A107)); ok(!r.error || /aprovada/.test(r.error), 'agendamentos seguem funcionando: ' + (r.error || 'ok'));
+ok((await q(`select count(*)::int n from revistorias_cliente`)).rows[0].n === (await q(`select count(distinct unit_id)::int n from revistorias_cliente`)).rows[0].n, 'sem linha duplicada por unidade');
 
 console.log('— Dados antigos e cascata');
 ok((await q(`select count(*)::int n from revistorias where origem='PLANILHA'`)).rows[0].n === antes.revs, 'revistoria antiga da planilha preservada');

@@ -12,7 +12,7 @@ import * as M from "./model.js";
 import * as S from "./service.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos" });
+const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "" });
 const pad = (n) => String(n).padStart(2, "0");
 const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const fmtD = (d) => { const p = String(d || "").slice(0, 10).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
@@ -35,7 +35,8 @@ const FORMS = {
   reabrir: { botao: "Reabrir", ok: "Reabrir revistoria" }
 };
 
-let host = null, root = null, projId = null, filt = FILTRO0(), modo = "lista", nomes = [];
+// Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
+let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", nomes = [], salvando = "";
 let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null;
 
 const hoje = () => host?.hoje?.() || new Date().toISOString().slice(0, 10);
@@ -50,6 +51,9 @@ const nomeUnidade = (u) => (host.casa() ? `Casa ${+u.a}` : `Apto ${u.codigo}`);
 const localUnidade = (u) => (host.casa() ? `Conjunto ${u.b}` : `Bloco ${u.b} · ${host.grid().pavLabel[u.p] || u.p}`);
 const rotuloLista = (u) => (host.casa() ? `Conj. ${u.b} · Casa ${+u.a}` : `Bloco ${u.b} · ${u.codigo}`);
 const vistPill = (c) => { const vc = host.vistoriaCor(c); return `<span class="ch-vpill rc-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(c))}</span>`; };
+// Liberação e execução (selos no mapa, colunas na lista, controles no painel).
+const execPill = (key, extra = "") => { const e = M.execInfo(key); return e ? `<span class="rc-exec${extra}" style="--c:${e.cor}"><i>${esc(e.sigla)}</i>${esc(e.equipe)} · ${esc(e.responsavel)}</span>` : '<span class="ch-mut">—</span>'; };
+const libPill = (lib) => (lib ? '<span class="rc-lib on">✓ Liberado</span>' : '<span class="rc-lib">Não liberado</span>');
 const quandoAg = (r) => (r ? [fmtD(r.data), hhmm(r.horario)].filter(Boolean).join(" · ") : "");
 
 /* ── tela ── */
@@ -60,7 +64,9 @@ function casca() {
       <div class="ch-line">
         <label class="fx-field fx-sel"><span>${esc(host.grupo())}</span><select id="rcBloco" aria-label="${esc(host.grupo())}"><option value="ALL">Todos</option>${host.grupos().map((b) => `<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select></label>
         <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="rcBusca" type="search" placeholder="${host.casa() ? "Casa ou cliente" : "Unidade (ex.: 604 ou A604) ou cliente"}" aria-label="Buscar unidade ou cliente" autocomplete="off"></label>
-        <div class="modetog ch-modo" role="tablist" aria-label="Visualização"><button type="button" data-modo="lista">Lista</button><button type="button" data-modo="mapa">Mapa</button></div>
+        <label class="fx-field fx-sel rc-f-lib"><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
+        <label class="fx-field fx-sel rc-f-exe"><span>Execução</span><select id="rcExe" aria-label="Execução">${M.FILTRO_EXECUCAO.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+        <div class="modetog ch-modo" role="tablist" aria-label="Visualização"><button type="button" data-modo="mapa">Mapa</button><button type="button" data-modo="lista">Lista</button></div>
       </div>
       <div class="ch-line ch-chips">
         ${M.FILTROS.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
@@ -73,19 +79,25 @@ function casca() {
   const q = (id) => root.querySelector(id);
   q("#rcBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; pintarConteudo(); });
   q("#rcBusca").addEventListener("input", (e) => { filt.busca = e.target.value; pintarConteudo(); });
+  q("#rcLib").addEventListener("change", (e) => { filt.liberado = e.target.value; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcExe").addEventListener("change", (e) => { filt.execucao = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcLimpar").addEventListener("click", () => { filt = FILTRO0(); sincronizarFiltros(); pintarConteudo(); });
   if (!root.dataset.ouvindo) { root.addEventListener("click", cliqueRaiz); root.dataset.ouvindo = "1"; }
 }
 function sincronizarFiltros() {
   const q = (id) => root.querySelector(id); if (!q("#rcBloco")) return;
   q("#rcBloco").value = filt.bloco; if (q("#rcBusca").value !== filt.busca) q("#rcBusca").value = filt.busca;
+  q("#rcLib").value = filt.liberado; q("#rcExe").value = filt.execucao;
+  q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado); q("#rcExe").closest("label").classList.toggle("on", !!filt.execucao);
   root.querySelectorAll(".rc-fr").forEach((b) => b.classList.toggle("active", filt.rapido === b.dataset.fr));
   root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
-  q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos";
+  q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos" && !filt.liberado && !filt.execucao;
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-rcu]");
   if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u, u.dataset.acao || ""); return; }
+  const kl = e.target.closest("[data-kpi-lib]");
+  if (kl) { filt.liberado = filt.liberado === "sim" ? "" : "sim"; sincronizarFiltros(); pintarConteudo(); return; }
   const fr = e.target.closest("[data-fr]");
   if (fr) { filt.rapido = fr.dataset.fr === filt.rapido && fr.matches("[data-kpi]") ? "todos" : fr.dataset.fr; sincronizarFiltros(); pintarConteudo(); return; }
   const md = e.target.closest("[data-modo]");
@@ -116,6 +128,7 @@ function pintarConteudo() {
     kpi("em_andamento", ind["Em andamento"], "Em andamento", M.STATUS["Em andamento"].borda, "Aguardando agendamento") +
     kpi("agendados", ind.Agendado, "Agendados", M.STATUS.Agendado.borda, "Revistoria marcada") +
     kpi("aprovados", ind.Aprovado, "Aprovados", M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
+    `<button type="button" class="ch-kpi${filt.liberado === "sim" ? " on" : ""}" data-kpi-lib style="--c:#0f3b31" title="Unidades liberadas para a execução dos serviços"><b>${ind.liberados}</b><span>Liberados</span></button>` +
     `<div class="ch-kpi k-info" style="--c:#6b8040" title="Revistorias já realizadas (aprovadas ou reprovadas)"><b>${ind.realizadas}</b><span>Revistorias realizadas</span></div>` +
     `<div class="ch-kpi k-info" style="--c:#2459b5" title="Revistorias agendadas para hoje e os próximos 7 dias"><b>${ind.semana}</b><span>Próximos 7 dias${ind.hoje ? ` · ${ind.hoje} hoje` : ""}</span></div>`;
   root.querySelector("#rcCount").textContent = `${vis.length} de ${naAba.length} unidade(s)`;
@@ -142,13 +155,15 @@ function htmlLista(vis, total) {
       <td class="ch-c-un rc-c-un"><b>${esc(rotuloLista(u))}</b>${u.cliente ? `<small>${esc(u.cliente)}</small>` : ""}</td>
       <td class="rc-c-st">${badge(s.status)}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>
       <td class="rc-c-vst">${vistPill(u.vistoria)}</td>
+      <td class="rc-c-lib">${libPill(s.liberado)}</td>
+      <td class="rc-c-exe">${execPill(s.execucao)}</td>
       <td class="ch-c-dt rc-c-dt">${quando}</td>
       <td class="ch-c-resp rc-c-resp">${esc(resp) || '<span class="ch-mut">—</span>'}</td>
       <td class="rc-c-n" title="Revistorias realizadas">${s.realizadas}${s.lista.length > s.realizadas ? `<small>${s.lista.length} agend.</small>` : ""}</td>
       <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
     </tr>`;
   };
-  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
 }
 
 function htmlMapa(lista, ok) {
@@ -158,9 +173,11 @@ function htmlMapa(lista, ok) {
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
     const s = u.situacao, i = s.info;
     const tip = [u.titulo, s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
-      s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
+      s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
+      s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
+    const ex = M.execInfo(s.execucao);
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}</button>`;
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}</button>`;
   };
   const g = host.grid();
   let h;
@@ -178,6 +195,8 @@ function htmlMapa(lista, ok) {
   return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.STATUS[s].cor};border-color:${M.STATUS[s].borda}"></span>${M.STATUS[s].label}</div>`).join("")}
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
     <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
+    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
+    ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
 }
 
@@ -274,15 +293,19 @@ function pintarPopup() {
       </div>
     </div>
     <div class="pp-body ch-body">
+      <div class="rc-loc"><div><span>Condomínio</span><b>${esc(host.project.name)}</b></div><div><span>${esc(host.grupo())}</span><b>${esc(u.b)}</b></div><div><span>${host.casa() ? "Casa" : "Apartamento"}</span><b>${esc(host.casa() ? +u.a : u.codigo)}</b></div></div>
       <div class="ch-now">
         <div class="ch-now-st"><span>Revistoria · Cliente</span>${badge(s.status, " lg")}${s.status ? `<small>${s.ciclo}º ciclo</small>` : ""}</div>
         <div><span>Status da vistoria</span>${vistPill(u.vistoria)}</div>
+        ${s.status ? `<div><span>Liberação</span>${libPill(s.liberado)}${s.liberadoEm ? `<small>${fmtDH(s.liberadoEm)}${s.liberadoPor ? ` · ${esc(s.liberadoPor)}` : ""}</small>` : ""}</div>
+        <div><span>Execução · equipe / responsável</span>${s.execucao ? `${execPill(s.execucao, " lg")}<small>Equipe ${esc(M.execInfo(s.execucao).equipe)} · Responsável ${esc(M.execInfo(s.execucao).responsavel)}</small>` : "<b>Não definida</b>"}</div>` : ""}
         <div><span>Cliente</span><b>${esc(u.cliente) || "—"}</b></div>
         <div><span>Revistorias realizadas</span><b>${s.realizadas}</b>${s.lista.length ? `<small>${s.lista.length} agendamento(s)</small>` : ""}</div>
         <div class="rc-now-prox"><span>${s.aberto ? "Próxima revistoria" : "Última revistoria"}</span>${prox}</div>
         <div><span>Última alteração</span><b>${s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—"}</b>${s.atualizadoPor ? `<small>por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}</small>` : ""}</div>
       </div>
       ${!s.status ? `<div class="pp-ro">Esta unidade não está na Revistoria · Cliente. Ela entra automaticamente, como <b>Em andamento</b>, quando o status da vistoria passa a <b>Revistoria</b>.</div>` : ""}
+      ${s.status && podeEditar() ? htmlOperacao(s) : ""}
       ${botoes ? `<div class="ch-btns">${botoes}</div>` : ""}
       ${s.status && !podeEditar() ? `<div class="pp-ro">Seu acesso a este condomínio é de consulta: agendamentos e resultados são registrados por administradores e pela equipe de revistorias.</div>` : ""}
       ${FORMS[painel] ? htmlForm(u, painel) : ""}
@@ -292,6 +315,37 @@ function pintarPopup() {
   if (painel === "resultado") ajustarResultado();
   if (painel === "historico") pintarHistorico();
   if (aviso) mostrarAviso(aviso.msg, aviso.tipo);
+}
+
+/** Controles de liberação e execução (gravam na hora, sem formulário). */
+function htmlOperacao(s) {
+  const dis = salvando ? " disabled" : "";
+  return `<div class="rc-op">
+      <div class="rc-op-row"><span class="rc-op-t">Liberado para execução</span>
+        <button type="button" class="rc-tog${s.liberado ? " on" : ""}" role="switch" aria-checked="${s.liberado}" data-lib="${!s.liberado}"${dis}><i></i>${s.liberado ? "Liberado" : "Não liberado"}</button></div>
+      <div class="rc-op-row rc-op-exe"><span class="rc-op-t">Execução</span>
+        <div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.EXECUCOES.map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}
+        ${s.execucao ? `<button type="button" class="rc-exe-opt rc-exe-none" data-exe=""${dis}><span>Remover</span></button>` : ""}</div></div>
+      ${salvando ? `<div class="rc-op-msg">Salvando…</div>` : ""}
+    </div>`;
+}
+async function salvarOperacao(tipo, valor) {
+  if (salvando || !cur) return;
+  const u = todasUnidades().find((x) => x.unitId === cur.unitId); if (!u?.situacao.status) return;
+  const s = u.situacao;
+  if (tipo === "execucao" && (valor || null) === (s.execucao || null)) return;
+  salvando = tipo; pintarPopup();
+  try {
+    const args = { unitId: u.unitId, pedido: novoPedido() };
+    const r = tipo === "liberacao" ? await S.liberar(host.sb, { ...args, liberado: valor })
+      : await S.execucao(host.sb, { ...args, execucao: valor || null, anterior: s.execucao || null });
+    host.toast(tipo === "liberacao" ? (valor ? "Unidade liberada para execução" : "Liberação retirada")
+      : valor ? `Execução: ${M.execRotulo(valor)}` : "Execução removida");
+    salvando = ""; await host.recarregar?.(r);
+  } catch (err) {
+    salvando = ""; host.toast(err.message || "Não foi possível salvar"); await host.recarregar?.();
+  }
+  pintarConteudo(); pintarPopup(); if (painel === "historico") carregarHistorico();
 }
 
 function htmlForm(u, tipo) {
@@ -354,7 +408,7 @@ function pintarHistorico() {
   if (!hist.length) { el.innerHTML = '<div class="ch-hist-empty">Nenhum registro para esta unidade.</div>'; return; }
   el.innerHTML = `<ol class="ch-hist-l">${hist.map((e) => {
     const d = M.descreverEvento(e);
-    const rota = d.de && d.de !== d.para ? `${badge(d.de, " sm")}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${badge(d.para, " sm")}` : badge(d.para, " sm");
+    const rota = d.mantemStatus ? "" : d.de && d.de !== d.para ? `${badge(d.de, " sm")}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${badge(d.para, " sm")}` : badge(d.para, " sm");
     return `<li style="--c:${d.cor}"><div class="ch-h1"><b>${esc(d.titulo)}</b><span class="ch-rota">${rota}</span><time>${fmtDH(d.quando)}</time></div>
       ${d.texto ? `<div class="ch-h2">${esc(d.texto)}</div>` : ""}<div class="ch-h4">${d.ciclo}º ciclo · registrado por ${esc(d.por)}</div></li>`;
   }).join("")}</ol>`;
@@ -366,6 +420,10 @@ function mostrarAviso(msg, tipo = "err") {
 function cliquePopup(e) {
   const t = e.target;
   if (t.closest("[data-close]")) { fechar(); return; }
+  const lb = t.closest("[data-lib]");
+  if (lb && !lb.disabled) { salvarOperacao("liberacao", lb.dataset.lib === "true"); return; }
+  const ex = t.closest("[data-exe]");
+  if (ex && !ex.disabled) { salvarOperacao("execucao", ex.dataset.exe); return; }
   const nav = t.closest("[data-nav]");
   if (nav) {
     const l = host.units(), i = l.findIndex((x) => x.b === cur.b && x.p === cur.p && x.a === cur.a), n = l[i + Number(nav.dataset.nav)];
@@ -417,8 +475,9 @@ async function enviar() {
 /* ── API para a tela de Vistorias ── */
 const api = {
   /** Mostra a aba. */
-  show(h) {
+  show(h, entrando = false) {
     host = h; root = document.getElementById("revcliRoot");
+    if (entrando) modo = "mapa";   // ao abrir (ou voltar para) a aba, o Mapa é a visualização principal
     if (!root || !host.project) return;
     if (projId !== host.project.id) {
       filt = FILTRO0(); nomes = []; projId = host.project.id; delete root.dataset.proj;
