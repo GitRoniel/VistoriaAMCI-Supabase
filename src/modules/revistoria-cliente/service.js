@@ -64,7 +64,7 @@ async function todas(consulta, tamanho = 1000) {
 }
 /** Relatórios ativos do condomínio (botão Relatório e quantitativos da lista). */
 export async function relatoriosCondominio(sb, projectId) {
-  const rels = await todas(() => sb.from("revistorias_relatorios").select("id,unit_id,enviado_em,removido_em").eq("project_id", projectId).order("id", { ascending: true }));
+  const rels = await todas(() => sb.from("revistorias_relatorios").select("id,unit_id,nome_arquivo,tamanho,enviado_em,removido_em").eq("project_id", projectId).order("id", { ascending: true }));
   return rels.filter((r) => !r.removido_em);
 }
 /** Apontamentos do condomínio: a mesma base do checklist do relatório (quantitativos da lista). */

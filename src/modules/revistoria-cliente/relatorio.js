@@ -65,8 +65,8 @@ export function extrair(paginas) {
       const n = norm(l.texto);
       // Cabeçalho do relatório e dados gerais
       if (!res.unidade) {
-        const m = /\bbl\s*([a-z0-9]{1,3})\s*-\s*apt?o?\s*(\d{1,5})\b/i.exec(l.texto);
-        if (m) res.unidade = { bloco: m[1].toUpperCase(), apto: m[2], texto: `BL ${m[1].toUpperCase()} - APT ${m[2]}` };
+        const m = /\bbl\s*([a-z0-9]{1,3})\s*-\s*apt?o?\s*(t?\d{1,5})\b/i.exec(l.texto);
+        if (m) res.unidade = { bloco: m[1].toUpperCase(), apto: m[2].toUpperCase(), texto: `BL ${m[1].toUpperCase()} - APT ${m[2].toUpperCase()}` };
       }
       const mr = /^realizado\s+(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/i.exec(l.texto);
       if (mr) { res.realizado = `${mr[3]}-${mr[2]}-${mr[1]}`; res.hora = mr[4]; }
@@ -134,8 +134,32 @@ export function extrair(paginas) {
   return res;
 }
 
+/** Código do apartamento comparável: pavimento + número, térreo (T) = 0 (T03 → 3, 507 → 507), como na planilha. */
+export const codigoComparavel = (x) => {
+  const s = String(x ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/^T/, "0");
+  return /^\d+$/.test(s) ? String(Number(s)) : s;
+};
 /** Confere se o relatório é da unidade (bloco e apto, ex.: BL A - APT 507 × Bloco A, apto 507). */
 export function mesmaUnidade(unidadePdf, bloco, codigo) {
   if (!unidadePdf) return null;
-  return String(unidadePdf.bloco).toUpperCase() === String(bloco).toUpperCase() && Number(unidadePdf.apto) === Number(codigo);
+  return String(unidadePdf.bloco).toUpperCase() === String(bloco).toUpperCase() && codigoComparavel(unidadePdf.apto) === codigoComparavel(codigo);
+}
+/** Unidade pelo nome do arquivo (ex.: "BL_A_-_APT_507_RelatorioEntregaUnidade.pdf" → { bloco: "A", apto: "507" }). */
+export function unidadeDoNome(nome) {
+  const s = String(nome || "").replace(/\.pdf$/i, "");
+  const m = /(?:^|[^A-Z0-9])(?:BL|BLOCO)[\s_.-]*([A-Z0-9]{1,3})[\s_.-]+(?:APTO|APT|AP)[\s_.-]*(T?\d{1,5})(?![0-9])/i.exec(s);
+  return m ? { bloco: m[1].toUpperCase(), apto: m[2].toUpperCase(), texto: `BL ${m[1].toUpperCase()} - APT ${m[2].toUpperCase()}` } : null;
+}
+/**
+ * Unidade de um PDF do lote: pelo nome do arquivo e pelo cabeçalho do PDF.
+ * achar(ref) → unidade do condomínio (ou null). Retorna { unidade, situacao, msg }:
+ *   ok · divergente (nome e PDF apontam unidades diferentes) · nao_encontrada (não identificada / não existe).
+ */
+export function decidirUnidade(porNome, porPdf, achar) {
+  const un = porNome ? achar(porNome) : null, up = porPdf ? achar(porPdf) : null;
+  if (un && up && un !== up) return { unidade: null, situacao: "divergente", msg: `Nome do arquivo: ${porNome.texto} · PDF: ${porPdf.texto}` };
+  const u = up || un;
+  if (u) return { unidade: u, situacao: "ok", msg: up && un ? "nome do arquivo e PDF conferem" : up ? "identificada pelo PDF" : "identificada pelo nome do arquivo" };
+  const ref = porPdf || porNome;
+  return { unidade: null, situacao: "nao_encontrada", msg: ref ? `${ref.texto} não existe neste condomínio` : "unidade não identificada no nome nem no PDF" };
 }

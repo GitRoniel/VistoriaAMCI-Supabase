@@ -13,11 +13,11 @@ const pad = (n) => String(n).padStart(2, "0");
 const fmtD = (d) => { const p = String(d || "").slice(0, 10).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
 const fmtDH = (ts) => { if (!ts) return ""; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const MB = (n) => (!n ? "" : n < 1048576 ? Math.max(1, Math.round(n / 1024)) + " KB" : (n / 1048576).toFixed(n > 10485760 ? 0 : 1).replace(".", ",") + " MB");
-const LIMITE = 25 * 1048576;
+export const LIMITE = 25 * 1048576;
 
 let pdfjsP = null;
 /** pdf.js (versão legacy: Safari/iPhone mais antigos), carregado sob demanda de www/pdfjs. */
-function pdfjs() {
+export function pdfjs() {
   if (!pdfjsP) {
     const base = document.baseURI;
     const url = new URL("./pdfjs/pdf.min.js", base).href;
@@ -27,7 +27,7 @@ function pdfjs() {
   return pdfjsP;
 }
 /** Texto do PDF com posições (para o extrator). */
-async function lerTexto(doc) {
+export async function lerTexto(doc) {
   const paginas = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const tc = await (await doc.getPage(i)).getTextContent();
@@ -269,7 +269,10 @@ async function lerDoPdf() {
     pintarChecklist();
   } catch (err) { console.error(err); st.host.toast("Não foi possível ler o PDF"); }
 }
-const seguro = (s) => String(s || "relatorio").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").replace(/_+/g, "_").slice(0, 80) || "relatorio";
+export const seguro = (s) => String(s || "relatorio").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").replace(/_+/g, "_").slice(0, 80) || "relatorio";
+/** Caminho no Storage: <condomínio>/<bloco>/<apto>/<data>-<arquivo>.pdf (validado de novo pelo banco). */
+export const caminhoRelatorio = (host, u, nome) =>
+  `${host.project.id}/${seguro(u.b)}/${seguro(host.casa() ? String(+u.a) : u.codigo)}/${Date.now()}-${seguro(String(nome || "").replace(/\.pdf$/i, ""))}.pdf`;
 async function enviar(arq) {
   const u = st.u, host = st.host;
   if (!/\.pdf$/i.test(arq.name) && arq.type !== "application/pdf") { host.toast("Envie um arquivo PDF"); return; }
@@ -288,7 +291,7 @@ async function enviar(arq) {
   } catch (err) { console.error(err); if (!confirm("Não foi possível ler o conteúdo deste PDF (os apontamentos não serão lidos). Enviar mesmo assim?")) { st.enviando = ""; pintar(); return; } }
   st.enviando = "Enviando…"; pintar();
   try {
-    const caminho = `${host.project.id}/${seguro(u.b)}/${seguro(host.casa() ? String(+u.a) : u.codigo)}/${Date.now()}-${seguro(arq.name.replace(/\.pdf$/i, ""))}.pdf`;
+    const caminho = caminhoRelatorio(host, u, arq.name);
     const r = await S.enviarRelatorio(host.sb, { unitId: u.unitId, caminho, arquivo: arq, nome: arq.name.slice(0, 200), tamanho: arq.size, paginas, resumo });
     st.enviando = ""; host.toast("Relatório enviado");
     st.rel = r.relatorio; st.doc?.destroy?.(); st.doc = null;

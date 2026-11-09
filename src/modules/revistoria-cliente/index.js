@@ -11,6 +11,7 @@
 import * as M from "./model.js";
 import * as S from "./service.js";
 import { abrirRelatorio } from "./relatorio-tela.js";
+import { abrirLote } from "./lote.js";
 // Status da chave: mesmos dados e regras do Controle de Chaves (chaves_unidades / chaves_ocorrencias e chaves_transferir).
 import * as CM from "../chaves/model.js";
 import * as CS from "../chaves/service.js";
@@ -98,6 +99,7 @@ function casca() {
       <div class="ch-line ch-chips">
         ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
         <span class="ch-count" id="rcCount"></span>
+        ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcLote" title="Enviar vários PDFs de relatório de uma vez; a unidade é reconhecida pelo nome do arquivo e pelo PDF">Relatórios em lote</button>` : ""}
         ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)">Importar planilha</button>` : ""}
         <button type="button" class="btn g ch-clear" id="rcLimpar">Limpar</button>
       </div>
@@ -117,6 +119,7 @@ function casca() {
   // Ordenação por horário (igual à aba Vistoria): cedo → tarde ou o inverso; sem horário fica depois
   q("#rcHr").addEventListener("click", () => { filt.hrSort = filt.hrSort === "asc" ? "desc" : "asc"; sincronizarFiltros(); pintarConteudo(); });
   q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
+  q("#rcLote")?.addEventListener("click", () => abrirLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
   q("#rcLimpar").addEventListener("click", () => { const hr = filt.hrSort; filt = FILTRO0(); filt.hrSort = hr; sincronizarFiltros(); pintarConteudo(); });
   if (!root.dataset.ouvindo) { root.addEventListener("click", cliqueRaiz); root.dataset.ouvindo = "1"; }
 }

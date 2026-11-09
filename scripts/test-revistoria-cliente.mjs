@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import * as M from "../src/modules/revistoria-cliente/model.js";
 import { comparar as compararPlanilha, revInfo } from "../src/modules/vistorias/revistorias.js";
-import { extrair, mesmaUnidade } from "../src/modules/revistoria-cliente/relatorio.js";
+import { extrair, mesmaUnidade, unidadeDoNome, decidirUnidade, codigoComparavel } from "../src/modules/revistoria-cliente/relatorio.js";
 
 // 1) Cores padronizadas.
 assert.equal(M.info("Aprovado").cor, "#2f9e5b");      // verde
@@ -217,6 +217,25 @@ assert.equal(M.passaExecucao("EMP_OSCAR", "EMP_OSCAR"), true); assert.equal(M.pa
   const conf = M.conferirExtraidos(["sala · PISO oco", "Varanda · guarda-corpo", "Varanda · guarda-corpo", ""], ck);
   assert.deepEqual(conf.map((c) => [c.usar, !!c.existente, c.repetido]), [[false, true, false], [true, false, false], [false, false, true], [false, false, false]]);
   assert.equal(conf[0].existente.concluido, true);
+}
+
+// Relatórios em lote: unidade pelo nome do arquivo e pelo PDF.
+assert.deepEqual(unidadeDoNome("BL_A_-_APT_507_RelatorioEntregaUnidade.pdf"), { bloco: "A", apto: "507", texto: "BL A - APT 507" });
+assert.deepEqual(unidadeDoNome("BL B - APTO T03.pdf"), { bloco: "B", apto: "T03", texto: "BL B - APT T03" });
+assert.equal(unidadeDoNome("relatorio.pdf"), null);
+assert.equal(codigoComparavel("T03"), "3"); assert.equal(codigoComparavel("0507"), "507");
+assert.equal(mesmaUnidade({ bloco: "A", apto: "T03" }, "A", "T03"), true); assert.equal(mesmaUnidade({ bloco: "a", apto: "3" }, "A", "T03"), true);
+{
+  const A507 = { id: "A507" }, B101 = { id: "B101" };
+  const achar = (r) => (r.bloco === "A" && codigoComparavel(r.apto) === "507" ? A507 : r.bloco === "B" && codigoComparavel(r.apto) === "101" ? B101 : null);
+  const nA = unidadeDoNome("BL_A_-_APT_507.pdf"), nB = unidadeDoNome("BL_B_-_APT_101.pdf"), nZ = unidadeDoNome("BL_Z_-_APT_999.pdf");
+  assert.deepEqual([decidirUnidade(nA, nA, achar).situacao, decidirUnidade(nA, nA, achar).unidade], ["ok", A507]);
+  assert.equal(decidirUnidade(null, nA, achar).msg, "identificada pelo PDF");
+  assert.equal(decidirUnidade(nA, null, achar).msg, "identificada pelo nome do arquivo");
+  assert.equal(decidirUnidade(nB, nA, achar).situacao, "divergente");          // nome e PDF apontam unidades diferentes
+  assert.equal(decidirUnidade(nZ, null, achar).situacao, "nao_encontrada");
+  assert.equal(decidirUnidade(null, null, achar).situacao, "nao_encontrada");
+  assert.equal(decidirUnidade(nZ, nA, achar).unidade, A507);                   // nome inválido, PDF confere: vale o PDF
 }
 
 console.log("Regras da Revistoria · Cliente verificadas.");
