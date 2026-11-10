@@ -18,3 +18,17 @@ horário, realização futura, pendências), tela desatualizada, clique repetido
 permissões por papel (admin e revistorias alteram; visitante, outro condomínio e sem acesso não),
 leitura por condomínio (RLS), escrita direta bloqueada, histórico imutável, importação da planilha
 atualizando a situação sem mexer na vistoria, dados antigos preservados e exclusão em cascata.
+
+## Correção das revistorias aprovadas em duplicidade (`duplicidade.mjs`)
+
+```bash
+scripts/db-tests/chaves/reset.sh 20261114120000
+node scripts/db-tests/revistoria-cliente/duplicidade.mjs
+```
+
+Reproduz o caso real (vistoria Revistoria Finalizada → Revistoria → Revistoria Finalizada, que registra de novo a
+mesma revistoria aprovada) e aplica `20261115120000_revistoria_duplicidades_correcao.sql` (duas vezes). Confere:
+nada apagado; status da vistoria de nenhuma unidade muda; fica 1 revistoria aprovada válida (a atual) e as
+repetidas ficam anuladas com motivo; horário do registro anulado mantido no atual; ciclo volta ao do 1º registro;
+evento "correcao" no histórico; unidades fora da regra (reprovada no meio, datas diferentes, em andamento) não
+mudam; rodar de novo não muda nada.

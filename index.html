@@ -596,10 +596,14 @@ body{background:var(--bg)}
 /* Panorama: blocos Vistorias e Revistorias com o mesmo desenho; marca de cor no topo dos números da revistoria */
 #resumoGrid{gap:14px}
 #resumoGrid .rg-big{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+#resumoGrid .rg-geral .rg-mini{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
 #resumoGrid .rg-big .rb{min-width:0;padding:9px 4px}
 #resumoGrid .rg-big .rb .l{line-height:1.25}
 @media(max-width:720px){#resumoGrid .rg-big .rb{padding:7px 2px}#resumoGrid .rg-big .rb .n{font-size:19px}#resumoGrid .rg-big .rb .l{font-size:7.5px;letter-spacing:.1px}}
-.rg-rev .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+.rg-rev .rg-mini .m,.rg-geral .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+.rg-big .rb.st-and .n{color:#b58a12}
+.rg-nota{margin:12px 0 0;font-size:11.5px;line-height:1.45;color:var(--muted)}
+.rg-nota b{color:#37564a}
 .rg-sub small{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
 .rg-vazio{padding:18px 12px;border:1px dashed #cfdad3;border-radius:10px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.45}
 .chart-tip{position:fixed;z-index:120;max-width:280px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;line-height:1.4;padding:8px 11px;border-radius:10px;box-shadow:0 12px 28px rgba(4,20,16,.3);pointer-events:none;opacity:0;transition:opacity .12s}
@@ -1391,12 +1395,6 @@ a.hm-tile{color:#172c25}
 .vw-switch{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:1100px){.vw-txt small{display:none}.vw-tab{min-height:54px}}
 /* ── ESTATÍSTICA GERAL ── (compacto; usa rg-card, stk-bar e ctbl do restante do site) */
-#v-stats .sec-head{padding:10px 16px;gap:4px 10px;flex-wrap:nowrap}
-#v-stats .sec-head .icn{width:30px;height:30px;border-radius:9px}
-#v-stats .sec-head .icn svg{width:15px;height:15px}
-#v-stats .sec-head h2{font-size:17px;white-space:nowrap}
-#v-stats .sec-head .sh-flow{font-size:12px;min-width:0}
-#v-stats .sec-body{padding:12px 14px}
 .st-wrap{display:grid;gap:10px}
 .st-wrap .rg-card{border-radius:12px;box-shadow:0 1px 2px rgba(16,42,36,.04)}
 .st-wrap .rg-card .rgh{padding:7px 12px;gap:10px;min-height:34px;box-sizing:border-box}
@@ -1488,12 +1486,6 @@ a.hm-tile{color:#172c25}
   .st-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
 }
 @media(max-width:720px){
-  #v-stats .sec-head{padding:8px 11px;gap:1px 9px;flex-wrap:wrap}
-  #v-stats .sec-head .icn{width:26px;height:26px;border-radius:8px}
-  #v-stats .sec-head .icn svg{width:13px;height:13px}
-  #v-stats .sec-head h2{font-size:15px}
-  #v-stats .sec-head .sh-flow{font-size:10.5px;flex-basis:100%;padding-left:35px;line-height:1.25}
-  #v-stats .sec-body{padding:8px}
   .st-wrap{gap:8px}
   .st-wrap .rg-body{padding:8px}
   .st-wrap .rg-card .rgh{padding:6px 10px;min-height:30px;font-size:10px}
@@ -2079,7 +2071,8 @@ body.rv-aberto{overflow:hidden}
 .rc-fin{display:block;font-size:10px;font-weight:700;color:#0f3b31;margin-top:1px}
 /* Mapa da Revistoria / Execução M.O.: cor predominante = equipe; ícone da equipe no canto inferior direito */
 .rc-u.rc-eq .rc-mk-exe{background:#fff;color:var(--c);box-shadow:0 0 0 1.5px var(--c)}
-.rc-u.rc-semeq{border-style:dashed}
+.rc-u.rc-semeq{border-style:dashed;border-width:1.5px}
+.rc-legend .sw.rc-sw-semeq{border-style:dashed}
 .rc-legend .rc-lg-t{font-weight:800;color:var(--ink)}
 .rc-sw-eq{display:inline-flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;font-style:normal}
 .lg-cores{margin-left:auto}
@@ -2968,7 +2961,10 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .stk-bar i span{color:#fff}
 :root[data-theme="dark"] .stk-bar i.stk-na span{color:#b4c1ba}
 :root[data-theme="dark"] .stk-tot{color:#a6b2ab}
-:root[data-theme="dark"] .rg-rev .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+:root[data-theme="dark"] .rg-rev .rg-mini .m,:root[data-theme="dark"] .rg-geral .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+:root[data-theme="dark"] .rg-big .rb.st-and .n{color:#efca61}
+:root[data-theme="dark"] .rg-nota{color:#a6b2ab}
+:root[data-theme="dark"] .rg-nota b{color:#bac9c3}
 :root[data-theme="dark"] .rg-sub small{color:#a6b2ab}
 :root[data-theme="dark"] .rg-vazio{border:1px dashed #454e48;color:#a6b2ab}
 :root[data-theme="dark"] .chart-tip{background:var(--ink);color:#fff;box-shadow:0 12px 28px rgba(0,0,0,0.54)}
@@ -3893,7 +3889,6 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
     <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Panorama de vistorias e revistorias, agenda e produtividade</small></span></button>
     <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
     <button type="button" class="vw-tab" data-view="revcli" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg></span><span class="vw-txt"><b>Revistoria · Cliente</b><small>Acompanhamento das revistorias e execução da mão de obra</small></span></button>
-    <button type="button" class="vw-tab" data-view="stats" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="vw-txt"><b>Estatística Geral</b><small>Aprovação e reprovação por vistoriador e acompanhamento técnico</small></span></button>
     <button type="button" class="vw-tab" data-view="chaves" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg></span><span class="vw-txt"><b>Controle de Chaves</b><small>Setor responsável, transferências e histórico</small></span></button>
   </nav>
 
@@ -3937,7 +3932,6 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
           <div class="lg"><span class="sw" style="background:#f2c14e;border-color:#d9a92f"></span>Agendado</div>
           <div class="lg"><span class="sw" style="background:#ff9e57;border-color:#e6863f"></span>Remarcado</div>
           <div class="lg"><span class="sw" style="background:#e8842a;border-color:#c96a1a"></span>Revistoria</div>
-          <div class="lg"><span class="sw" style="background:#2f6fdb;border-color:#2459b5"></span>Revistoria Finalizada</div>
           <div class="lg"><span class="sw" style="background:#2f9e5b;border-color:#268a4d"></span>Aprovado</div>
           <div class="lg"><span class="sw" style="background:#8a948f;border-color:#6f7a74"></span>Processo em Andamento</div>
           <div class="lg-rvs" id="cliRevLegend" hidden></div>
@@ -3962,18 +3956,6 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
     </div>
   </section>
 
-  <!-- ====== ESTATÍSTICA GERAL ====== -->
-  <section class="view" id="v-stats">
-    <div class="sec-head">
-      <span class="icn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
-      <h2>Estatística Geral</h2>
-      <div class="sh-flow">Vistoriadores × <b>Acompanhamento Técnico</b></div>
-    </div>
-    <div class="sec-body">
-      <div class="st-wrap" id="statsWrap"></div>
-    </div>
-  </section>
-
   <!-- ====== CONTROLE DE CHAVES (claviculário; módulo em src/modules/chaves) ====== -->
   <section class="view" id="v-chaves">
     <div class="sec-head">
@@ -3992,7 +3974,6 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   <button class="navbtn active" data-view="resumo"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Resumo</span></button>
   <button class="navbtn" data-view="cliente"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Cliente</span></button>
   <button class="navbtn" data-view="revcli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg><span>Revistoria</span></button>
-  <button class="navbtn" data-view="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Estatística</span></button>
   <button class="navbtn" data-view="chaves"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg><span>Chaves</span></button>
 </nav>
 
@@ -4367,15 +4348,20 @@ const FRENTES=[
   {key:"qual",step:"Etapa 2",name:"Qualidade",flow:FLOW,done:["lv","rev","fz"]},
   {key:"astec",step:"Etapa 3",name:"Assist. Técnica",flow:FLOW,done:["lv","rev","fz"]},
 ];
-const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria Finalizada",ap:"Aprovado",in:"Processo em Andamento"};
-// Valor gravado no banco (client_inspections.status). Só o rótulo exibido do status "in" mudou:
-// no banco ele continua "Inadimplência" (restrição client_inspections_status_check).
-const CLI_DB={...CLL,in:"Inadimplência"};
+// "Revistoria Finalizada" (rf) não é mais uma situação da aba Vistoria: a unidade aparece como "Revistoria" e a
+// conclusão fica na aba Revistoria · Cliente (status Aprovado). No banco o valor continua gravado (a função
+// revistoria_resultado grava "Revistoria Finalizada" ao aprovar), só a tela da vistoria deixou de separar.
+const CLL={na:"Não agendado",ag:"Agendado",rm:"Remarcado",rv:"Revistoria",rf:"Revistoria",ap:"Aprovado",in:"Processo em Andamento"};
+// Valor gravado no banco (client_inspections.status). Só o rótulo exibido de "in" e "rf" mudou:
+// no banco continuam "Inadimplência" (restrição client_inspections_status_check) e "Revistoria Finalizada".
+const CLI_DB={...CLL,rf:"Revistoria Finalizada",in:"Inadimplência"};
+// Situação exibida na aba Vistoria (filtros, contagens, popup): rf conta como rv.
+const cliShow=c=>c==="rf"?"rv":c;
 // Texto de status vindo do banco (logs, histórico) → rótulo da tela.
 const cliStatusLabel=v=>/inadimpl/i.test(String(v??""))?CLL.in:v;
-const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#2f6fdb",tx:"#fff",bd:"#2459b5"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"},in:{bg:"#8a948f",tx:"#fff",bd:"#6f7a74"}};
+const CLR_C={na:{bg:"#fff",tx:"#9aa39a",bd:"#c7ccbf"},ag:{bg:"#f2c14e",tx:"#5a4409",bd:"#d9a92f"},rm:{bg:"#ff9e57",tx:"#7a3300",bd:"#e6863f"},rv:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},rf:{bg:"#e8842a",tx:"#fff",bd:"#c96a1a"},ap:{bg:"#2f9e5b",tx:"#fff",bd:"#268a4d"},in:{bg:"#8a948f",tx:"#fff",bd:"#6f7a74"}};
 // "Processo em Andamento" (cinza; "Inadimplência" no banco) é o último status da lista: não conta como vistoriada nem como agendada.
-const CLI_FLOW=["na","ag","rm","rv","rf","ap","in"];
+const CLI_FLOW=["na","ag","rm","rv","ap","in"];
 function normCli(t){t=(t||"").toString().trim().toLowerCase();
   if(t.includes("inadimpl")||t.includes("processo em andamento"))return"in";
   if(t.includes("não agend")||t.includes("nao agend"))return"na";
@@ -4661,13 +4647,13 @@ function renderCli(){
   const flow=document.getElementById("cliFlow");if(flow)flow.textContent=LAYOUT.summary;
   const v=Object.values(state.cli),t=v.length;
   const n=c=>v.filter(x=>x===c).length;
-  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv"),rf=n("rf"),ap=n("ap"),inad=n("in");
-  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f6fdb","#2459b5","Rev. finalizada",rf],["#2f9e5b","#268a4d","Aprovado",ap],["#8a948f","#6f7a74","Processo em Andamento",inad]];
+  const na=n("na"),ag=n("ag"),rm=n("rm"),rv=n("rv")+n("rf"),ap=n("ap"),inad=n("in");
+  const R=[["#fff","#c7ccbf","Não agendado",na],["#f2c14e","#d9a92f","Agendado",ag],["#ff9e57","#e6863f","Remarcado",rm],["#e8842a","#c96a1a","Revistoria",rv],["#2f9e5b","#268a4d","Aprovado",ap],["#8a948f","#6f7a74","Processo em Andamento",inad]];
   document.getElementById("cliResumo").innerHTML=R.map(([bg,bd,l,val])=>
     `<div class="rc"><div class="rl"><span class="sw" style="background:${bg};border-color:${bd}"></span>${l}</div><div class="rv">${val}</div></div>`).join("")+
     `<div class="rc tot"><div class="rl">Total de unidades</div><div class="rv">${t} <span style="font-size:12px;color:#9aa39a;font-weight:700">${LAYOUT.unitsWord}</span></div></div>`;
-  // Revistoria Finalizada conta como unidade vistoriada; a % de revistoria considera só as pendentes.
-  const vist=ap+rv+rf, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
+  // Revistoria = reprovada na 1ª vistoria (inclui as já aprovadas depois na aba Revistoria · Cliente).
+  const vist=ap+rv, p1=vist?Math.round(ap/vist*100):0, pr=t?Math.round(rv/t*100):0;
   pct1.textContent=p1+"%"; bar1.style.width=p1+"%"; foot1.textContent=`${ap} de ${vist} vistoriados`;
   const META=0.70; const goalEl=document.getElementById("goal1");
   if(goalEl){
@@ -4682,7 +4668,7 @@ function renderCli(){
       goalEl.className="af-goal";
     }
   }
-  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) p/ revistoria`+(rf?` · ${rf} finalizada(s)`:"");
+  pctR.textContent=pr+"%"; barR.style.width=pr+"%"; footR.textContent=`${rv} unidade(s) encaminhada(s) p/ revistoria`;
   if(cliMode==="lista"){ ensureCliFilters(); renderCliList(); }
 }
 
@@ -4774,7 +4760,7 @@ function renderCliList(){
   LAYOUT.units.forEach(({b,p,a})=>{
     const k=kC(b,p,a); rows.push({b,p,a,code:state.cli[k],info:state.cliInfo[k]||{},pcd:!!state.unitMeta[k]?.pcd,rev:revLast(k),rvc:rvcStatus(k)});
   });
-  if(cliFilt.status.length) rows=rows.filter(r=>cliFilt.status.includes(r.code));
+  if(cliFilt.status.length) rows=rows.filter(r=>cliFilt.status.includes(cliShow(r.code)));
   if(cliFilt.rapido!=="todos") rows=rows.filter(r=>RVC.passaFiltroRapido(cliFilt.rapido,{vistoria:r.code,revistoria:r.rvc},"vistoria"));
   if(cliFilt.bloco!=="ALL") rows=rows.filter(r=>r.b===cliFilt.bloco);
   if(cliFilt.dtIni||cliFilt.dtFim){
@@ -4951,7 +4937,7 @@ function renderCliPop(){
   const key=kC(ctx.b,ctx.p,ctx.a),info=state.cliInfo[key]||emptyCliInfo(),cur=state.cli[key],meta=state.unitMeta[key]||{};
   const val=f=>esc(cliDraftValue(f)),scope=cliEditScope(key),can=!!scope,dis=scope==="all"?"":"disabled";
   const fdis=f=>(scope==="all"||(scope==="rev"&&REV_FIELDS.includes(f)))?"":"disabled";
-  const stDis=c=>(scope==="all"||(scope==="rev"&&cur==="rv"&&c==="rf"))?"":"disabled";
+  const stDis=c=>scope==="all"?"":"disabled";
   const idx=LAYOUT.units.findIndex(u=>u.b===ctx.b&&u.p===ctx.p&&u.a===ctx.a);
   const responsaveis=[...new Set(Object.values(state.cliInfo).flatMap(i=>[i.responsavel,i.resp_revistoria]).filter(Boolean))].sort((x,y)=>x.localeCompare(y,"pt-BR"));
   const kicker=LAYOUT.kind==="casa"?`Conjunto ${ctx.b}`:`Bloco ${ctx.b} · ${PAVL[ctx.p]}`;
@@ -4959,7 +4945,7 @@ function renderCliPop(){
   const cliente=cliDraftValue("cliente");
   const initials=String(cliente||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
   const tags=[meta.pcd?'<span class="tag pcd">PCD</span>':"",info.sale_stage?`<span class="tag stage${/distrato/i.test(info.sale_stage)?" warn":""}">${esc(info.sale_stage)}</span>`:""].join("");
-  // Data e responsável da revistoria aparecem em "Revistoria Finalizada" (opcionais); os valores salvos são mantidos.
+  // Data e responsável da revistoria aprovada (gravados pela aba Revistoria · Cliente); opcionais, os valores salvos são mantidos.
   const showRev=cur==="rf";
   const revs=revList(key).slice().reverse();
   // Revistoria · Cliente: situação e agendamentos (registrados na aba Revistoria · Cliente ou pela planilha).
@@ -4967,7 +4953,7 @@ function renderCliPop(){
   const revHist=revs.length||rcSt?`<div class="pp-revs"><div class="pp-label">Revistoria · Cliente ${rcSt?rvcBadge(rcSt):""}<small>· agende e registre o resultado na aba Revistoria · Cliente</small></div>${revs.length?`<ul>${revs.map(r=>`<li>${revChip(r)}<b>Agendamento nº ${r.numero}</b><span>${esc(revWhen(r))||"Sem data"}${r.responsavel?" · "+esc(r.responsavel):""}</span></li>`).join("")}</ul>`:""}</div>`:"";
   const dateField=(field,label)=>`<label class="pp-f"><span>${label}</span><span class="pp-row"><input type="date" name="${field}" value="${val(field)}" ${fdis(field)}><button type="button" class="pp-mini" data-today="${field}" ${fdis(field)}>Hoje</button></span></label>`;
   const revBlock=showRev?`<div class="pp-rev pp-full">
-          <div class="pp-rev-t">Revistoria finalizada <small>(opcional)</small></div>
+          <div class="pp-rev-t">Revistoria aprovada <small>(Revistoria · Cliente · opcional)</small></div>
           ${dateField("data_revistoria","Data da revistoria")}
           <label class="pp-f"><span>Responsável pela revistoria</span><input name="resp_revistoria" list="ppRespList" value="${val("resp_revistoria")}" placeholder="Quem fez a revistoria" autocomplete="off" ${fdis("resp_revistoria")}></label>
         </div>`:"";
@@ -4984,7 +4970,7 @@ function renderCliPop(){
     <div class="pp-body">
       <div class="pp-client"><span class="pp-avatar">${esc(initials)}</span><span class="pp-client-txt"><b>${esc(cliente)||"Sem cliente vinculado"}</b>${tags?`<span class="pp-tags">${tags}</span>`:""}</span></div>
       <div class="pp-label">Status da vistoria</div>
-      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cur}" class="pp-st${c===cur?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
+      <div class="pp-status" role="radiogroup" aria-label="Status da vistoria">${CLI_FLOW.map(c=>{const s=CLR_C[c];return `<button type="button" role="radio" aria-checked="${c===cliShow(cur)}" class="pp-st${c===cliShow(cur)?" sel":""}" data-code="${c}" ${stDis(c)} style="--st-bg:${s.bg};--st-bd:${s.bd};--st-tx:${s.tx}"><i></i>${CLL[c]}</button>`;}).join("")}</div>
       ${revHist}
       ${reagHtml(key,cur)}
       <form class="pp-form" novalidate>
@@ -4996,7 +4982,7 @@ function renderCliPop(){
         ${revBlock}
         <label class="pp-f pp-full"><span>Acomp. Técnico</span>${acompSelect(cliDraftValue("acomp"),`name="acomp" class="pp-select" ${dis}`)}</label>
         <label class="pp-f pp-full"><span>Observações</span><textarea name="obs" rows="2" placeholder="Pendências, coproprietário, combinados..." ${fdis("obs")}>${val("obs")}</textarea></label>
-        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: finalize a revistoria e ajuste a data, o responsável pela revistoria e as observações.</div>`:""}
+        ${scope==="rev"?`<div class="pp-ro pp-full">Permissão Revistorias: registre o resultado na aba Revistoria · Cliente; aqui ajuste a data, o responsável pela revistoria e as observações.</div>`:""}
         ${can?`<div class="pp-actions pp-full"><span class="pp-hint"></span><button type="button" class="btn g" data-pp="discard" hidden>Descartar</button><button type="submit" class="btn p" disabled>Salvar</button></div>`:`<div class="pp-ro pp-full">${currentUser?.nivel==="revistorias"?"Com a permissão Revistorias você altera apenas unidades em Revistoria.":"Somente administradores editam a vistoria do cliente."}</div>`}
       </form>
     </div>`;
@@ -5114,16 +5100,15 @@ async function setStatus(code){
     catch(e){state.obra[key][ctx.fr]=old;renderObra();renderResumo();renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   } else {
     const scopeKey=kC(ctx.b,ctx.p,ctx.a);
-    if(!canEditCli()&&!(cliEditScope(scopeKey)==="rev"&&state.cli[scopeKey]==="rv"&&code==="rf")){
-      toast(currentUser?.nivel==="revistorias"?"A permissão Revistorias só finaliza revistorias":"Somente administrador edita a Vistoria Cliente");return;}
+    if(!canEditCli()){
+      toast(currentUser?.nivel==="revistorias"?"Registre o resultado da revistoria na aba Revistoria · Cliente":"Somente administrador edita a Vistoria Cliente");return;}
     const target={...ctx},key=kC(target.b,target.p,target.a);const old=state.cli[key];
-    if(old===code)return;
+    // "Revistoria" numa unidade com revistoria aprovada (rf) já é a situação exibida: não regrava nem reabre a revistoria.
+    if(old===code||cliShow(old)===code)return;
     state.cli[key]=code;
     const detalhe="CLIENTE · "+unitShort(target.b,target.p,target.a)+": "+(CLL[old]||old)+" → "+(CLL[code]||code);
     renderCli(); renderResumo(); renderPop();
     if((code==="ag"||code==="rm")&&!cliDraftValue("data_vistoria"))pop.querySelector('[name="data_vistoria"]')?.focus();
-    // Revistoria Finalizada: data e responsável da revistoria são opcionais (aparecem para preencher se quiser).
-    if(code==="rf"&&!cliDraftValue("data_revistoria"))pop.querySelector('[name="data_revistoria"]')?.focus();
     try{await setCell("cli",target.b,target.p,target.a,"status",CLI_DB[code],detalhe);toast("Status: "+CLL[code]);}
     catch(e){state.cli[key]=old;renderCli();renderResumo();if(ctx&&kC(ctx.b,ctx.p,ctx.a)===key)renderPop();toast(syncErrorMessage(e));load(true).catch(()=>{});}
   }
@@ -5181,7 +5166,7 @@ function chavesHost(){
     casa:()=>LAYOUT.kind==="casa", grupo:()=>LAYOUT.group, grupos:()=>LAYOUT.groups,
     grid:()=>LAYOUT.kind==="casa"?{grupos:LAYOUT.groups,maxCasas:LAYOUT.maxHouses,counts:LAYOUT.counts,pavLabel:PAVL}:{grupos:BLOCOS,pavs:PAVS,apts:APTS,pavLabel:PAVL},
     // status da vistoria: só leitura (client_inspections), nunca alterado pelo módulo
-    vistoria:(b,p,a)=>state.cli[kC(b,p,a)]||"na", vistoriaCodigos:()=>CLI_FLOW,
+    vistoria:(b,p,a)=>cliShow(state.cli[kC(b,p,a)]||"na"), vistoriaCodigos:()=>CLI_FLOW,
     vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na, vistoriaInfo:(b,p,a)=>state.cliInfo[kC(b,p,a)],
     // Revistoria · Cliente (revistorias_cliente): só leitura; "" = sem registro
     revistoria:(b,p,a)=>rvcStatus(kC(b,p,a)), revistoriaInstalada:()=>rvcInstalled,
@@ -5215,7 +5200,7 @@ function revcliHost(){
     codigo:(b,p,a)=>unitCode(b,p,a), titulo:(b,p,a)=>unitTitle(b,p,a),
     casa:()=>LAYOUT.kind==="casa", grupo:()=>LAYOUT.group, grupos:()=>LAYOUT.groups,
     grid:()=>LAYOUT.kind==="casa"?{grupos:LAYOUT.groups,maxCasas:LAYOUT.maxHouses,counts:LAYOUT.counts,pavLabel:PAVL}:{grupos:BLOCOS,pavs:PAVS,apts:APTS,pavLabel:PAVL},
-    vistoria:(b,p,a)=>state.cli[kC(b,p,a)]||"na", vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na,
+    vistoria:(b,p,a)=>cliShow(state.cli[kC(b,p,a)]||"na"), vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na,
     cliente:(b,p,a)=>state.cliInfo[kC(b,p,a)]?.cliente||"",
     acompanhamento:id=>{const k=unitKey(id);return k?state.rvc[k]||null:null;}, agendamentos:id=>{const k=unitKey(id);return k?revList(k):[];},
     recarregar:rvcRecarregar, hoje:todayISO,
@@ -5236,7 +5221,9 @@ function centralHost(overlay){
     projetos:()=>ovProjects().filter(p=>projectExperience(p).ready).map(p=>({id:p.id,nome:projectExperience(p).title||p.name,cor:ovColor(p.id)})),
     vistoriaInfo:t=>{const c=normCli(t);const s=CLR_C[c]||CLR_C.na;return {code:c,label:CLL[c]||t||"—",bg:s.bg,tx:s.tx,bd:s.bd};},
     abrirNaVistoria:u=>centralIrPara(u,"cliente"), abrirNaRevistoria:u=>centralIrPara(u,"revcli"),
-    panorama:overlay?null:{el:document.getElementById("resumoGrid"),mostrar:()=>{renderResumo();animateResumo();}}
+    panorama:overlay?null:{el:document.getElementById("resumoGrid"),mostrar:()=>{renderResumo();animateResumo();}},
+    // Vistoriadores × acompanhamento técnico (antiga Estatística Geral): só no Resumo Geral do condomínio aberto
+    estatistica:overlay||!appProject?null:{titulo:projectExperience(appProject).title||appProject.name,pintar:el=>renderStats(el)}
   };
 }
 async function centralIrPara(u,view){
@@ -5274,7 +5261,6 @@ function switchView(v){
   if(v==="cliente")renderCli();
   // Resumo Geral abre sempre no Panorama (Vistorias e Revistorias) e a agenda em "Hoje em diante"
   if(v==="resumo"){renderResumo();window.AmciCentral?.mostrar(document.getElementById("centralRoot"),centralHost(false),true);}else window.AmciCentral?.esconder();
-  if(v==="stats")renderStats();
   // Controle de Chaves: módulo à parte (www/chaves.js), com o contexto desta tela.
   if(v==="chaves")window.AmciChaves?.show(chavesHost());else window.AmciChaves?.hide();
   if(v==="revcli")window.AmciRevCliente?.show(revcliHost(),true);else window.AmciRevCliente?.hide();
@@ -5741,7 +5727,7 @@ function renderOvFilters(){
   const projects=ovProjects();
   document.getElementById("ovProjects").innerHTML=`<button class="fchip fx-all${ovFilt.projects.length?"":" active"}" type="button" data-ovproj="ALL" style="--c:#1f4a3f">Todos</button>`+
     projects.map(p=>`<button class="fchip${ovFilt.projects.includes(String(p.id))?" active":""}" type="button" data-ovproj="${esc(p.id)}" style="--c:${ovColor(p.id)}"><i></i>${esc(projectExperience(p).title||p.name)}</button>`).join("");
-  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","rf","ap","na","in"].map(c=>
+  document.getElementById("ovStatus").innerHTML=["ALL","ag","rm","rv","ap","na","in"].map(c=>
     `<button class="fchip${c==="ALL"?" fx-all":""}${c==="ALL"?(ovFilt.status.length?"":" active"):(ovFilt.status.includes(c)?" active":"")}" type="button" data-ovstatus="${c}" style="--c:${c==="ALL"?"#1f4a3f":CLR_C[c].bd}">${c==="ALL"?"":"<i></i>"}${c==="ALL"?"Todos":CLL[c]}</button>`).join("");
   const fx=document.getElementById("ovFilters");fx.classList.toggle("ov-resumo",ovMode==="resumo");fx.classList.toggle("fx-open",ovFiltOpen);
   document.querySelectorAll("#ovMode [data-ovmode]").forEach(b=>{const on=b.dataset.ovmode===ovMode;b.classList.toggle("active",on);b.setAttribute("aria-selected",on);});
@@ -5760,8 +5746,7 @@ function renderOverview(){
     ["all","Total de agendamentos",ovRows.length,""],
     ["today","Agendamentos de hoje",count(r=>r.data===today),"blue"],
     ["next","Próximos",count(r=>r.data&&r.data>=today),""],
-    ["rv","Revistorias",count(r=>r.code==="rv"),"warn"],
-    ["rf","Revistorias finalizadas",count(r=>r.code==="rf"),"fin"],
+    ["rv","Revistorias",count(r=>cliShow(r.code)==="rv"),"warn"],
     ["active","Condomínios ativos",active.size,""]];
   document.getElementById("ovCards").innerHTML=cards.map(([k,l,v,c])=>`<button type="button" class="kbox ov-card ${c}" data-ovcard="${k}"><div class="kl">${l}</div><div class="kv">${v}</div></button>`).join("");
   // Período, condomínio e datas valem para os dois modos; status, cliente e unidade só para a Lista.
@@ -5772,7 +5757,7 @@ function renderOverview(){
   if(ovFilt.dtIni)rows=rows.filter(r=>r.data&&r.data>=ovFilt.dtIni);
   if(ovFilt.dtFim)rows=rows.filter(r=>r.data&&r.data<=ovFilt.dtFim);
   if(ovMode==="resumo"){renderOvSummary(rows,today);return;}
-  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(r.code));
+  if(ovFilt.status.length)rows=rows.filter(r=>ovFilt.status.includes(cliShow(r.code)));
   const q=ovFilt.q.trim().toLowerCase();if(q)rows=rows.filter(r=>r.cliente.toLowerCase().includes(q));
   const uq=ovFilt.u.trim().toLowerCase().replace(/\s+/g,"");
   if(uq)rows=rows.filter(r=>{const full=(r.b+r.ucode).toLowerCase();return full.startsWith(uq)||r.ucode.toLowerCase()===uq.replace(/^0+(?=\d)/,"")||(!r.casa&&r.ucode.toLowerCase().includes(uq));});
@@ -5819,10 +5804,10 @@ function renderOvSummary(rows,today){
     if(!days.has(r.data))days.set(r.data,new Map());
     const k=r.projectId+"|"+r.b,m=days.get(r.data);
     if(!m.has(k))m.set(k,{date:r.data,projectId:r.projectId,projectName:r.projectName,local:r.groupLabel,b:r.b,v:0,rv:0});
-    const g=m.get(k);if(r.code==="rv")g.rv++;else g.v++;
+    const g=m.get(k);if(cliShow(r.code)==="rv")g.rv++;else g.v++;
   }
   const order=[...days.keys()].sort();
-  const totV=dated.filter(r=>r.code!=="rv").length,totR=dated.length-totV;
+  const totV=dated.filter(r=>cliShow(r.code)!=="rv").length,totR=dated.length-totV;
   document.getElementById("ovCount").textContent=`${order.length} dia(s) · ${[...days.values()].reduce((n,m)=>n+m.size,0)} local(is)`;
   const list=document.getElementById("ovList");
   let h=`<div class="ov-sum-wrap"><div class="ov-sum-kpis"><div class="ov-sum-k"><span><i class="ov-pre">Total de </i>vistorias</span><b>${totV}</b></div><div class="ov-sum-k rv"><span><i class="ov-pre">Total de </i>revistorias</span><b>${totR}</b></div><div class="ov-sum-k tot"><span>Total geral</span><b>${totV+totR}</b></div></div>`;
@@ -5917,7 +5902,7 @@ function impStatusCode(raw){
   const t=impNorm(raw);if(!t)return "";
   if(/n[ao]o agend/.test(t)||t==="nao agendada")return "";
   if(/inadimpl|processo em andamento/.test(t))return "in";
-  if(/finaliz/.test(t))return "rf";
+  if(/finaliz/.test(t))return "rv";   // a conclusão da revistoria é registrada na aba Revistoria · Cliente
   if(/aprov/.test(t))return "ap";
   if(/reprov|revist/.test(t))return "rv";
   if(/remarc/.test(t))return "rm";
@@ -6070,7 +6055,8 @@ function impCompare(sys,sheet,revOpt,modo="vist"){
     // Exibe o rótulo da tela; grava o valor do banco (CLI_DB).
     const curCode=normCli(sys.status),next=CLL[sheet.status],nextDb=CLI_DB[sheet.status],cur=sys.status?CLL[curCode]:"";
     if(curCode==="na")items.push({key:"status",label:"Status",kind:"fill",cur:"",next,changes:[{field:"status",old:sys.status||"Não agendado",new:nextDb}]});
-    else if(curCode===sheet.status)items.push({key:"status",label:"Status",kind:"same",cur,next});
+    // rf (revistoria aprovada) e "Revistoria" na planilha são a mesma situação: nada a mudar (não reabre a revistoria)
+    else if(cliShow(curCode)===cliShow(sheet.status))items.push({key:"status",label:"Status",kind:"same",cur,next});
     else items.push({key:"status",label:"Status",kind:"conflict",cur,next,source:src.status||"SISTEMA",changes:[{field:"status",old:sys.status,new:nextDb}]});
   }
   // Revistoria: comparada com a revistoria mais recente da unidade; nunca muda o status da vistoria.
@@ -6778,11 +6764,34 @@ document.getElementById("modsList").addEventListener("change",async e=>{
 const BARCLR=p=>p>=80?"#2f9e5b":p>=40?"#6B8040":"#ED7A12";
 const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
 /* ── PANORAMA (Resumo Geral do condomínio) ──
-   Dois blocos independentes, com o mesmo desenho: Vistorias (client_inspections: status da 1ª vistoria de
-   cada unidade) e Revistorias (revistorias_cliente: situação de cada unidade em revistoria; revistorias:
-   agendamentos). Cada unidade conta uma vez em cada bloco; nada da vistoria entra na revistoria e vice-versa.
-   Mesmas regras do restante do site: vistoriada = Aprovado + Revistoria + Revistoria Finalizada; Processo em
-   Andamento não conta como agendada; Rev. Reprovada = última revistoria realizada reprovada (RVC.reprovada). */
+   Três blocos com o mesmo desenho, nesta ordem:
+   1) Panorama Geral: Vistoria + Revistoria juntas. Cada unidade conta UMA vez, pela etapa mais recente
+      (a situação da Revistoria · Cliente quando a unidade está nela; senão o status da vistoria) → as
+      categorias somam o total de unidades. Vistorias realizadas = unidades vistoriadas; revistorias
+      realizadas = revistorias aprovadas ou reprovadas (sem as anuladas) — contagens separadas, nunca somadas.
+   2) Panorama de Vistorias (client_inspections: status da 1ª vistoria de cada unidade).
+   3) Panorama de Revistorias (revistorias_cliente: Em andamento, Agendado, Aprovado — os mesmos status, cores
+      e contagens da aba Revistoria · Cliente; revistorias: agendamentos).
+   Mesmas regras do restante do site: vistoriada = Aprovado + Revistoria (inclui a revistoria já aprovada, gravada
+   como "Revistoria Finalizada"); Processo em Andamento não conta como agendada; Rev. Reprovada = última
+   revistoria realizada reprovada (RVC.reprovada). */
+// Situação geral da unidade (Panorama Geral): uma por unidade, a da etapa mais recente.
+const PG_CAT=[
+  {k:"ap",label:"Aprovados",cor:"#2f9e5b",borda:"#268a4d",dica:"vistoria aprovada na 1ª vez ou revistoria aprovada"},
+  {k:"ag",label:"Agendados",cor:"#2f6fdb",borda:"#2459b5",dica:"vistoria ou revistoria com data marcada"},
+  {k:"and",label:"Em andamento",cor:"#f2c14e",borda:"#d9a92f",dica:"em revistoria, aguardando o agendamento"},
+  {k:"pend",label:"Pendentes",cor:"#c9d1cc",borda:"#9aa39a",dica:"sem vistoria agendada"},
+  {k:"in",label:"Processo em Andamento",cor:"#8a948f",borda:"#6f7a74",dica:"processo do cliente em andamento"}];
+function pgSituacao(code,rc){
+  if(rc==="Aprovado")return "ap";
+  if(rc==="Agendado")return "ag";
+  if(rc==="Em andamento")return "and";
+  if(code==="ap"||code==="rf")return "ap";
+  if(code==="rv")return "and";
+  if(code==="ag"||code==="rm")return "ag";
+  if(code==="in")return "in";
+  return "pend";
+}
 function rgStack(rows,legend){
   // rows: [{label, total, segs:[{cls|cor,label,n}], tot}] → barras empilhadas por bloco/conjunto
   let h=`<div class="stk-legend">${legend.map(l=>`<span><i class="${l.cls||""}"${l.cor?` style="background:${l.cor}"`:""}></i>${l.label}</span>`).join("")}</div><div class="stk-chart">`;
@@ -6807,54 +6816,77 @@ function rgCard(o){
 }
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
-  const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
-  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap"),inad=cc("in");
+  // Revistoria Finalizada (rf) é a revistoria já aprovada: na vistoria conta como Revistoria (reprovada na 1ª vez).
+  const cv=Object.values(state.cli).map(cliShow),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
+  const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),ap=cc("ap"),inad=cc("in");
   // Processo em Andamento não conta como agendada para o cliente.
-  const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na-inad)/ct*100):0;
+  const vist=ap+rv, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na-inad)/ct*100):0;
   const groupLabel=b=>`${LAYOUT.groupShort} ${b}`;
-  // BLOCO 1 · Vistorias
-  const vRows=LAYOUT.groups.map(block=>{
-    const st=groupUnits(block).map(u=>state.cli[kC(u.b,u.p,u.a)]),n=x=>st.filter(v=>v===x).length;
-    const total=st.length,a=n("ap"),f=n("rf"),r=n("rv"),w=n("ag")+n("rm");
-    return {label:groupLabel(block),total,tot:`${a}/${total}`,segs:[
-      {cls:"stk-ok",label:"Aprovados",n:a},{cls:"stk-fin",label:"Revistorias finalizadas",n:f},{cls:"stk-rev",label:"Revistorias / Reprovados",n:r},
-      {cls:"stk-na",label:"Sem vistoria",n:total-a-f-r,extra:w?` · inclui ${w} agendado(s)/remarcado(s) aguardando vistoria`:""}]};
+  const S=RVC.STATUS,sit=k=>RVC.situacao(state.rvc[k],revList(k));
+  const rvcKeys=rvcInstalled?Object.keys(state.rvc).filter(k=>state.rvc[k]?.status):[];
+  const sitMap=new Map(rvcKeys.map(k=>[k,sit(k)]));
+  // BLOCO 1 · Panorama Geral (cada unidade uma vez, pela etapa mais recente)
+  const geral=k=>pgSituacao(state.cli[k],sitMap.get(k)?.status||"");
+  const todas=LAYOUT.units.map(u=>kC(u.b,u.p,u.a)),gc={};PG_CAT.forEach(c=>gc[c.k]=0);todas.forEach(k=>gc[geral(k)]++);
+  const tu=todas.length,feitasRev=[...sitMap.values()].reduce((n,s)=>n+s.realizadas,0);
+  const agV=todas.filter(k=>!sitMap.has(k)&&geral(k)==="ag").length,agR=gc.ag-agV;
+  const rAprov=[...sitMap.values()].filter(x=>x.status==="Aprovado").length;
+  const gPct=tu?Math.round(gc.ap/tu*100):0,gMov=tu?Math.round((gc.ap+gc.ag)/tu*100):0;
+  const gRows=LAYOUT.groups.map(block=>{
+    const ks=groupUnits(block).map(u=>kC(u.b,u.p,u.a)),n={};PG_CAT.forEach(c=>n[c.k]=0);ks.forEach(k=>n[geral(k)]++);
+    return {label:groupLabel(block),total:ks.length,tot:`${n.ap}/${ks.length}`,segs:PG_CAT.map(c=>({cor:c.cor,label:c.label,n:n[c.k],cls:c.k==="pend"?"stk-na":""}))};
   });
-  let h=rgCard({tipo:"vist",titulo:"Panorama de Vistorias",destaque:`${aprovPct}% aprov. na 1ª vistoria`,
+  let h=rgCard({tipo:"geral",titulo:"Panorama Geral",destaque:`${gPct}% aprovados`,
+    donut:[gPct,"#2f9e5b","Aprovados"],
+    big:[[tu,"Total de unidades"],[vist,"Vistorias realizadas","blue"],[feitasRev,"Revistorias realizadas","blue"],[gc.ap,"Aprovados","ok"],[gc.pend,"Pendentes","warn"]],
+    barra:{rot:"Agendados ou aprovados",txt:`${gc.ap+gc.ag}/${tu} · ${gMov}%`,pct:gMov},
+    mini:[...PG_CAT.map(c=>[c.label,gc[c.k],c.borda]),["Vistorias agendadas",agV,"#d9a92f"],["Revistorias agendadas",agR,S.Agendado.borda]],
+    sub:`Situação geral por ${LAYOUT.group} <small>· Vistoria + Revistoria · cada unidade conta uma vez</small>`,
+    grafico:rgStack(gRows,PG_CAT.map(c=>({cor:c.k==="pend"?"":c.cor,cls:c.k==="pend"?"stk-na":"",label:c.label})))+
+      `<p class="rg-nota"><b>Como ler:</b> cada unidade aparece uma vez, pela etapa mais recente — a situação da Revistoria · Cliente quando a unidade está nela; senão, o status da vistoria. Aprovados = aprovados na 1ª vistoria (${gc.ap-rAprov}) + aprovados na revistoria (${rAprov}).</p>`});
+  // BLOCO 2 · Vistorias
+  const vRows=LAYOUT.groups.map(block=>{
+    const st=groupUnits(block).map(u=>cliShow(state.cli[kC(u.b,u.p,u.a)])),n=x=>st.filter(v=>v===x).length;
+    const total=st.length,a=n("ap"),r=n("rv"),w=n("ag")+n("rm");
+    return {label:groupLabel(block),total,tot:`${a}/${total}`,segs:[
+      {cls:"stk-ok",label:"Aprovados",n:a},{cls:"stk-rev",label:"Revistorias / Reprovados",n:r},
+      {cls:"stk-na",label:"Sem vistoria",n:total-a-r,extra:w?` · inclui ${w} agendado(s)/remarcado(s) aguardando vistoria`:""}]};
+  });
+  h+=rgCard({tipo:"vist",titulo:"Panorama de Vistorias",destaque:`${aprovPct}% aprov. na 1ª vistoria`,
     donut:[aprovPct,"#2f9e5b","Aprovação"],
-    big:[[ct,"Unidades"],[vist,"Vistoriadas","blue"],[na+ag+rm,"A vistoriar"],[ap,"Aprovadas","ok"],[rv+rf,"Reprovadas","warn"]],
+    big:[[ct,"Unidades"],[vist,"Vistoriadas","blue"],[na+ag+rm,"A vistoriar"],[ap,"Aprovadas","ok"],[rv,"Reprovadas","warn"]],
     barra:{rot:"Agendadas p/ cliente",txt:`${ct-na-inad}/${ct} · ${entPct}%`,pct:entPct},
-    mini:[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]],
+    mini:[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Aprovado",ap],["Processo em Andamento",inad]],
     sub:`Vistorias por ${LAYOUT.group}`,
-    grafico:rgStack(vRows,[{cls:"stk-ok",label:"Aprovados"},{cls:"stk-fin",label:"Revistorias finalizadas"},{cls:"stk-rev",label:"Revistorias / Reprovados"},{cls:"stk-na",label:"Sem vistoria"}])});
-  // BLOCO 2 · Revistorias (unidades em revistoria_cliente; revistorias realizadas = agendamentos aprovados ou reprovados)
+    grafico:rgStack(vRows,[{cls:"stk-ok",label:"Aprovados"},{cls:"stk-rev",label:"Revistorias / Reprovados"},{cls:"stk-na",label:"Sem vistoria"}])});
+  // BLOCO 3 · Revistorias (mesmos status, cores e contagens da aba Revistoria · Cliente)
   if(rvcInstalled){
-    const S=RVC.STATUS,keys=Object.keys(state.rvc).filter(k=>state.rvc[k]?.status);
-    const sit=k=>RVC.situacao(state.rvc[k],revList(k));
-    const sits=keys.map(sit),rn=x=>sits.filter(s=>s.status===x).length;
+    const keys=rvcKeys,sits=keys.map(k=>sitMap.get(k)),rn=x=>sits.filter(s=>s.status===x).length;
     const tot=sits.length,rAnd=rn("Em andamento"),rAg=rn("Agendado"),rAp=rn("Aprovado"),rRep=sits.filter(s=>RVC.reprovada(s)).length;
-    const feitas=sits.reduce((n,s)=>n+s.realizadas,0),agds=keys.reduce((n,k)=>n+revList(k).filter(r=>r.status!=="Cancelada").length,0);
+    const agds=keys.reduce((n,k)=>n+revList(k).filter(r=>r.status!=="Cancelada").length,0);
     const rPct=tot?Math.round(rAp/tot*100):0,movPct=tot?Math.round((rAg+rAp)/tot*100):0;
+    const ordem=RVC.STATUS_ORDEM;   // Em andamento → Agendado → Aprovado (como na legenda da aba)
     const rRows=LAYOUT.groups.map(block=>{
-      const ss=groupUnits(block).map(u=>kC(u.b,u.p,u.a)).filter(k=>state.rvc[k]?.status).map(sit),n=x=>ss.filter(s=>s.status===x).length;
-      return {label:groupLabel(block),total:ss.length,tot:ss.length?`${n("Aprovado")}/${ss.length}`:"—",segs:[
-        {cor:S.Aprovado.cor,label:"Aprovadas",n:n("Aprovado")},{cor:S.Agendado.cor,label:"Agendadas",n:n("Agendado")},{cor:S["Em andamento"].borda,label:"Aguardando agendamento",n:n("Em andamento")}]};
+      const ss=groupUnits(block).map(u=>kC(u.b,u.p,u.a)).filter(k=>sitMap.has(k)).map(k=>sitMap.get(k)),n=x=>ss.filter(s=>s.status===x).length;
+      return {label:groupLabel(block),total:ss.length,tot:ss.length?`${n("Aprovado")}/${ss.length}`:"—",segs:ordem.map(x=>({cor:S[x].cor,label:S[x].label,n:n(x)}))};
     });
     h+=rgCard({tipo:"rev",titulo:"Panorama de Revistorias",destaque:tot?`${rPct}% aprovadas`:"sem unidades em revistoria",
-      donut:[rPct,"#2f6fdb","Aprovação"],
-      big:[[tot,"Unidades em revistoria"],[rAnd,"Aguardando agendamento"],[rAg,"Agendadas","blue"],[rAp,"Aprovadas","ok"],[rRep,"Rev. Reprovada","warn"]],
-      barra:{rot:"Agendadas ou aprovadas",txt:`${rAg+rAp}/${tot} · ${movPct}%`,pct:movPct},
-      mini:[["Em andamento",rAnd,S["Em andamento"].borda],["Agendado",rAg,S.Agendado.borda],["Aprovado",rAp,S.Aprovado.borda],["Rev. Reprovada",rRep,"#b33636"],["Revistorias realizadas",feitas,"#6b8040"],["Agendamentos",agds,"#2459b5"]],
+      donut:[rPct,S.Aprovado.cor,"Aprovado"],
+      big:[[tot,"Unidades em revistoria"],[rAnd,S["Em andamento"].label,"st-and"],[rAg,S.Agendado.label,"blue"],[rAp,S.Aprovado.label,"ok"],[rRep,"Rev. Reprovada","warn"]],
+      barra:{rot:"Agendado ou aprovado",txt:`${rAg+rAp}/${tot} · ${movPct}%`,pct:movPct},
+      mini:[...ordem.map(x=>[S[x].label,rn(x),S[x].borda]),["Rev. Reprovada",rRep,RVC.REPROVADA.borda],["Revistorias realizadas",feitasRev,"#6b8040"],["Agendamentos",agds,"#2459b5"]],
       sub:`Revistorias por ${LAYOUT.group} <small>· unidades em revistoria</small>`,
-      grafico:tot?rgStack(rRows,[{cor:S.Aprovado.cor,label:"Aprovadas"},{cor:S.Agendado.cor,label:"Agendadas"},{cor:S["Em andamento"].borda,label:"Aguardando agendamento"}])
+      grafico:tot?rgStack(rRows,ordem.map(x=>({cor:S[x].cor,label:S[x].label})))
         :`<div class="rg-vazio">Nenhuma unidade em revistoria neste condomínio. As unidades entram automaticamente quando a vistoria passa a <b>Revistoria</b>.</div>`});
   }
   grid.innerHTML=h;
-  // A Estatística Geral usa os mesmos dados: atualiza junto quando estiver aberta.
-  if(document.getElementById("v-stats")?.classList.contains("active"))renderStats();
+  // Vistoriadores × acompanhamento técnico (Produtividade): mesmos dados, atualiza junto quando estiver na tela.
+  renderStats();
 }
-/* ── ESTATÍSTICA GERAL ──
-   Vistoriadores × Acompanhamento Técnico, calculado no navegador com os dados do Supabase já
+/* ── VISTORIADORES × ACOMPANHAMENTO TÉCNICO (seção da Produtividade no Resumo Geral do condomínio) ──
+   Era a aba "Estatística Geral", removida da navegação: o conteúdo (único que não existia na Produtividade:
+   recorte por acompanhamento técnico e por vistoriador na situação atual) foi para a Produtividade.
+   Calculado no navegador com os dados do Supabase já
    carregados para o condomínio (state.cli / state.cliInfo, vindos de client_inspections e
    atualizados em tempo real): nenhuma consulta ou cópia de dados à parte.
    Mesma regra do Resumo Geral e da planilha Excel: vistoriada = Aprovado + Revistoria +
@@ -6882,10 +6914,10 @@ function stBar(x,label,minTxt=18){
   return `<div class="stk-bar" role="img" aria-label="${esc(label)}: aprovação ${stPct(x.pa,x.n)}, reprovação ${stPct(x.pr,x.n)}">`+
     segs.map(s=>`<i class="${s.cls}" style="width:${s.pct}%" data-tip="${esc(`${label} · ${s.l}: ${s.n} de ${x.n} (${fmtPct(s.pct)})`)}" tabindex="0">${s.pct>=minTxt?`<span>${fmtPct(s.pct)}</span>`:""}</i>`).join("")+`</div>`;
 }
-function renderStats(){
-  const wrap=document.getElementById("statsWrap");if(!wrap)return;
+function renderStats(el){
+  const wrap=el||document.getElementById("statsWrap");if(!wrap||!wrap.isConnected)return;
   const rows=statsRows(),tot=stAgg(rows);
-  if(!rows.length){wrap.innerHTML=`<div class="rg-card"><div class="rgh"><span>Estatística Geral</span></div><div class="st-empty">Nenhuma unidade vistoriada neste condomínio ainda (Aprovado, Revistoria ou Revistoria Finalizada).</div></div>`;return;}
+  if(!rows.length){wrap.innerHTML=`<div class="rg-card"><div class="rgh"><span>Vistoriadores × acompanhamento técnico</span></div><div class="st-empty">Nenhuma unidade vistoriada neste condomínio ainda (Aprovado ou Revistoria).</div></div>`;return;}
   const byResp=new Map();rows.forEach(r=>{if(!byResp.has(r.resp))byResp.set(r.resp,[]);byResp.get(r.resp).push(r);});
   const people=[...byResp.entries()].map(([name,rs])=>({name,...stAgg(rs),ac:Object.fromEntries(ST_ACOMP.map(c=>[c.k,stAgg(rs.filter(r=>r.acomp===c.k))]))}));
   const cats=ST_ACOMP.map(c=>({...c,...stAgg(rows.filter(r=>r.acomp===c.k))}));
@@ -6901,7 +6933,7 @@ function renderStats(){
     `<div class="rb bad"><div class="n">${fmtPct(tot.pr)}</div><div class="l">% Reprovação</div></div>`+
     `<div class="rb"><div class="n">${people.length}</div><div class="l">Vistoriadores</div></div></div></div></div></div>`;
   // 2. Por acompanhamento técnico + comparativo de taxas
-  const legend=`<div class="st-legend"><span><i class="stk-ok"></i>Aprovadas</span><span><i class="stk-rev"></i>Reprovadas (Revistoria / Rev. finalizada)</span></div>`;
+  const legend=`<div class="st-legend"><span><i class="stk-ok"></i>Aprovadas</span><span><i class="stk-rev"></i>Reprovadas (foram para revistoria)</span></div>`;
   h+=`<div class="st-grid2"><div class="rg-card"><div class="rgh"><span>Por acompanhamento técnico</span><b>${tot.n} vistorias</b></div><div class="rg-body">${legend}<div class="st-acomp">`+
     shown.map(c=>`<div class="stk-row"><span class="stk-lbl">${esc(c.l)}<small>${c.n} vist. · ${stPct(tot.n?c.n/tot.n*100:0,tot.n)} do total</small></span>${stBar(c,c.l)}`+
       `<span class="stk-tot"><b>${stPct(c.pa,c.n)}</b><span>${stPct(c.pr,c.n)}</span></span></div>`).join("")+`</div></div></div>`;
@@ -6928,14 +6960,15 @@ function renderStats(){
     acCols.map(c=>`<th class="${c.g} sep">Vist.</th><th class="${c.g}">% Aprov.</th><th class="${c.g}">% Reprov.</th>`).join("")+`</tr></thead><tbody>`+
     people.map(x=>row(x)).join("")+row(totRow,"st-tot")+`</tbody></table></div></div>`+
     `<div class="st-cards">${people.map(x=>card(x)).join("")}${card(totRow," tot")}</div>`+
-    `<p class="st-note"><b>Critérios:</b> vistoriada = Aprovado + Revistoria + Revistoria Finalizada (mesma regra do Resumo Geral); aprovação = Aprovado ÷ vistoriadas; reprovação = (Revistoria + Revistoria Finalizada) ÷ vistoriadas. Cada unidade conta uma vez (a revistoria não cria registro novo) para o vistoriador do campo Responsável, com o nome como foi registrado. Não agendado, Agendado, Remarcado e Processo em Andamento ficam de fora. Dados em tempo real do Supabase.</p></div></div>`;
+    `<p class="st-note"><b>Critérios:</b> situação atual deste condomínio (não depende do período acima). Vistoriada = Aprovado + Revistoria (inclui as revistorias já aprovadas; mesma regra do Panorama); aprovação = Aprovado ÷ vistoriadas; reprovação = Revistoria ÷ vistoriadas. Cada unidade conta uma vez (a revistoria não cria registro novo) para o vistoriador do campo Responsável, com o nome como foi registrado. Não agendado, Agendado, Remarcado e Processo em Andamento ficam de fora. Dados em tempo real do Supabase.</p></div></div>`;
   wrap.innerHTML=h;
 }
-document.getElementById("statsWrap")?.addEventListener("click",e=>{
-  const s=e.target.closest("[data-st-sort]");if(!s)return;
+// A seção é redesenhada junto com a Produtividade: eventos delegados no documento.
+document.addEventListener("click",e=>{
+  const s=e.target.closest("#statsWrap [data-st-sort]");if(!s)return;
   const k=s.dataset.stSort;stSort=stSort.key===k?{key:k,dir:-stSort.dir}:{key:k,dir:k==="name"?1:-1};renderStats();
 });
-document.getElementById("statsWrap")?.addEventListener("change",e=>{
+document.addEventListener("change",e=>{
   if(e.target.id!=="stSortSel")return;const k=e.target.value;stSort={key:k,dir:k==="name"?1:-1};renderStats();document.getElementById("stSortSel")?.focus();
 });
 /* tooltip dos gráficos (mouse, teclado e toque) */
@@ -7258,7 +7291,7 @@ document.getElementById("ovStatus").addEventListener("click",e=>{const b=e.targe
 document.getElementById("ovList").addEventListener("click",e=>{const d=e.target.closest("[data-ovday]");if(d){openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r)openOvSummaryRow(ovSumView[+r.dataset.ovsum]);});
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const d=e.target.closest("[data-ovday]");if(d){e.preventDefault();openOvSummaryDay(d.dataset.ovday,d.dataset.ovdayproj);return;}const r=e.target.closest("[data-ovsum]");if(r&&e.key==="Enter"){e.preventDefault();openOvSummaryRow(ovSumView[+r.dataset.ovsum]);}});
 document.getElementById("ovCards").addEventListener("click",e=>{const c=e.target.closest("[data-ovcard]");if(!c)return;const k=c.dataset.ovcard;
-  ovFilt={...OV_EMPTY(),period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",status:k==="rv"?["rv"]:k==="rf"?["rf"]:[]};if(k==="rv"||k==="rf")ovMode="lista";renderOvFilters();renderOverview();});
+  ovFilt={...OV_EMPTY(),period:k==="today"?"today":(k==="active"||k==="next")?"next":"ALL",status:k==="rv"?["rv"]:[]};if(k==="rv")ovMode="lista";renderOvFilters();renderOverview();});
 document.getElementById("ovList").addEventListener("click",e=>{const r=e.target.closest("[data-ov]");if(r)openOverviewUnit(ovView[+r.dataset.ov]);});
 document.getElementById("ovList").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const r=e.target.closest("[data-ov]");if(r){e.preventDefault();openOverviewUnit(ovView[+r.dataset.ov]);}});
 // O nome do condomínio só indica a obra aberta; voltar à seleção de obras é pelo botão Início.

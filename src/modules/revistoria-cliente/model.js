@@ -23,7 +23,7 @@ export const info = (status) => STATUS[status] || SEM_REGISTRO;
 // A lista e as cores vêm do cadastro central (window.AmciCores → aplicarEquipes); as abaixo valem até carregar.
 // A cor da equipe pinta a unidade nos mapas da Revistoria e da Execução M.O.; equipes desativadas continuam
 // identificando as unidades já atribuídas (histórico), mas não aparecem para novas atribuições.
-import { EQUIPES_PADRAO, equipes as normalizarEquipes, SEM_EQUIPE } from "../cores/model.js";
+import { EQUIPES_PADRAO, equipes as normalizarEquipes, SEM_EQUIPE, APROVADA_SEM_EQUIPE } from "../cores/model.js";
 const paraExec = (e) => ({ key: e.id, equipe: e.grupo, responsavel: e.nome, sigla: e.sigla, cor: e.cor, borda: e.borda, texto: e.texto, ativo: e.ativo !== false, ordem: e.ordem || 0 });
 export const EXECUCOES = normalizarEquipes(EQUIPES_PADRAO).map(paraExec);
 export const EQUIPES = [];
@@ -39,11 +39,15 @@ aplicarEquipes(null);
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 /** Equipes que podem ser escolhidas (ativas) + a atual da unidade, mesmo desativada. */
 export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.key === atual);
-/** Cor do apartamento nos mapas da Revistoria / Execução M.O.: a da equipe; sem equipe = neutra. */
+/** Cor do apartamento no mapa da Execução M.O.: a da equipe; sem equipe = tom de destaque (falta mão de obra);
+ *  sem equipe e já Aprovado na revistoria = cinza mais forte (concluída). */
 export function corUnidade(s) {
   const e = execInfo(s?.execucao);
-  return e ? { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e } : { ...SEM_EQUIPE, equipe: null };
+  if (e) return { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e, aprovada: false };
+  if (s?.status === "Aprovado") return { ...APROVADA_SEM_EQUIPE, equipe: null, aprovada: true };
+  return { ...SEM_EQUIPE, equipe: null, aprovada: false };
 }
+export { SEM_EQUIPE, APROVADA_SEM_EQUIPE };
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
 export const FILTRO_LIBERADO = [{ key: "", label: "Todos" }, { key: "sim", label: "Liberados" }, { key: "nao", label: "Não liberados" }];
 /** Filtro rápido de Execução (botões da aba): acumulativo (Felipe + Renato…); vazio = todas as equipes. */

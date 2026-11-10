@@ -24,8 +24,11 @@ export const EQUIPES_PADRAO = [
   { id: "EMP_OSCAR", grupo: "EMP", nome: "Oscar", sigla: "O", cor: "#00838f", cor_padrao: "#00838f", ativo: true, ordem: 3 },
   { id: "EMP_NILSON", grupo: "EMP", nome: "Nilson", sigla: "N", cor: "#8d5524", cor_padrao: "#8d5524", ativo: true, ordem: 4 }
 ];
-/** Unidade sem equipe vinculada (mapa da Revistoria / Execução M.O.): neutra, padronizada. */
-export const SEM_EQUIPE = { cor: "#ffffff", borda: "#b9c1bc", texto: "#52675d" };
+/** Unidade sem equipe vinculada (mapa da Execução M.O.): tom mais escuro que o fundo, para destacar quem ainda
+ *  não tem mão de obra alocada (com contorno tracejado no mapa). */
+export const SEM_EQUIPE = { cor: "#bcc7c1", borda: "#5f6f67", texto: "#1d2e26" };
+/** Unidade já aprovada na revistoria e sem equipe: cinza mais forte (concluída, não precisa de mão de obra). */
+export const APROVADA_SEM_EQUIPE = { cor: "#7d8782", borda: "#5f6964", texto: "#ffffff" };
 /** Sugestões para equipes novas (distintas das cores de status e de setores). */
 export const PALETA_EQUIPES = ["#7b4fc9", "#c2185b", "#00838f", "#8d5524", "#3949ab", "#00897b", "#ad1457", "#5d4037", "#6d4c41", "#1e88e5", "#7cb342", "#f4511e"];
 

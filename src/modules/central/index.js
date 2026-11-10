@@ -4,14 +4,15 @@
 // abas Vistoria · Cliente e Revistoria · Cliente; aqui tudo vem das funções central_* do banco (RLS valendo).
 //
 // host = { sb, projetos(): [{id,nome,cor,pronto}], hoje(), toast(msg), usuarioId(), vistoriaInfo(statusTexto),
-//          abrirNaVistoria(unidade), abrirNaRevistoria(unidade), panorama?: { el, mostrar() } }
+//          abrirNaVistoria(unidade), abrirNaRevistoria(unidade), panorama?: { el, mostrar() },
+//          estatistica?: { titulo, pintar(el) } (Vistoriadores × acompanhamento técnico, na Produtividade) }
 import * as M from "./model.js";
 import * as S from "./service.js";
 import { pintarProdutividade } from "./produtividade.js";
 import { abrirUnidade, fecharUnidade, recentes as recentesDe } from "./unidade.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-// Ordem da página: Panorama (Vistorias e Revistorias) → Agenda Operacional → Produtividade; Unidades é a pesquisa.
+// Ordem da página: Panorama (Geral, Vistorias e Revistorias) → Agenda Operacional → Produtividade; Unidades é a pesquisa.
 const ABAS = [
   { key: "panorama", label: "Panorama", ic: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>' },
   { key: "agenda", label: "Agenda Operacional", ic: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h6"/>' },

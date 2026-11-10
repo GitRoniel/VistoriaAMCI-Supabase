@@ -104,6 +104,10 @@ function pintarConteudo(grao) {
       </tbody></table></div>
       <p class="pv-nota"><b>Como ler:</b> <i>Realizadas</i> mede produtividade; <i>% aprov.</i> mede o resultado da 1ª vistoria (aprovada × com pendências) e não a qualidade do trabalho de quem vistoriou. Pendências são as dos relatórios das unidades vistoriadas pela pessoa. A resolução das pendências é da obra e não é atribuída ao vistoriador. Nomes iguais com maiúsculas ou espaços diferentes contam como a mesma pessoa.</p></details>`
     : `<div class="ct-vazio"><b>Nenhuma vistoria ou revistoria com responsável no período.</b></div>`}</section>`;
+  // 2b. Vistoriadores × acompanhamento técnico (era a aba Estatística Geral): situação atual do condomínio aberto,
+  // calculada pela tela da Vistoria (host.estatistica); não aparece na Central da tela inicial (vários condomínios).
+  const est = host.estatistica;
+  if (est) h += `<section class="pv-sec pv-est"><h3>Vistoriadores × acompanhamento técnico <small>· situação atual · ${esc(est.titulo)}</small></h3><div class="st-wrap" id="statsWrap"></div></section>`;
   // 3. Produtividade por período: gráfico principal grande; aprovações e pendências ao lado, menores
   h += `<section class="pv-sec"><h3>Produtividade por período <small>· ${grao === "mes" ? "por mês" : grao === "semana" ? "por semana" : "por dia"}</small></h3>
     ${barras({ id: "pvG1", titulo: "Vistorias e revistorias realizadas", baldes: d.serie, series: ["vistorias", "revistorias"], grao, classe: "cg-grande" })}
@@ -124,7 +128,7 @@ function pintarConteudo(grao) {
   const cs = d.condominios || [];
   if (cs.length) {
     h += `<details class="pv-sec pv-mais pv-cond"${cs.length > 1 ? " open" : ""}><summary><h3>Por condomínio <small>· clique para ver só um condomínio</small></h3></summary><div class="pv-tw"><table class="pv-tbl"><thead><tr>
-      <th class="l">Condomínio</th><th>Unidades</th><th>Vistoriadas</th><th>Aprovadas</th><th>% aprov. 1ª</th><th>Em revistoria</th><th>Rev. finalizadas</th><th>Pendências</th><th>Resolvidas</th><th>% resolução</th><th title="No período">Vist. período</th><th title="No período">Rev. período</th></tr></thead><tbody>
+      <th class="l">Condomínio</th><th>Unidades</th><th>Vistoriadas</th><th>Aprovadas</th><th>% aprov. 1ª</th><th>Em revistoria</th><th title="Unidades aprovadas na revistoria">Aprov. na revistoria</th><th>Pendências</th><th>Resolvidas</th><th>% resolução</th><th title="No período">Vist. período</th><th title="No período">Rev. período</th></tr></thead><tbody>
       ${cs.map((x) => `<tr data-pv-proj="${x.project_id}" tabindex="0" title="Ver só este condomínio"><td class="l"><b>${esc(nomeP(x.project_id))}</b></td><td>${x.unidades}</td><td>${x.vistoriadas}</td><td>${x.aprovadas_1a + x.rev_finalizadas}</td><td>${M.fmtPct(M.pct(x.aprovadas_1a, x.vistoriadas))}</td><td>${x.em_revistoria}</td><td>${x.rev_finalizadas}</td><td>${x.pend_total}</td><td>${x.pend_resolvidas}</td><td>${M.fmtPct(M.pct(x.pend_resolvidas, x.pend_total))}</td><td>${x.vist_realizadas}</td><td>${x.rev_realizadas}</td></tr>`).join("")}
       </tbody></table></div></details>`;
   }
@@ -151,6 +155,7 @@ function pintarConteudo(grao) {
   </section>`;
   const abertos = [...el.querySelectorAll("details[data-k]")].filter((x) => x.open).map((x) => x.dataset.k);
   el.innerHTML = h;
+  if (est) est.pintar(el.querySelector("#statsWrap"));
   // mantém abertas as consultas complementares que o usuário abriu (ao trocar período ou parâmetro)
   el.querySelectorAll("details").forEach((x, i) => { x.dataset.k = String(i); if (abertos.includes(String(i))) x.open = true; });
 }
