@@ -50,6 +50,7 @@ function el() {
     document.body.appendChild(ov);
     ov.addEventListener("click", (e) => { if (e.target === ov) fechar(); else clique(e); });
     ov.addEventListener("change", mudou);
+    ov.addEventListener("toggle", (e) => { if (st && e.target.classList?.contains("rv-hist")) st.histAberto = e.target.open; }, true);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ov.classList.contains("open") && !document.fullscreenElement) { if (ov.classList.contains("rv-cheia")) telaCheia(false); else fechar(); } });
     document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && ov.classList.contains("rv-cheia")) telaCheia(false, true); });
   }
@@ -186,7 +187,7 @@ function historico(info) {
   };
   const reproc = st.podeEditar && info.vigente && !C.emAndamento(info.status)
     ? `<button type="button" class="btn g" data-rv="converter" data-reproc="1"${st.pedindo ? " disabled" : ""}>Reprocessar conversão</button>` : "";
-  return `<details class="rv-hist"><summary>Versões do relatório (${todas.length})</summary><ul>${todas.map(linha).join("")}</ul>${reproc ? `<div class="rv-hist-a">${reproc}<span>Gera uma nova versão; as anteriores e o original ficam guardados.</span></div>` : ""}</details>`;
+  return `<details class="rv-hist"${st.histAberto ? " open" : ""}><summary>Versões do relatório (${todas.length})</summary><ul>${todas.map(linha).join("")}</ul>${reproc ? `<div class="rv-hist-a">${reproc}<span>Gera uma nova versão; as anteriores e o original ficam guardados.</span></div>` : ""}</details>`;
 }
 function secaoDocumento() {
   const info = C.versoesDoRelatorio(st.rel, st.versoes), v = C.arquivoExibido(info, st.escolha);

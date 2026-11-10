@@ -15,13 +15,26 @@ const TOL = 3.5;
 
 /** Linhas da página (de cima para baixo), cada uma com os itens da esquerda para a direita. */
 export function linhas(itens) {
-  const ord = [...itens].filter((i) => limpa(i.str)).sort((a, b) => b.y - a.y || a.x - b.x);
+  const ord = [...itens].filter((i) => i.str && i.str.length).sort((a, b) => b.y - a.y || a.x - b.x);
   const out = [];
   for (const it of ord) {
     const l = out.find((x) => Math.abs(x.y - it.y) <= TOL);
     if (l) l.itens.push(it); else out.push({ y: it.y, itens: [it] });
   }
-  out.forEach((l) => l.itens.sort((a, b) => a.x - b.x));
+  out.forEach((l) => {
+    l.itens.sort((a, b) => a.x - b.x);
+    // trechos encostados (geradores que escrevem letra a letra ou palavra a palavra) viram um segmento só
+    const seg = [];
+    for (const it of l.itens) {
+      const ant = seg[seg.length - 1], t = it.tam || 8;
+      const fim = ant ? ant.x + (ant.w || 0) : 0, gap = ant ? it.x - fim : Infinity;
+      if (ant && ant.w != null && gap < 0.3 * t && gap > -0.5 * t) {
+        ant.str += (gap > 0.15 * t && !/\s$/.test(ant.str) && !/^\s/.test(it.str) ? " " : "") + it.str;
+        ant.w = Math.max(ant.w, it.x + (it.w || 0) - ant.x);
+      } else seg.push({ ...it });
+    }
+    l.itens = seg.filter((x) => limpa(x.str)).map((x) => ({ ...x, str: limpa(x.str) }));
+  });
   out.sort((a, b) => b.y - a.y);
   return out.map((l) => ({ tipo: "texto", y: l.y, x: l.itens[0].x, itens: l.itens, texto: limpa(l.itens.map((i) => i.str).join(" ")) }));
 }
@@ -43,13 +56,21 @@ export function descricaoNc(paragrafos, { ambiente = "", servico = "" } = {}) {
     else {
       let t = ps[0].replace(auto, "").trim();
       if (servico && norm(t).startsWith(norm(servico))) t = t.slice(servico.length);
-      t = t.replace(/^.*?do formul[aá]rio .*?cliente\b,?/i, "").trim();
+      t = t.replace(/^.*?do formul[aá]rio .*?cliente\b[.,;]?/i, "").trim();
       if (ambiente) t = t.replace(new RegExp("^,?\\s*localizado na\\s+" + ambiente.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*"), "i"), "").trim();
       t = t.replace(/^,?\s*localizado na\s+\S+(\s+\d+)?\s*/i, "").trim();
       ps = t ? [t] : [];
     }
   }
-  return limpa(ps.join(" "));
+  return limpa(ps.join(" ")).replace(/^[.,;:\-–\s]+/, "");
+}
+
+/** Serviço e ambiente escritos pelo próprio Mobuss no texto automático da NC (mais confiáveis que a posição). */
+export function origemNc(paragrafos) {
+  const t = limpa((paragrafos || []).join(" "));
+  const m = /a partir do item\s+(.+?),\s*do formul[aá]rio/i.exec(t);
+  const a = /localizado na\s+(.+?)(?:\.|$|\s{2})/i.exec(t);
+  return { servico: m ? limpa(m[1]) : "", ambiente: a ? limpa(a[1]) : "" };
 }
 
 /**
@@ -62,9 +83,14 @@ export function extrair(paginas) {
   const itens = [], ncs = [], fotosItem = [], naoAssociadas = [], avisos = [];
   const ambientes = [];
   const col = { desc: 161, resp: 392, obs: 490 };
-  let seq = 0, assinaturas = 0, ambiente = "", anterior = "", item = null, nc = null, alvo = null, modo = "", descUltY = null, termo = false;
+  let seq = 0, assinaturas = 0, ambiente = "", anterior = "", ultimaLinha = "", item = null, nc = null, alvo = null, modo = "", descUltY = null, termo = false;
   const fechaDesc = () => {
     if (!nc || !nc.paragrafos) return;
+    const o = origemNc(nc.paragrafos);
+    if (o.servico && norm(o.servico) !== norm(nc.servicoOriginal)) {
+      if (nc.servicoOriginal) avisos.push(`NC ${nc.numero}: serviço pela posição ("${nc.servicoOriginal}") difere do texto do Mobuss ("${o.servico}"); usado o do texto`);
+      nc.servicoOriginal = o.servico;
+    }
     nc.descricao = descricaoNc(nc.paragrafos, { ambiente: nc.ambiente, servico: nc.servicoOriginal });
     delete nc.paragrafos;
   };
@@ -93,6 +119,7 @@ export function extrair(paginas) {
         continue;
       }
       const l = ev, t = l.texto, n = norm(t);
+      const acima = ultimaLinha; ultimaLinha = t;
       // cabeçalho/rodapé das páginas
       if (RODAPE.test(n) || ehEmail(t)) { if (/^gerado:/.test(n) && !cab.geradoEm) { const m = DATA.exec(t); cab.geradoEm = iso(m); } continue; }
       const mu = /^bl\s*([a-z0-9]{1,3})\s*-\s*apt?o?\.?\s*(t?\d{1,5})\s*\((.*)\)$/i.exec(t);
@@ -131,7 +158,7 @@ export function extrair(paginas) {
         continue;
       }
       // ambiente: a linha logo acima de "Vistoria do Cliente | CHECKLIST ..."
-      if (/\|\s*checklist/.test(n)) { fechaItem(); ambiente = limpa(anterior); if (ambiente && !ambientes.includes(ambiente)) ambientes.push(ambiente); continue; }
+      if (/\|\s*checklist/.test(n)) { fechaItem(); ambiente = limpa(acima || anterior); if (ambiente && !ambientes.includes(ambiente)) ambientes.push(ambiente); continue; }
       // NC
       const mnc = /^n[aã]o conformidade\s+(\d+)$/i.exec(t);
       if (mnc) {

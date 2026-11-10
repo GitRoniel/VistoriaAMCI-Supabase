@@ -52,6 +52,15 @@ const seqs = [...x.ncs.flatMap((n) => n.fotos), ...x.fotosItem.flatMap((i) => i.
 ok(igual(seqs, Array.from({ length: E.totalFotos }, (_, i) => i + 1)), "cada foto usada uma única vez, ordem preservada");
 ok(x.avisos.length === 0, "sem avisos: " + x.avisos.join(" | "));
 
+// ── mesmo documento escrito letra a letra (Chrome/Skia): os trechos encostados viram palavras e linhas iguais ──
+{
+  const g2 = await gerarMobussSintetico(PDFLib, { letraALetra: true });
+  const x2 = extrair((await criarLeitor(PDFLib)(g2.bytes)).paginas);
+  ok(igual(x2.ncs.map((n) => [n.numero, n.ambiente, n.servicoOriginal, n.descricao, n.fotos.length]), x.ncs.map((n) => [n.numero, n.ambiente, n.servicoOriginal, n.descricao, n.fotos.length])),
+    "PDF escrito letra a letra: mesma extração (NCs, ambientes, serviços, descrições, fotos)");
+  ok(x2.cabecalho.unidade === "BL B - APT 204" && x2.cabecalho.responsavel === E.cabecalho.responsavel, "PDF letra a letra: cabeçalho");
+}
+
 // ── conversão completa ──
 const etapas = [];
 const r = await converter(PDFLib, bytes, { regras: [], etapa: async (e) => { etapas.push(e); }, geradoEm: new Date("2026-11-10T12:00:00Z") });

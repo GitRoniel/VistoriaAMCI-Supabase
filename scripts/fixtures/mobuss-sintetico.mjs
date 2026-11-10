@@ -27,7 +27,7 @@ export function png(w, h, [r, g, b]) {
 /**
  * Gera o PDF. Retorna { bytes, esperado } com o que o conversor deve encontrar.
  */
-export async function gerarMobussSintetico(PDFLib) {
+export async function gerarMobussSintetico(PDFLib, { letraALetra = false } = {}) {
   const { PDFDocument, StandardFonts } = PDFLib;
   const doc = await PDFDocument.create();
   const f = await doc.embedFont(StandardFonts.Helvetica), fb = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -36,7 +36,11 @@ export async function gerarMobussSintetico(PDFLib) {
   const foto = async (retrato = true) => doc.embedPng(png(retrato ? 144 : 256, retrato ? 256 : 144, cores[nFoto++ % cores.length]));
   const assinatura = await doc.embedPng(png(520, 200, [240, 240, 240]));
   let pg = null, nPag = 0;
-  const T = (s, x, y, t = 8, fonte = f) => pg.drawText(s, { x, y, size: t, font: fonte });
+  // letraALetra: um comando de texto por caractere (como o PDF gerado pelo Chrome), para testar a junção dos trechos
+  const T = (s, x, y, t = 8, fonte = f) => {
+    if (!letraALetra) return pg.drawText(s, { x, y, size: t, font: fonte });
+    for (const ch of s) { pg.drawText(ch, { x, y, size: t, font: fonte }); x += fonte.widthOfTextAtSize(ch, t); }
+  };
   const nova = () => {
     pg = doc.addPage([595.28, 841.89]); nPag++;
     T("RELATÓRIO DE ENTREGA DA UNIDADE", 8, 811.5, 12, fb);

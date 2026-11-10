@@ -83,7 +83,7 @@ function lerCMap(txt) {
 }
 
 export function criarLeitor(PDFLib) {
-  const { PDFDocument, PDFName, PDFDict, PDFArray, PDFRawStream, PDFRef, decodePDFRawStream } = PDFLib;
+  const { PDFDocument, PDFName, PDFDict, PDFArray, PDFRawStream, PDFRef, decodePDFRawStream, StandardFontEmbedder, StandardFonts } = PDFLib;
   const N = (s) => PDFName.of(s);
   const bytesDe = (stream) => { try { return decodePDFRawStream(stream).decode(); } catch { return new Uint8Array(0); } };
   const latin = (u8) => { let s = ""; for (const c of u8) s += String.fromCharCode(c); return s; };
@@ -96,9 +96,42 @@ export function criarLeitor(PDFLib) {
       if (cacheFonte.has(chave)) return cacheFonte.get(chave);
       const d = ctx.lookup(ref, PDFDict);
       let f = { bytes: 1, mapa: null };
+      const tipo0 = String(d.get(N("Subtype"))) === "/Type0";
       const tu = d.get(N("ToUnicode"));
       if (tu) { const s = ctx.lookup(tu); if (s instanceof PDFRawStream) f = lerCMap(latin(bytesDe(s))); }
-      else if (String(d.get(N("Subtype"))) === "/Type0") f = { bytes: 2, mapa: null };
+      else if (tipo0) f = { bytes: 2, mapa: null };
+      // larguras dos glifos (milésimos do corpo), para posicionar e juntar os trechos de texto
+      const larg = new Map(); let padrao = 500;
+      const nums = (arr) => (arr instanceof PDFArray ? arr.asArray().map((x) => ctx.lookup(x)?.asNumber?.() ?? 0) : []);
+      try {
+        if (tipo0) {
+          const desc = ctx.lookup(ctx.lookup(d.get(N("DescendantFonts")), PDFArray)?.get(0), PDFDict);
+          padrao = desc?.get(N("DW"))?.asNumber?.() ?? 1000;
+          const w = ctx.lookup(desc?.get(N("W")));
+          const itens = w instanceof PDFArray ? w.asArray().map((x) => ctx.lookup(x)) : [];
+          for (let k = 0; k < itens.length;) {
+            const c0 = itens[k]?.asNumber?.(); const prox = itens[k + 1];
+            if (prox instanceof PDFArray) { nums(prox).forEach((v, j) => larg.set(c0 + j, v)); k += 2; }
+            else { const c1 = prox?.asNumber?.(), v = itens[k + 2]?.asNumber?.() ?? padrao; for (let c = c0; c <= c1 && c - c0 < 65536; c++) larg.set(c, v); k += 3; }
+          }
+        } else {
+          const fc = d.get(N("FirstChar"))?.asNumber?.() ?? 0;
+          nums(ctx.lookup(d.get(N("Widths")))).forEach((v, j) => larg.set(fc + j, v));
+          padrao = 556;
+          // fontes padrão (Helvetica, Times, Courier…) sem tabela de larguras: métricas AFM do pdf-lib
+          const base = String(d.get(N("BaseFont")) || "").replace(/^\//, "").replace(/^[A-Z]{6}\+/, "");
+          if (!larg.size && StandardFontEmbedder && Object.values(StandardFonts || {}).includes(base)) {
+            const emb = StandardFontEmbedder.for(base), cache = new Map();
+            const porCod = (cod) => {
+              if (cache.has(cod)) return cache.get(cod);
+              let v = padrao; try { v = emb.widthOfTextAtSize(f.mapa?.get(cod) ?? WINANSI[cod] ?? String.fromCharCode(cod), 1000); } catch { /* glifo ausente */ }
+              cache.set(cod, v); return v;
+            };
+            for (let c = 32; c < 256; c++) larg.set(c, porCod(c));
+          }
+        }
+      } catch { /* sem larguras: aproximação */ }
+      f.larg = (cod) => larg.get(cod) ?? padrao;
       cacheFonte.set(chave, f); return f;
     };
     const texto = (f, u8) => {
@@ -116,13 +149,18 @@ export function criarLeitor(PDFLib) {
       const itens = [], imagens = [];
       const percorrer = (conteudo, recursos, ctmBase, profundidade) => {
         const fontes = recursos?.lookupMaybe?.(N("Font"), PDFDict), xobj = recursos?.lookupMaybe?.(N("XObject"), PDFDict);
-        let ctm = ctmBase, pilha = [], tm = [1, 0, 0, 1, 0, 0], tlm = [1, 0, 0, 1, 0, 0], f = { bytes: 1, mapa: null }, tam = 10, lead = 0;
+        let ctm = ctmBase, pilha = [], tm = [1, 0, 0, 1, 0, 0], tlm = [1, 0, 0, 1, 0, 0], f = { bytes: 1, mapa: null }, tam = 10, lead = 0, tc = 0;
         let ops = [];
+        const avancar = (dx) => { tm = mul([1, 0, 0, 1, dx, 0], tm); };
         const emitir = (u8) => {
-          const s = texto(f, u8); if (!s) return;
+          const s = texto(f, u8);
+          let unid = 0, n = 0;
+          if (f.bytes === 2) for (let k = 0; k + 1 < u8.length; k += 2) { unid += f.larg ? f.larg((u8[k] << 8) | u8[k + 1]) : 500; n++; }
+          else for (const c of u8) { unid += f.larg ? f.larg(c) : 500; n++; }
+          const dx = (unid / 1000) * tam + tc * n;
           const m = mul(tm, ctm), escala = Math.hypot(m[0], m[1]) || 1;
-          itens.push({ str: s, x: m[4], y: m[5], w: s.length * tam * escala * 0.5, tam: tam * escala });
-          tm = [tm[0], tm[1], tm[2], tm[3], tm[4] + s.length * tam * 0.5 * tm[0], tm[5]];
+          if (s) itens.push({ str: s, x: m[4], y: m[5], w: dx * escala, tam: tam * escala });
+          avancar(dx);
         };
         for (const tk of tokens(conteudo)) {
           if (tk.t !== "op") { ops.push(tk); continue; }
@@ -137,6 +175,7 @@ export function criarLeitor(PDFLib) {
             case "Td": tm = tlm = mul([1, 0, 0, 1, num(2), num(1)], tlm); break;
             case "TD": lead = -num(1); tm = tlm = mul([1, 0, 0, 1, num(2), num(1)], tlm); break;
             case "TL": lead = num(1); break;
+            case "Tc": tc = num(1) || 0; break;
             case "T*": tm = tlm = mul([1, 0, 0, 1, 0, -lead], tlm); break;
             case "Tf": { tam = num(1) || tam; const nome = a[a.length - 2]?.v; const r = nome && fontes?.get(N(nome)); f = r ? fonte(r) : { bytes: 1, mapa: null }; break; }
             case "Tj": if (a.at(-1)?.t === "s") emitir(a.at(-1).v); break;
@@ -144,8 +183,8 @@ export function criarLeitor(PDFLib) {
             case '"': tm = tlm = mul([1, 0, 0, 1, 0, -lead], tlm); if (a.at(-1)?.t === "s") emitir(a.at(-1).v); break;
             case "TJ": {
               const ini = a.findLastIndex((x) => x.t === "["); const partes = ini >= 0 ? a.slice(ini + 1) : [];
-              const u = []; for (const p of partes) if (p.t === "s") u.push(...p.v);
-              if (u.length) emitir(Uint8Array.from(u)); break;
+              for (const p of partes) { if (p.t === "s") emitir(p.v); else if (typeof p.v === "number") avancar((-p.v / 1000) * tam); }
+              break;
             }
             case "Do": {
               const nome = a.at(-1)?.v, r = nome && xobj?.get(N(nome)); if (!r) break;
