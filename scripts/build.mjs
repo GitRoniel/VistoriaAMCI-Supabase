@@ -66,6 +66,8 @@ const buildOptions = {
 const xlsxOptions = { ...buildOptions, entryPoints: ["./src/xlsx-entry.js"], outfile: "www/xlsx-reader.js" };
 // Controle de Chaves: aba das Vistorias (index.html), que expõe window.AmciChaves. O CSS fica no
 // index.html para o tema escuro ser gerado junto com o restante da tela.
+// Cores centralizadas (setores e equipes) + editor do Admin (window.AmciCores), usado por Chaves e Revistoria.
+const coresOptions = { ...buildOptions, entryPoints: ["./src/modules/cores/index.js"], outfile: "www/cores.js" };
 const chavesOptions = { ...buildOptions, entryPoints: ["./src/modules/chaves/index.js"], outfile: "www/chaves.js" };
 // Revistoria · Cliente: aba das Vistorias (index.html), que expõe window.AmciRevCliente (CSS no index.html, como o das Chaves).
 const revclienteOptions = { ...buildOptions, entryPoints: ["./src/modules/revistoria-cliente/index.js"], outfile: "www/revcliente.js" };
@@ -96,6 +98,7 @@ if (watch) {
   const ctx = await context(buildOptions);
   await ctx.watch();
   await (await context(xlsxOptions)).watch();
+  await (await context(coresOptions)).watch();
   await (await context(chavesOptions)).watch();
   await (await context(revclienteOptions)).watch();
   await (await context(centralOptions)).watch();
@@ -105,6 +108,7 @@ if (watch) {
 } else {
   await build(buildOptions);
   await build(xlsxOptions);
+  await build(coresOptions);
   await build(chavesOptions);
   await build(revclienteOptions);
   await build(centralOptions);

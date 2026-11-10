@@ -17,7 +17,7 @@ import * as CM from "../chaves/model.js";
 import * as CS from "../chaves/service.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: [], relatorio: "", chave: "", data: "", hrSort: "asc" });
+const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: [], relatorio: "", statusExec: "", chave: "", data: "", hrSort: "asc" });
 const pad = (n) => String(n).padStart(2, "0");
 const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const fmtD = (d) => { const p = String(d || "").slice(0, 10).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
@@ -89,7 +89,7 @@ const AREAS = [
     ic: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>' }
 ];
 /** Filtros de cada área (bloco e busca são comuns). */
-const CAMPOS_AREA = { acomp: ["rapido", "data"], exec: ["liberado", "execucao", "relatorio", "chave"] };
+const CAMPOS_AREA = { acomp: ["rapido", "data"], exec: ["statusExec", "liberado", "execucao", "relatorio", "chave"] };
 /** Filtro efetivo da área: os campos da outra área não valem aqui (ficam guardados para quando voltar). */
 function filtroArea() {
   const f0 = FILTRO0(), f = { ...filt };
@@ -111,19 +111,18 @@ function casca() {
         <label class="fx-field fx-sel rc-f-lib"${so("exec")}><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
         <label class="fx-field fx-sel rc-f-key"${so("exec")}><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
       </div>
-      <div class="ch-line rc-exe-fil" role="group" aria-label="Filtrar por equipe de execução"${so("exec")}>
-        <span class="rc-exe-fil-t">Execução</span>
-        ${M.BOTOES_EXECUCAO.map((e) => `<button type="button" class="rc-exe-b" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i>${esc(e.sigla)}</i>${esc(e.label)}<b class="rc-exe-n" data-exe-n="${esc(e.key)}"></b></button>`).join("")}
-        <button type="button" class="rc-exe-x" id="rcExeX" aria-label="Limpar filtro de execução" title="Mostrar todas as equipes" hidden>× Todas as equipes</button>
-      </div>
-      <div class="ch-line rc-rel-fil" role="group" aria-label="Filtrar por relatório"${so("exec")}>
-        <span class="rc-exe-fil-t">Relatório</span>
-        ${M.FILTRO_RELATORIO.map((o) => `<button type="button" class="rc-rel-b r-${o.key}" data-rel-f="${o.key}" aria-pressed="false">${o.key === "com" ? ICONE.relatorio : ICONE.semRel}<span>${esc(o.label)}</span><b data-rel-n="${o.key}"></b></button>`).join("")}
+      <div class="ch-line ch-chips rc-fil-eq" role="group" aria-label="Filtrar por equipe (mais de uma ao mesmo tempo)"${so("exec")}>
+        <span class="rc-fil-t">Equipe</span>
+        ${[...M.BOTOES_EXECUCAO, { key: "sem", label: "Sem equipe", cor: "#8a948f" }].map((e) => `<button type="button" class="fchip rc-eqf" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i></i>${esc(e.label)}<b class="rc-chip-n" data-exe-n="${esc(e.key)}"></b></button>`).join("")}
+        <button type="button" class="rc-exe-x" id="rcExeX" aria-label="Limpar filtro de equipe" title="Mostrar todas as equipes" hidden>× Todas</button>
+        <span class="rc-fil-t rc-fil-t2">Relatório</span>
+        ${M.FILTRO_RELATORIO.map((o) => `<button type="button" class="fchip rc-relf" data-rel-f="${o.key}" style="--c:${o.key === "com" ? "#2f6fdb" : "#b9770e"}" aria-pressed="false"><i></i>${esc(o.label)}<b class="rc-chip-n" data-rel-n="${o.key}"></b></button>`).join("")}
       </div>
       <div class="ch-line ch-chips">
         ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}"${so("acomp")}>${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
         <span class="ch-count" id="rcCount"></span>
         ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcLote" title="Enviar vários PDFs de relatório de uma vez; a unidade é reconhecida pelo nome do arquivo e pelo PDF"${so("exec")}>Relatórios em lote</button>` : ""}
+        ${window.AmciCores ? `<button type="button" class="btn g ch-clear rc-imp" id="rcCores" title="${host.papel() === "admin" ? "Cores e cadastro das equipes de mão de obra (vale para todos os módulos)" : "Cores das equipes de mão de obra"}"${so("exec")}>${host.papel() === "admin" ? "Equipes e cores" : "Cores das equipes"}</button>` : ""}
         ${host.abrirChaves ? `<button type="button" class="btn g ch-clear rc-imp" id="rcChaves" title="Abrir o Controle de Chaves (setores, transferências e ocorrências de todas as unidades)"${so("exec")}>Controle de Chaves</button>` : ""}
         ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)"${so("acomp")}>Importar planilha</button>` : ""}
         <button type="button" class="btn g ch-clear" id="rcLimpar">Limpar</button>
@@ -148,6 +147,7 @@ function casca() {
   q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
   q("#rcLote")?.addEventListener("click", () => abrirLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
   q("#rcChaves")?.addEventListener("click", () => host.abrirChaves?.());
+  q("#rcCores")?.addEventListener("click", () => window.AmciCores?.abrirEditor({ admin: host.papel() === "admin", aba: "equipes", rotulos: Object.fromEntries(Object.entries(CM.SETORES).map(([k, x]) => [k, x.label])) }));
   // Limpar: bloco, busca e os filtros da área aberta (os da outra área continuam como estavam)
   q("#rcLimpar").addEventListener("click", () => { const f0 = FILTRO0(); for (const k of ["bloco", "busca", ...CAMPOS_AREA[area]]) filt[k] = f0[k]; sincronizarFiltros(); pintarConteudo(); });
   if (!root.dataset.ouvindo) { root.addEventListener("click", cliqueRaiz); root.dataset.ouvindo = "1"; }
@@ -156,9 +156,9 @@ function sincronizarFiltros() {
   const q = (id) => root.querySelector(id); if (!q("#rcBloco")) return;
   q("#rcBloco").value = filt.bloco; if (q("#rcBusca").value !== filt.busca) q("#rcBusca").value = filt.busca;
   q("#rcLib").value = filt.liberado; q("#rcChave").value = filt.chave;
-  root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = filt.execucao.includes(b.dataset.exeF); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = filt.execucao.includes(b.dataset.exeF); b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
   q("#rcExeX").hidden = !filt.execucao.length;
-  root.querySelectorAll("[data-rel-f]").forEach((b) => { const on = b.dataset.relF === filt.relatorio; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  root.querySelectorAll("[data-rel-f]").forEach((b) => { const on = b.dataset.relF === filt.relatorio; b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
   if (q("#rcData").value !== filt.data) q("#rcData").value = filt.data;
   q("#rcDataX").hidden = !filt.data; q("#rcData").closest("label").classList.toggle("on", !!filt.data);
   q("#rcChave").closest("label").classList.toggle("on", !!filt.chave);
@@ -170,7 +170,7 @@ function sincronizarFiltros() {
   root.querySelectorAll("[data-so]").forEach((el) => { el.hidden = el.dataset.so !== area; });
   root.dataset.areaAtual = area;
   const f = filtroArea();
-  q("#rcLimpar").hidden = f.bloco === "ALL" && !f.busca && f.rapido === "todos" && !f.liberado && !f.execucao.length && !f.relatorio && !f.chave && !f.data;
+  q("#rcLimpar").hidden = f.bloco === "ALL" && !f.busca && f.rapido === "todos" && !f.liberado && !f.execucao.length && !f.relatorio && !f.statusExec && !f.chave && !f.data;
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-rcu]");
@@ -212,7 +212,7 @@ function pintarConteudo() {
   const ok = new Set(vis.map((u) => u.unitId));
   root.querySelector("#rcKpis").innerHTML = area === "acomp" ? kpisAcompanhamento(naAba) : kpisExecucao(naAba);
   // nº de unidades de cada equipe nos botões de Execução (todas as unidades da aba)
-  root.querySelectorAll("[data-exe-n]").forEach((b) => { b.textContent = String(naAba.filter((u) => u.situacao.execucao === b.dataset.exeN).length); });
+  root.querySelectorAll("[data-exe-n]").forEach((b) => { b.textContent = String(naAba.filter((u) => M.passaExecucao(b.dataset.exeN, u.situacao.execucao)).length); });
   root.querySelectorAll("[data-rel-n]").forEach((b) => { const n = naAba.filter((u) => M.passaRelatorio(b.dataset.relN, u.temRelatorio)).length; b.textContent = apontOk ? String(n) : "…"; });
   root.querySelector("#rcCount").textContent = `${vis.length} de ${naAba.length} unidade(s)`;
   root.querySelector("#rcGrid").innerHTML = modo === "mapa" ? htmlMapa(lista, ok) : htmlLista(vis, naAba.length);
@@ -231,20 +231,15 @@ function kpisAcompanhamento(naAba) {
 }
 /** Execução M.O.: liberação, equipe, chave e checklist dos relatórios das unidades da aba. */
 function kpisExecucao(naAba) {
-  const lib = naAba.filter((u) => u.situacao.liberado).length, sem = naAba.filter((u) => !u.situacao.execucao).length;
-  const prod = naAba.filter((u) => !u.chave.perdida && u.chave.setor === "producao").length;
-  const rel = naAba.filter((u) => comRelatorio.has(u.unitId)).length;
+  const lib = naAba.filter((u) => u.situacao.liberado).length;
   let apT = 0, apR = 0; for (const u of naAba) { const r = apont.get(u.unitId); if (r) { apT += r.total; apR += r.resolvidas; } }
   const pct = apT ? Math.round((apR / apT) * 100) : 0;
-  const kpi = (kx, on, n, label, cor, title) => `<button type="button" class="ch-kpi${on ? " on" : ""}" data-kx="${kx}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
-  const algum = filt.liberado || filt.execucao.length || filt.relatorio || filt.chave;
-  return kpi("todos:", !algum, naAba.length, "Unidades em revistoria", "#1f4a3f", "Todas as unidades da aba (limpa os filtros da Execução M.O.)") +
-    kpi("liberado:sim", filt.liberado === "sim", lib, "Liberadas", "#0f3b31", "Unidades liberadas para a execução dos serviços") +
-    kpi("liberado:nao", filt.liberado === "nao", naAba.length - lib, "Não liberadas", "#8a948f", "Unidades ainda não liberadas para a execução") +
-    kpi("execucao:sem", filt.execucao.includes("sem"), sem, "Sem equipe", "#b9770e", "Unidades sem equipe de execução definida") +
-    kpi("chave:producao", filt.chave === "producao", chavesOk ? prod : "…", "Chave na Produção", CM.SETORES.producao?.cor || "#6b8040", "Chave com o setor de Produção (Controle de Chaves)") +
-    kpi("relatorio:com", filt.relatorio === "com", apontOk ? rel : "…", "Com relatório", "#2f6fdb", "Unidades com relatório de revistoria enviado") +
-    `<div class="ch-kpi k-info" style="--c:#0097a7" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><b>${apontOk ? `${apR}/${apT}` : "…"}</b><span>Apontamentos resolvidos${apT ? ` · ${pct}%` : ""}</span></div>`;
+  const n = (k) => naAba.filter((u) => M.passaStatusExecucao(k, u.situacao)).length;
+  const st = (key, label, cor, num, title) => `<button type="button" class="ch-kpi${filt.statusExec === key ? " on" : ""}" data-kx="statusExec:${key}" style="--c:${cor}" title="${esc(title)}" aria-pressed="${filt.statusExec === key}"><b>${num}</b><span>${esc(label)}</span></button>`;
+  return st("", "Todas", "#1f4a3f", naAba.length, "Todas as unidades da aba (os demais filtros continuam valendo)") +
+    M.STATUS_EXECUCAO.map((x) => st(x.key, x.label, x.cor, n(x.key), x.key === "finalizado" ? "Serviço da mão de obra concluído" : `Revistoria · Cliente: ${x.label}`)).join("") +
+    `<div class="ch-kpi k-info rc-k-sec" style="--c:#0f3b31" title="Unidades liberadas para a execução dos serviços"><b>${lib}</b><span>Liberadas</span></div>` +
+    `<div class="ch-kpi k-info rc-k-sec" style="--c:#0097a7" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><b>${apontOk ? `${apR}/${apT}` : "…"}</b><span>Apontamentos resolvidos${apT ? ` · ${pct}%` : ""}</span></div>`;
 }
 
 function ordemUnidade() {
@@ -266,7 +261,7 @@ function htmlLista(vis, total) {
     if (area === "exec") {
       return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">${cUn}${cSt}
       <td class="rc-c-lib">${libPill(s.liberado)}</td>
-      <td class="rc-c-exe">${execPill(s.execucao)}</td>
+      <td class="rc-c-exe">${execPill(s.execucao)}${s.finalizada ? `<small class="rc-fin">✓ finalizada ${esc(fmtD(s.finalizadaEm))}</small>` : ""}</td>
       <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
       ${celulasApontamentos(u.unitId)}
       <td class="ch-c-ac"><button type="button" class="btn ${comRelatorio.has(u.unitId) ? "g rc-tem-rel" : "p"} ch-mini" ${attrs} data-acao="relatorio" title="${comRelatorio.has(u.unitId) ? "Relatório enviado: abrir o checklist" : "Sem relatório enviado"}">Relatório</button>${bHist}</td>
@@ -310,18 +305,20 @@ function htmlMapa(lista, ok) {
   const btn = (b, p, a) => {
     const u = porId.get(`${b}|${p}|${a}`);
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
-    const s = u.situacao, i = s.info;
-    const tip = [u.titulo, s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
+    const s = u.situacao, i = s.info, c = M.corUnidade(s);
+    const tip = [u.titulo, s.execucao ? `Equipe: ${M.execRotulo(s.execucao)}${c.equipe && !c.equipe.ativo ? " (desativada)" : ""}${s.finalizada ? " · execução finalizada" : ""}` : s.status ? "Sem equipe de execução" : "",
+      s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
       s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
-      s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
+      M.reprovada(s) ? "Revistoria reprovada" : "",
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
     // chave: canto inferior esquerdo, no mesmo formato do canto da aba Vistoria, na cor do setor (Controle de Chaves)
     const exe = area === "exec";
     const km = exe && chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
-    const ex = exe ? M.execInfo(s.execucao) : null;
-    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
+    const ex = c.equipe;
+    const cor = s.status ? c : M.SEM_REGISTRO;   // fora da revistoria: cinza claro (como antes)
+    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? "rc-semeq" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
   };
   const g = host.grid();
   let h;
@@ -336,12 +333,15 @@ function htmlMapa(lista, ok) {
     h = `<div class="gridscroll"><table class="mx ch-mx"><thead><tr><th class="corner">PAV</th>${g.grupos.map((b) => `<th class="blkh">${esc(b)}</th>`).join("")}</tr></thead><tbody>` +
       g.pavs.map((p) => `<tr><td class="pavh">${esc(g.pavLabel[p].toUpperCase())}</td>${g.grupos.map((b) => `<td class="cell"><div class="apts">${g.apts.map((a) => btn(b, p, a)).join("")}</div></td>`).join("")}</tr>`).join("") + "</tbody></table></div>";
   }
-  return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.STATUS[s].cor};border-color:${M.STATUS[s].borda}"></span>${M.STATUS[s].label}</div>`).join("")}
-    <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
-    <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
-    <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
-    ${area === "exec" ? `<div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
-    ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}` : ""}
+  // legenda: as equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
+  const usadas = new Set(lista.map((u) => u.situacao.execucao).filter(Boolean));
+  const eqs = M.EXECUCOES.filter((e) => e.ativo || usadas.has(e.key));
+  return h + `<div class="legend ch-legend rc-legend">
+    <div class="lg rc-lg-t">Cor = equipe de execução:</div>
+    ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
+    <div class="lg"><span class="sw" style="background:${M.corUnidade(null).cor};border-color:${M.corUnidade(null).borda}"></span>Sem equipe</div>
+    <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Fora da Revistoria · Cliente</div>
+    ${area === "exec" ? `<div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>` : ""}
     ${area === "exec" && chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
     <div class="lg ch-lg-dica">${area === "exec" ? "Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório" : "Toque na unidade para agendar, registrar o resultado ou ver o histórico"}</div></div>`;
 }
@@ -552,12 +552,15 @@ function htmlOperacao(s) {
   const dis = salvando ? " disabled" : "", ed = podeEditar(), ex = M.execInfo(s.execucao);
   const quemLib = s.liberadoEm ? `${fmtDH(s.liberadoEm)}${s.liberadoPor ? ` · ${esc(s.liberadoPor)}` : ""}` : "";
   const lib = ed ? `<button type="button" class="rc-tog${s.liberado ? " on" : ""}" role="switch" aria-checked="${s.liberado}" data-lib="${!s.liberado}"${dis}><i></i>${s.liberado ? "Liberado" : "Não liberado"}</button>` : libPill(s.liberado);
-  const exe = ed ? `<div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.EXECUCOES.map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}" title="${esc(e.equipe)} · ${esc(e.responsavel)}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}</div>
+  const exe = ed ? `<div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.opcoesExecucao(s.execucao).map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}" title="${esc(e.equipe)} · ${esc(e.responsavel)}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}</div>
       ${s.execucao ? `<button type="button" class="rc-exe-none" data-exe=""${dis}>Remover execução</button>` : ""}`
     : ex ? execPill(s.execucao) : '<b class="rc-mut">Não definida</b>';
   return `<div class="rc-or rc-or-lib"><span class="rc-or-t">Liberação</span><div class="rc-or-v">${lib}${quemLib ? `<small class="rc-or-q">${quemLib}</small>` : ""}</div></div>
     <div class="rc-or rc-or-ex"><span class="rc-or-t">Execução</span><div class="rc-or-v rc-or-exe">${exe}</div>
-      ${!ed && ex ? `<div class="rc-or-d">Equipe ${esc(ex.equipe)} · Responsável ${esc(ex.responsavel)}</div>` : ""}</div>
+      ${!ed && ex ? `<div class="rc-or-d">Equipe ${esc(ex.equipe)} · Responsável ${esc(ex.responsavel)}${ex.ativo ? "" : " (equipe desativada)"}</div>` : ""}</div>
+    <div class="rc-or rc-or-fin"><span class="rc-or-t">Finalizado</span><div class="rc-or-v">${ed
+      ? `<button type="button" class="rc-tog${s.finalizada ? " on" : ""}" role="switch" aria-checked="${s.finalizada}" data-fin="${!s.finalizada}"${dis}${!s.finalizada && !s.execucao ? ' disabled title="Defina a equipe antes de finalizar"' : ""}><i></i>${s.finalizada ? "Execução finalizada" : "Não finalizada"}</button>`
+      : s.finalizada ? '<span class="rc-lib on">✓ Execução finalizada</span>' : '<span class="rc-lib">Não finalizada</span>'}${s.finalizadaEm ? `<small class="rc-or-q">${fmtDH(s.finalizadaEm)}${s.finalizadaPor ? ` · ${esc(s.finalizadaPor)}` : ""}</small>` : ""}</div></div>
     ${salvando ? `<div class="rc-op-msg">Salvando…</div>` : ""}`;
 }
 async function salvarOperacao(tipo, valor) {
@@ -569,8 +572,10 @@ async function salvarOperacao(tipo, valor) {
   try {
     const args = { unitId: u.unitId, pedido: novoPedido() };
     const r = tipo === "liberacao" ? await S.liberar(host.sb, { ...args, liberado: valor })
+      : tipo === "finalizar" ? await S.finalizarExecucao(host.sb, { ...args, finalizada: valor })
       : await S.execucao(host.sb, { ...args, execucao: valor || null, anterior: s.execucao || null });
     host.toast(tipo === "liberacao" ? (valor ? "Unidade liberada para execução" : "Liberação retirada")
+      : tipo === "finalizar" ? (valor ? "Execução finalizada" : "Execução reaberta")
       : valor ? `Execução: ${M.execRotulo(valor)}` : "Execução removida");
     salvando = ""; await host.recarregar?.(r);
   } catch (err) {
@@ -655,6 +660,8 @@ function cliquePopup(e) {
   if (t.closest("[data-central]")) { const c = cur; if (c) window.AmciCentral?.abrirUnidade(c.unitId); return; }
   const lb = t.closest("[data-lib]");
   if (lb && !lb.disabled) { salvarOperacao("liberacao", lb.dataset.lib === "true"); return; }
+  const fin = t.closest("[data-fin]");
+  if (fin && !fin.disabled) { salvarOperacao("finalizar", fin.dataset.fin === "true"); return; }
   const ex = t.closest("[data-exe]");
   if (ex && !ex.disabled) { salvarOperacao("execucao", ex.dataset.exe); return; }
   const nav = t.closest("[data-nav]");
@@ -749,11 +756,23 @@ async function transferirChave(f) {
   } catch (err) { msg.textContent = err.message || "Não foi possível transferir"; msg.className = "pp-hint ch-msg err"; b.disabled = false; b.textContent = "Transferir chave"; agendarChaves(); }
 }
 
+/* ── cores centralizadas (window.AmciCores): setores (marca da chave) e equipes (cor do apartamento) ── */
+let ouvindoCores = false;
+function aplicarCores(cfg) { CM.aplicarCores(cfg); M.aplicarEquipes(cfg); }
+function coresMudaram(cfg) {
+  aplicarCores(cfg);
+  if (!root?.isConnected || !host) return;
+  delete root.dataset.proj;   // botões das equipes refeitos (equipe nova, renomeada ou desativada)
+  pintar(); if (cur && !preenchendo() && !ocupado) pintarPopup();
+}
+
 /* ── API para a tela de Vistorias ── */
 const api = {
   /** Mostra a aba. */
   show(h, entrando = false) {
     host = h; root = document.getElementById("revcliRoot");
+    aplicarCores(window.AmciCores?.get());
+    if (!ouvindoCores && window.AmciCores) { window.AmciCores.on(coresMudaram); ouvindoCores = true; }
     if (entrando) modo = "mapa";   // ao abrir (ou voltar para) a aba, o Mapa é a visualização principal
     if (!root || !host.project) return;
     if (projId !== host.project.id) {

@@ -229,5 +229,6 @@ assert.ok(html.includes('supabase.rpc("vistoria_reagendar"') && html.includes("R
 assert.ok(html.includes('startImport("rev")') && html.includes("args.p_sincronizar_data=false"), "Importação só de revistorias (aba Revistoria).");
 await import("./test-revistoria-cliente.mjs");
 await import("./test-central.mjs");
+await import("./test-cores.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");
