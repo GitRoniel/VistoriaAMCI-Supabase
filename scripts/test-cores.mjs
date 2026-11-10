@@ -48,6 +48,12 @@ const st = (o) => M.situacao({ status: "Agendado", ciclo: 1, versao: 1, ...o }, 
 assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE" })).cor, "#ff0000");
 assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE", status: "Aprovado" })).cor, "#ff0000", "aprovado não compete com a cor da equipe");
 assert.equal(M.corUnidade(st({ execucao: null })).cor, C.SEM_EQUIPE.cor);
+assert.equal(M.corUnidade(st({ execucao: null, status: "Em andamento" })).cor, C.SEM_EQUIPE.cor, "sem equipe em andamento: tom de destaque");
+assert.equal(M.corUnidade(st({ execucao: null, status: "Agendado" })).cor, C.SEM_EQUIPE.cor);
+assert.equal(M.corUnidade(st({ execucao: null, status: "Aprovado" })).cor, C.APROVADA_SEM_EQUIPE.cor, "aprovado sem equipe: cinza mais forte");
+assert.ok(M.corUnidade(st({ execucao: null, status: "Aprovado" })).aprovada && !M.corUnidade(st({ execucao: null })).aprovada);
+assert.notEqual(C.SEM_EQUIPE.cor.toLowerCase(), "#ffffff", "sem equipe não é mais branco");
+assert.notEqual(C.SEM_EQUIPE.cor, C.APROVADA_SEM_EQUIPE.cor);
 assert.equal(M.corUnidade(st({ execucao: "EMP_NILSON" })).cor, "#8d5524", "equipe desativada mantém a cor nas unidades dela");
 // setor e equipe independentes
 CM.aplicarCores({ setores: C.setores([{ categoria: "setor_chave", chave: "producao", cor: "#3366ff" }]) });

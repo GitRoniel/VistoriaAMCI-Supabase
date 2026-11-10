@@ -222,9 +222,9 @@ function kpisAcompanhamento(naAba) {
   const ind = M.indicadores(naAba, hoje()), rep = naAba.filter((u) => M.reprovada(u.situacao)).length;
   const kpi = (key, n, label, cor, title) => `<button type="button" class="ch-kpi${filt.rapido === key ? " on" : ""}" data-kpi data-fr="${key}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
   return kpi("todos", ind.total, "Unidades em revistoria", "#1f4a3f", "Todas as unidades acompanhadas nesta aba") +
-    kpi("em_andamento", ind["Em andamento"], "Aguardando agendamento", M.STATUS["Em andamento"].borda, "Em andamento: aguardando o agendamento da revistoria") +
-    kpi("agendados", ind.Agendado, "Agendadas", M.STATUS.Agendado.borda, "Revistoria marcada") +
-    kpi("aprovados", ind.Aprovado, "Aprovadas", M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
+    kpi("em_andamento", ind["Em andamento"], M.STATUS["Em andamento"].label, M.STATUS["Em andamento"].borda, "Em andamento: aguardando o agendamento da revistoria") +
+    kpi("agendados", ind.Agendado, M.STATUS.Agendado.label, M.STATUS.Agendado.borda, "Revistoria marcada") +
+    kpi("aprovados", ind.Aprovado, M.STATUS.Aprovado.label, M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
     kpi(M.REPROVADA.key, rep, "Rev. Reprovada", M.REPROVADA.borda, "Última revistoria reprovada; a unidade segue em novo ciclo") +
     `<div class="ch-kpi k-info" style="--c:#6b8040" title="Revistorias já realizadas (aprovadas ou reprovadas)"><b>${ind.realizadas}</b><span>Revistorias realizadas</span></div>` +
     `<div class="ch-kpi k-info" style="--c:#2459b5" title="Revistorias agendadas para hoje e os próximos 7 dias"><b>${ind.semana}</b><span>Próximos 7 dias${ind.hoje ? ` · ${ind.hoje} hoje` : ""}</span></div>`;
@@ -323,7 +323,7 @@ function htmlMapa(lista, ok) {
     // Execução M.O.: cor = equipe de execução (sem equipe = neutra)
     const ex = c.equipe;
     const cor = s.status ? c : M.SEM_REGISTRO;   // fora da revistoria: cinza claro
-    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? "rc-semeq" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? (c.aprovada ? "rc-aprsemeq" : "rc-semeq") : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
     return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
   };
   const g = host.grid();
@@ -353,7 +353,8 @@ function htmlMapa(lista, ok) {
   return h + `<div class="legend ch-legend rc-legend">
     <div class="lg rc-lg-t">Cor = equipe de execução:</div>
     ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
-    <div class="lg"><span class="sw" style="background:${M.corUnidade(null).cor};border-color:${M.corUnidade(null).borda}"></span>Sem equipe</div>
+    <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.SEM_EQUIPE.cor};border-color:${M.SEM_EQUIPE.borda}"></span>Sem equipe (sem mão de obra alocada)</div>
+    <div class="lg"><span class="sw" style="background:${M.APROVADA_SEM_EQUIPE.cor};border-color:${M.APROVADA_SEM_EQUIPE.borda}"></span>Aprovado sem equipe</div>
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Fora da Revistoria · Cliente</div>
     <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
     ${chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
