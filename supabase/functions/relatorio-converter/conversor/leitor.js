@@ -22,7 +22,7 @@ function* tokens(b) {
     if (c === 40) {                                                                       // (string literal)
       const out = []; let nivel = 1; i++;
       while (i < n && nivel > 0) {
-        let ch = b[i++];
+        const ch = b[i++];
         if (ch === 92) {
           const e = b[i++];
           if (e === 110) out.push(10); else if (e === 114) out.push(13); else if (e === 116) out.push(9);
