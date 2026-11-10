@@ -187,9 +187,36 @@ assert.equal(mesmaUnidade(rel.unidade, "C", "204"), true); assert.equal(mesmaUni
 
 // Execução: botões de filtro rápido (um por vez; clicar de novo limpa) — não atribuem nada.
 assert.deepEqual(M.BOTOES_EXECUCAO.map((b) => b.label), ["M.O.P – Felipe", "M.O.P – Renato", "EMP – Oscar", "EMP – Nilson"]);
-assert.equal(M.alternarExecucao("", "EMP_OSCAR"), "EMP_OSCAR");
-assert.equal(M.alternarExecucao("EMP_OSCAR", "EMP_OSCAR"), "");
-assert.equal(M.alternarExecucao("EMP_OSCAR", "MOP_FELIPE"), "MOP_FELIPE");
+// equipes acumulativas: clicar liga/desliga cada uma, mantendo as outras
+assert.deepEqual(M.alternarExecucao([], "EMP_OSCAR"), ["EMP_OSCAR"]);
+assert.deepEqual(M.alternarExecucao(["EMP_OSCAR"], "EMP_OSCAR"), []);
+assert.deepEqual(M.alternarExecucao(["EMP_OSCAR"], "MOP_FELIPE"), ["EMP_OSCAR", "MOP_FELIPE"]);
+assert.deepEqual(M.alternarExecucao("", "EMP_OSCAR"), ["EMP_OSCAR"], "valor antigo (texto) também funciona");
+assert.equal(fe({ execucao: ["MOP_FELIPE", "MOP_RENATO"] }), "1,2", "Felipe + Renato");
+assert.equal(fe({ execucao: ["EMP_OSCAR", "sem"] }), "3,4,6", "Oscar + sem equipe");
+assert.equal(fe({ execucao: [] }), fe({ execucao: "" }), "nenhuma equipe marcada = todas");
+// relatório: com / sem
+assert.equal(M.passaRelatorio("", false), true); assert.equal(M.passaRelatorio("com", true), true); assert.equal(M.passaRelatorio("com", false), false);
+assert.equal(M.passaRelatorio("sem", false), true); assert.equal(M.passaRelatorio("sem", true), false);
+// correções do administrador (agendamentos)
+{
+  const ags = [{ id: 7, numero: 1, status: "Aprovada", data: "2026-10-20" }, { id: 10, numero: 2, status: "Aprovada", data: "2026-10-20", horario: "09:00:00" }];
+  const s0 = M.situacao({ status: "Aprovado", ciclo: 2, versao: 3, revistoria_id: 10 }, ags);
+  assert.equal(s0.realizadas, 2);
+  assert.deepEqual(M.correcoes(ags[0], s0, "admin"), { corrigir: true, anular: true }, "anula o registro anterior");
+  assert.deepEqual(M.correcoes(ags[1], s0, "admin"), { corrigir: true, anular: false }, "o atual/mais recente não se anula");
+  assert.deepEqual(M.correcoes(ags[0], s0, "revistorias"), { corrigir: false, anular: false }, "só administrador");
+  const s1 = M.situacao({ status: "Aprovado", ciclo: 2, versao: 4, revistoria_id: 10 }, [{ ...ags[0], status: "Cancelada", anulado_em: "2026-11-10T10:00:00Z" }, ags[1]]);
+  assert.equal(s1.realizadas, 1, "anulado não conta"); assert.equal(s1.lista.length, 1); assert.equal(s1.anulados.length, 1);
+  assert.deepEqual(M.correcoes(s1.anulados[0], s1, "admin"), { corrigir: false, anular: false });
+  const ok = { data: "2026-10-20", horario: "09:00", responsavel: "Levi", realizada: "2026-10-20", motivo: "horário faltando" };
+  assert.equal(M.validarCorrecao(ok, true, "2026-11-10"), "");
+  assert.match(M.validarCorrecao({ ...ok, motivo: "" }, true, "2026-11-10"), /motivo/);
+  assert.match(M.validarCorrecao({ ...ok, horario: "25:00" }, true, "2026-11-10"), /Horário/);
+  assert.match(M.validarCorrecao({ ...ok, realizada: "2026-12-01" }, true, "2026-11-10"), /futura/);
+  assert.equal(M.validarCorrecao({ ...ok, realizada: "" }, false, "2026-11-10"), "", "agendamento em aberto não pede data de realização");
+  assert.equal(M.descreverEvento({ tipo: "correcao", status_novo: "Aprovado", status_anterior: "Aprovado" }).mantemStatus, true);
+}
 assert.equal(M.passaExecucao("EMP_OSCAR", "EMP_OSCAR"), true); assert.equal(M.passaExecucao("EMP_OSCAR", "EMP_NILSON"), false); assert.equal(M.passaExecucao("", null), true);
 
 // Apontamentos: fonte única (relatório individual e Lista), sem repetidos, sem 100% quando vazio.

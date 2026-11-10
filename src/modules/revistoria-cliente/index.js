@@ -17,7 +17,7 @@ import * as CM from "../chaves/model.js";
 import * as CS from "../chaves/service.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: "", chave: "", data: "", hrSort: "asc" });
+const FILTRO0 = () => ({ bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: [], relatorio: "", chave: "", data: "", hrSort: "asc" });
 const pad = (n) => String(n).padStart(2, "0");
 const fmtDH = (ts) => { if (!ts) return "—"; const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const fmtD = (d) => { const p = String(d || "").slice(0, 10).split("-"); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
@@ -33,7 +33,9 @@ const ICONE = {
   historico: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>`,
   relatorio: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13l2 2 4-4M8 18h8"/></svg>`,
   chave: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg>`,
-  relogio: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`
+  relogio: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+  semRel: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9.5 13.5l5 5M14.5 13.5l-5 5"/></svg>`,
+  editar: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`
 };
 const FORMS = {
   agendar: { botao: "Agendar revistoria", curto: "Agendar", ok: "Confirmar agendamento" },
@@ -45,7 +47,7 @@ const FORMS = {
 
 // Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
 let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", area = "acomp", nomes = [], salvando = "";
-let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null;
+let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null, alvoAg = null;
 // chaves: unitId → situação da chave (CM.situacao); comRelatorio: unidades com relatório enviado;
 // apont: unitId → { total, resolvidas, pct } do checklist (mesma regra do relatório individual: M.checklistUnidade)
 let chaves = new Map(), chavesOk = false, chavesProj = null, cancelarChaves = null, recargaChaves = null, comRelatorio = new Set();
@@ -57,7 +59,7 @@ function unidade(u) {
   const unitId = host.unitId(u.b, u.p, u.a);
   return { ...u, unitId, codigo: host.codigo(u.b, u.p, u.a), titulo: host.titulo(u.b, u.p, u.a), vistoria: host.vistoria(u.b, u.p, u.a),
     cliente: host.cliente(u.b, u.p, u.a), situacao: M.situacao(host.acompanhamento(unitId), host.agendamentos(unitId)),
-    chave: chaves.get(unitId) || CM.situacao(null) };
+    chave: chaves.get(unitId) || CM.situacao(null), temRelatorio: comRelatorio.has(unitId) };
 }
 const todasUnidades = () => host.units().filter((u) => host.unitId(u.b, u.p, u.a)).map(unidade);
 const nomeUnidade = (u) => (host.casa() ? `Casa ${+u.a}` : `Apto ${u.codigo}`);
@@ -87,7 +89,7 @@ const AREAS = [
     ic: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>' }
 ];
 /** Filtros de cada área (bloco e busca são comuns). */
-const CAMPOS_AREA = { acomp: ["rapido", "data"], exec: ["liberado", "execucao", "chave"] };
+const CAMPOS_AREA = { acomp: ["rapido", "data"], exec: ["liberado", "execucao", "relatorio", "chave"] };
 /** Filtro efetivo da área: os campos da outra área não valem aqui (ficam guardados para quando voltar). */
 function filtroArea() {
   const f0 = FILTRO0(), f = { ...filt };
@@ -98,7 +100,7 @@ const so = (a) => ` data-so="${a}"`;
 function casca() {
   root.innerHTML = `
     <div class="modetog rc-modo" role="tablist" aria-label="Visualização"><button type="button" role="tab" data-modo="mapa">Mapa</button><button type="button" role="tab" data-modo="lista">Lista</button></div>
-    <div class="rc-areas" role="tablist" aria-label="Área da revistoria">${AREAS.map((a) => `<button type="button" role="tab" class="rc-area" data-area="${a.key}"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${a.ic}</svg></span><span class="vw-txt"><b>${esc(a.label)}</b><small>${esc(a.sub)}</small></span></button>`).join("")}</div>
+    <div class="rc-areas" role="tablist" aria-label="Área da revistoria">${AREAS.map((a) => `<button type="button" role="tab" class="rc-aba" data-area="${a.key}"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${a.ic}</svg></span><span class="vw-txt"><b>${esc(a.label)}</b><small>${esc(a.sub)}</small></span></button>`).join("")}</div>
     <div class="ch-top rc-top" id="rcKpis"></div>
     <div class="clif ch-filters rc-filters">
       <div class="ch-line">
@@ -113,6 +115,10 @@ function casca() {
         <span class="rc-exe-fil-t">Execução</span>
         ${M.BOTOES_EXECUCAO.map((e) => `<button type="button" class="rc-exe-b" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i>${esc(e.sigla)}</i>${esc(e.label)}<b class="rc-exe-n" data-exe-n="${esc(e.key)}"></b></button>`).join("")}
         <button type="button" class="rc-exe-x" id="rcExeX" aria-label="Limpar filtro de execução" title="Mostrar todas as equipes" hidden>× Todas as equipes</button>
+      </div>
+      <div class="ch-line rc-rel-fil" role="group" aria-label="Filtrar por relatório"${so("exec")}>
+        <span class="rc-exe-fil-t">Relatório</span>
+        ${M.FILTRO_RELATORIO.map((o) => `<button type="button" class="rc-rel-b r-${o.key}" data-rel-f="${o.key}" aria-pressed="false">${o.key === "com" ? ICONE.relatorio : ICONE.semRel}<span>${esc(o.label)}</span><b data-rel-n="${o.key}"></b></button>`).join("")}
       </div>
       <div class="ch-line ch-chips">
         ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}"${so("acomp")}>${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
@@ -131,7 +137,9 @@ function casca() {
   q("#rcLib").addEventListener("change", (e) => { filt.liberado = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   // Execução: filtro rápido (um responsável por vez; clicar de novo mostra todas). Não atribui nada.
   root.querySelectorAll("[data-exe-f]").forEach((b) => b.addEventListener("click", () => { filt.execucao = M.alternarExecucao(filt.execucao, b.dataset.exeF); sincronizarFiltros(); pintarConteudo(); }));
-  q("#rcExeX").addEventListener("click", () => { filt.execucao = ""; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcExeX").addEventListener("click", () => { filt.execucao = []; sincronizarFiltros(); pintarConteudo(); });
+  // Relatório: com ou sem relatório enviado (clicar de novo mostra todas)
+  root.querySelectorAll("[data-rel-f]").forEach((b) => b.addEventListener("click", () => { filt.relatorio = filt.relatorio === b.dataset.relF ? "" : b.dataset.relF; sincronizarFiltros(); pintarConteudo(); }));
   q("#rcChave").addEventListener("change", (e) => { filt.chave = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcData").addEventListener("input", (e) => { filt.data = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   q("#rcDataX").addEventListener("click", () => { filt.data = ""; sincronizarFiltros(); pintarConteudo(); });
@@ -148,8 +156,9 @@ function sincronizarFiltros() {
   const q = (id) => root.querySelector(id); if (!q("#rcBloco")) return;
   q("#rcBloco").value = filt.bloco; if (q("#rcBusca").value !== filt.busca) q("#rcBusca").value = filt.busca;
   q("#rcLib").value = filt.liberado; q("#rcChave").value = filt.chave;
-  root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = b.dataset.exeF === filt.execucao; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
-  q("#rcExeX").hidden = !filt.execucao;
+  root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = filt.execucao.includes(b.dataset.exeF); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+  q("#rcExeX").hidden = !filt.execucao.length;
+  root.querySelectorAll("[data-rel-f]").forEach((b) => { const on = b.dataset.relF === filt.relatorio; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
   if (q("#rcData").value !== filt.data) q("#rcData").value = filt.data;
   q("#rcDataX").hidden = !filt.data; q("#rcData").closest("label").classList.toggle("on", !!filt.data);
   q("#rcChave").closest("label").classList.toggle("on", !!filt.chave);
@@ -161,19 +170,20 @@ function sincronizarFiltros() {
   root.querySelectorAll("[data-so]").forEach((el) => { el.hidden = el.dataset.so !== area; });
   root.dataset.areaAtual = area;
   const f = filtroArea();
-  q("#rcLimpar").hidden = f.bloco === "ALL" && !f.busca && f.rapido === "todos" && !f.liberado && !f.execucao && !f.chave && !f.data;
+  q("#rcLimpar").hidden = f.bloco === "ALL" && !f.busca && f.rapido === "todos" && !f.liberado && !f.execucao.length && !f.relatorio && !f.chave && !f.data;
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-rcu]");
   if (u && u.dataset.acao === "relatorio") { e.stopPropagation(); abrirRel(u.dataset.b, u.dataset.p, u.dataset.a); return; }
   if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u, u.dataset.acao || ""); return; }
-  const ar = e.target.closest(".rc-area[data-area]");
+  const ar = e.target.closest(".rc-aba[data-area]");
   if (ar) { if (ar.dataset.area !== area) { area = ar.dataset.area; sincronizarFiltros(); pintarConteudo(); if (cur) pintarPopup(); } return; }
   // indicadores da Execução M.O.: "campo:valor" (clicar de novo limpa; "todos" limpa os filtros da área)
   const kx = e.target.closest("[data-kx]");
   if (kx) {
     const [campo, valor] = kx.dataset.kx.split(":");
-    if (campo === "todos") for (const k of CAMPOS_AREA.exec) filt[k] = "";
+    if (campo === "todos") { const f0 = FILTRO0(); for (const k of CAMPOS_AREA.exec) filt[k] = f0[k]; }
+    else if (campo === "execucao") filt.execucao = M.alternarExecucao(filt.execucao, valor);
     else filt[campo] = filt[campo] === valor ? "" : valor;
     sincronizarFiltros(); pintarConteudo(); return;
   }
@@ -203,6 +213,7 @@ function pintarConteudo() {
   root.querySelector("#rcKpis").innerHTML = area === "acomp" ? kpisAcompanhamento(naAba) : kpisExecucao(naAba);
   // nº de unidades de cada equipe nos botões de Execução (todas as unidades da aba)
   root.querySelectorAll("[data-exe-n]").forEach((b) => { b.textContent = String(naAba.filter((u) => u.situacao.execucao === b.dataset.exeN).length); });
+  root.querySelectorAll("[data-rel-n]").forEach((b) => { const n = naAba.filter((u) => M.passaRelatorio(b.dataset.relN, u.temRelatorio)).length; b.textContent = apontOk ? String(n) : "…"; });
   root.querySelector("#rcCount").textContent = `${vis.length} de ${naAba.length} unidade(s)`;
   root.querySelector("#rcGrid").innerHTML = modo === "mapa" ? htmlMapa(lista, ok) : htmlLista(vis, naAba.length);
 }
@@ -226,13 +237,13 @@ function kpisExecucao(naAba) {
   let apT = 0, apR = 0; for (const u of naAba) { const r = apont.get(u.unitId); if (r) { apT += r.total; apR += r.resolvidas; } }
   const pct = apT ? Math.round((apR / apT) * 100) : 0;
   const kpi = (kx, on, n, label, cor, title) => `<button type="button" class="ch-kpi${on ? " on" : ""}" data-kx="${kx}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
-  const algum = filt.liberado || filt.execucao || filt.chave;
+  const algum = filt.liberado || filt.execucao.length || filt.relatorio || filt.chave;
   return kpi("todos:", !algum, naAba.length, "Unidades em revistoria", "#1f4a3f", "Todas as unidades da aba (limpa os filtros da Execução M.O.)") +
     kpi("liberado:sim", filt.liberado === "sim", lib, "Liberadas", "#0f3b31", "Unidades liberadas para a execução dos serviços") +
     kpi("liberado:nao", filt.liberado === "nao", naAba.length - lib, "Não liberadas", "#8a948f", "Unidades ainda não liberadas para a execução") +
-    kpi("execucao:sem", filt.execucao === "sem", sem, "Sem equipe", "#b9770e", "Unidades sem equipe de execução definida") +
+    kpi("execucao:sem", filt.execucao.includes("sem"), sem, "Sem equipe", "#b9770e", "Unidades sem equipe de execução definida") +
     kpi("chave:producao", filt.chave === "producao", chavesOk ? prod : "…", "Chave na Produção", CM.SETORES.producao?.cor || "#6b8040", "Chave com o setor de Produção (Controle de Chaves)") +
-    `<div class="ch-kpi k-info" style="--c:#2f6fdb" title="Unidades com relatório de revistoria enviado"><b>${apontOk ? rel : "…"}</b><span>Com relatório</span></div>` +
+    kpi("relatorio:com", filt.relatorio === "com", apontOk ? rel : "…", "Com relatório", "#2f6fdb", "Unidades com relatório de revistoria enviado") +
     `<div class="ch-kpi k-info" style="--c:#0097a7" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><b>${apontOk ? `${apR}/${apT}` : "…"}</b><span>Apontamentos resolvidos${apT ? ` · ${pct}%` : ""}</span></div>`;
 }
 
@@ -346,7 +357,7 @@ function garantirPopup() {
   const editou = (e) => { const f = e.target.closest(".ch-form"); if (!f || ocupado) return; f.dataset.dirty = "1"; aviso = null; const m = pop.querySelector(".ch-msg"); if (m) { m.textContent = ""; m.className = "pp-hint ch-msg"; } if (e.target.name === "resultado") ajustarResultado(); };
   pop.addEventListener("input", editou);
   pop.addEventListener("change", editou);
-  pop.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.dataset.tipo === "chave") transferirChave(e.target); else enviar(); });
+  pop.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.dataset.tipo === "chave") transferirChave(e.target); else if (e.target.dataset.tipo === "corrigir" || e.target.dataset.tipo === "anular") enviarCorrecao(e.target); else enviar(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop.classList.contains("open")) fechar(); });
   document.addEventListener("click", (e) => { const path = e.composedPath(); if (pop.classList.contains("open") && !path.includes(pop) && !path.some((n) => n.matches?.("[data-rcu],.toast")) && !fundo.classList.contains("show")) fechar(); });
   addEventListener("resize", () => posicionar());
@@ -395,14 +406,63 @@ async function carregarHistorico() {
 }
 
 function htmlAgendamentos(s) {
-  if (!s.lista.length) return "";
+  if (!s.lista.length && !s.anulados?.length) return "";
+  const papel = host.papel();
   const linhas = [...s.lista].reverse().map((r) => {
     const g = M.agendamento(r), cls = g.resultado === "Aprovada" ? "ok" : g.resultado === "Reprovada" ? "rep" : g.status === "Cancelado" ? "can" : "ab";
     const det = [r.responsavel ? `Responsável: ${esc(r.responsavel)}` : "", r.realizada_em ? `realizada em ${esc(fmtD(r.realizada_em))}` : "",
       r.observacoes ? esc(r.observacoes) : "", r.resultado_obs ? `<em>${esc(r.resultado_obs)}</em>` : ""].filter(Boolean).join(" · ");
-    return `<li class="rc-ag ${cls}"><div class="rc-ag1"><b>Nº ${r.numero}</b><span>${esc(quandoAg(r)) || "Sem data"}</span><span class="rc-ag-st">${esc(g.status)}${g.resultado ? ` · ${esc(g.resultado)}` : ""}</span>${r.ciclo ? `<small>${r.ciclo}º ciclo</small>` : ""}</div>${det ? `<div class="rc-ag2">${det}</div>` : ""}</li>`;
+    const c = M.correcoes(r, s, papel), dis = ocupado ? " disabled" : "";
+    const ferr = c.corrigir ? `<div class="rc-ag-adm">${`<button type="button" class="rc-ag-b" data-painel="corrigir" data-ag="${r.id}"${dis}>${ICONE.editar}Corrigir</button>`}${c.anular ? `<button type="button" class="rc-ag-b anular" data-painel="anular" data-ag="${r.id}"${dis}>${ICONE.cancelar}Anular duplicado</button>` : ""}</div>` : "";
+    return `<li class="rc-ag ${cls}${alvoAg === r.id && (painel === "corrigir" || painel === "anular") ? " alvo" : ""}"><div class="rc-ag1"><b>Nº ${r.numero}</b><span>${esc(quandoAg(r)) || "Sem data"}</span><span class="rc-ag-st">${esc(g.status)}${g.resultado ? ` · ${esc(g.resultado)}` : ""}</span>${r.ciclo ? `<small>${r.ciclo}º ciclo</small>` : ""}</div>${det ? `<div class="rc-ag2">${det}</div>` : ""}${ferr}</li>`;
   }).join("");
-  return `<div class="rc-ags"><div class="pp-label">Agendamentos <small>· ${s.realizadas} realizada(s) de ${s.lista.length}</small></div><ul>${linhas}</ul></div>`;
+  const anul = (s.anulados || []).map((r) => `<li class="rc-ag anul"><div class="rc-ag1"><b>Nº ${r.numero}</b><span>${esc(quandoAg(r)) || "Sem data"}</span><span class="rc-ag-st">Anulado</span></div><div class="rc-ag2">${esc(r.anulado_motivo || "")}${r.anulado_email ? ` · por ${esc(r.anulado_email)}` : ""}${r.anulado_em ? ` · ${esc(fmtDH(r.anulado_em))}` : ""}</div></li>`).join("");
+  return `<div class="rc-ags"><div class="pp-label">Agendamentos <small>· ${s.realizadas} realizada(s) de ${s.lista.length}${s.anulados?.length ? ` · ${s.anulados.length} anulado(s)` : ""}</small></div><ul>${linhas}</ul>${anul ? `<details class="rc-anul"><summary>Registros anulados (${s.anulados.length})</summary><ul>${anul}</ul></details>` : ""}</div>`;
+}
+/** Formulário do administrador: corrigir os dados de um agendamento ou anular um registro em duplicidade. */
+function htmlCorrecao(u, tipo) {
+  const s = u.situacao, r = [...s.lista].find((x) => x.id === alvoAg);
+  if (!r) return "";
+  const realizada = M.REALIZADAS.includes(r.status), g = M.agendamento(r);
+  const resumo = `<div class="rc-cor-h pp-full"><b>Agendamento nº ${r.numero}</b><span>${esc(quandoAg(r)) || "Sem data"} · ${esc(g.status)}${g.resultado ? ` · ${esc(g.resultado)}` : ""}${r.responsavel ? ` · ${esc(r.responsavel)}` : ""}</span></div>`;
+  const motivo = (ph) => `<label class="pp-f pp-full"><span>Motivo (fica no histórico)</span><textarea name="motivo" rows="2" maxlength="500" required placeholder="${esc(ph)}"></textarea></label>`;
+  const acoes = (ok, sec = "") => `<div class="pp-actions pp-full"><span class="pp-hint ch-msg" role="status"></span><button type="button" class="btn g" data-painel="">Voltar</button><button type="submit" class="btn p${sec}"${ocupado ? " disabled" : ""}>${ocupado ? "Registrando…" : ok}</button></div>`;
+  if (tipo === "anular") {
+    return `<form class="ch-form rc-form rc-cor" data-tipo="anular" novalidate>${resumo}
+      ${motivo("Ex.: registro em duplicidade do agendamento nº " + (s.lista.find((x) => x.id === s.revistoriaId)?.numero || "") + " (mesma revistoria)")}
+      <p class="ch-nota pp-full">O registro <b>não é apagado</b>: fica guardado como <b>anulado</b>, deixa de contar nas revistorias realizadas e sai da lista. O motivo, o status original e quem anulou ficam no histórico.</p>
+      ${acoes("Anular registro", " rc-btn-sec")}</form>`;
+  }
+  return `<form class="ch-form rc-form rc-cor" data-tipo="corrigir" novalidate>${resumo}
+    <div class="rc-dh pp-full"><label class="pp-f"><span>Data da revistoria</span><input type="date" name="data" required value="${esc(String(r.data || "").slice(0, 10))}"></label>
+      <label class="pp-f"><span>Horário <small>(opcional)</small></span><input type="time" name="horario" step="300" value="${esc(hhmm(r.horario))}"></label></div>
+    <label class="pp-f pp-full"><span>Responsável <small>(opcional)</small></span><input name="responsavel" list="rcNomes" placeholder="Nome" autocomplete="off" maxlength="80" value="${esc(r.responsavel || "")}"><datalist id="rcNomes">${nomes.map((n) => `<option value="${esc(n)}"></option>`).join("")}</datalist></label>
+    ${realizada ? `<label class="pp-f pp-full"><span>Data da realização</span><input type="date" name="realizada" required max="${esc(hoje())}" value="${esc(String(r.realizada_em || "").slice(0, 10))}"></label>` : ""}
+    ${motivo("Ex.: horário não informado no primeiro lançamento")}
+    <p class="ch-nota pp-full">O status não muda (use Remarcar, Cancelar, Registrar resultado ou Reabrir para isso). O antes e o depois ficam no histórico.</p>
+    ${acoes("Salvar correção")}</form>`;
+}
+async function enviarCorrecao(f) {
+  if (ocupado || !cur || !alvoAg) return;
+  const tipo = f.dataset.tipo, u = todasUnidades().find((x) => x.unitId === cur.unitId), r = u?.situacao.lista.find((x) => x.id === alvoAg);
+  if (!r) return;
+  const val = (n) => f.elements[n]?.value || "";
+  const v = { data: val("data"), horario: val("horario"), responsavel: M.limparNome(val("responsavel")), realizada: val("realizada"), motivo: val("motivo").trim() };
+  const erro = tipo === "anular" ? (v.motivo.length < 3 ? "Informe o motivo (ex.: registro em duplicidade)" : "") : M.validarCorrecao(v, M.REALIZADAS.includes(r.status), hoje());
+  if (erro) { mostrarAviso(erro); return; }
+  if (tipo === "anular" && !confirm(`Anular o agendamento nº ${r.numero}? Ele deixa de contar nas revistorias realizadas (o registro e o motivo ficam no histórico).`)) return;
+  pedido = pedido || novoPedido(); ocupado = true; mostrarAviso("Registrando…", "info");
+  try {
+    const res = tipo === "anular" ? await S.anularAgendamento(host.sb, { id: r.id, motivo: v.motivo, pedido })
+      : await S.corrigirAgendamento(host.sb, { id: r.id, ...v, pedido });
+    ocupado = false; pedido = null; aviso = null; alvoAg = null; painel = "historico"; hist = null;
+    host.toast(res?.repetido ? "Já registrado" : tipo === "anular" ? `Agendamento nº ${r.numero} anulado` : `Agendamento nº ${r.numero} corrigido`);
+    await host.recarregar?.(res);
+    pintarPopup(); carregarHistorico(); pintarConteudo();
+  } catch (err) {
+    ocupado = false; pedido = novoPedido(); mostrarAviso(err.message || "Não foi possível registrar.");
+    const b = f.querySelector("[type=submit]"); if (b) { b.disabled = false; b.textContent = tipo === "anular" ? "Anular registro" : "Salvar correção"; }
+  }
 }
 
 function pintarPopup() {
@@ -424,7 +484,9 @@ function pintarPopup() {
   const rep = M.reprovada(s);
   const opcard = s.status || chavesOk ? `<div class="rc-opcard">${s.status ? htmlOperacao(s) : ""}${htmlChave(u)}</div>` : "";
   // Painel (formulário ou histórico) logo abaixo das ações; agendamentos no fim.
+  if ((painel === "corrigir" || painel === "anular") && !s.lista.some((x) => x.id === alvoAg)) { painel = ""; alvoAg = null; }
   const area = FORMS[painel] ? htmlForm(u, painel)
+    : painel === "corrigir" || painel === "anular" ? `<div class="rc-area rc-cor-area">${htmlCorrecao(u, painel)}</div>`
     : painel === "historico" ? `<div class="ch-hist rc-area"><div class="pp-label">Histórico da revistoria</div><div id="rcHist" class="ch-hist-body"></div></div>` : "";
   pop.innerHTML = `
     <div class="pp-head">
@@ -603,12 +665,13 @@ function cliquePopup(e) {
   }
   const pn = t.closest("[data-painel]");
   if (pn) {
-    const alvo = pn.dataset.painel === painel ? "" : pn.dataset.painel;
+    const alvo = pn.dataset.painel === painel && (Number(pn.dataset.ag) || null) === alvoAg ? "" : pn.dataset.painel;
     if (FORMS[painel] && alvo !== painel && preenchendo() && !confirm("Descartar o registro em andamento?")) return;
-    painel = alvo; aviso = null; pedido = FORMS[painel] ? novoPedido() : null;
+    painel = alvo; aviso = null; pedido = FORMS[painel] || painel === "corrigir" || painel === "anular" ? novoPedido() : null;
+    alvoAg = painel === "corrigir" || painel === "anular" ? Number(pn.dataset.ag) || null : null;
     pintarPopup(); posicionar();
     if (painel === "historico") carregarHistorico();
-    if (FORMS[painel]) focarForm();
+    if (FORMS[painel] || alvoAg) focarForm();
   }
 }
 
