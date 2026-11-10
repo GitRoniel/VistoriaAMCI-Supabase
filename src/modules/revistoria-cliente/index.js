@@ -306,17 +306,23 @@ function htmlMapa(lista, ok) {
     const u = porId.get(`${b}|${p}|${a}`);
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
     const s = u.situacao, i = s.info, c = M.corUnidade(s);
-    const tip = [u.titulo, s.execucao ? `Equipe: ${M.execRotulo(s.execucao)}${c.equipe && !c.equipe.ativo ? " (desativada)" : ""}${s.finalizada ? " · execução finalizada" : ""}` : s.status ? "Sem equipe de execução" : "",
+    const exe = area === "exec";
+    const tip = [u.titulo, !exe ? "" : s.execucao ? `Equipe: ${M.execRotulo(s.execucao)}${c.equipe && !c.equipe.ativo ? " (desativada)" : ""}${s.finalizada ? " · execução finalizada" : ""}` : s.status ? "Sem equipe de execução" : "",
       s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
       s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
-      M.reprovada(s) ? "Revistoria reprovada" : "",
+      !exe && s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
     // chave: canto inferior esquerdo, no mesmo formato do canto da aba Vistoria, na cor do setor (Controle de Chaves)
-    const exe = area === "exec";
     const km = exe && chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
+    if (!exe) {
+      // Acompanhamento Geral: cor = situação da revistoria, nº de revistorias realizadas e contorno de Rev. Reprovada
+      const clsA = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+      return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}</button>`;
+    }
+    // Execução M.O.: cor = equipe de execução (sem equipe = neutra)
     const ex = c.equipe;
-    const cor = s.status ? c : M.SEM_REGISTRO;   // fora da revistoria: cinza claro (como antes)
+    const cor = s.status ? c : M.SEM_REGISTRO;   // fora da revistoria: cinza claro
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? "rc-semeq" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
     return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
   };
@@ -333,7 +339,15 @@ function htmlMapa(lista, ok) {
     h = `<div class="gridscroll"><table class="mx ch-mx"><thead><tr><th class="corner">PAV</th>${g.grupos.map((b) => `<th class="blkh">${esc(b)}</th>`).join("")}</tr></thead><tbody>` +
       g.pavs.map((p) => `<tr><td class="pavh">${esc(g.pavLabel[p].toUpperCase())}</td>${g.grupos.map((b) => `<td class="cell"><div class="apts">${g.apts.map((a) => btn(b, p, a)).join("")}</div></td>`).join("")}</tr>`).join("") + "</tbody></table></div>";
   }
-  // legenda: as equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
+  if (area !== "exec") {
+    // Acompanhamento Geral: legenda de status (como antes)
+    return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((x) => `<div class="lg"><span class="sw" style="background:${M.STATUS[x].cor};border-color:${M.STATUS[x].borda}"></span>${M.STATUS[x].label}</div>`).join("")}
+    <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
+    <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
+    <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
+    <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
+  }
+  // Execução M.O.: legenda das equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
   const usadas = new Set(lista.map((u) => u.situacao.execucao).filter(Boolean));
   const eqs = M.EXECUCOES.filter((e) => e.ativo || usadas.has(e.key));
   return h + `<div class="legend ch-legend rc-legend">
@@ -341,9 +355,9 @@ function htmlMapa(lista, ok) {
     ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
     <div class="lg"><span class="sw" style="background:${M.corUnidade(null).cor};border-color:${M.corUnidade(null).borda}"></span>Sem equipe</div>
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Fora da Revistoria · Cliente</div>
-    ${area === "exec" ? `<div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>` : ""}
-    ${area === "exec" && chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
-    <div class="lg ch-lg-dica">${area === "exec" ? "Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório" : "Toque na unidade para agendar, registrar o resultado ou ver o histórico"}</div></div>`;
+    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
+    ${chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
+    <div class="lg ch-lg-dica">Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório</div></div>`;
 }
 
 /* ── painel da unidade ── */
