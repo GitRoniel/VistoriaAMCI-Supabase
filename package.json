@@ -10,7 +10,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:watch": "node scripts/build.mjs --watch",
-    "check": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs && node scripts/conversor-test.mjs",
+    "test:conversor": "node scripts/conversor-test.mjs",
     "import:data": "node --env-file-if-exists=.env scripts/import-sheets.mjs",
     "export:reports": "node --env-file-if-exists=.env scripts/export-reports.mjs",
     "cap:add:android": "npx cap add android",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
     "esbuild": "0.28.2",
+    "pdf-lib": "1.17.1",
     "supabase": "2.116.0"
   }
 }
