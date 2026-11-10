@@ -4,7 +4,9 @@
 // Duas categorias independentes (nunca se misturam):
 //   A) Legendas operacionais — setores do Controle de Chaves (tabela cores_legendas, categoria "setor_chave").
 //      Sem configuração = cor padrão do aplicativo (abaixo).
-//   B) Equipes de mão de obra — cadastro equipes_execucao (id estável, nome, equipe, sigla, cor, cor padrão, ativa).
+//   B) Equipes de mão de obra — cadastro equipes_execucao (id estável, nome, equipe, sigla, cor, cor padrão, ativa)
+//      e as demais legendas do mapa da Execução M.O. (tabela cores_legendas, categoria "execucao_mapa": sem equipe,
+//      aprovado sem equipe, fora da revistoria, liberado e os botões de status). Sem configuração = cor padrão.
 // Para cada cor de fundo calculamos a borda (mais escura) e o texto (claro ou escuro) com contraste adequado.
 
 export const CATEGORIA_SETOR = "setor_chave";
@@ -29,6 +31,29 @@ export const EQUIPES_PADRAO = [
 export const SEM_EQUIPE = { cor: "#bcc7c1", borda: "#5f6f67", texto: "#1d2e26" };
 /** Unidade já aprovada na revistoria e sem equipe: cinza mais forte (concluída, não precisa de mão de obra). */
 export const APROVADA_SEM_EQUIPE = { cor: "#7d8782", borda: "#5f6964", texto: "#ffffff" };
+/** Legendas do mapa da Execução M.O. (categoria execucao_mapa): identificador fixo → rótulo e cor padrão.
+ *  As telas não têm cor fixa para esses itens: leem daqui (com a cor personalizada aplicada por legendasExecucao). */
+export const CATEGORIA_EXECUCAO = "execucao_mapa";
+export const LEGENDAS_EXECUCAO_PADRAO = {
+  sem_equipe: { label: "Sem equipe (sem mão de obra alocada)", grupo: "mapa", ...SEM_EQUIPE },
+  aprovado_sem_equipe: { label: "Aprovado sem equipe", grupo: "mapa", ...APROVADA_SEM_EQUIPE },
+  fora_revistoria: { label: "Fora da Revistoria · Cliente", grupo: "mapa", cor: "#e3e7e4", borda: "#b9c1bc", texto: "#5f6b64" },
+  liberado: { label: "Liberado para execução", grupo: "mapa", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
+  st_em_andamento: { label: "Em andamento", grupo: "status", cor: "#d9a92f", borda: "#b88f27", texto: "#14241c" },
+  st_finalizado: { label: "Finalizado", grupo: "status", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
+  st_agendado: { label: "Agendado", grupo: "status", cor: "#2459b5", borda: "#1e4b98", texto: "#ffffff" },
+  st_aprovado: { label: "Aprovado", grupo: "status", cor: "#268a4d", borda: "#207441", texto: "#ffffff" }
+};
+/** Legendas da Execução M.O. com as cores personalizadas aplicadas (linhas de cores_legendas). */
+export function legendasExecucao(linhas = []) {
+  const custom = {};
+  for (const l of linhas || []) if (l?.categoria === CATEGORIA_EXECUCAO && LEGENDAS_EXECUCAO_PADRAO[l.chave] && hexOk(l.cor)) custom[l.chave] = hex(l.cor);
+  const out = {};
+  for (const [k, p] of Object.entries(LEGENDAS_EXECUCAO_PADRAO)) {
+    out[k] = custom[k] ? { ...p, ...estilo(custom[k]), custom: true, padrao: p.cor } : { ...p, custom: false, padrao: p.cor };
+  }
+  return out;
+}
 /** Sugestões para equipes novas (distintas das cores de status e de setores). */
 export const PALETA_EQUIPES = ["#7b4fc9", "#c2185b", "#00838f", "#8d5524", "#3949ab", "#00897b", "#ad1457", "#5d4037", "#6d4c41", "#1e88e5", "#7cb342", "#f4511e"];
 

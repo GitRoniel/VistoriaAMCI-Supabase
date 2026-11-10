@@ -2,7 +2,9 @@
 // mudam (inclusive em tempo real, quando outro administrador altera em outro aparelho) e mostra o editor do Admin.
 //
 //   A) Legendas operacionais: public.cores_legendas (setores do Controle de Chaves)
-//   B) Equipes de mão de obra: public.equipes_execucao (id estável; nome, equipe, sigla, cor, ativa)
+//   B) Equipes de mão de obra: public.equipes_execucao (id estável; nome, equipe, sigla, cor, ativa) e as legendas do
+//      mapa da Execução M.O.: public.cores_legendas, categoria "execucao_mapa" (sem equipe, aprovado sem equipe, fora
+//      da revistoria, liberado e botões de status). Mesma tabela das legendas, categoria separada dos setores.
 //
 // Os módulos (Controle de Chaves, Revistoria · Cliente) não guardam cores próprias: leem daqui e repintam em `on()`.
 // Escrita só pelas funções do banco, que conferem se o usuário é administrador (o editor só esconde os botões).
@@ -11,7 +13,8 @@ import * as M from "./model.js";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const naoInstalado = (err) => ["42P01", "42883", "PGRST205", "PGRST202", "PGRST204"].includes(err?.code) || /does not exist|could not find/i.test(err?.message || "");
 let sb = null, canal = null, recarga = null, pedido = 0;
-let estado = { carregado: false, instalado: true, setores: M.setores([]), equipes: M.equipes(null) };
+const vazio = () => ({ carregado: false, instalado: true, setores: M.setores([]), equipes: M.equipes(null), execucao: M.legendasExecucao([]) });
+let estado = vazio();
 const ouvintes = new Set();
 let ov = null, ctx = { admin: false, aba: "setores", rotulos: {} }, msg = null;
 
@@ -26,7 +29,8 @@ async function carregar() {
   if (meu !== pedido) return;
   const inst = !(naoInstalado(a.error) || naoInstalado(b.error));
   if ((a.error && !naoInstalado(a.error)) || (b.error && !naoInstalado(b.error))) console.warn("Cores: não foi possível carregar", a.error || b.error);
-  estado = { carregado: true, instalado: inst, setores: M.setores(a.data || []), equipes: M.equipes(b.data && b.data.length ? b.data : null) };
+  estado = { carregado: true, instalado: inst, setores: M.setores(a.data || []), equipes: M.equipes(b.data && b.data.length ? b.data : null),
+    execucao: M.legendasExecucao(a.data || []) };
   avisar();
 }
 const agendar = () => { clearTimeout(recarga); recarga = setTimeout(carregar, 250); };
@@ -41,7 +45,7 @@ function garantirEditor() {
   if (ov) return;
   ov = document.createElement("div"); ov.className = "cr-ov"; ov.id = "crOv"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "Cores e equipes");
   ov.innerHTML = `<div class="cr-box"><div class="cr-head"><div><b>Cores e equipes</b><small>Configuração central: vale para todos os módulos e condomínios</small></div><button type="button" class="pp-icon cr-x" data-cr-fechar aria-label="Fechar">×</button></div>
-    <div class="modetog cr-tabs" role="tablist"><button type="button" role="tab" data-cr-aba="setores">A · Legendas operacionais</button><button type="button" role="tab" data-cr-aba="equipes">B · Equipes de mão de obra</button></div>
+    <div class="modetog cr-tabs" role="tablist"><button type="button" role="tab" data-cr-aba="setores">A · Legendas operacionais</button><button type="button" role="tab" data-cr-aba="equipes">B · Equipes e legendas da M.O.</button></div>
     <div class="cr-msg" role="status" aria-live="polite"></div><div class="cr-body" id="crBody"></div></div>`;
   document.body.appendChild(ov);
   ov.addEventListener("click", clique);
@@ -80,7 +84,26 @@ function pintarEditor() {
     ${ro ? "" : `<div class="cr-nova"><b>Nova equipe</b><span class="cr-prev cr-prev-eq" id="crNovaPrev" style="background:${nova};border-color:${M.estilo(nova).borda};color:${M.estilo(nova).texto}"><i>?</i>Equipe · Nome</span>
       <label class="cr-cor"><input type="color" value="${nova}" id="crNovaCor" aria-label="Cor da nova equipe"></label>
       <span class="cr-campos"><input class="cr-in s" id="crNovaSigla" maxlength="2" placeholder="Sigla" aria-label="Sigla"><input class="cr-in g" id="crNovaGrupo" maxlength="30" placeholder="Equipe (ex.: M.O.P)" aria-label="Equipe"><input class="cr-in n" id="crNovaNome" maxlength="60" placeholder="Responsável" aria-label="Responsável"></span>
-      <button type="button" class="btn p ch-mini" data-cr-nova>Adicionar equipe</button></div>`}`;
+      <button type="button" class="btn p ch-mini" data-cr-nova>Adicionar equipe</button></div>`}
+    ${secaoLegendasExecucao(ro)}`;
+}
+/** Legendas do mapa e botões de status da Execução M.O. (categoria execucao_mapa): uma linha por item, sem exceção. */
+function secaoLegendasExecucao(ro) {
+  const L = estado.execucao;
+  const linha = (k) => {
+    const x = L[k], st = k === "liberado" ? `<i class="cr-lib">✓</i>` : "";
+    return `<li class="cr-row" data-legexec="${k}"><span class="cr-prev" style="background:${x.cor};border-color:${x.borda};color:${x.texto}">${st}${esc(x.label)}</span>
+      <label class="cr-cor"><input type="color" value="${x.cor}" data-cr-cor aria-label="Cor de ${esc(x.label)}"${ro ? " disabled" : ""}></label>
+      <span class="cr-st">${x.custom ? "personalizada" : "padrão"}</span>
+      ${ro ? "" : `<span class="cr-acoes"><button type="button" class="btn p ch-mini" data-cr-salvar-legexec="${k}" disabled>Salvar</button><button type="button" class="btn g ch-mini" data-cr-padrao-legexec="${k}"${x.custom ? "" : " disabled"} title="Voltar para a cor original (${x.padrao})">Restaurar</button></span>`}</li>`;
+  };
+  const grupo = (g) => Object.keys(L).filter((k) => L[k].grupo === g).map(linha).join("");
+  return `<h4 class="cr-sub">Legendas do mapa da Execução M.O.</h4>
+    <p class="cr-nota">Cor dos apartamentos sem equipe, aprovados sem equipe e fora da revistoria, e a marca ✓ de liberado. A marca da chave (canto esquerdo) usa as cores dos setores do Controle de Chaves (aba A).</p>
+    <ul class="cr-list">${grupo("mapa")}</ul>
+    <h4 class="cr-sub">Botões de status da Execução M.O.</h4>
+    <ul class="cr-list">${grupo("status")}</ul>
+    ${ro ? "" : `<div class="cr-rodape"><button type="button" class="btn g" data-cr-padrao-legexec-todos${Object.values(L).some((x) => x.custom) ? "" : " disabled"}>Restaurar as cores padrão das legendas da M.O.</button></div>`}`;
 }
 /** Prévia ao vivo, antes de salvar. */
 function previa(e) {
@@ -94,6 +117,8 @@ function previa(e) {
       const atual = estado.equipes.find((x) => x.id === row.dataset.equipe);
       const mudou = !atual || cor !== atual.cor || (s && (s.value.trim().toUpperCase() !== atual.sigla || g.value.trim() !== atual.grupo || n.value.trim() !== atual.nome || row.querySelector("[data-cr-ativo]").checked !== atual.ativo));
       const b = row.querySelector("[data-cr-salvar-equipe]"); if (b) b.disabled = !mudou;
+    } else if (row.dataset.legexec) {
+      const b = row.querySelector("[data-cr-salvar-legexec]"); if (b) b.disabled = cor === estado.execucao[row.dataset.legexec].cor;
     } else {
       const b = row.querySelector("[data-cr-salvar-setor]"); if (b) b.disabled = cor === estado.setores[row.dataset.setor].cor;
     }
@@ -120,8 +145,16 @@ function clique(e) {
   const ps = t.closest("[data-cr-padrao-setor]");
   if (ps) { const k = ps.dataset.crPadraoSetor; executar(() => rpc("cores_legenda_restaurar", { p_categoria: M.CATEGORIA_SETOR, p_chave: k }), `${ctx.rotulos[k] || k}: cor original restaurada`); return; }
   if (t.closest("[data-cr-padrao-todos]")) {
-    if (!confirm("Restaurar as cores padrão de todos os setores? As cores personalizadas serão descartadas (as equipes não mudam).")) return;
+    if (!confirm("Restaurar as cores padrão de todos os setores? As cores personalizadas serão descartadas (as equipes e as legendas da M.O. não mudam).")) return;
     executar(() => rpc("cores_legenda_restaurar", { p_categoria: M.CATEGORIA_SETOR, p_chave: null }), "Cores padrão restauradas"); return;
+  }
+  const sl = t.closest("[data-cr-salvar-legexec]");
+  if (sl) { const k = sl.dataset.crSalvarLegexec, cor = ov.querySelector(`[data-legexec="${k}"] [data-cr-cor]`).value; executar(() => rpc("cores_legenda_salvar", { p_categoria: M.CATEGORIA_EXECUCAO, p_chave: k, p_cor: cor }), `Cor de ${estado.execucao[k].label} salva`); return; }
+  const pl = t.closest("[data-cr-padrao-legexec]");
+  if (pl) { const k = pl.dataset.crPadraoLegexec; executar(() => rpc("cores_legenda_restaurar", { p_categoria: M.CATEGORIA_EXECUCAO, p_chave: k }), `${estado.execucao[k].label}: cor original restaurada`); return; }
+  if (t.closest("[data-cr-padrao-legexec-todos]")) {
+    if (!confirm("Restaurar as cores padrão das legendas da Execução M.O.? As equipes e os setores do Controle de Chaves não mudam.")) return;
+    executar(() => rpc("cores_legenda_restaurar", { p_categoria: M.CATEGORIA_EXECUCAO, p_chave: null }), "Cores padrão das legendas da M.O. restauradas"); return;
   }
   const se = t.closest("[data-cr-salvar-equipe]");
   if (se) {
@@ -156,7 +189,8 @@ const api = {
     carregar();
   },
   recarregar: carregar,
-  /** Estado atual: { carregado, instalado, setores: {chave: {cor,borda,texto,custom,padrao}}, equipes: [...] }. */
+  /** Estado atual: { carregado, instalado, setores: {chave: {cor,borda,texto,custom,padrao}}, equipes: [...],
+   *  execucao: {item: {label,grupo,cor,borda,texto,custom,padrao}} }. */
   get: () => estado,
   /** Avisa quando as cores mudarem; devolve a função para parar de ouvir. */
   on(fn) { ouvintes.add(fn); return () => ouvintes.delete(fn); },
@@ -167,7 +201,7 @@ const api = {
     if (sb) carregar();
   },
   fechar,
-  reset() { try { canal?.unsubscribe?.(); } catch { /* sem tempo real */ } canal = null; sb = null; fechar(); estado = { carregado: false, instalado: true, setores: M.setores([]), equipes: M.equipes(null) }; avisar(); }
+  reset() { try { canal?.unsubscribe?.(); } catch { /* sem tempo real */ } canal = null; sb = null; fechar(); estado = vazio(); avisar(); }
 };
 window.AmciCores = api;
 export default api;
