@@ -23,19 +23,24 @@ export const info = (status) => STATUS[status] || SEM_REGISTRO;
 // A lista e as cores vêm do cadastro central (window.AmciCores → aplicarEquipes); as abaixo valem até carregar.
 // A cor da equipe pinta a unidade nos mapas da Revistoria e da Execução M.O.; equipes desativadas continuam
 // identificando as unidades já atribuídas (histórico), mas não aparecem para novas atribuições.
-import { EQUIPES_PADRAO, equipes as normalizarEquipes, SEM_EQUIPE, APROVADA_SEM_EQUIPE } from "../cores/model.js";
+import { EQUIPES_PADRAO, equipes as normalizarEquipes, SEM_EQUIPE, APROVADA_SEM_EQUIPE, legendasExecucao } from "../cores/model.js";
 const paraExec = (e) => ({ key: e.id, equipe: e.grupo, responsavel: e.nome, sigla: e.sigla, cor: e.cor, borda: e.borda, texto: e.texto, ativo: e.ativo !== false, ordem: e.ordem || 0 });
 export const EXECUCOES = normalizarEquipes(EQUIPES_PADRAO).map(paraExec);
 export const EQUIPES = [];
 export const BOTOES_EXECUCAO = [];
-/** Troca a lista de equipes pela do cadastro central (mesmo array: quem importou vê a lista nova). */
+/** Legendas do mapa e dos botões de status da Execução M.O. (configuração central, categoria execucao_mapa):
+ *  mesmo objeto sempre, atualizado por aplicarEquipes. Nenhuma cor desses itens fica fixa na tela. */
+export const LEG_EXECUCAO = legendasExecucao([]);
+/** Troca a lista de equipes (e as legendas da Execução M.O.) pela do cadastro central (mesmos objetos: quem
+ *  importou vê a configuração nova). */
 export function aplicarEquipes(cfg) {
+  Object.assign(LEG_EXECUCAO, cfg?.execucao || legendasExecucao([]));
+  for (const x of STATUS_EXECUCAO) { const c = LEG_EXECUCAO["st_" + x.key]; if (c) x.cor = c.cor; }
   const l = (cfg?.equipes?.length ? cfg.equipes : normalizarEquipes(EQUIPES_PADRAO)).map(paraExec);
   EXECUCOES.splice(0, EXECUCOES.length, ...l);
   EQUIPES.splice(0, EQUIPES.length, ...new Set(l.filter((e) => e.ativo).map((e) => e.equipe)));
   BOTOES_EXECUCAO.splice(0, BOTOES_EXECUCAO.length, ...l.filter((e) => e.ativo).map((e) => ({ key: e.key, label: `${e.equipe} – ${e.responsavel}`, sigla: e.sigla, cor: e.cor })));
 }
-aplicarEquipes(null);
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 /** Equipes que podem ser escolhidas (ativas) + a atual da unidade, mesmo desativada. */
 export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.key === atual);
@@ -44,8 +49,9 @@ export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.ke
 export function corUnidade(s) {
   const e = execInfo(s?.execucao);
   if (e) return { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e, aprovada: false };
-  if (s?.status === "Aprovado") return { ...APROVADA_SEM_EQUIPE, equipe: null, aprovada: true };
-  return { ...SEM_EQUIPE, equipe: null, aprovada: false };
+  const leg = (k, padrao) => { const x = LEG_EXECUCAO[k] || padrao; return { cor: x.cor, borda: x.borda, texto: x.texto }; };
+  if (s?.status === "Aprovado") return { ...leg("aprovado_sem_equipe", APROVADA_SEM_EQUIPE), equipe: null, aprovada: true };
+  return { ...leg("sem_equipe", SEM_EQUIPE), equipe: null, aprovada: false };
 }
 export { SEM_EQUIPE, APROVADA_SEM_EQUIPE };
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
@@ -72,6 +78,7 @@ export const STATUS_EXECUCAO = [
   { key: "agendado", label: "Agendado", cor: "#2459b5" },
   { key: "aprovado", label: "Aprovado", cor: "#268a4d" }
 ];
+aplicarEquipes(null);   // cores padrão (equipes, legendas e status) até a configuração central chegar
 export function passaStatusExecucao(chave, s) {
   if (!chave) return true;
   if (chave === "finalizado") return !!s?.finalizada;

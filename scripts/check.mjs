@@ -226,6 +226,11 @@ assert.ok(pan.indexOf('titulo:"Panorama Geral"') > 0 && pan.indexOf('titulo:"Pan
 assert.ok(html.includes('table:"revistorias_cliente"') && html.includes("RVC.passaFiltroRapido"), "Tempo real e filtro rápido da Revistoria · Cliente na Vistoria.");
 const revCliJs = await readFile(resolve(root, "www/revcliente.js"), "utf8").catch(() => "");
 assert.ok(revCliJs.includes("revistoria_agendar") && revCliJs.includes("revistoria_resultado") && revCliJs.includes("revistoria_reabrir") && !/\.from\("(revistorias_cliente|revistorias|client_inspections)"\)\.(insert|update|upsert|delete)/.test(revCliJs), "Aba Revistoria · Cliente grava só pelas funções do banco.");
+const rcSrc = await readFile(resolve(root, "src/modules/revistoria-cliente/index.js"), "utf8");
+assert.ok(/const km = chavesOk && s\.status \? marcaChave\(u\.chave\) : "";/.test(rcSrc) && /rc-mk-key sem/.test(rcSrc), "Marca da chave nos dois mapas da Revistoria, com Sem status neutro.");
+assert.ok(rcSrc.includes("M.LEG_EXECUCAO.fora_revistoria") && !/M\.SEM_EQUIPE\.cor|M\.APROVADA_SEM_EQUIPE\.cor/.test(rcSrc), "Legendas da Execução M.O. vêm da configuração central.");
+const legMig = await readFile(resolve(root, "supabase/migrations/20261116120000_cores_legendas_execucao.sql"), "utf8");
+assert.doesNotMatch(legMig, /create table|drop table|delete from|grant (insert|update|delete)/i, "Legendas da M.O.: sem tabela nova, sem apagar dados, sem escrita direta.");
 assert.ok(!/root\.dataset\.cores\b/.test(await readFile(resolve(root, "src/modules/chaves/index.js"), "utf8")), "Chaves: o contêiner não pode ter data-cores (qualquer clique abriria o editor de cores).");
 assert.ok(chavesJs.includes("rc-badge") && !/client_inspections"\)\.(update|insert)|revistoria_(agendar|resultado|cancelar|reabrir)/.test(chavesJs), "Controle de Chaves mostra a Revistoria · Cliente sem alterá-la.");
 const revLib = await readFile(resolve(root, "supabase/migrations/20261109120000_revistoria_liberacao_execucao.sql"), "utf8");

@@ -300,6 +300,14 @@ function celulasApontamentos(unitId) {
       <td class="rc-c-res${cls}" title="${r.resolvidas} de ${r.total} resolvido(s) (${r.pct}%)"><span class="rc-resq"><b>${r.resolvidas}/${r.total}</b><span class="rc-prog" aria-hidden="true"><i style="width:${r.pct}%"></i></span><small>${r.pct}%</small></span></td>`;
 }
 
+/** Marca da chave (canto inferior esquerdo do apartamento), igual nos dois mapas da aba. */
+function marcaChave(k) {
+  if (k.perdida) return `<i class="rc-mk-key lost" aria-hidden="true"></i>`;
+  const st = CM.SETORES[k.setor] && k.setor !== "sem" ? CM.SETORES[k.setor] : null, sem = CM.SETORES.sem;
+  return st ? `<i class="rc-mk-key" style="--k:${st.cor}" aria-hidden="true"></i>` : `<i class="rc-mk-key sem" style="--k:${sem.cor};--kb:${sem.borda}" aria-hidden="true"></i>`;
+}
+/** Legenda da marca da chave (as mesmas cores e nomes do Controle de Chaves). */
+const legendaChave = () => chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="sem" style="--k:${CM.SETORES.sem.cor};--kb:${CM.SETORES.sem.borda}"></i>${esc(CM.SETORES.sem.label)}</span><span class="rc-lg-key-i"><i class="lost"></i>Perdida</span></div>` : "";
 function htmlMapa(lista, ok) {
   const porId = new Map(lista.map((u) => [`${u.b}|${u.p}|${u.a}`, u]));
   const btn = (b, p, a) => {
@@ -313,18 +321,19 @@ function htmlMapa(lista, ok) {
       !exe && s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
-    // chave: canto inferior esquerdo, no mesmo formato do canto da aba Vistoria, na cor do setor (Controle de Chaves)
-    const km = exe && chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
+    // chave: canto inferior esquerdo (Acompanhamento Geral e Execução M.O.), na cor do setor do Controle de Chaves
+    // (mesmos dados: chaves_unidades / chaves_ocorrencias); sem setor = marca neutra "Sem status"; perdida = contorno.
+    const km = chavesOk && s.status ? marcaChave(u.chave) : "";
     if (!exe) {
       // Acompanhamento Geral: cor = situação da revistoria, nº de revistorias realizadas e contorno de Rev. Reprovada
       const clsA = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-      return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}</button>`;
+      return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${km}</button>`;
     }
     // Execução M.O.: cor = equipe de execução (sem equipe = neutra)
     const ex = c.equipe;
-    const cor = s.status ? c : M.SEM_REGISTRO;   // fora da revistoria: cinza claro
+    const cor = s.status ? c : M.LEG_EXECUCAO.fora_revistoria;   // fora da revistoria (cor configurável)
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? (c.aprovada ? "rc-aprsemeq" : "rc-semeq") : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km}</button>`;
   };
   const g = host.grid();
   let h;
@@ -345,6 +354,7 @@ function htmlMapa(lista, ok) {
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
     <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
     <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
+    ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
   }
   // Execução M.O.: legenda das equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
@@ -353,11 +363,11 @@ function htmlMapa(lista, ok) {
   return h + `<div class="legend ch-legend rc-legend">
     <div class="lg rc-lg-t">Cor = equipe de execução:</div>
     ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
-    <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.SEM_EQUIPE.cor};border-color:${M.SEM_EQUIPE.borda}"></span>Sem equipe (sem mão de obra alocada)</div>
-    <div class="lg"><span class="sw" style="background:${M.APROVADA_SEM_EQUIPE.cor};border-color:${M.APROVADA_SEM_EQUIPE.borda}"></span>Aprovado sem equipe</div>
-    <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Fora da Revistoria · Cliente</div>
+    <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.LEG_EXECUCAO.sem_equipe.cor};border-color:${M.LEG_EXECUCAO.sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.sem_equipe.label)}</div>
+    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.aprovado_sem_equipe.cor};border-color:${M.LEG_EXECUCAO.aprovado_sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.aprovado_sem_equipe.label)}</div>
+    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.fora_revistoria.cor};border-color:${M.LEG_EXECUCAO.fora_revistoria.borda}"></span>${esc(M.LEG_EXECUCAO.fora_revistoria.label)}</div>
     <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
-    ${chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
+    ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório</div></div>`;
 }
 
@@ -773,7 +783,12 @@ async function transferirChave(f) {
 
 /* ── cores centralizadas (window.AmciCores): setores (marca da chave) e equipes (cor do apartamento) ── */
 let ouvindoCores = false;
-function aplicarCores(cfg) { CM.aplicarCores(cfg); M.aplicarEquipes(cfg); }
+function aplicarCores(cfg) {
+  CM.aplicarCores(cfg); M.aplicarEquipes(cfg);
+  // ✓ Liberado (mapa, legenda e lista): cor da configuração central, via variável CSS no contêiner da aba
+  const l = M.LEG_EXECUCAO.liberado;
+  if (root && l) { root.style.setProperty("--rc-lib", l.cor); root.style.setProperty("--rc-lib-t", l.texto); }
+}
 function coresMudaram(cfg) {
   aplicarCores(cfg);
   if (!root?.isConnected || !host) return;
