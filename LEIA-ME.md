@@ -334,3 +334,44 @@ Migration `supabase/migrations/20261117120000_revistoria_aprovacao_entrega_chave
 - **Resumo Geral:** Panorama Geral conta a unidade uma vez como aprovada e separa 1ª vistoria × aprovação técnica × entrega de chave; Panorama de Revistorias mostra "Aprovação técnica" e "Entrega de chave". **Produtividade:** "Unidades aprovadas tecnicamente" (como antes) e, à parte, "Aprovadas por entrega de chave" (com reprovação, sem revistoria realizada e pendências em aberto na entrega) — fora dos indicadores de qualidade. Central de Unidades: "Aprovada por entrega da chave" e o evento na linha do tempo.
 - **Dados existentes:** as unidades já Aprovadas receberam a origem técnica; as unidades da Revistoria cuja chave já estava registrada como entregue ao cliente foram aprovadas pela mesma regra, com a data da entrega original e o evento marcado como aplicado na implantação.
 - Testes: `scripts/db-tests/revistoria-cliente/entrega-chave.mjs` (todos os cenários: pendente, não agendada, agendada, reprovada, várias reprovações, aprovada tecnicamente, transferências internas, retirada por equipe, devolução, regularização, reprocessamento, simultaneidade, planilha, reabertura, fora da revistoria, permissões e dados existentes) e regras em `scripts/test-revistoria-cliente.mjs`.
+
+## Conversor Mobuss → relatório compacto (Revistoria · Cliente)
+
+Migration `supabase/migrations/20261118120000_relatorio_conversao.sql` e Edge Function `supabase/functions/relatorio-converter`. Ao enviar o **Relatório de Entrega da Unidade** do Mobuss (individual ou em lote), o servidor gera automaticamente o **relatório compacto** (modelo "Relatório Final de Vistoria": A4 paisagem, fotos em grade de 3 por linha agrupadas por ambiente, legenda NC / Ambiente / Serviço / Problema e resumo final) como uma **nova versão do mesmo registro**. O original nunca é alterado nem apagado pela conversão.
+
+- **Conversor** (`supabase/functions/relatorio-converter/conversor/`, JavaScript puro com o pdf-lib injetado; o mesmo código roda no Deno e nos testes do Node):
+  - `leitor.js`: lê o texto **nativo** do PDF com posições (inclusive fontes Identity-H com ToUnicode) e as imagens desenhadas, com a posição em cada página. As fotos JPEG são copiadas como estão, sem recodificar. Não há OCR: PDF digitalizado (sem texto) é recusado com mensagem clara.
+  - `extrator.js`: obra, bloco, apartamento, data/hora da vistoria, responsável (assinatura do termo), total de NCs declarado, ambientes, itens do checklist, cada **Não Conformidade** (número, ambiente, serviço do item, descrição escrita na vistoria sem o texto automático do Mobuss; vazia = "Não informado") e as fotos.
+  - **Associação das fotos:** as fotos são ligadas pela posição entre "Anexos da Não Conformidade N" e o próximo bloco, inclusive quando o bloco atravessa a quebra de página. A ordem do documento é preservada e cada foto é usada uma vez. A lista "Imagem k: arquivo" confere a quantidade. "Anexos do Item" vira **foto do item (sem NC)**; foto fora de qualquer bloco fica **não associada**, com a página do original, sem ser atribuída a uma NC. As assinaturas do termo são ignoradas.
+  - `converter.js` valida antes de gerar: PDF legível, unidade e ambientes encontrados, pelo menos uma NC, **quantidade de NCs igual à declarada pelo Mobuss** e nenhuma foto usada duas vezes. Em caso de divergência a conversão falha e nada incompleto é gerado.
+  - `gerador.js`: cabeçalho (obra, bloco, unidade, data, responsável, total de NCs), corpo por ambiente e fotos em encaixe proporcional (sem distorção). O resumo final traz totais, NCs por ambiente, NCs por serviço, a tabela de todos os apontamentos e observações da conversão (fotos de item, sem vínculo, NCs sem foto).
+  - `dicionario.js` + tabela `relatorio_servicos_dicionario`: nome longo → nome curto (Cerâmica, Skin Coat, Piso Laminado, Tomadas, Louças e Metais, Portas, Janelas).
+    - A comparação ignora acentos, espaços e pontuação.
+    - As regras do banco (editáveis só por administradores pela RPC `relatorio_dicionario_salvar`; desativar em vez de apagar) têm prioridade sobre as padrão.
+    - Serviço sem equivalência mantém o nome original e é listado no resumo da versão para cadastro.
+- **Banco e Storage:**
+  - `revistorias_relatorios_versoes` guarda uma linha por arquivo: o **original** (v1, criado por gatilho no envio; os relatórios antigos receberam a sua no backfill) e cada **convertido** (v1, v2…).
+  - Cada versão tem id, caminho, status, datas, tamanho, páginas, resumo (sem dados pessoais do cliente), erro e quem pediu.
+  - `revistorias_relatorios` ganhou `conversao_status`, `conversao_erro`, `conversao_em` e `convertido_id` (versão vigente). `pendente` = ainda sem convertido.
+  - Os convertidos ficam no mesmo bucket privado, em `<condomínio>/conversoes/<relatório>/vN.pdf`. Só o servidor grava nessa pasta (política de Storage) e a leitura é por URL assinada temporária.
+- **Fluxo e status:**
+  - A Edge Function chama `revistoria_conversao_solicitar` **como o usuário**. Essa RPC confere o acesso de edição (admin/revistorias) e garante uma conversão em andamento por relatório: o pedido repetido devolve a mesma, e uma parada há mais de 5 min vira falha por tempo esgotado.
+  - O processamento segue em segundo plano (`EdgeRuntime.waitUntil`) e grava as etapas **Aguardando → Processando → Extraindo → Organizando fotos → Gerando**.
+  - Depois envia o PDF e só então `revistoria_conversao_concluir` marca **Disponível**: a RPC confere o arquivo no Storage e o caminho da versão, e registra o evento no histórico da unidade.
+  - Em caso de erro, `revistoria_conversao_falhar` registra o motivo. O original e a última versão convertida válida continuam como estão.
+  - "Reprocessar" cria uma nova versão; as anteriores ficam no histórico. As etapas, a conclusão e a falha só podem ser gravadas com service_role.
+- **Tela do relatório** (`relatorio-tela.js`, `visualizador.js`, `conversao.js`):
+  - O visualizador mostra **todas as páginas em rolagem vertical contínua**, sem botões anterior/próxima, com o indicador "Página x de N".
+  - Só as páginas perto da área visível são desenhadas; as distantes têm o canvas descartado e há um limite de pixels por página, para o celular.
+  - Controles: zoom (−, +, Ajustar, mantendo a posição de leitura), **tela cheia** (API de tela cheia; no iPhone, modo da página com áreas seguras), Abrir e Baixar, sempre do arquivo exibido.
+  - O seletor **[Convertido] [Original Mobuss]** abre o convertido por padrão. A linha da versão mostra versão, data, tamanho, NCs e fotos.
+  - Enquanto converte, aparecem as etapas (tempo real + consulta a cada 4 s) e o original já pode ser lido; o convertido abre sozinho quando fica pronto.
+  - Em falha aparecem o motivo e "Tentar novamente". Relatório antigo aparece como "Pendente de conversão", com "Converter agora".
+  - "Versões do relatório" lista o histórico (abrir versões anteriores, Reprocessar). Visitantes só visualizam.
+  - O checklist continua lendo o original.
+- **Mapa da Execução M.O.:** ✓ **Liberado** no canto superior direito e a marca de **chave entregue ao cliente** (a mesma do Acompanhamento Geral) no superior esquerdo; os dois podem aparecer juntos.
+- **Testes:**
+  - `pnpm check` roda as regras da tela e do mapa (`scripts/test-conversao-tela.mjs`) e `scripts/conversor-test.mjs`. Este último usa um PDF sintético no formato do Mobuss, com dados fictícios (`scripts/fixtures/mobuss-sintetico.mjs`), e cobre o dicionário, a extração, a associação das fotos (inclusive com quebra de página), a geração, a proporção das fotos, as 3 fotos por linha e as validações.
+  - Para conferir um PDF real (fora do repositório, por conter dados do cliente): `node scripts/conversor-test.mjs relatorio.pdf 32 39 saida.pdf`.
+  - Banco: `scripts/db-tests/relatorios/test.mjs` (`reset.sh 20261117120000` antes, para testar também o backfill).
+- **Implantação:** aplicar a migration e publicar a função (`relatorio-converter`, `verify_jwt = true`). O service role é fornecido pelo próprio Supabase à função; nada vai para o navegador.

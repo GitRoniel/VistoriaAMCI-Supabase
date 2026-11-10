@@ -51,6 +51,7 @@ export function criarVisualizador(caixa, { aoMudar = () => {} } = {}) {
   }
   function paginaAtual() {
     if (!paginas.length) return 0;
+    if (caixa.scrollTop > 0 && caixa.scrollTop + caixa.clientHeight >= caixa.scrollHeight - 2) return paginas.length;   // fim do documento
     const topo = caixa.getBoundingClientRect().top + 40;
     let atual = 1;
     for (const p of paginas) { if (p.el.getBoundingClientRect().top <= topo) atual = p.n; else break; }
