@@ -229,6 +229,11 @@ assert.ok(revCliJs.includes("revistoria_agendar") && revCliJs.includes("revistor
 const rcSrc = await readFile(resolve(root, "src/modules/revistoria-cliente/index.js"), "utf8");
 assert.ok(/const km = chavesOk && s\.status \? marcaChave\(u\.chave\) : "";/.test(rcSrc) && /rc-mk-key sem/.test(rcSrc), "Marca da chave nos dois mapas da Revistoria, com Sem status neutro.");
 assert.ok(rcSrc.includes("M.LEG_EXECUCAO.fora_revistoria") && !/M\.SEM_EQUIPE\.cor|M\.APROVADA_SEM_EQUIPE\.cor/.test(rcSrc), "Legendas da Execução M.O. vêm da configuração central.");
+const entMig = await readFile(resolve(root, "supabase/migrations/20261117120000_revistoria_aprovacao_entrega_chave.sql"), "utf8");
+assert.match(entMig, /create trigger chaves_movimentacoes_30_revistoria after insert on public\.chaves_movimentacoes\s+for each row when \(new\.setor = 'cliente' and new\.tipo in \('transferencia', 'regularizacao'\)\)/, "Só a entrega efetiva ao cliente aciona a aprovação.");
+assert.match(entMig, /revistorias_eventos_chave_mov_uniq on public\.revistorias_eventos \(chave_mov_id\)/, "Entrega idempotente (um evento por movimentação).");
+assert.doesNotMatch(entMig, /update public\.revistorias\s+set|delete from|drop table|truncate|grant (insert|update|delete)/i, "Entrega de chave nunca altera o resultado técnico (revistorias) nem apaga dados.");
+assert.ok(rcSrc.includes("htmlOrigem(s)") && rcSrc.includes("tagEntrega(s)"), "Revistoria mostra a origem da aprovação e o resultado técnico.");
 const legMig = await readFile(resolve(root, "supabase/migrations/20261116120000_cores_legendas_execucao.sql"), "utf8");
 assert.doesNotMatch(legMig, /create table|drop table|delete from|grant (insert|update|delete)/i, "Legendas da M.O.: sem tabela nova, sem apagar dados, sem escrita direta.");
 assert.ok(!/root\.dataset\.cores\b/.test(await readFile(resolve(root, "src/modules/chaves/index.js"), "utf8")), "Chaves: o contêiner não pode ter data-cores (qualquer clique abriria o editor de cores).");

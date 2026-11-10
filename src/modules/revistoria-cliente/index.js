@@ -224,7 +224,7 @@ function kpisAcompanhamento(naAba) {
   return kpi("todos", ind.total, "Unidades em revistoria", "#1f4a3f", "Todas as unidades acompanhadas nesta aba") +
     kpi("em_andamento", ind["Em andamento"], M.STATUS["Em andamento"].label, M.STATUS["Em andamento"].borda, "Em andamento: aguardando o agendamento da revistoria") +
     kpi("agendados", ind.Agendado, M.STATUS.Agendado.label, M.STATUS.Agendado.borda, "Revistoria marcada") +
-    kpi("aprovados", ind.Aprovado, M.STATUS.Aprovado.label, M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
+    kpi("aprovados", ind.Aprovado, M.STATUS.Aprovado.label, M.STATUS.Aprovado.borda, `Aprovado: ${ind.Aprovado - ind.aprovEntrega} por aprovação técnica · ${ind.aprovEntrega} por entrega de chave ao cliente`) +
     kpi(M.REPROVADA.key, rep, "Rev. Reprovada", M.REPROVADA.borda, "Última revistoria reprovada; a unidade segue em novo ciclo") +
     `<div class="ch-kpi k-info" style="--c:#6b8040" title="Revistorias já realizadas (aprovadas ou reprovadas)"><b>${ind.realizadas}</b><span>Revistorias realizadas</span></div>` +
     `<div class="ch-kpi k-info" style="--c:#2459b5" title="Revistorias agendadas para hoje e os próximos 7 dias"><b>${ind.semana}</b><span>Próximos 7 dias${ind.hoje ? ` · ${ind.hoje} hoje` : ""}</span></div>`;
@@ -256,7 +256,7 @@ function htmlLista(vis, total) {
     const s = u.situacao, attrs = `data-rcu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`;
     const rep = M.reprovada(s);
     const cUn = `<td class="ch-c-un rc-c-un"><b>${esc(rotuloLista(u))}</b>${u.cliente ? `<small>${esc(u.cliente)}</small>` : ""}</td>`;
-    const cSt = `<td class="rc-c-st">${badge(s.status)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>`;
+    const cSt = `<td class="rc-c-st">${badge(s.status)}${tagEntrega(s)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>`;
     const bHist = `<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button>`;
     if (area === "exec") {
       return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">${cUn}${cSt}
@@ -300,6 +300,8 @@ function celulasApontamentos(unitId) {
       <td class="rc-c-res${cls}" title="${r.resolvidas} de ${r.total} resolvido(s) (${r.pct}%)"><span class="rc-resq"><b>${r.resolvidas}/${r.total}</b><span class="rc-prog" aria-hidden="true"><i style="width:${r.pct}%"></i></span><small>${r.pct}%</small></span></td>`;
 }
 
+/** Etiqueta complementar do Aprovado por entrega da chave (o status continua "Aprovado"; filtros não mudam). */
+const tagEntrega = (s) => s.porEntrega ? `<span class="rc-ent-tag" title="Aprovado por entrega da chave ao cliente · resultado técnico: ${esc(M.resultadoTecnico(s).label.toLowerCase())}">${ICONE.chave}Entrega de chave</span>` : "";
 /** Marca da chave (canto inferior esquerdo do apartamento), igual nos dois mapas da aba. */
 function marcaChave(k) {
   if (k.perdida) return `<i class="rc-mk-key lost" aria-hidden="true"></i>`;
@@ -319,6 +321,7 @@ function htmlMapa(lista, ok) {
       s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
       s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
       !exe && s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
+      s.status === "Aprovado" ? `Origem: ${(M.ORIGENS_APROVACAO[s.aprovacaoOrigem] || M.ORIGENS_APROVACAO.tecnica).label} · resultado técnico: ${M.resultadoTecnico(s).label.toLowerCase()}` : "",
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
     // chave: canto inferior esquerdo (Acompanhamento Geral e Execução M.O.), na cor do setor do Controle de Chaves
@@ -327,7 +330,7 @@ function htmlMapa(lista, ok) {
     if (!exe) {
       // Acompanhamento Geral: cor = situação da revistoria, nº de revistorias realizadas e contorno de Rev. Reprovada
       const clsA = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-      return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${km}</button>`;
+      return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${km}</button>`;
     }
     // Execução M.O.: cor = equipe de execução (sem equipe = neutra)
     const ex = c.equipe;
@@ -354,6 +357,7 @@ function htmlMapa(lista, ok) {
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
     <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
     <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
+    <div class="lg"><span class="sw rc-sw-ent">${ICONE.chave}</span>Aprovado por entrega da chave ao cliente</div>
     ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
   }
@@ -525,7 +529,7 @@ function pintarPopup() {
     </div>
     <div class="pp-body ch-body rc-pbody">
       <div class="rc-strip">
-        <div class="rc-strip-st">${badge(s.status, " lg")}${s.status ? `<span class="rc-ciclo">${s.ciclo}º ciclo</span>` : ""}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}</div>
+        <div class="rc-strip-st">${badge(s.status, " lg")}${tagEntrega(s)}${s.status ? `<span class="rc-ciclo">${s.ciclo}º ciclo</span>` : ""}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}</div>
         <div class="rc-strip-v"><span class="rc-strip-l">Vistoria</span>${vistPill(u.vistoria)}</div>
       </div>
       ${!s.status ? `<div class="pp-ro">Esta unidade não está na Revistoria · Cliente. Ela entra automaticamente, como <b>Em andamento</b>, quando o status da vistoria passa a <b>Revistoria</b>.</div>` : ""}
@@ -537,6 +541,7 @@ function pintarPopup() {
         ${info("Revistorias", `${s.realizadas} realizada(s)`, s.lista.length ? `${s.lista.length} agendamento(s)` : "nenhum agendamento")}
         ${info("Última alteração", s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—", s.atualizadoPor ? `por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}` : "")}
       </div>` : ""}
+      ${htmlOrigem(s)}
       ${htmlReprovacao(s)}
       ${area === "exec" ? "" : opcard}
       ${s.status && !podeEditar() ? `<div class="pp-ro rc-ro">Acesso de consulta: agendamentos e resultados são registrados por administradores e pela equipe de revistorias.</div>` : ""}
@@ -549,6 +554,22 @@ function pintarPopup() {
 }
 
 /** Última reprovação (pendências que motivaram), quando a unidade está em Rev. Reprovada. */
+/** Origem da aprovação e resultado técnico (independentes): só para unidades Aprovadas. */
+const textoTecnico = (t) => {
+  const r = t.revistoria;
+  if (t.key === "reprovada") return `Reprovado na última revistoria (nº ${r.numero}${r.realizada_em ? ` · ${fmtD(r.realizada_em)}` : ""})${t.reprovacoes > 1 ? ` · ${t.reprovacoes} reprovações` : ""}`;
+  if (t.key === "aprovada") return `Aprovado na revistoria nº ${r.numero}${r.realizada_em ? ` · ${fmtD(r.realizada_em)}` : ""}`;
+  if (t.key === "aguardando") return `Aguardando realização${r?.data ? ` (agendada para ${fmtD(r.data)})` : ""}`;
+  return "Revistoria não realizada";
+};
+function htmlOrigem(s) {
+  if (s.status !== "Aprovado") return "";
+  const o = M.ORIGENS_APROVACAO[s.aprovacaoOrigem] || M.ORIGENS_APROVACAO.tecnica, t = M.resultadoTecnico(s);
+  return `<div class="rc-origem${s.porEntrega ? " ent" : ""}" role="status">
+    <div><span>Origem da aprovação</span><b>${s.porEntrega ? ICONE.chave : ""}${esc(o.label)}</b>${s.aprovacaoEm ? `<small>${fmtDH(s.aprovacaoEm)}</small>` : ""}</div>
+    <div><span>Resultado técnico</span><b class="rt-${t.key}">${esc(textoTecnico(t))}</b></div>
+    ${s.porEntrega ? `<p>Encerrada pela entrega da chave ao cliente (Controle de Chaves). Reprovações, pendências e agendamentos anteriores continuam registrados.</p>` : ""}</div>`;
+}
 function htmlReprovacao(s) {
   if (!M.reprovada(s)) return "";
   const r = M.ultimaReprovacao(s);

@@ -1940,6 +1940,22 @@ html{background-color:var(--status-top,var(--chrome-top))}
 .rc-key-corner::after{content:'';position:absolute;bottom:1px;left:1px;width:5px;height:5px;border-radius:1px;background:#7b8a82}
 .rc-lg-key-i i{width:8px;height:8px;border-radius:2px;background:var(--k)}
 .rc-lg-key-i i.lost{background:#fff;box-shadow:inset 0 0 0 2px #b33636}
+/* Aprovado por entrega da chave ao cliente: etiqueta, marca no mapa (canto superior esquerdo) e cartão no popup */
+.rc-ent-tag{display:inline-flex;align-items:center;gap:3px;margin-left:5px;padding:1px 6px;border-radius:999px;border:1px solid #b9dcc6;background:#effaf3;color:#1e6b3e;font-size:10px;font-weight:800;white-space:nowrap;vertical-align:middle}
+.rc-ent-tag svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4}
+.rc-u .rc-mk-ent{position:absolute;top:-5px;left:-5px;width:13px;height:13px;border-radius:50%;background:#fff;color:#1e6b3e;box-shadow:0 0 0 1.5px #268a4d;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.rc-u .rc-mk-ent svg,.rc-sw-ent svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:2.6}
+.rc-sw-ent{display:inline-flex!important;align-items:center;justify-content:center;background:#fff!important;border-color:#268a4d!important;color:#1e6b3e;border-radius:50%!important}
+.rc-origem{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px 14px;padding:9px 11px;border:1px solid #cfe3d6;border-left:4px solid #268a4d;border-radius:12px;background:#f6fbf8;font-size:12px;line-height:1.4}
+.rc-origem.ent{border-left-color:#1e6b3e}
+.rc-origem div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.rc-origem span{color:var(--muted);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.rc-origem b{display:inline-flex;align-items:center;gap:5px;color:#1f3d31;font-size:12.5px}
+.rc-origem b svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2}
+.rc-origem b.rt-reprovada{color:#9e2f25}.rc-origem b.rt-aprovada{color:#1e6b3e}.rc-origem b.rt-aguardando,.rc-origem b.rt-nao_realizada{color:#6b5a1e}
+.rc-origem small{color:var(--muted);font-size:11px}
+.rc-origem p{grid-column:1/-1;margin:2px 0 0;color:#52675d;font-size:11.5px}
+.ch-ent-nota{flex-basis:100%;margin-top:4px;padding:6px 9px;border-radius:9px;background:#effaf3;border:1px solid #b9dcc6;color:#1e6b3e;font-size:11.5px;line-height:1.4;font-weight:600}
 .rc-u .rc-mk-key.sem{box-shadow:inset 0 0 0 1px var(--kb,#c3cac5),0 0 0 1.5px #fff}
 .rc-lg-key-i i.sem{box-shadow:inset 0 0 0 1px var(--kb,#c3cac5)}
 .rc-key.lost{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;border:1px solid #f0c9c3;background:#fdf3f2;color:#9e2f25;font-size:11px;font-weight:800;white-space:nowrap}
@@ -3498,6 +3514,22 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rc-key-corner::after{background:#7b8a82}
 :root[data-theme="dark"] .rc-lg-key-i i{background:var(--k)}
 :root[data-theme="dark"] .rc-lg-key-i i.lost{background:#282828;box-shadow:inset 0 0 0 2px rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .rc-ent-tag{border:1px solid #41594a;background:#1b2b21;color:#78d9a0}
+:root[data-theme="dark"] .rc-ent-tag svg{fill:none;stroke:currentColor}
+:root[data-theme="dark"] .rc-u .rc-mk-ent{background:#282828;color:#78d9a0;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .rc-u .rc-mk-ent svg,:root[data-theme="dark"] .rc-sw-ent svg{fill:none;stroke:currentColor}
+:root[data-theme="dark"] .rc-sw-ent{background:#282828!important;border-color:#268a4d!important;color:#78d9a0}
+:root[data-theme="dark"] .rc-origem{border:1px solid #3f5045;border-left:4px solid #268a4d;background:#1e2b24}
+:root[data-theme="dark"] .rc-origem.ent{border-left-color:#1e6b3e}
+:root[data-theme="dark"] .rc-origem span{color:#a6b2ab}
+:root[data-theme="dark"] .rc-origem b{color:#cbd6d2}
+:root[data-theme="dark"] .rc-origem b svg{fill:none;stroke:currentColor}
+:root[data-theme="dark"] .rc-origem b.rt-reprovada{color:#de7b73}
+:root[data-theme="dark"] .rc-origem b.rt-aprovada{color:#78d9a0}
+:root[data-theme="dark"] .rc-origem b.rt-aguardando,:root[data-theme="dark"] .rc-origem b.rt-nao_realizada{color:#d9c478}
+:root[data-theme="dark"] .rc-origem small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-origem p{color:#abbcb4}
+:root[data-theme="dark"] .ch-ent-nota{background:#1b2b21;border:1px solid #41594a;color:#78d9a0}
 :root[data-theme="dark"] .rc-u .rc-mk-key.sem{box-shadow:inset 0 0 0 1px var(--kb,#3d413e),0 0 0 1.5px #282828}
 :root[data-theme="dark"] .rc-lg-key-i i.sem{box-shadow:inset 0 0 0 1px var(--kb,#3d413e)}
 :root[data-theme="dark"] .rc-key.lost{border:1px solid #553e3b;background:#2d1e1c;color:#de7b73}
@@ -5178,6 +5210,8 @@ function chavesHost(){
     vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na, vistoriaInfo:(b,p,a)=>state.cliInfo[kC(b,p,a)],
     // Revistoria · Cliente (revistorias_cliente): só leitura; "" = sem registro
     revistoria:(b,p,a)=>rvcStatus(kC(b,p,a)), revistoriaInstalada:()=>rvcInstalled,
+    // entrega da chave ao cliente aprova a unidade na Revistoria (regra do banco): relê a situação sem esperar o tempo real
+    revistoriaMudou:()=>rvcRecarregar(),
     fmtData:fmtDate, papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
   };
 }
@@ -6838,7 +6872,7 @@ function renderResumo(){
   const todas=LAYOUT.units.map(u=>kC(u.b,u.p,u.a)),gc={};PG_CAT.forEach(c=>gc[c.k]=0);todas.forEach(k=>gc[geral(k)]++);
   const tu=todas.length,feitasRev=[...sitMap.values()].reduce((n,s)=>n+s.realizadas,0);
   const agV=todas.filter(k=>!sitMap.has(k)&&geral(k)==="ag").length,agR=gc.ag-agV;
-  const rAprov=[...sitMap.values()].filter(x=>x.status==="Aprovado").length;
+  const rAprov=[...sitMap.values()].filter(x=>x.status==="Aprovado").length,rEnt=[...sitMap.values()].filter(x=>x.porEntrega).length;
   const gPct=tu?Math.round(gc.ap/tu*100):0,gMov=tu?Math.round((gc.ap+gc.ag)/tu*100):0;
   const gRows=LAYOUT.groups.map(block=>{
     const ks=groupUnits(block).map(u=>kC(u.b,u.p,u.a)),n={};PG_CAT.forEach(c=>n[c.k]=0);ks.forEach(k=>n[geral(k)]++);
@@ -6848,10 +6882,10 @@ function renderResumo(){
     donut:[gPct,"#2f9e5b","Aprovados"],
     big:[[tu,"Total de unidades"],[vist,"Vistorias realizadas","blue"],[feitasRev,"Revistorias realizadas","blue"],[gc.ap,"Aprovados","ok"],[gc.pend,"Pendentes","warn"]],
     barra:{rot:"Agendados ou aprovados",txt:`${gc.ap+gc.ag}/${tu} · ${gMov}%`,pct:gMov},
-    mini:[...PG_CAT.map(c=>[c.label,gc[c.k],c.borda]),["Vistorias agendadas",agV,"#d9a92f"],["Revistorias agendadas",agR,S.Agendado.borda]],
+    mini:[...PG_CAT.map(c=>[c.label,gc[c.k],c.borda]),["Vistorias agendadas",agV,"#d9a92f"],["Revistorias agendadas",agR,S.Agendado.borda],["Aprov. por entrega de chave",rEnt,"#1e6b3e"]],
     sub:`Situação geral por ${LAYOUT.group} <small>· Vistoria + Revistoria · cada unidade conta uma vez</small>`,
     grafico:rgStack(gRows,PG_CAT.map(c=>({cor:c.k==="pend"?"":c.cor,cls:c.k==="pend"?"stk-na":"",label:c.label})))+
-      `<p class="rg-nota"><b>Como ler:</b> cada unidade aparece uma vez, pela etapa mais recente — a situação da Revistoria · Cliente quando a unidade está nela; senão, o status da vistoria. Aprovados = aprovados na 1ª vistoria (${gc.ap-rAprov}) + aprovados na revistoria (${rAprov}).</p>`});
+      `<p class="rg-nota"><b>Como ler:</b> cada unidade aparece uma vez, pela etapa mais recente — a situação da Revistoria · Cliente quando a unidade está nela; senão, o status da vistoria. Aprovados = aprovados na 1ª vistoria (${gc.ap-rAprov}) + aprovação técnica na revistoria (${rAprov-rEnt}) + entrega da chave ao cliente (${rEnt}). A entrega da chave encerra a unidade (aprovação operacional) sem contar como aprovação técnica.</p>`});
   // BLOCO 2 · Vistorias
   const vRows=LAYOUT.groups.map(block=>{
     const st=groupUnits(block).map(u=>cliShow(state.cli[kC(u.b,u.p,u.a)])),n=x=>st.filter(v=>v===x).length;
@@ -6882,7 +6916,7 @@ function renderResumo(){
       donut:[rPct,S.Aprovado.cor,"Aprovado"],
       big:[[tot,"Unidades em revistoria"],[rAnd,S["Em andamento"].label,"st-and"],[rAg,S.Agendado.label,"blue"],[rAp,S.Aprovado.label,"ok"],[rRep,"Rev. Reprovada","warn"]],
       barra:{rot:"Agendado ou aprovado",txt:`${rAg+rAp}/${tot} · ${movPct}%`,pct:movPct},
-      mini:[...ordem.map(x=>[S[x].label,rn(x),S[x].borda]),["Rev. Reprovada",rRep,RVC.REPROVADA.borda],["Revistorias realizadas",feitasRev,"#6b8040"],["Agendamentos",agds,"#2459b5"]],
+      mini:[...ordem.map(x=>[S[x].label,rn(x),S[x].borda]),["Aprovação técnica",rAp-rEnt,S.Aprovado.borda],["Entrega de chave",rEnt,"#1e6b3e"],["Rev. Reprovada",rRep,RVC.REPROVADA.borda],["Revistorias realizadas",feitasRev,"#6b8040"],["Agendamentos",agds,"#2459b5"]],
       sub:`Revistorias por ${LAYOUT.group} <small>· unidades em revistoria</small>`,
       grafico:tot?rgStack(rRows,ordem.map(x=>({cor:S[x].cor,label:S[x].label})))
         :`<div class="rg-vazio">Nenhuma unidade em revistoria neste condomínio. As unidades entram automaticamente quando a vistoria passa a <b>Revistoria</b>.</div>`});

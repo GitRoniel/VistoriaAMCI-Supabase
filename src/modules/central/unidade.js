@@ -71,7 +71,7 @@ function pintar() {
   b.innerHTML = `
     <div class="ct-u-st"><span class="ct-geral" style="--c:${geral.cor}">${esc(geral.label)}</span>
       <span class="ct-u-l">Vistoria ${pill(host, v.status)}</span>
-      <span class="ct-u-l">Revistoria ${rc ? `${revPill(rc.status)}<small>${rc.ciclo}º ciclo</small>` : '<b class="ct-mut">sem registro</b>'}</span></div>
+      <span class="ct-u-l">Revistoria ${rc ? `${revPill(rc.status)}<small>${rc.ciclo}º ciclo${rc.status === "Aprovado" ? ` · ${rc.aprovacao_origem === "entrega_chave" ? "origem: entrega de chave ao cliente" : "aprovação técnica"}` : ""}</small>` : '<b class="ct-mut">sem registro</b>'}</span></div>
     <div class="ct-u-info">
       <div><span>Última atividade</span><b>${ult ? esc(M.fmtDH(ult.quando)) : "—"}</b><small>${ult ? esc([ult.titulo, ult.por].filter(Boolean).join(" · ")) : ""}</small></div>
       <div><span>Vistoria</span><b>${v.inspection_date ? esc([M.fmtD(v.inspection_date), v.inspection_time].filter(Boolean).join(" · ")) : "—"}</b><small>${esc(v.responsible || "sem responsável")}</small></div>
