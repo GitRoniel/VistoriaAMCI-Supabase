@@ -31,15 +31,21 @@ export const EQUIPES = ["M.O.P", "EMP"];
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
 export const FILTRO_LIBERADO = [{ key: "", label: "Todos" }, { key: "sim", label: "Liberados" }, { key: "nao", label: "Não liberados" }];
-/** Filtro rápido de Execução (botões da aba): um responsável por vez; vazio = todas as equipes. */
+/** Filtro rápido de Execução (botões da aba): acumulativo (Felipe + Renato…); vazio = todas as equipes. */
 export const BOTOES_EXECUCAO = EXECUCOES.map((e) => ({ key: e.key, label: `${e.equipe} – ${e.responsavel}`, sigla: e.sigla, cor: e.cor }));
-export const alternarExecucao = (atual, clicado) => (atual === clicado ? "" : clicado);
+const listaExec = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+/** Liga/desliga uma equipe (ou "sem") na seleção, mantendo as outras. */
+export const alternarExecucao = (atual, clicado) => { const l = listaExec(atual); return l.includes(clicado) ? l.filter((k) => k !== clicado) : [...l, clicado]; };
 export function passaExecucao(chave, execucao) {
+  if (Array.isArray(chave)) return !chave.length || chave.some((k) => passaExecucao(k, execucao));
   if (!chave) return true;
   if (chave === "sem") return !execucao;
   if (chave.startsWith("equipe:")) return execInfo(execucao)?.equipe === chave.slice(7);
   return execucao === chave;
 }
+/** Filtro de relatório: "com" (relatório enviado), "sem" ou "" (todas). */
+export const FILTRO_RELATORIO = [{ key: "com", label: "Com relatório" }, { key: "sem", label: "Sem relatório" }];
+export const passaRelatorio = (chave, tem) => !chave || (chave === "com" ? !!tem : !tem);
 export function passaLiberado(chave, liberado) {
   return !chave || (chave === "sim" ? !!liberado : !liberado);
 }
@@ -138,13 +144,14 @@ const ordNum = (x, y) => (x.numero || 0) - (y.numero || 0);
  * @param ags  agendamentos da unidade (linhas de revistorias)
  */
 export function situacao(a, ags = []) {
-  const lista = [...(ags || [])].sort(ordNum);
+  // agendamentos anulados pelo administrador (duplicidade) ficam fora das listas e das contagens
+  const todos = [...(ags || [])].sort(ordNum), anulados = todos.filter((r) => r.anulado_em), lista = todos.filter((r) => !r.anulado_em);
   const realizadas = lista.filter((r) => REALIZADAS.includes(r.status));
-  if (!a) return { status: "", info: SEM_REGISTRO, lista, realizadas: realizadas.length, aberto: null, ultima: realizadas.at(-1) || null, ciclo: 0, versao: null,
-    liberado: false, execucao: null };
+  if (!a) return { status: "", info: SEM_REGISTRO, lista, anulados, realizadas: realizadas.length, aberto: null, ultima: realizadas.at(-1) || null, ciclo: 0, versao: null,
+    liberado: false, execucao: null, revistoriaId: null };
   const aberto = a.status === "Agendado" ? lista.filter((r) => ABERTOS.includes(r.status)).at(-1) || null : null;
   return {
-    status: a.status, info: info(a.status), ciclo: a.ciclo || 1, versao: a.versao ?? null, lista,
+    status: a.status, info: info(a.status), ciclo: a.ciclo || 1, versao: a.versao ?? null, lista, anulados, revistoriaId: a.revistoria_id ?? null,
     realizadas: realizadas.length, aberto, ultima: realizadas.at(-1) || null,
     entrouEm: a.entrou_em || "", atualizadoEm: a.atualizado_em || "", atualizadoPor: a.atualizado_email || "",
     liberado: !!a.liberado, liberadoEm: a.liberado_em || "", liberadoPor: a.liberado_por || "",
@@ -192,6 +199,7 @@ export function passaFiltros(u, f) {
   if (f.data && agendaRevistoria(u.situacao).data !== f.data) return false;
   if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
   if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
+  if (!passaRelatorio(f.relatorio, u.temRelatorio)) return false;
   const q = norm(f.busca).replace(/\s/g, "");
   if (q) {
     const cod = norm(u.codigo), comBloco = norm(u.b) + cod;
@@ -250,17 +258,40 @@ export function acoes(status, podeEditar) {
 const TITULOS = {
   entrada: "Entrou na Revistoria · Cliente", agendamento: "Revistoria agendada", remarcacao: "Revistoria remarcada",
   cancelamento: "Agendamento cancelado", reabertura: "Reaberta: novas pendências", vistoria: "Mudança na aba Vistoria",
-  planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução", relatorio: "Relatório"
+  planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução", relatorio: "Relatório",
+  correcao: "Correção de agendamento (administrador)"
 };
+/**
+ * Correções do administrador no agendamento: Corrigir (qualquer agendamento não anulado) e Anular (revistoria
+ * realizada que não seja a atual nem a mais recente; as mesmas regras o banco confere de novo).
+ */
+export function correcoes(r, s, papel) {
+  if (papel !== "admin" || !r || r.anulado_em) return { corrigir: false, anular: false };
+  const maisRecente = Math.max(0, ...[...(s?.lista || []), ...(s?.anulados || [])].map((x) => x.numero || 0));
+  return { corrigir: true, anular: REALIZADAS.includes(r.status) && r.id !== s?.revistoriaId && (r.numero || 0) < maisRecente };
+}
+export function validarCorrecao(v, realizada, hoje = "") {
+  if (!v?.data || !dataOk(v.data) || v.data < "2020-01-01") return "Data da revistoria inválida";
+  if (v.horario && !/^([01]\d|2[0-3]):[0-5]\d$/.test(v.horario)) return "Horário inválido (use HH:MM)";
+  if (limparNome(v.responsavel)) { const n = validarNome(v.responsavel); if (n) return n; }
+  if (realizada) {
+    if (!v.realizada || !dataOk(v.realizada)) return "Informe a data em que a revistoria foi realizada";
+    if (hoje && v.realizada > hoje) return "A data da realização não pode ser futura";
+  }
+  const m = String(v.motivo || "").trim();
+  if (m.length < 3) return "Informe o motivo da correção";
+  if (m.length > 500) return "Motivo muito longo (máximo de 500 caracteres)";
+  return "";
+}
 export function descreverEvento(e) {
   let titulo = TITULOS[e.tipo] || e.tipo;
   if (e.tipo === "resultado") titulo = e.status_novo === "Aprovado" ? "Revistoria aprovada" : "Revistoria reprovada";
   if (e.tipo === "liberacao") titulo = /retirada/i.test(e.descricao || "") ? "Liberação retirada" : "Liberada para execução";
   const por = e.registrado_email === "migração" ? "situação inicial" : e.registrado_email || "sistema";
   return { titulo, de: e.status_anterior || "", para: e.status_novo || "", ciclo: e.ciclo || 1, texto: e.descricao || "", quando: e.registrado_em, por,
-    mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao" || e.tipo === "relatorio",
+    mantemStatus: e.tipo === "liberacao" || e.tipo === "execucao" || e.tipo === "relatorio" || e.tipo === "correcao",
     cor: e.tipo === "resultado" && e.status_novo !== "Aprovado" ? "#d64545" : e.tipo === "cancelamento" ? "#8a948f"
-      : e.tipo === "liberacao" ? "#0f3b31" : e.tipo === "execucao" ? "#7b4fc9" : info(e.status_novo).borda };
+      : e.tipo === "liberacao" ? "#0f3b31" : e.tipo === "execucao" ? "#7b4fc9" : e.tipo === "correcao" ? "#b9770e" : info(e.status_novo).borda };
 }
 
 // ── Apontamentos da revistoria (checklist do relatório) ──
