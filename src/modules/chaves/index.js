@@ -168,7 +168,7 @@ function htmlMapa(lista, ok) {
     const tip = [u.titulo, o ? `Chave perdida · ${M.ETAPAS[o.etapa].label}` : st.setor === "sem" ? "Chave: sem status" : `Chave: ${s.label}${st.responsavel ? " com " + st.responsavel : ""}`,
       st.movimentadoEm ? `desde ${fmtDH(st.movimentadoEm)}` : "", `Vistoria: ${host.vistoriaLabel(u.vistoria)}`, u.revistoria ? `Revistoria · Cliente: ${rcInfo(u.revistoria).label}` : ""].filter(Boolean).join(" · ");
     const cls = ["apt", "ch-u", o ? `lost e-${o.etapa}` : "", ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-chu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.cor};color:${s.texto};border-color:${s.borda}">${esc(host.casa() ? +a : a)}</button>`;
+    return `<button type="button" class="${cls}" data-chu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.cor};color:${s.texto};border-color:${s.borda}">${esc(host.codigo(b, p, a))}</button>`;
   };
   const g = host.grid();
   let h;

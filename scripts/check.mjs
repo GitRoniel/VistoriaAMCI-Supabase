@@ -24,7 +24,7 @@ assert.ok(html.includes('id="btnProjectSwitch"'), "Ação para trocar de empreen
 assert.ok(html.includes("Acompanhamento da obra, vistorias dos clientes e mantenha toda a equipe trabalhando com informações atualizadas."), "Texto solicitado para o login não encontrado.");
 assert.ok(!html.includes('<span class="login-kicker">Alto do Jerivá Residencial</span>'), "O empreendimento ainda aparece indevidamente no login.");
 assert.ok(html.includes("alto-mangueiral-logo-white.png"), "Logo transparente do Alto Mangueiral não encontrada no login.");
-assert.ok(html.includes("Aprovações e Revistorias por ${LAYOUT.group}"), "Progresso por bloco/conjunto não encontrado no resumo.");
+assert.ok(html.includes("Vistorias por ${LAYOUT.group}") && html.includes("Revistorias por ${LAYOUT.group}"), "Panorama de Vistorias e de Revistorias por bloco/conjunto não encontrado no resumo.");
 assert.ok(html.includes("houseLayout") && html.includes('project?.kind==="casas"'), "Tipo do condomínio (casas/apartamentos) precisa vir do banco.");
 assert.ok(!html.includes("PROJECT_EXPERIENCES") && !html.includes("BURITI_CONJUNTOS"), "Condomínios não podem ficar fixos no código.");
 assert.ok(html.includes("resetPasswordForEmail(email,{redirectTo})") && html.includes('type==="recovery"') && html.includes("openResetNewPassword(") && html.includes("updateUser({password"), "Esqueci minha senha precisa usar o link de recuperação do Supabase Auth.");

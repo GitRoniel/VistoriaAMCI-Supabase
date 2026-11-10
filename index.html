@@ -105,6 +105,8 @@ button{cursor:pointer;border:none;background:none}
 /* ── GRID (matrix) ── */
 .gridscroll{overflow-x:auto;border:1px solid var(--border);border-radius:7px;-webkit-overflow-scrolling:touch}
 table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:820px}
+/* Numeração completa (401, T01) nos mapas: no celular/tablet a tabela fica mais larga (rolagem lateral) para os 3 dígitos caberem sem encostar nos cantos coloridos */
+@media(max-width:900px){table.mx:not(.casas){min-width:1060px}.mx .apt{letter-spacing:0}}
 .mx th.corner{background:var(--moss);color:var(--lioness);font-size:9px;font-weight:700;letter-spacing:.06em;padding:8px 6px;
   text-align:center;width:52px;position:sticky;left:0;z-index:3}
 .mx th.blkh{background:var(--moss);color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
@@ -591,6 +593,15 @@ body{background:var(--bg)}
 .stk-bar i span{font-size:10.5px;font-weight:700;color:#fff;pointer-events:none;white-space:nowrap}
 .stk-bar i.stk-na span{color:#4a5a52}
 .stk-tot{font-size:11px;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+/* Panorama: blocos Vistorias e Revistorias com o mesmo desenho; marca de cor no topo dos números da revistoria */
+#resumoGrid{gap:14px}
+#resumoGrid .rg-big{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+#resumoGrid .rg-big .rb{min-width:0;padding:9px 4px}
+#resumoGrid .rg-big .rb .l{line-height:1.25}
+@media(max-width:720px){#resumoGrid .rg-big .rb{padding:7px 2px}#resumoGrid .rg-big .rb .n{font-size:19px}#resumoGrid .rg-big .rb .l{font-size:7.5px;letter-spacing:.1px}}
+.rg-rev .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+.rg-sub small{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
+.rg-vazio{padding:18px 12px;border:1px dashed #cfdad3;border-radius:10px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.45}
 .chart-tip{position:fixed;z-index:120;max-width:280px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;line-height:1.4;padding:8px 11px;border-radius:10px;box-shadow:0 12px 28px rgba(4,20,16,.3);pointer-events:none;opacity:0;transition:opacity .12s}
 .chart-tip.show{opacity:1}
 @media(max-width:960px){
@@ -2023,6 +2034,33 @@ body.rv-aberto{overflow:hidden}
 /* Revistoria · Cliente: filtro rápido de Execução (botões), Lista compacta e quantitativos de apontamentos */
 .rc-exe-fil{flex-wrap:wrap;gap:6px}
 .rc-exe-fil-t{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+/* Revistoria: Mapa/Lista no topo (mesmo componente e medidas da aba Vistoria) e as duas áreas
+   Acompanhamento Geral / Execução M.O. (mesmo desenho dos botões grandes de navegação, .vw-tab) */
+#v-revcli .rc-modo{padding:3px;border-radius:10px;margin-bottom:10px;gap:3px}
+#v-revcli .rc-modo button{min-height:32px;padding:0 6px;border-radius:8px;font-size:12.5px}
+.rc-areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.rc-area{display:flex;align-items:center;gap:13px;min-height:64px;padding:11px 16px;text-align:left;background:#f8faf8;border:1.5px solid #dbe4dd;border-radius:14px;color:#617168;font-family:inherit;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;min-width:0}
+.rc-area:hover{border-color:#9fb6a6;background:#fff}
+.rc-area:focus-visible{outline:3px solid rgba(107,128,64,.45);outline-offset:2px}
+.rc-area.on{background:#fff;border-color:#1f4a3f;box-shadow:0 6px 18px rgba(31,61,56,.1);color:#173a32}
+.rc-area.on .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
+.rc-root [data-so][hidden]{display:none!important}
+.rc-exe-n{margin-left:6px;font-size:11px;font-weight:800;opacity:.7;font-variant-numeric:tabular-nums}
+.rc-exe-b.on .rc-exe-n{opacity:.9}
+@media(max-width:1100px){.rc-area{min-height:54px}}
+@media(max-width:720px){
+  #v-revcli .rc-modo{margin-bottom:8px}
+  #v-revcli .rc-modo button{min-height:36px}
+  .rc-areas{gap:7px;margin-bottom:8px}
+  .rc-area{min-height:48px;padding:7px 10px;gap:9px;border-radius:12px}
+  .rc-area .vw-ic{width:32px;height:32px;border-radius:9px}
+  .rc-area .vw-ic svg{width:16px;height:16px}
+  .rc-area .vw-txt b{font-size:12.5px;line-height:1.2}
+  .rc-area{padding:7px 8px;gap:7px}
+  .rc-area .vw-ic{width:28px;height:28px;border-radius:8px}
+}
+.rc-root .rc-imp{white-space:nowrap}
+.pv{gap:16px}
 .rc-exe-b{height:30px;display:inline-flex;align-items:center;gap:6px;padding:0 11px 0 4px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--c) 45%,#fff);background:#fff;color:#33463d;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;transition:.12s}
 .rc-exe-b i{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;border-radius:50%;background:var(--c);color:#fff;font-size:10.5px;font-style:normal;font-weight:800}
 .rc-exe-b:hover{border-color:var(--c);color:var(--ink)}
@@ -2196,7 +2234,15 @@ body.rv-aberto{overflow:hidden}
 .ct-spin{display:inline-block;width:13px;height:13px;margin-right:6px;border-radius:50%;border:2px solid #dbe4dd;border-top-color:var(--ink-2,#1f4a3f);animation:chspin .8s linear infinite;vertical-align:-2px}
 /* Agenda */
 .ct-agenda{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
-.ct-kpis{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.ct-kpis{display:grid;grid-template-columns:repeat(var(--n,8),minmax(0,1fr));gap:6px}
+.ct-kpi.k-info{cursor:default}
+.ct-kpi.k-hoje{border-color:#bfe0ca;background:#f1f8f3}.ct-kpi.k-hoje b{color:#1d6b3c}
+.ct-agtop{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.ct-modo button{min-height:32px!important;font-size:12.5px!important;padding:0 14px!important}
+.ct-per{display:flex;gap:6px;flex-wrap:wrap}
+.ct-per[hidden]{display:none}
+.ct-per-t{font-size:11.5px;font-weight:600;color:var(--muted)}
+.ct-mut{color:var(--muted);font-style:italic}
 .ct-kpi{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0;padding:7px 10px;border:1px solid #e3e9e4;border-radius:10px;background:#fff;text-align:left;cursor:pointer;transition:.12s}
 .ct-kpi b{font-size:19px;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
 .ct-kpi span{font-size:10.5px;font-weight:700;color:#52675d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -2226,9 +2272,12 @@ body.rv-aberto{overflow:hidden}
 .ct-dh span{font-size:12px;font-weight:600;color:#52675d;font-variant-numeric:tabular-nums}
 .ct-dh em{margin-left:auto;font-style:normal;font-size:11px;font-weight:600;color:var(--muted)}
 .ct-dia.hoje .ct-dh{background:#e9f2ec;box-shadow:inset 3px 0 0 #2f9e5b}
+.ct-dia.hoje .ct-row{background:#f7fbf8}
+.ct-dia.hoje .ct-row:hover{background:#eef6f0}
+.ct-dia.hoje .ct-dh{background:#dff0e5;box-shadow:inset 4px 0 0 #2f9e5b}
 .ct-dia.hoje .ct-dh b{color:#1d6b3c}
 .ct-dia.passado .ct-dh b{color:#52675d}
-.ct-row{display:grid;grid-template-columns:44px 104px minmax(0,1.6fr) minmax(0,.9fr) minmax(0,1.1fr) 70px;align-items:center;gap:8px;width:100%;padding:5px 12px;border-bottom:1px solid #f0f3f1;background:none;text-align:left;font-size:12px;color:var(--ink);cursor:pointer}
+.ct-row{display:grid;grid-template-columns:44px 104px minmax(0,1.7fr) minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:8px;width:100%;padding:5px 12px;border-bottom:1px solid #f0f3f1;background:none;text-align:left;font-size:12px;color:var(--ink);cursor:pointer}
 .ct-row:hover,.ct-urow:hover{background:#f6f9f7}
 .ct-row:focus-visible,.ct-urow:focus-visible{outline:2px solid #6b8040;outline-offset:-2px}
 .ct-row.s-cancelada{opacity:.6}
@@ -2290,7 +2339,36 @@ body.rv-aberto{overflow:hidden}
 .pv-d.up{background:#eaf6ee;color:#1f6b3d}.pv-d.down{background:#fdf3f2;color:#9e2f25}
 .cg-prop{display:block;height:5px;margin-top:4px;border-radius:999px;background:#e3e9e4;overflow:hidden}
 .cg-prop i{display:block;height:100%;background:var(--c);border-radius:999px}
-.pv-graf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pv-graf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+/* Produtividade: destaques do período, ranking por vistoriador e consultas complementares (details) */
+.pv-hero{display:grid;grid-template-columns:1.25fr repeat(4,minmax(0,1fr));gap:8px}
+.pv-hero .pv-k{padding:11px 13px;border-radius:12px}
+.pv-hero .pv-k b{font-size:24px}
+.pv-hero .pv-k.hero{background:linear-gradient(145deg,#244e42,#17362f);border-color:#17362f}
+.pv-hero .pv-k.hero b,.pv-hero .pv-k.hero span{color:#fff}.pv-hero .pv-k.hero small{color:#cfe0d6}
+.pv-hero .pv-k.hero .pv-d{background:rgba(255,255,255,.16);color:#fff}
+.pv-k.v{box-shadow:inset 3px 0 0 #2f6fdb}.pv-k.r{box-shadow:inset 3px 0 0 #e8842a}.pv-k.c{box-shadow:inset 3px 0 0 #0097a7}
+.pv-linha{margin:0;font-size:11.5px;color:#52675d;line-height:1.5}
+.pv-linha b{color:var(--ink)}.pv-linha b.bad{color:#9e2f25}.pv-linha span{color:var(--muted)}
+.pv-rk-h,.pv-rank li{display:grid;grid-template-columns:minmax(90px,170px) minmax(0,1fr) 78px 58px;align-items:center;gap:10px}
+.pv-rk-h{padding:0 10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.pv-rk-h>span:nth-child(n+3){text-align:right}
+.pv-rk-leg{display:flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0;font-size:11px}
+.pv-rk-leg i{width:10px;height:10px;border-radius:3px}.pv-rk-leg i.v,.pv-rk-bar i.v{background:#2f6fdb}.pv-rk-leg i.r,.pv-rk-bar i.r{background:#e8842a}
+.pv-rk-leg i.r{margin-left:6px}
+.pv-rank{list-style:none;margin:0;padding:4px 0;border:1px solid #e3e9e4;border-radius:11px;background:#fff;max-height:340px;overflow:auto}
+.pv-rank li{padding:5px 10px;border-bottom:1px solid #f0f3f1}
+.pv-rank li:last-child{border-bottom:0}
+.pv-rk-n{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-rk-bar{display:flex;height:14px;border-radius:4px;background:#f1f4f2;overflow:hidden}
+.pv-rk-bar i{display:block;height:100%;outline:none}
+.pv-rk-bar i+i{box-shadow:inset 1px 0 0 rgba(255,255,255,.75)}
+.pv-rk-t{display:flex;justify-content:flex-end;align-items:baseline;gap:4px;font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.pv-rk-a{text-align:right;font-size:12px;font-weight:700;color:#1f6b3d;font-variant-numeric:tabular-nums}
+.pv-mais>summary{cursor:pointer;font-size:11.5px;font-weight:700;color:#52675d;padding:4px 0;list-style-position:inside}
+.pv-mais[open]>summary{margin-bottom:6px}
+.pv-cond>summary h3{display:inline;margin:0}
+.cg-grande .cg-area{height:220px}
 .cg{margin:0;padding:9px 10px 8px;border:1px solid #e3e9e4;border-radius:11px;background:#fff;min-width:0;display:grid;gap:6px}
 .cg figcaption{font-size:12px;font-weight:700;color:var(--ink)}
 .cg-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:#52675d}
@@ -2409,7 +2487,7 @@ body.ct-un-aberto{overflow:hidden}
 .ct-docs li.rem{opacity:.6}
 .ct-docs li span{display:flex;gap:4px}
 .pp-central svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:1100px){.ct-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.pv-graf{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1100px){.ct-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.pv-graf{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-hero{grid-template-columns:repeat(3,minmax(0,1fr))}.pv-hero .pv-k.hero{grid-column:1/-1}}
 @media(max-width:720px){
   .ct-gsearch{flex-basis:100%;order:2}
   .ct-gsearch input,.ct-fq input,.ct-ubusca input{font-size:16px}
@@ -2420,7 +2498,10 @@ body.ct-un-aberto{overflow:hidden}
   .ct-fil .fx-field select{max-width:120px}
   .ct-fq{flex-basis:100%}
   .ct-ag{max-height:72vh}
-  .ct-row{grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"hr un pd" "hr tp sts" "hr rs sts";gap:1px 8px;padding:7px 10px}
+  .ct-row{grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"hr un un" "hr tp sts" "hr rs sts";gap:1px 8px;padding:7px 10px}
+  .ct-kpis{grid-template-columns:repeat(min(var(--n,8),4),minmax(0,1fr))}
+  .ct-agtop .ct-modo{flex:1 1 100%}
+  .ct-agtop .ct-modo button{flex:1 1 0}
   .ct-hr{grid-area:hr;align-self:start}
   .ct-un{grid-area:un}.ct-tp{grid-area:tp}.ct-rs{grid-area:rs;font-size:11px;color:var(--muted)}
   .ct-sts{grid-area:sts;justify-content:flex-end;align-self:end}
@@ -2429,6 +2510,12 @@ body.ct-un-aberto{overflow:hidden}
   .ct-rc{grid-column:1}
   .pv-graf{grid-template-columns:minmax(0,1fr)}
   .pv-ks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pv-hero{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pv-hero .pv-k b{font-size:20px}
+  .pv-rk-h,.pv-rank li{grid-template-columns:minmax(0,1fr) 64px 48px;gap:3px 8px}
+  .pv-rk-h .pv-rk-leg{display:none}
+  .pv-rank .pv-rk-bar{grid-column:1/-1;grid-row:2}
+  .cg-grande .cg-area{height:170px}
   .ct-u-info{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ct-dr{width:100%}
 }
@@ -2808,6 +2895,9 @@ html[data-theme="dark"].auth-restoring .auth-restore i{border:2px solid rgba(255
 :root[data-theme="dark"] .stk-bar i span{color:#fff}
 :root[data-theme="dark"] .stk-bar i.stk-na span{color:#b4c1ba}
 :root[data-theme="dark"] .stk-tot{color:#a6b2ab}
+:root[data-theme="dark"] .rg-rev .rg-mini .m{border-top:3px solid var(--rvs,transparent)}
+:root[data-theme="dark"] .rg-sub small{color:#a6b2ab}
+:root[data-theme="dark"] .rg-vazio{border:1px dashed #454e48;color:#a6b2ab}
 :root[data-theme="dark"] .chart-tip{background:var(--ink);color:#fff;box-shadow:0 12px 28px rgba(0,0,0,0.54)}
 @media(max-width:960px){
   :root[data-theme="dark"] .rg-layout .rg-col+.rg-col{border-left:none;border-top:1px solid #3e4641}
@@ -3380,6 +3470,11 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
   :root[data-theme="dark"] .rc-tbl .rc-c-key::before{color:#a6b2ab}
 }
 :root[data-theme="dark"] .rc-exe-fil-t{color:#a6b2ab}
+:root[data-theme="dark"] .rc-area{background:#222822;border:1.5px solid #414a43;color:#a6b2ab}
+:root[data-theme="dark"] .rc-area:hover{border-color:#515c55;background:#282828}
+:root[data-theme="dark"] .rc-area:focus-visible{outline:3px solid rgba(107,128,64,.45)}
+:root[data-theme="dark"] .rc-area.on{background:#282828;border-color:#1f4a3f;box-shadow:0 6px 18px rgba(0,0,0,0.18);color:#cfd9d7}
+:root[data-theme="dark"] .rc-area.on .vw-ic{background:linear-gradient(145deg,#244e42,#17362f);color:#dccb91}
 :root[data-theme="dark"] .rc-exe-b{border:1.5px solid color-mix(in srgb,var(--c) 45%,#3b3b3b);background:#282828;color:#c1cec8}
 :root[data-theme="dark"] .rc-exe-b i{background:var(--c);color:#fff}
 :root[data-theme="dark"] .rc-exe-b:hover{border-color:var(--c);color:#cfd9d7}
@@ -3434,6 +3529,10 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .ct-sub{color:#a6b2ab}
 :root[data-theme="dark"] .ct-skel i{background:linear-gradient(90deg,#1f2320 25%,#222722 50%,#1f2320 75%)}
 :root[data-theme="dark"] .ct-spin{border:2px solid #414a43;border-top-color:var(--ink-2,#1f4a3f)}
+:root[data-theme="dark"] .ct-kpi.k-hoje{border-color:#405747;background:#1e2821}
+:root[data-theme="dark"] .ct-kpi.k-hoje b{color:#77da9e}
+:root[data-theme="dark"] .ct-per-t{color:#a6b2ab}
+:root[data-theme="dark"] .ct-mut{color:#a6b2ab}
 :root[data-theme="dark"] .ct-kpi{border:1px solid #404741;background:#282828}
 :root[data-theme="dark"] .ct-kpi b{color:#cfd9d7}
 :root[data-theme="dark"] .ct-kpi span{color:#abbcb4}
@@ -3457,6 +3556,9 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .ct-dh span{color:#abbcb4}
 :root[data-theme="dark"] .ct-dh em{color:#a6b2ab}
 :root[data-theme="dark"] .ct-dia.hoje .ct-dh{background:#1c241f;box-shadow:inset 3px 0 0 rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .ct-dia.hoje .ct-row{background:#1f2b22}
+:root[data-theme="dark"] .ct-dia.hoje .ct-row:hover{background:#1d2720}
+:root[data-theme="dark"] .ct-dia.hoje .ct-dh{background:#19221c;box-shadow:inset 4px 0 0 rgba(0,0,0,0.6)}
 :root[data-theme="dark"] .ct-dia.hoje .ct-dh b{color:#77da9e}
 :root[data-theme="dark"] .ct-dia.passado .ct-dh b{color:#abbcb4}
 :root[data-theme="dark"] .ct-row{border-bottom:1px solid #3c433e;background:none;color:#cfd9d7}
@@ -3507,6 +3609,30 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .pv-d.down{background:#2d1e1c;color:#de7b73}
 :root[data-theme="dark"] .cg-prop{background:#1b1f1c}
 :root[data-theme="dark"] .cg-prop i{background:var(--c)}
+:root[data-theme="dark"] .pv-hero .pv-k.hero{background:linear-gradient(145deg,#244e42,#17362f);border-color:#17362f}
+:root[data-theme="dark"] .pv-hero .pv-k.hero b,:root[data-theme="dark"] .pv-hero .pv-k.hero span{color:#fff}
+:root[data-theme="dark"] .pv-hero .pv-k.hero small{color:#cfe0d6}
+:root[data-theme="dark"] .pv-hero .pv-k.hero .pv-d{background:rgba(255,255,255,.16);color:#fff}
+:root[data-theme="dark"] .pv-k.v{box-shadow:inset 3px 0 0 #2f6fdb}
+:root[data-theme="dark"] .pv-k.r{box-shadow:inset 3px 0 0 #e8842a}
+:root[data-theme="dark"] .pv-k.c{box-shadow:inset 3px 0 0 rgba(0,0,0,0.6)}
+:root[data-theme="dark"] .pv-linha{color:#abbcb4}
+:root[data-theme="dark"] .pv-linha b{color:#cfd9d7}
+:root[data-theme="dark"] .pv-linha b.bad{color:#de7b73}
+:root[data-theme="dark"] .pv-linha span{color:#a6b2ab}
+:root[data-theme="dark"] .pv-rk-h{color:#a6b2ab}
+:root[data-theme="dark"] .pv-rk-leg i.v,:root[data-theme="dark"] .pv-rk-bar i.v{background:#2f6fdb}
+:root[data-theme="dark"] .pv-rk-leg i.r,:root[data-theme="dark"] .pv-rk-bar i.r{background:#e8842a}
+:root[data-theme="dark"] .pv-rank{border:1px solid #404741;background:#282828}
+:root[data-theme="dark"] .pv-rank li{border-bottom:1px solid #3c433e}
+:root[data-theme="dark"] .pv-rank li:last-child{border-bottom:0}
+:root[data-theme="dark"] .pv-rk-n{color:#cfd9d7}
+:root[data-theme="dark"] .pv-rk-bar{background:#202422}
+:root[data-theme="dark"] .pv-rk-bar i{outline:none}
+:root[data-theme="dark"] .pv-rk-bar i+i{box-shadow:inset 1px 0 0 rgba(40,40,40,0.75)}
+:root[data-theme="dark"] .pv-rk-t{color:#cfd9d7}
+:root[data-theme="dark"] .pv-rk-a{color:#79d89e}
+:root[data-theme="dark"] .pv-mais>summary{color:#abbcb4}
 :root[data-theme="dark"] .cg{border:1px solid #404741;background:#282828}
 :root[data-theme="dark"] .cg figcaption{color:#cfd9d7}
 :root[data-theme="dark"] .cg-leg{color:#abbcb4}
@@ -3656,9 +3782,9 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 
   <!-- Páginas do condomínio: escolha clara entre o resumo e o mapa/lista (no celular, barra inferior) -->
   <nav class="vw-switch" aria-label="Páginas do condomínio">
-    <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Agenda, produtividade e unidades de todos os condomínios</small></span></button>
+    <button type="button" class="vw-tab active" data-view="resumo" aria-pressed="true"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="vw-txt"><b>Resumo Geral</b><small>Panorama de vistorias e revistorias, agenda e produtividade</small></span></button>
     <button type="button" class="vw-tab" data-view="cliente" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="vw-txt"><b>Vistoria · Cliente</b><small>Mapa e lista das unidades para agendar e registrar vistorias</small></span></button>
-    <button type="button" class="vw-tab" data-view="revcli" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg></span><span class="vw-txt"><b>Revistoria · Cliente</b><small>Agendamentos, resultados e ciclos das revistorias</small></span></button>
+    <button type="button" class="vw-tab" data-view="revcli" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M9 13l2 2 4-4"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/></svg></span><span class="vw-txt"><b>Revistoria · Cliente</b><small>Acompanhamento das revistorias e execução da mão de obra</small></span></button>
     <button type="button" class="vw-tab" data-view="stats" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="vw-txt"><b>Estatística Geral</b><small>Aprovação e reprovação por vistoriador e acompanhamento técnico</small></span></button>
     <button type="button" class="vw-tab" data-view="chaves" aria-pressed="false"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14.5 8.5l2 2"/></svg></span><span class="vw-txt"><b>Controle de Chaves</b><small>Setor responsável, transferências e histórico</small></span></button>
   </nav>
@@ -3668,7 +3794,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
     <div class="sec-head">
       <span class="icn"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
       <h2>Resumo Geral</h2>
-      <div class="sh-flow">Central operacional · <b>agenda, produtividade e unidades</b> de todos os condomínios</div>
+      <div class="sh-flow">Panorama de <b>vistorias e revistorias</b> · agenda operacional · produtividade</div>
     </div>
     <div class="sec-body">
       <!-- Central Operacional (src/modules/central → www/central.js); o Panorama do condomínio é a aba "Panorama" -->
@@ -4172,7 +4298,7 @@ function houseLayout(counts){
 let LAYOUT=apartmentLayout();
 function layoutFor(project){return projectExperience(project).layout==="casa"?houseLayout({}):apartmentLayout();}
 function unitCode(b,p,a){return LAYOUT.kind==="casa"?String(+a):unitCode_(p,a);}
-function unitTitle(b,p,a){return LAYOUT.kind==="casa"?`Casa ${+a} · Conjunto ${b}`:`Apto ${a} · Bloco ${b} ${PAVL[p]}`;}
+function unitTitle(b,p,a){return LAYOUT.kind==="casa"?`Casa ${+a} · Conjunto ${b}`:`Apto ${unitCode_(p,a)} · Bloco ${b} · ${PAVL[p]}`;}
 function unitShort(b,p,a){return LAYOUT.kind==="casa"?`Conj. ${b} casa ${+a}`:`${b} ${PAVL[p]} apto ${a}`;}
 function groupUnits(b){return LAYOUT.units.filter(u=>u.b===b);}
 
@@ -4251,11 +4377,11 @@ function buildGrid(kind,fr){
   const codeOf=(b,p,a)=> kind==="obra" ? state.obra[kO(b,p,a)][fr] : state.cli[kC(b,p,a)];
   const CLR = kind==="obra" ? CLR_O : CLR_C;
   const aptBtn=(b,p,a)=>{const c=codeOf(b,p,a),s=CLR[c];
-    if(kind==="obra")return `<button class="apt" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${a}</button>`;
+    if(kind==="obra")return `<button class="apt" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}">${unitCode(b,p,a)}</button>`;
     // canto colorido = situação na Revistoria · Cliente (Em andamento, Agendado, Aprovado)
     const k=kC(b,p,a),info=state.cliInfo[k]||{},pcd=state.unitMeta[k]?.pcd,rc=rvcStatus(k);
     const tip=unitTitle(b,p,a)+" · "+CLL[c]+(info.cliente?" · "+info.cliente:"")+(pcd?" · PCD":"")+(rc?" · Revistoria · Cliente: "+RVC.info(rc).label:"");
-    return `<button class="apt${pcd?" pcd":""}${rc?" rvs":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}${rc?";--rvs:"+RVC.info(rc).cor:""}">${LAYOUT.kind==="casa"?+a:a}</button>`;};
+    return `<button class="apt${pcd?" pcd":""}${rc?" rvs":""}" data-k="${kind}" data-fr="${fr}" data-b="${b}" data-p="${p}" data-a="${a}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${s.bg};color:${s.tx};border-color:${s.bd}${rc?";--rvs:"+RVC.info(rc).cor:""}">${unitCode(b,p,a)}</button>`;};
   if(kind==="cli"&&LAYOUT.kind==="casa"){
     if(single)return `<div class="casa-single"><div class="casa-single-head">Conjunto ${blk} · ${groupUnits(blk).length} casas</div><div class="casa-wrap">`+groupUnits(blk).map(u=>aptBtn(u.b,u.p,u.a)).join("")+`</div></div>`;
     const cols=Array.from({length:LAYOUT.maxHouses},(_,i)=>i+1);
@@ -4292,7 +4418,7 @@ function buildObraGeral(){
     const qd=FRENTES.map(f=>{const c=st[f.key],s=CLR_O[c];const dp=pl[f.key],dl=lb[f.key];
       const dt=(dp?" · P "+fmtDate(dp):"")+(dl?" · L "+fmtDate(dl):"");
       return `<button class="qd" data-k="obra" data-fr="${f.key}" data-b="${b}" data-p="${p}" data-a="${a}" title="${f.name}: ${STL[c]}${dt}" style="background:${s.bg}"></button>`;}).join("");
-    return `<div class="qapt" title="${b} ${PAVL[p]} · Apto ${a}"><div class="qgrid">${qd}</div><span class="qnum">${a}</span></div>`;
+    return `<div class="qapt" title="${b} ${PAVL[p]} · Apto ${unitCode(b,p,a)}"><div class="qgrid">${qd}</div><span class="qnum">${unitCode(b,p,a)}</span></div>`;
   };
   if(single){
     let h='<div class="single">';
@@ -4686,7 +4812,7 @@ function renderPop(){
   if(!ctx)return;
   pop.classList.toggle("pp",ctx.k==="cli");
   if(ctx.k==="cli")return renderCliPop();
-  const f=FRENTES.find(x=>x.key===ctx.fr),flow=f.flow,title=f.name+" · "+ctx.b+" "+PAVL[ctx.p]+" · Apto "+ctx.a;
+  const f=FRENTES.find(x=>x.key===ctx.fr),flow=f.flow,title=f.name+" · "+ctx.b+" "+PAVL[ctx.p]+" · Apto "+unitCode(ctx.b,ctx.p,ctx.a);
   const cur=state.obra[kO(ctx.b,ctx.p,ctx.a)][ctx.fr];
   const pl=state.obraPlan[kPV(ctx.b,ctx.p)][ctx.fr]||"", lb=state.obraLib[kPV(ctx.b,ctx.p)][ctx.fr]||"";
   const dateHtml=`<div class="popdate"><div class="pd-note">Datas do andar — Bloco ${ctx.b} · ${PAVL[ctx.p]} (valem p/ todos os aptos)</div><label>Data planejada${canEditPlan()?"":" (somente admin)"}</label><input type="date" id="popPlan" value="${pl}" ${canEditPlan()?"":"disabled"}><label style="margin-top:7px">Data de liberação da vistoria</label><input type="date" id="popLib" value="${lb}" ${canEditFrente(ctx.fr)?"":"disabled"}></div>`;
@@ -4986,6 +5112,8 @@ function revcliHost(){
     recarregar:rvcRecarregar, hoje:todayISO,
     // importação da planilha só de revistorias (mesmo importador da Visão Geral; só administradores)
     podeImportar:()=>adminProjects().some(p=>String(p.id)===String(appProject?.id)), importarRevistorias:()=>startImport("rev"),
+    // Execução M.O.: atalho para o Controle de Chaves completo (mesma tela da aba Controle de Chaves)
+    abrirChaves:()=>switchView("chaves"),
     papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
   };
 }
@@ -5016,7 +5144,7 @@ async function centralIrPara(u,view){
 function openCentral(){
   const ov=document.getElementById("centralOv");
   document.body.classList.add("admin-open");ov.classList.add("open");ov.setAttribute("aria-hidden","false");ov.scrollTop=0;
-  window.AmciCentral?.mostrar(document.getElementById("centralRootOv"),centralHost(true));
+  window.AmciCentral?.mostrar(document.getElementById("centralRootOv"),centralHost(true),true);
 }
 function closeCentral(){
   const ov=document.getElementById("centralOv");if(!ov?.classList.contains("open"))return;
@@ -5035,7 +5163,8 @@ function switchView(v){
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active",s.id==="v-"+v));
   if(v==="obra")renderObra();
   if(v==="cliente")renderCli();
-  if(v==="resumo"){renderResumo();window.AmciCentral?.mostrar(document.getElementById("centralRoot"),centralHost(false));}else window.AmciCentral?.esconder();
+  // Resumo Geral abre sempre no Panorama (Vistorias e Revistorias) e a agenda em "Hoje em diante"
+  if(v==="resumo"){renderResumo();window.AmciCentral?.mostrar(document.getElementById("centralRoot"),centralHost(false),true);}else window.AmciCentral?.esconder();
   if(v==="stats")renderStats();
   // Controle de Chaves: módulo à parte (www/chaves.js), com o contexto desta tela.
   if(v==="chaves")window.AmciChaves?.show(chavesHost());else window.AmciChaves?.hide();
@@ -6537,51 +6666,78 @@ document.getElementById("modsList").addEventListener("change",async e=>{
 });
 const BARCLR=p=>p>=80?"#2f9e5b":p>=40?"#6B8040":"#ED7A12";
 const fmtPct=v=>(Math.round(v*10)/10).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+/* ── PANORAMA (Resumo Geral do condomínio) ──
+   Dois blocos independentes, com o mesmo desenho: Vistorias (client_inspections: status da 1ª vistoria de
+   cada unidade) e Revistorias (revistorias_cliente: situação de cada unidade em revistoria; revistorias:
+   agendamentos). Cada unidade conta uma vez em cada bloco; nada da vistoria entra na revistoria e vice-versa.
+   Mesmas regras do restante do site: vistoriada = Aprovado + Revistoria + Revistoria Finalizada; Processo em
+   Andamento não conta como agendada; Rev. Reprovada = última revistoria realizada reprovada (RVC.reprovada). */
+function rgStack(rows,legend){
+  // rows: [{label, total, segs:[{cls|cor,label,n}], tot}] → barras empilhadas por bloco/conjunto
+  let h=`<div class="stk-legend">${legend.map(l=>`<span><i class="${l.cls||""}"${l.cor?` style="background:${l.cor}"`:""}></i>${l.label}</span>`).join("")}</div><div class="stk-chart">`;
+  rows.forEach(r=>{
+    const total=r.total||0;
+    const aria=r.segs.map(x=>`${x.label}: ${x.n} (${fmtPct(total?x.n/total*100:0)})`).join("; ");
+    h+=`<div class="stk-row"><span class="stk-lbl">${esc(r.label)}</span><div class="stk-bar" role="img" aria-label="${esc(r.label)}: ${esc(total?aria:"sem unidades")}">`+
+      (total?r.segs.filter(x=>x.n>0).map(x=>{const pct=x.n/total*100;const tip=`${r.label} · ${x.label}: ${x.n} de ${total} (${fmtPct(pct)})${x.extra||""}`;
+        return `<i class="${x.cls||""}"${x.cor?` style="width:${pct}%;background:${x.cor}"`:` style="width:${pct}%"`} data-tip="${esc(tip)}" tabindex="0">${pct>=9?`<span>${Math.round(pct)}%</span>`:""}</i>`;}).join(""):"")+
+      `</div><span class="stk-tot">${r.tot}</span></div>`;
+  });
+  return h+`</div>`;
+}
+function rgCard(o){
+  // o: {titulo, destaque, donut:[pct,cor,rot], big:[[n,rot,cls]], barra:{rot,txt,pct}, mini:[[rot,n,cor?]], sub, grafico}
+  return `<div class="rg-card rg-${o.tipo}"><div class="rgh"><span>${o.titulo}</span><b>${o.destaque}</b></div><div class="rg-body rg-layout"><div class="rg-col">`+
+    `<div class="rg-charts">${donut(o.donut[0],o.donut[1],o.donut[2],150)}<div class="rg-stats"><div class="rg-big">`+
+    o.big.map(b=>`<div class="rb${b[2]?" "+b[2]:""}"><div class="n">${b[0]}</div><div class="l">${b[1]}</div></div>`).join("")+`</div></div></div>`+
+    `<div class="pbar"><div class="pt"><span>${o.barra.rot}</span><b>${o.barra.txt}</b></div><div class="track"><i style="width:${o.barra.pct}%;background:${BARCLR(o.barra.pct)}"></i></div></div>`+
+    `<div class="rg-mini">`+o.mini.map(m=>`<div class="m"${m[2]?` style="--rvs:${m[2]}"`:""}><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`+
+    `</div><div class="rg-col"><div class="rg-sub">${o.sub}</div>${o.grafico}</div></div></div>`;
+}
 function renderResumo(){
   const grid=document.getElementById("resumoGrid"); if(!grid)return;
   const cv=Object.values(state.cli),ct=cv.length;const cc=x=>cv.filter(v=>v===x).length;
   const na=cc("na"),ag=cc("ag"),rm=cc("rm"),rv=cc("rv"),rf=cc("rf"),ap=cc("ap"),inad=cc("in");
   // Processo em Andamento não conta como agendada para o cliente.
   const vist=ap+rv+rf, aprovPct=vist?Math.round(ap/vist*100):0, entPct=ct?Math.round((ct-na-inad)/ct*100):0;
-  let h=`<div class="rg-card"><div class="rgh"><span>Vistoria · Cliente</span><b>${aprovPct}% aprov.</b></div><div class="rg-body rg-layout"><div class="rg-col">`;
-  h+=`<div class="rg-charts">${donut(aprovPct,"#2f9e5b","Aprovação",150)}<div class="rg-stats"><div class="rg-big">`+
-     `<div class="rb"><div class="n">${ct}</div><div class="l">Unidades</div></div>`+
-     `<div class="rb ok"><div class="n">${ap}</div><div class="l">Aprovados</div></div>`+
-     `<div class="rb warn"><div class="n">${rv}</div><div class="l">Revistoria</div></div></div></div></div>`;
-  h+=`<div class="pbar"><div class="pt"><span>Agendadas p/ cliente</span><b>${ct-na-inad}/${ct} · ${entPct}%</b></div><div class="track"><i style="width:${entPct}%;background:${BARCLR(entPct)}"></i></div></div>`;
-  const mini=[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]];
-  h+=`<div class="rg-mini">`+mini.map(m=>`<div class="m"><div class="mn">${m[1]}</div><div class="ml">${m[0]}</div></div>`).join("")+`</div>`;
-  // Revistoria · Cliente (situação de cada unidade em acompanhamento); não muda os números da vistoria acima.
-  const rcs=Object.values(state.rvc),rcN=st=>rcs.filter(a=>a.status===st).length;
-  const rcFeitas=Object.values(state.revs).reduce((n,l)=>n+l.filter(r=>RVC.REALIZADAS.includes(r.status)).length,0);
-  if(rcs.length)h+=`<div class="rg-sub rg-sub-rv">Revistoria · Cliente · ${rcs.length} unidade(s)</div><div class="rg-mini rg-mini-rv">`+
-    RVC.STATUS_ORDEM.map(x=>`<div class="m" style="--rvs:${RVC.STATUS[x].borda}"><div class="mn">${rcN(x)}</div><div class="ml">${RVC.STATUS[x].label}</div></div>`).join("")+
-    `<div class="m" style="--rvs:#6b8040"><div class="mn">${rcFeitas}</div><div class="ml">Revistorias realizadas</div></div></div>`;
-  h+=`</div><div class="rg-col">`;
-  h+=`<div class="rg-sub">Aprovações e Revistorias por ${LAYOUT.group}</div>`;
-  h+=`<div class="stk-legend"><span><i class="stk-ok"></i>Aprovados</span><span><i class="stk-fin"></i>Revistorias finalizadas</span><span><i class="stk-rev"></i>Revistorias / Reprovados</span><span><i class="stk-na"></i>Sem agendamento</span></div><div class="stk-chart">`;
   const groupLabel=b=>`${LAYOUT.groupShort} ${b}`;
-  LAYOUT.groups.forEach(block=>{
-    const statuses=groupUnits(block).map(u=>state.cli[kC(u.b,u.p,u.a)]);
-    const total=statuses.length||1;
-    const approved=statuses.filter(status=>status==="ap").length;
-    const reviews=statuses.filter(status=>status==="rv").length;
-    const finished=statuses.filter(status=>status==="rf").length;
-    const waiting=statuses.filter(status=>status==="ag"||status==="rm").length;
-    const rest=total-approved-reviews-finished;
-    const segs=[
-      {cls:"stk-ok",label:"Aprovados",n:approved},
-      {cls:"stk-fin",label:"Revistorias finalizadas",n:finished},
-      {cls:"stk-rev",label:"Revistorias / Reprovados",n:reviews},
-      {cls:"stk-na",label:"Sem agendamento",n:rest,extra:waiting?` · inclui ${waiting} agendado(s)/remarcado(s) aguardando vistoria`:""}
-    ];
-    const aria=segs.map(x=>`${x.label}: ${x.n} (${fmtPct(x.n/total*100)})`).join("; ");
-    h+=`<div class="stk-row"><span class="stk-lbl">${groupLabel(block)}</span><div class="stk-bar" role="img" aria-label="${groupLabel(block)}: ${esc(aria)}">`+
-      segs.filter(x=>x.n>0).map(x=>{const pct=x.n/total*100;const tip=`${groupLabel(block)} · ${x.label}: ${x.n} de ${total} (${fmtPct(pct)})${x.extra||""}`;
-        return `<i class="${x.cls}" style="width:${pct}%" data-tip="${esc(tip)}" tabindex="0">${pct>=9?`<span>${Math.round(pct)}%</span>`:""}</i>`;}).join("")+
-      `</div><span class="stk-tot">${approved}/${total}</span></div>`;
+  // BLOCO 1 · Vistorias
+  const vRows=LAYOUT.groups.map(block=>{
+    const st=groupUnits(block).map(u=>state.cli[kC(u.b,u.p,u.a)]),n=x=>st.filter(v=>v===x).length;
+    const total=st.length,a=n("ap"),f=n("rf"),r=n("rv"),w=n("ag")+n("rm");
+    return {label:groupLabel(block),total,tot:`${a}/${total}`,segs:[
+      {cls:"stk-ok",label:"Aprovados",n:a},{cls:"stk-fin",label:"Revistorias finalizadas",n:f},{cls:"stk-rev",label:"Revistorias / Reprovados",n:r},
+      {cls:"stk-na",label:"Sem vistoria",n:total-a-f-r,extra:w?` · inclui ${w} agendado(s)/remarcado(s) aguardando vistoria`:""}]};
   });
-  h+=`</div></div></div></div>`;
+  let h=rgCard({tipo:"vist",titulo:"Panorama de Vistorias",destaque:`${aprovPct}% aprov. na 1ª vistoria`,
+    donut:[aprovPct,"#2f9e5b","Aprovação"],
+    big:[[ct,"Unidades"],[vist,"Vistoriadas","blue"],[na+ag+rm,"A vistoriar"],[ap,"Aprovadas","ok"],[rv+rf,"Reprovadas","warn"]],
+    barra:{rot:"Agendadas p/ cliente",txt:`${ct-na-inad}/${ct} · ${entPct}%`,pct:entPct},
+    mini:[["Não agendado",na],["Agendado",ag],["Remarcado",rm],["Revistoria",rv],["Rev. finalizada",rf],["Aprovado",ap],["Processo em Andamento",inad]],
+    sub:`Vistorias por ${LAYOUT.group}`,
+    grafico:rgStack(vRows,[{cls:"stk-ok",label:"Aprovados"},{cls:"stk-fin",label:"Revistorias finalizadas"},{cls:"stk-rev",label:"Revistorias / Reprovados"},{cls:"stk-na",label:"Sem vistoria"}])});
+  // BLOCO 2 · Revistorias (unidades em revistoria_cliente; revistorias realizadas = agendamentos aprovados ou reprovados)
+  if(rvcInstalled){
+    const S=RVC.STATUS,keys=Object.keys(state.rvc).filter(k=>state.rvc[k]?.status);
+    const sit=k=>RVC.situacao(state.rvc[k],revList(k));
+    const sits=keys.map(sit),rn=x=>sits.filter(s=>s.status===x).length;
+    const tot=sits.length,rAnd=rn("Em andamento"),rAg=rn("Agendado"),rAp=rn("Aprovado"),rRep=sits.filter(s=>RVC.reprovada(s)).length;
+    const feitas=sits.reduce((n,s)=>n+s.realizadas,0),agds=keys.reduce((n,k)=>n+revList(k).filter(r=>r.status!=="Cancelada").length,0);
+    const rPct=tot?Math.round(rAp/tot*100):0,movPct=tot?Math.round((rAg+rAp)/tot*100):0;
+    const rRows=LAYOUT.groups.map(block=>{
+      const ss=groupUnits(block).map(u=>kC(u.b,u.p,u.a)).filter(k=>state.rvc[k]?.status).map(sit),n=x=>ss.filter(s=>s.status===x).length;
+      return {label:groupLabel(block),total:ss.length,tot:ss.length?`${n("Aprovado")}/${ss.length}`:"—",segs:[
+        {cor:S.Aprovado.cor,label:"Aprovadas",n:n("Aprovado")},{cor:S.Agendado.cor,label:"Agendadas",n:n("Agendado")},{cor:S["Em andamento"].borda,label:"Aguardando agendamento",n:n("Em andamento")}]};
+    });
+    h+=rgCard({tipo:"rev",titulo:"Panorama de Revistorias",destaque:tot?`${rPct}% aprovadas`:"sem unidades em revistoria",
+      donut:[rPct,"#2f6fdb","Aprovação"],
+      big:[[tot,"Unidades em revistoria"],[rAnd,"Aguardando agendamento"],[rAg,"Agendadas","blue"],[rAp,"Aprovadas","ok"],[rRep,"Rev. Reprovada","warn"]],
+      barra:{rot:"Agendadas ou aprovadas",txt:`${rAg+rAp}/${tot} · ${movPct}%`,pct:movPct},
+      mini:[["Em andamento",rAnd,S["Em andamento"].borda],["Agendado",rAg,S.Agendado.borda],["Aprovado",rAp,S.Aprovado.borda],["Rev. Reprovada",rRep,"#b33636"],["Revistorias realizadas",feitas,"#6b8040"],["Agendamentos",agds,"#2459b5"]],
+      sub:`Revistorias por ${LAYOUT.group} <small>· unidades em revistoria</small>`,
+      grafico:tot?rgStack(rRows,[{cor:S.Aprovado.cor,label:"Aprovadas"},{cor:S.Agendado.cor,label:"Agendadas"},{cor:S["Em andamento"].borda,label:"Aguardando agendamento"}])
+        :`<div class="rg-vazio">Nenhuma unidade em revistoria neste condomínio. As unidades entram automaticamente quando a vistoria passa a <b>Revistoria</b>.</div>`});
+  }
   grid.innerHTML=h;
   // A Estatística Geral usa os mesmos dados: atualiza junto quando estiver aberta.
   if(document.getElementById("v-stats")?.classList.contains("active"))renderStats();

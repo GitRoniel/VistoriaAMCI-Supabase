@@ -44,7 +44,7 @@ const FORMS = {
 };
 
 // Mapa é a visualização principal: abre (e volta) sempre no Mapa; a Lista fica para consulta detalhada.
-let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", nomes = [], salvando = "";
+let host = null, root = null, projId = null, filt = FILTRO0(), modo = "mapa", area = "acomp", nomes = [], salvando = "";
 let pop = null, fundo = null, cur = null, painel = "", hist = null, ocupado = false, aviso = null, pedido = null;
 // chaves: unitId → situação da chave (CM.situacao); comRelatorio: unidades com relatório enviado;
 // apont: unitId → { total, resolvidas, pct } do checklist (mesma regra do relatório individual: M.checklistUnidade)
@@ -76,31 +76,50 @@ const chavePill = (k, extra = "") => {
 const quandoAg = (r) => (r ? [fmtD(r.data), hhmm(r.horario)].filter(Boolean).join(" · ") : "");
 
 /* ── tela ── */
+// Duas áreas sobre os mesmos dados (revistorias_cliente, revistorias, chaves e relatórios), sem duplicar telas:
+//   Acompanhamento Geral: agendamentos, status, aprovações e indicadores do fluxo da revistoria;
+//   Execução M.O.: liberação, equipes de mão de obra (M.O.P Felipe/Renato, EMP), relatórios/checklist e chaves.
+// Cada área mostra só os seus filtros, indicadores, colunas e marcas no mapa; bloco e busca valem para as duas.
+const AREAS = [
+  { key: "acomp", label: "Acompanhamento Geral", sub: "Agendamentos, status e aprovações das revistorias",
+    ic: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 15.5l2 2 4-4.5"/>' },
+  { key: "exec", label: "Execução M.O.", sub: "Liberação, equipes de mão de obra, relatórios e chaves",
+    ic: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>' }
+];
+/** Filtros de cada área (bloco e busca são comuns). */
+const CAMPOS_AREA = { acomp: ["rapido", "data"], exec: ["liberado", "execucao", "chave"] };
+/** Filtro efetivo da área: os campos da outra área não valem aqui (ficam guardados para quando voltar). */
+function filtroArea() {
+  const f0 = FILTRO0(), f = { ...filt };
+  for (const k of CAMPOS_AREA[area === "acomp" ? "exec" : "acomp"]) f[k] = f0[k];
+  return f;
+}
+const so = (a) => ` data-so="${a}"`;
 function casca() {
   root.innerHTML = `
+    <div class="modetog rc-modo" role="tablist" aria-label="Visualização"><button type="button" role="tab" data-modo="mapa">Mapa</button><button type="button" role="tab" data-modo="lista">Lista</button></div>
+    <div class="rc-areas" role="tablist" aria-label="Área da revistoria">${AREAS.map((a) => `<button type="button" role="tab" class="rc-area" data-area="${a.key}"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${a.ic}</svg></span><span class="vw-txt"><b>${esc(a.label)}</b><small>${esc(a.sub)}</small></span></button>`).join("")}</div>
     <div class="ch-top rc-top" id="rcKpis"></div>
     <div class="clif ch-filters rc-filters">
       <div class="ch-line">
         <label class="fx-field fx-sel"><span>${esc(host.grupo())}</span><select id="rcBloco" aria-label="${esc(host.grupo())}"><option value="ALL">Todos</option>${host.grupos().map((b) => `<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select></label>
         <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="rcBusca" type="search" placeholder="${host.casa() ? "Casa ou cliente" : "Unidade (ex.: 604 ou A604) ou cliente"}" aria-label="Buscar unidade ou cliente" autocomplete="off"></label>
-        <label class="fx-field rc-f-data"><span>Data</span><input type="date" id="rcData" aria-label="Data da revistoria"><button type="button" class="rc-f-x" id="rcDataX" aria-label="Limpar data" hidden>×</button></label>
-        <button class="fx-btn rc-hr" id="rcHr" type="button" aria-label="Ordenar por horário">${ICONE.relogio}<span>Horário ↑</span></button>
-        <div class="modetog ch-modo" role="tablist" aria-label="Visualização"><button type="button" data-modo="mapa">Mapa</button><button type="button" data-modo="lista">Lista</button></div>
+        <label class="fx-field rc-f-data"${so("acomp")}><span>Data</span><input type="date" id="rcData" aria-label="Data da revistoria"><button type="button" class="rc-f-x" id="rcDataX" aria-label="Limpar data" hidden>×</button></label>
+        <button class="fx-btn rc-hr" id="rcHr" type="button" aria-label="Ordenar por horário"${so("acomp")}>${ICONE.relogio}<span>Horário ↑</span></button>
+        <label class="fx-field fx-sel rc-f-lib"${so("exec")}><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
+        <label class="fx-field fx-sel rc-f-key"${so("exec")}><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
       </div>
-      <div class="ch-line rc-line2">
-        <label class="fx-field fx-sel rc-f-lib"><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
-        <label class="fx-field fx-sel rc-f-key"><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
-      </div>
-      <div class="ch-line rc-exe-fil" role="group" aria-label="Filtrar por execução">
+      <div class="ch-line rc-exe-fil" role="group" aria-label="Filtrar por equipe de execução"${so("exec")}>
         <span class="rc-exe-fil-t">Execução</span>
-        ${M.BOTOES_EXECUCAO.map((e) => `<button type="button" class="rc-exe-b" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i>${esc(e.sigla)}</i>${esc(e.label)}</button>`).join("")}
+        ${M.BOTOES_EXECUCAO.map((e) => `<button type="button" class="rc-exe-b" data-exe-f="${esc(e.key)}" style="--c:${e.cor}" aria-pressed="false"><i>${esc(e.sigla)}</i>${esc(e.label)}<b class="rc-exe-n" data-exe-n="${esc(e.key)}"></b></button>`).join("")}
         <button type="button" class="rc-exe-x" id="rcExeX" aria-label="Limpar filtro de execução" title="Mostrar todas as equipes" hidden>× Todas as equipes</button>
       </div>
       <div class="ch-line ch-chips">
-        ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}">${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
+        ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}"${so("acomp")}>${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
         <span class="ch-count" id="rcCount"></span>
-        ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcLote" title="Enviar vários PDFs de relatório de uma vez; a unidade é reconhecida pelo nome do arquivo e pelo PDF">Relatórios em lote</button>` : ""}
-        ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)">Importar planilha</button>` : ""}
+        ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcLote" title="Enviar vários PDFs de relatório de uma vez; a unidade é reconhecida pelo nome do arquivo e pelo PDF"${so("exec")}>Relatórios em lote</button>` : ""}
+        ${host.abrirChaves ? `<button type="button" class="btn g ch-clear rc-imp" id="rcChaves" title="Abrir o Controle de Chaves (setores, transferências e ocorrências de todas as unidades)"${so("exec")}>Controle de Chaves</button>` : ""}
+        ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)"${so("acomp")}>Importar planilha</button>` : ""}
         <button type="button" class="btn g ch-clear" id="rcLimpar">Limpar</button>
       </div>
     </div>
@@ -120,7 +139,9 @@ function casca() {
   q("#rcHr").addEventListener("click", () => { filt.hrSort = filt.hrSort === "asc" ? "desc" : "asc"; sincronizarFiltros(); pintarConteudo(); });
   q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
   q("#rcLote")?.addEventListener("click", () => abrirLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
-  q("#rcLimpar").addEventListener("click", () => { const hr = filt.hrSort; filt = FILTRO0(); filt.hrSort = hr; sincronizarFiltros(); pintarConteudo(); });
+  q("#rcChaves")?.addEventListener("click", () => host.abrirChaves?.());
+  // Limpar: bloco, busca e os filtros da área aberta (os da outra área continuam como estavam)
+  q("#rcLimpar").addEventListener("click", () => { const f0 = FILTRO0(); for (const k of ["bloco", "busca", ...CAMPOS_AREA[area]]) filt[k] = f0[k]; sincronizarFiltros(); pintarConteudo(); });
   if (!root.dataset.ouvindo) { root.addEventListener("click", cliqueRaiz); root.dataset.ouvindo = "1"; }
 }
 function sincronizarFiltros() {
@@ -136,14 +157,26 @@ function sincronizarFiltros() {
   q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado);
   root.querySelectorAll(".rc-fr").forEach((b) => b.classList.toggle("active", filt.rapido === b.dataset.fr));
   root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
-  q("#rcLimpar").hidden = filt.bloco === "ALL" && !filt.busca && filt.rapido === "todos" && !filt.liberado && !filt.execucao && !filt.chave && !filt.data;
+  root.querySelectorAll("[data-area]").forEach((b) => { const on = b.dataset.area === area; b.classList.toggle("on", on); b.setAttribute("aria-selected", String(on)); });
+  root.querySelectorAll("[data-so]").forEach((el) => { el.hidden = el.dataset.so !== area; });
+  root.dataset.areaAtual = area;
+  const f = filtroArea();
+  q("#rcLimpar").hidden = f.bloco === "ALL" && !f.busca && f.rapido === "todos" && !f.liberado && !f.execucao && !f.chave && !f.data;
 }
 function cliqueRaiz(e) {
   const u = e.target.closest("[data-rcu]");
   if (u && u.dataset.acao === "relatorio") { e.stopPropagation(); abrirRel(u.dataset.b, u.dataset.p, u.dataset.a); return; }
   if (u) { e.stopPropagation(); abrir(u.dataset.b, u.dataset.p, u.dataset.a, u, u.dataset.acao || ""); return; }
-  const kl = e.target.closest("[data-kpi-lib]");
-  if (kl) { filt.liberado = filt.liberado === "sim" ? "" : "sim"; sincronizarFiltros(); pintarConteudo(); return; }
+  const ar = e.target.closest(".rc-area[data-area]");
+  if (ar) { if (ar.dataset.area !== area) { area = ar.dataset.area; sincronizarFiltros(); pintarConteudo(); if (cur) pintarPopup(); } return; }
+  // indicadores da Execução M.O.: "campo:valor" (clicar de novo limpa; "todos" limpa os filtros da área)
+  const kx = e.target.closest("[data-kx]");
+  if (kx) {
+    const [campo, valor] = kx.dataset.kx.split(":");
+    if (campo === "todos") for (const k of CAMPOS_AREA.exec) filt[k] = "";
+    else filt[campo] = filt[campo] === valor ? "" : valor;
+    sincronizarFiltros(); pintarConteudo(); return;
+  }
   const fr = e.target.closest("[data-fr]");
   if (fr) { filt.rapido = fr.dataset.fr === filt.rapido && fr.matches("[data-kpi]") ? "todos" : fr.dataset.fr; sincronizarFiltros(); pintarConteudo(); return; }
   const md = e.target.closest("[data-modo]");
@@ -165,20 +198,42 @@ function pintarConteudo() {
   if (!root?.querySelector("#rcGrid")) return;
   const lista = todasUnidades();
   const naAba = lista.filter((u) => u.situacao.status);
-  const vis = naAba.filter((u) => M.passaFiltros(u, filt));
+  const vis = naAba.filter((u) => M.passaFiltros(u, filtroArea()));
   const ok = new Set(vis.map((u) => u.unitId));
-  const ind = M.indicadores(naAba, hoje());
-  const kpi = (key, n, label, cor, title) => `<button type="button" class="ch-kpi${filt.rapido === key ? " on" : ""}" data-kpi data-fr="${key}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
-  root.querySelector("#rcKpis").innerHTML =
-    kpi("todos", ind.total, "Unidades em revistoria", "#1f4a3f", "Todas as unidades acompanhadas nesta aba") +
-    kpi("em_andamento", ind["Em andamento"], "Em andamento", M.STATUS["Em andamento"].borda, "Aguardando agendamento") +
-    kpi("agendados", ind.Agendado, "Agendados", M.STATUS.Agendado.borda, "Revistoria marcada") +
-    kpi("aprovados", ind.Aprovado, "Aprovados", M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
-    `<button type="button" class="ch-kpi${filt.liberado === "sim" ? " on" : ""}" data-kpi-lib style="--c:#0f3b31" title="Unidades liberadas para a execução dos serviços"><b>${ind.liberados}</b><span>Liberados</span></button>` +
-    `<div class="ch-kpi k-info" style="--c:#6b8040" title="Revistorias já realizadas (aprovadas ou reprovadas)"><b>${ind.realizadas}</b><span>Revistorias realizadas</span></div>` +
-    `<div class="ch-kpi k-info" style="--c:#2459b5" title="Revistorias agendadas para hoje e os próximos 7 dias"><b>${ind.semana}</b><span>Próximos 7 dias${ind.hoje ? ` · ${ind.hoje} hoje` : ""}</span></div>`;
+  root.querySelector("#rcKpis").innerHTML = area === "acomp" ? kpisAcompanhamento(naAba) : kpisExecucao(naAba);
+  // nº de unidades de cada equipe nos botões de Execução (todas as unidades da aba)
+  root.querySelectorAll("[data-exe-n]").forEach((b) => { b.textContent = String(naAba.filter((u) => u.situacao.execucao === b.dataset.exeN).length); });
   root.querySelector("#rcCount").textContent = `${vis.length} de ${naAba.length} unidade(s)`;
   root.querySelector("#rcGrid").innerHTML = modo === "mapa" ? htmlMapa(lista, ok) : htmlLista(vis, naAba.length);
+}
+/** Acompanhamento Geral: fluxo da revistoria (cada unidade conta uma vez; realizadas = revistorias feitas). */
+function kpisAcompanhamento(naAba) {
+  const ind = M.indicadores(naAba, hoje()), rep = naAba.filter((u) => M.reprovada(u.situacao)).length;
+  const kpi = (key, n, label, cor, title) => `<button type="button" class="ch-kpi${filt.rapido === key ? " on" : ""}" data-kpi data-fr="${key}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
+  return kpi("todos", ind.total, "Unidades em revistoria", "#1f4a3f", "Todas as unidades acompanhadas nesta aba") +
+    kpi("em_andamento", ind["Em andamento"], "Aguardando agendamento", M.STATUS["Em andamento"].borda, "Em andamento: aguardando o agendamento da revistoria") +
+    kpi("agendados", ind.Agendado, "Agendadas", M.STATUS.Agendado.borda, "Revistoria marcada") +
+    kpi("aprovados", ind.Aprovado, "Aprovadas", M.STATUS.Aprovado.borda, "Revistoria aprovada pelo cliente") +
+    kpi(M.REPROVADA.key, rep, "Rev. Reprovada", M.REPROVADA.borda, "Última revistoria reprovada; a unidade segue em novo ciclo") +
+    `<div class="ch-kpi k-info" style="--c:#6b8040" title="Revistorias já realizadas (aprovadas ou reprovadas)"><b>${ind.realizadas}</b><span>Revistorias realizadas</span></div>` +
+    `<div class="ch-kpi k-info" style="--c:#2459b5" title="Revistorias agendadas para hoje e os próximos 7 dias"><b>${ind.semana}</b><span>Próximos 7 dias${ind.hoje ? ` · ${ind.hoje} hoje` : ""}</span></div>`;
+}
+/** Execução M.O.: liberação, equipe, chave e checklist dos relatórios das unidades da aba. */
+function kpisExecucao(naAba) {
+  const lib = naAba.filter((u) => u.situacao.liberado).length, sem = naAba.filter((u) => !u.situacao.execucao).length;
+  const prod = naAba.filter((u) => !u.chave.perdida && u.chave.setor === "producao").length;
+  const rel = naAba.filter((u) => comRelatorio.has(u.unitId)).length;
+  let apT = 0, apR = 0; for (const u of naAba) { const r = apont.get(u.unitId); if (r) { apT += r.total; apR += r.resolvidas; } }
+  const pct = apT ? Math.round((apR / apT) * 100) : 0;
+  const kpi = (kx, on, n, label, cor, title) => `<button type="button" class="ch-kpi${on ? " on" : ""}" data-kx="${kx}" style="--c:${cor}" title="${esc(title)}"><b>${n}</b><span>${esc(label)}</span></button>`;
+  const algum = filt.liberado || filt.execucao || filt.chave;
+  return kpi("todos:", !algum, naAba.length, "Unidades em revistoria", "#1f4a3f", "Todas as unidades da aba (limpa os filtros da Execução M.O.)") +
+    kpi("liberado:sim", filt.liberado === "sim", lib, "Liberadas", "#0f3b31", "Unidades liberadas para a execução dos serviços") +
+    kpi("liberado:nao", filt.liberado === "nao", naAba.length - lib, "Não liberadas", "#8a948f", "Unidades ainda não liberadas para a execução") +
+    kpi("execucao:sem", filt.execucao === "sem", sem, "Sem equipe", "#b9770e", "Unidades sem equipe de execução definida") +
+    kpi("chave:producao", filt.chave === "producao", chavesOk ? prod : "…", "Chave na Produção", CM.SETORES.producao?.cor || "#6b8040", "Chave com o setor de Produção (Controle de Chaves)") +
+    `<div class="ch-kpi k-info" style="--c:#2f6fdb" title="Unidades com relatório de revistoria enviado"><b>${apontOk ? rel : "…"}</b><span>Com relatório</span></div>` +
+    `<div class="ch-kpi k-info" style="--c:#0097a7" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><b>${apontOk ? `${apR}/${apT}` : "…"}</b><span>Apontamentos resolvidos${apT ? ` · ${pct}%` : ""}</span></div>`;
 }
 
 function ordemUnidade() {
@@ -189,31 +244,41 @@ function htmlLista(vis, total) {
   if (!total) return `<div class="clif-empty">Nenhuma unidade em revistoria neste condomínio. As unidades entram aqui automaticamente quando o status da vistoria passa a <b>Revistoria</b>.</div>`;
   if (!vis.length) return `<div class="clif-empty">Nenhuma unidade encontrada com esses filtros.</div>`;
   const ord = ordemUnidade();
-  vis = [...vis].sort((x, y) => M.compararAgenda(x, y, filt.hrSort, ord));
+  // Acompanhamento: ordem da agenda (data e horário); Execução: ordem das unidades (bloco, pavimento, apto)
+  vis = [...vis].sort(area === "acomp" ? (x, y) => M.compararAgenda(x, y, filt.hrSort, ord) : ord);
   const linha = (u) => {
-    const s = u.situacao, attrs = `data-rcu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`, ac = M.acoes(s.status, podeEditar());
+    const s = u.situacao, attrs = `data-rcu data-b="${esc(u.b)}" data-p="${esc(u.p)}" data-a="${esc(u.a)}"`;
     const rep = M.reprovada(s);
-    const ag = M.agendaRevistoria(s);
+    const cUn = `<td class="ch-c-un rc-c-un"><b>${esc(rotuloLista(u))}</b>${u.cliente ? `<small>${esc(u.cliente)}</small>` : ""}</td>`;
+    const cSt = `<td class="rc-c-st">${badge(s.status)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>`;
+    const bHist = `<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button>`;
+    if (area === "exec") {
+      return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">${cUn}${cSt}
+      <td class="rc-c-lib">${libPill(s.liberado)}</td>
+      <td class="rc-c-exe">${execPill(s.execucao)}</td>
+      <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
+      ${celulasApontamentos(u.unitId)}
+      <td class="ch-c-ac"><button type="button" class="btn ${comRelatorio.has(u.unitId) ? "g rc-tem-rel" : "p"} ch-mini" ${attrs} data-acao="relatorio" title="${comRelatorio.has(u.unitId) ? "Relatório enviado: abrir o checklist" : "Sem relatório enviado"}">Relatório</button>${bHist}</td>
+    </tr>`;
+    }
+    const ac = M.acoes(s.status, podeEditar()), ag = M.agendaRevistoria(s);
     const quando = s.aberto ? `<b>${esc(fmtD(ag.data)) || "Sem data"}${ag.hora ? ` · ${esc(ag.hora)}` : ' <span class="rc-semh">sem horário</span>'}</b><small>agendada</small>`
       : s.status === "Aprovado" && s.ultima ? `<b>${esc(fmtD(s.ultima.realizada_em || s.ultima.data)) || "—"}</b><small>aprovada</small>`
       : s.ultima ? `<span class="ch-mut">aguardando</span><small>última: ${esc(fmtD(s.ultima.realizada_em || s.ultima.data))} · ${esc(M.agendamento(s.ultima).resultado.toLowerCase())}</small>` : '<span class="ch-mut">aguardando agendamento</span>';
     const resp = (s.aberto || s.ultima)?.responsavel;
     const principal = ac.length ? `<button type="button" class="btn p ch-mini" ${attrs} data-acao="${ac[0]}">${ac[0] === "agendar" ? "Agendar" : ac[0] === "resultado" ? "Resultado" : "Reabrir"}</button>` : "";
-    return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">
-      <td class="ch-c-un rc-c-un"><b>${esc(rotuloLista(u))}</b>${u.cliente ? `<small>${esc(u.cliente)}</small>` : ""}</td>
-      <td class="rc-c-st">${badge(s.status)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>
+    return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">${cUn}${cSt}
       <td class="rc-c-vst">${vistPill(u.vistoria)}</td>
-      <td class="rc-c-lib">${libPill(s.liberado)}</td>
-      <td class="rc-c-exe">${execPill(s.execucao)}</td>
       <td class="ch-c-dt rc-c-dt">${quando}</td>
       <td class="ch-c-resp rc-c-resp">${esc(resp) || '<span class="ch-mut">—</span>'}</td>
       <td class="rc-c-n" title="Revistorias realizadas">${s.realizadas}${s.lista.length > s.realizadas ? `<small>${s.lista.length} agend.</small>` : ""}</td>
-      <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
-      ${celulasApontamentos(u.unitId)}
-      <td class="ch-c-ac">${principal}<button type="button" class="btn g ch-mini${comRelatorio.has(u.unitId) ? " rc-tem-rel" : ""}" ${attrs} data-acao="relatorio" title="${comRelatorio.has(u.unitId) ? "Relatório enviado" : "Sem relatório enviado"}">Relatório</button><button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button></td>
+      <td class="ch-c-ac">${principal}${bHist}</td>
     </tr>`;
   };
-  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl"><thead><tr><th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Liberado</th><th>Execução</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Chave</th><th title="Apontamentos no checklist do relatório da unidade">Qtd. Apont.</th><th title="Apontamentos marcados como resolvidos no checklist">Qtd. Resolvidas</th><th>Ação</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+  const cab = area === "exec"
+    ? `<th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Liberado</th><th>Execução</th><th>Chave</th><th title="Apontamentos no checklist do relatório da unidade">Qtd. Apont.</th><th title="Apontamentos marcados como resolvidos no checklist">Qtd. Resolvidas</th><th>Ação</th>`
+    : `<th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Vistoria</th><th>Próxima / última</th><th class="th-cli">Responsável</th><th>Revistorias</th><th>Ação</th>`;
+  return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl rc-tbl-${area}"><thead><tr>${cab}</tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
 }
 
 /** Qtd. Apontamentos e Qtd. Resolvidas (com progresso): "—" sem relatório ou sem apontamentos, nunca 100% vazio. */
@@ -241,10 +306,11 @@ function htmlMapa(lista, ok) {
       chavesOk ? (u.chave.perdida ? `Chave perdida (${CM.ETAPAS[u.chave.perdida.etapa]?.label || ""})` : `Chave: ${CM.setorLabel(u.chave.setor)}${u.chave.responsavel ? " com " + u.chave.responsavel : ""}`) : "",
       `Vistoria: ${host.vistoriaLabel(u.vistoria)}`].filter(Boolean).join(" · ");
     // chave: canto inferior esquerdo, no mesmo formato do canto da aba Vistoria, na cor do setor (Controle de Chaves)
-    const km = chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
-    const ex = M.execInfo(s.execucao);
+    const exe = area === "exec";
+    const km = exe && chavesOk && s.status ? (u.chave.perdida ? "lost" : CM.SETORES[u.chave.setor] && u.chave.setor !== "sem" ? CM.SETORES[u.chave.setor].cor : "") : "";
+    const ex = exe ? M.execInfo(s.execucao) : null;
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.casa() ? +a : a)}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km ? `<i class="rc-mk-key${km === "lost" ? " lost" : ""}"${km === "lost" ? "" : ` style="--k:${km}"`} aria-hidden="true"></i>` : ""}</button>`;
   };
   const g = host.grid();
   let h;
@@ -262,11 +328,11 @@ function htmlMapa(lista, ok) {
   return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.STATUS[s].cor};border-color:${M.STATUS[s].borda}"></span>${M.STATUS[s].label}</div>`).join("")}
     <div class="lg"><span class="sw" style="background:${M.SEM_REGISTRO.cor};border-color:${M.SEM_REGISTRO.borda}"></span>Sem registro</div>
     <div class="lg"><span class="sw rc-sw-n">2</span>Nº de revistorias realizadas (quando mais de uma)</div>
-    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
-    ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}
     <div class="lg"><span class="sw rc-sw-rep"></span>Rev. Reprovada (contorno vermelho)</div>
-    ${chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
-    <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
+    ${area === "exec" ? `<div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
+    ${M.EXECUCOES.map((e) => `<div class="lg"><span class="sw rc-sw-exe" style="--c:${e.cor}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}</div>`).join("")}` : ""}
+    ${area === "exec" && chavesOk ? `<div class="lg rc-lg-key"><span class="rc-lg-key-t"><span class="rc-key-corner"></span>Chave (canto esquerdo):</span>${CM.SETORES_DESTINO.map((k) => `<span class="rc-lg-key-i"><i style="--k:${CM.SETORES[k].cor}"></i>${esc(CM.SETORES[k].label)}</span>`).join("")}<span class="rc-lg-key-i"><i class="lost"></i>Perdida</span><span class="rc-lg-key-i">sem marca = sem status</span></div>` : ""}
+    <div class="lg ch-lg-dica">${area === "exec" ? "Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório" : "Toque na unidade para agendar, registrar o resultado ou ver o histórico"}</div></div>`;
 }
 
 /* ── painel da unidade ── */
@@ -356,6 +422,7 @@ function pintarPopup() {
     : { rot: "Próxima revistoria", val: "—", sub: "aguardando agendamento" };
   const info = (rot, val, sub = "", cls = "") => `<div class="rc-i${cls}"><span>${rot}</span><b>${val}</b>${sub ? `<small>${sub}</small>` : ""}</div>`;
   const rep = M.reprovada(s);
+  const opcard = s.status || chavesOk ? `<div class="rc-opcard">${s.status ? htmlOperacao(s) : ""}${htmlChave(u)}</div>` : "";
   // Painel (formulário ou histórico) logo abaixo das ações; agendamentos no fim.
   const area = FORMS[painel] ? htmlForm(u, painel)
     : painel === "historico" ? `<div class="ch-hist rc-area"><div class="pp-label">Histórico da revistoria</div><div id="rcHist" class="ch-hist-body"></div></div>` : "";
@@ -377,13 +444,14 @@ function pintarPopup() {
       ${!s.status ? `<div class="pp-ro">Esta unidade não está na Revistoria · Cliente. Ela entra automaticamente, como <b>Em andamento</b>, quando o status da vistoria passa a <b>Revistoria</b>.</div>` : ""}
       ${botoes ? `<div class="ch-btns rc-btns">${botoes}</div>` : ""}
       ${area}
+      ${area === "exec" ? opcard : ""}
       ${s.status ? `<div class="ch-now rc-info">
         ${info(prox.rot, prox.val, prox.sub, " rc-i-prox")}
         ${info("Revistorias", `${s.realizadas} realizada(s)`, s.lista.length ? `${s.lista.length} agendamento(s)` : "nenhum agendamento")}
         ${info("Última alteração", s.atualizadoEm ? fmtDH(s.atualizadoEm) : "—", s.atualizadoPor ? `por ${esc(s.atualizadoPor === "migração" ? "situação inicial" : s.atualizadoPor)}` : "")}
       </div>` : ""}
       ${htmlReprovacao(s)}
-      ${s.status || chavesOk ? `<div class="rc-opcard">${s.status ? htmlOperacao(s) : ""}${htmlChave(u)}</div>` : ""}
+      ${area === "exec" ? "" : opcard}
       ${s.status && !podeEditar() ? `<div class="pp-ro rc-ro">Acesso de consulta: agendamentos e resultados são registrados por administradores e pela equipe de revistorias.</div>` : ""}
       ${painel === "historico" ? "" : htmlAgendamentos(s)}
     </div>`;
