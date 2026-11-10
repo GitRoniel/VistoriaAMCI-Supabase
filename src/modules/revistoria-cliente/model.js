@@ -197,8 +197,30 @@ export function situacao(a, ags = []) {
     entrouEm: a.entrou_em || "", atualizadoEm: a.atualizado_em || "", atualizadoPor: a.atualizado_email || "",
     liberado: !!a.liberado, liberadoEm: a.liberado_em || "", liberadoPor: a.liberado_por || "",
     execucao: execInfo(a.execucao) ? a.execucao : null, execucaoEm: a.execucao_em || "", execucaoPor: a.execucao_por || "",
-    finalizada: !!a.execucao_finalizada_em, finalizadaEm: a.execucao_finalizada_em || "", finalizadaPor: a.execucao_finalizada_por || ""
+    finalizada: !!a.execucao_finalizada_em, finalizadaEm: a.execucao_finalizada_em || "", finalizadaPor: a.execucao_finalizada_por || "",
+    // origem do Aprovado (status operacional): aprovação técnica ou entrega da chave ao cliente (Controle de Chaves)
+    aprovacaoOrigem: a.status === "Aprovado" ? a.aprovacao_origem || "tecnica" : "", aprovacaoEm: a.aprovacao_em || "",
+    porEntrega: a.status === "Aprovado" && a.aprovacao_origem === "entrega_chave"
   };
+}
+
+/** Origem da aprovação (status operacional Aprovado). */
+export const ORIGENS_APROVACAO = {
+  tecnica: { key: "tecnica", label: "Aprovação técnica", curto: "Aprovação técnica" },
+  entrega_chave: { key: "entrega_chave", label: "Entrega de Chave ao Cliente", curto: "Entrega de chave" }
+};
+/**
+ * Resultado técnico da Revistoria (independente do status operacional): a última revistoria realizada
+ * (Aprovada/Reprovada, sem as anuladas); sem nenhuma realizada, "Aguardando realização" se houver agendamento em
+ * aberto ou "Não realizada". A entrega da chave nunca muda este resultado.
+ */
+export function resultadoTecnico(s) {
+  const lista = s?.lista || [], reprov = lista.filter((r) => r.status === "Reprovada").length;
+  const ult = lista.filter((r) => REALIZADAS.includes(r.status)).at(-1);
+  if (ult) return { key: ult.status === "Aprovada" ? "aprovada" : "reprovada", label: ult.status === "Aprovada" ? "Aprovado" : "Reprovado", revistoria: ult, reprovacoes: reprov };
+  const ab = lista.filter((r) => ABERTOS.includes(r.status)).at(-1);
+  if (ab) return { key: "aguardando", label: "Aguardando realização", revistoria: ab, reprovacoes: 0 };
+  return { key: "nao_realizada", label: "Não realizada", revistoria: null, reprovacoes: 0 };
 }
 
 /** Próxima revistoria (data agendada) para ordenar e exibir: "AAAA-MM-DD" ou "". */
@@ -206,11 +228,11 @@ export const proxima = (s) => (s?.aberto?.data ? String(s.aberto.data).slice(0, 
 
 /** Indicadores da aba. */
 export function indicadores(unidades, hoje = "") {
-  const out = { total: 0, "Em andamento": 0, Agendado: 0, Aprovado: 0, realizadas: 0, hoje: 0, semana: 0, liberados: 0 };
+  const out = { total: 0, "Em andamento": 0, Agendado: 0, Aprovado: 0, aprovEntrega: 0, realizadas: 0, hoje: 0, semana: 0, liberados: 0 };
   const fim = hoje ? somaDias(hoje, 7) : "";
   for (const u of unidades) {
     const s = u.situacao; if (!s?.status) continue;
-    out.total++; out[s.status]++; out.realizadas += s.realizadas; if (s.liberado) out.liberados++;
+    out.total++; out[s.status]++; out.realizadas += s.realizadas; if (s.liberado) out.liberados++; if (s.porEntrega) out.aprovEntrega++;
     const d = proxima(s);
     if (d && hoje && d === hoje) out.hoje++;
     if (d && hoje && d >= hoje && d <= fim) out.semana++;
@@ -302,7 +324,7 @@ const TITULOS = {
   entrada: "Entrou na Revistoria · Cliente", agendamento: "Revistoria agendada", remarcacao: "Revistoria remarcada",
   cancelamento: "Agendamento cancelado", reabertura: "Reaberta: novas pendências", vistoria: "Mudança na aba Vistoria",
   planilha: "Planilha de vistorias", liberacao: "Liberação para execução", execucao: "Execução", relatorio: "Relatório",
-  correcao: "Correção de agendamento (administrador)"
+  correcao: "Correção de agendamento (administrador)", entrega_chave: "Chave entregue ao cliente"
 };
 /**
  * Correções do administrador no agendamento: Corrigir (qualquer agendamento não anulado) e Anular (revistoria

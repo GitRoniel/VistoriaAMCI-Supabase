@@ -215,6 +215,8 @@ export function rotuloBalde(ini, grao) {
 export function situacaoGeral(v, rc) {
   const st = v?.status || "Não agendado";
   if (st === "Aprovado") return { label: "Aprovada na 1ª vistoria", cor: "#268a4d" };
+  // aprovada operacionalmente pela entrega da chave ao cliente (o resultado técnico continua o da última revistoria)
+  if (rc?.status === "Aprovado" && rc.aprovacao_origem === "entrega_chave") return { label: "Aprovada por entrega da chave", cor: "#268a4d" };
   if (st === "Revistoria Finalizada" || rc?.status === "Aprovado") return { label: "Aprovada após revistoria", cor: "#268a4d" };
   if (st === "Revistoria") return rc?.status === "Agendado" ? { label: "Em revistoria · agendada", cor: "#c96a1a" } : { label: "Em revistoria · aguardando agendamento", cor: "#c96a1a" };
   if (st === "Agendado" || st === "Remarcado") return { label: "Aguardando a 1ª vistoria", cor: "#2459b5" };
@@ -267,7 +269,8 @@ const tituloVistoria = (h) => {
 const TIPO_EVENTO = {
   entrada: "Entrou na Revistoria", agendamento: "Revistoria agendada", remarcacao: "Revistoria remarcada", cancelamento: "Agendamento cancelado",
   resultado: "Revistoria realizada", reabertura: "Revistoria reaberta", vistoria: "Mudança vinda da vistoria", planilha: "Atualização pela planilha",
-  liberacao: "Liberação para execução", execucao: "Equipe de execução", relatorio: "Relatório"
+  liberacao: "Liberação para execução", execucao: "Equipe de execução", relatorio: "Relatório",
+  correcao: "Correção de agendamento", entrega_chave: "Chave entregue ao cliente · aprovação operacional"
 };
 /**
  * Linha do tempo da unidade, em ordem cronológica, sem sobrescrever nada: cada registro original vira um

@@ -7,7 +7,7 @@ import { barras, proporcao } from "./graficos.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const PARAMS0 = { diasEspera: 15, diasSemAtualizacao: 30, diasPendencia: 30, minPendencias: 10 };
-let st = { carregando: false, dados: null, erro: "", chave: "", pedido: 0 };
+let st = { carregando: false, dados: null, erro: "", chave: "", pedido: 0, entrega: null };
 let ctxAtual = null, body = null;
 
 const cfg = () => {
@@ -38,9 +38,10 @@ async function carregar(iv, grao, params) {
   const meu = ++st.pedido, ctx = ctxAtual;
   st.carregando = true; st.erro = ""; pintarConteudo(grao);
   try {
-    const d = await S.produtividade(ctx.host.sb, { ...iv, grao, projetos: ctx.projetos, ...params });
+    const [d, ent] = await Promise.all([S.produtividade(ctx.host.sb, { ...iv, grao, projetos: ctx.projetos, ...params }),
+      S.aprovacoesEntrega(ctx.host.sb, ctx.projetos).catch(() => null)]);   // banco sem a regra ainda: tile some
     if (meu !== st.pedido) return;
-    st.dados = d;
+    st.dados = d; st.entrega = ent;
   } catch (err) {
     if (meu !== st.pedido) return;
     if (S.naoInstalado(err)) { ctx.naoInstalado(); return; }
@@ -118,7 +119,8 @@ function pintarConteudo(grao) {
   // 4. Situação atual (unidades únicas: cada apartamento conta uma vez)
   h += `<section class="pv-sec"><h3>Situação atual <small>· unidades únicas</small></h3><div class="pv-ks">
     ${tile(g.vistoriadas, "Unidades vistoriadas", `de ${g.unidades} · ${M.fmtPct(M.pct(g.vistoriadas, g.unidades))}`)}
-    ${tile(aprovTot, "Unidades aprovadas", `${g.aprovadas_1a} na 1ª vistoria · ${g.rev_finalizadas} após revistoria`, " ok")}
+    ${tile(aprovTot, "Unidades aprovadas tecnicamente", `${g.aprovadas_1a} na 1ª vistoria · ${g.rev_finalizadas} após revistoria`, " ok")}
+    ${st.entrega ? tile(st.entrega.unidades, "Aprovadas por entrega de chave", `operacional, fora dos indicadores de qualidade${st.entrega.unidades ? ` · ${st.entrega.reprovadas} com reprovação · ${st.entrega.semRevistoria} sem revistoria realizada · ${st.entrega.pendencias} pendência(s) em aberto na entrega` : ""}`, " c") : ""}
     ${tile(M.fmtPct(M.pct(g.aprovadas_1a, g.vistoriadas)), "Aprovação na 1ª vistoria", "aprovadas ÷ vistoriadas", " ok")}
     ${tile(g.em_revistoria, "Em revistoria", `${g.rc_agendado} agendada(s) · ${g.rc_em_andamento} aguardando`, " warn")}
     ${tile(g.aguardando_vistoria, "Aguardando a 1ª vistoria", `${g.nao_agendadas} sem agendamento`)}

@@ -353,7 +353,9 @@ function mostrarResumo() {
   const v = capturarForm(); if (v.setor || v.obs.trim() || ((f.dataset.tipo === "transferir" || f.dataset.tipo === "regularizar") && v.responsavel.trim())) f.dataset.dirty = "1";
   const el = f.querySelector(".ch-resumo"); if (!el) return;
   const u = todasUnidades().find((x) => x.unitId === cur.unitId), st = u.situacao, nome = M.limparNome(v.responsavel);
-  el.innerHTML = `${pill(st.setor)}${st.responsavel ? `<em>${esc(st.responsavel)}</em>` : st.perdida ? "<em>chave perdida</em>" : ""}${SETA}${v.setor ? pill(v.setor) : '<span class="ch-mut">setor</span>'}${nome ? `<em>${esc(nome)}</em>` : '<span class="ch-mut">quem recebe</span>'}`;
+  el.innerHTML = `${pill(st.setor)}${st.responsavel ? `<em>${esc(st.responsavel)}</em>` : st.perdida ? "<em>chave perdida</em>" : ""}${SETA}${v.setor ? pill(v.setor) : '<span class="ch-mut">setor</span>'}${nome ? `<em>${esc(nome)}</em>` : '<span class="ch-mut">quem recebe</span>'}` +
+    // entrega efetiva ao cliente: a Revistoria · Cliente encerra a unidade como Aprovado (regra do banco, na mesma gravação)
+    (v.setor === "cliente" && u.revistoria && u.revistoria !== "Aprovado" ? `<span class="ch-ent-nota">Entrega ao cliente: na Revistoria · Cliente a unidade passa a <b>Aprovado</b> (origem: entrega de chave). Reprovações, pendências e agendamentos ficam preservados.</span>` : "");
 }
 function pintarHistorico() {
   const el = pop?.querySelector("#chHist"); if (!el) return;
@@ -412,7 +414,10 @@ async function enviar() {
   try {
     await fazer();
     ocupado = false; pedido = null; aviso = null; painel = "historico"; hist = null;
-    host.toast(msgOk);
+    // entrega ao cliente: o banco aprova a unidade na Revistoria · Cliente na mesma gravação → a tela relê a situação
+    const entrega = v.setor === "cliente" && (tipo === "transferir" || tipo === "regularizar") && u.revistoria && u.revistoria !== "Aprovado";
+    host.toast(entrega ? `${msgOk} · Revistoria: Aprovado (entrega de chave)` : msgOk);
+    if (v.setor === "cliente") host.revistoriaMudou?.();
     await carregar(true);
     pintarPopup(); carregarHistorico();
   } catch (err) {

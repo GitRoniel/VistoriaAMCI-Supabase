@@ -56,7 +56,7 @@ const lista = [
   { b: "D", situacao: M.situacao({ status: "Agendado" }, [{ numero: 1, status: "Reprovada" }, { numero: 2, status: "Agendada", data: "2026-11-05" }]) },
   { b: "E", situacao: M.situacao(null, []) }
 ];
-assert.deepEqual(M.indicadores(lista, "2026-11-04"), { total: 4, "Em andamento": 1, Agendado: 2, Aprovado: 1, realizadas: 2, hoje: 0, semana: 1, liberados: 0 });
+assert.deepEqual(M.indicadores(lista, "2026-11-04"), { total: 4, "Em andamento": 1, Agendado: 2, Aprovado: 1, aprovEntrega: 0, realizadas: 2, hoje: 0, semana: 1, liberados: 0 });
 assert.deepEqual([...lista].sort((x, y) => M.comparar(x, y)).map((u) => u.b), ["D", "B", "C", "A", "E"]);
 
 // 5) Filtros da aba: bloco, unidade/cliente e rápido.
@@ -263,6 +263,30 @@ assert.equal(mesmaUnidade({ bloco: "A", apto: "T03" }, "A", "T03"), true); asser
   assert.equal(decidirUnidade(nZ, null, achar).situacao, "nao_encontrada");
   assert.equal(decidirUnidade(null, null, achar).situacao, "nao_encontrada");
   assert.equal(decidirUnidade(nZ, nA, achar).unidade, A507);                   // nome inválido, PDF confere: vale o PDF
+}
+
+// Aprovação por entrega da chave ao cliente: status operacional Aprovado, origem identificada, resultado técnico preservado
+{
+  const rep = [{ numero: 1, status: "Reprovada", realizada_em: "2026-10-10" }, { numero: 2, status: "Reprovada", realizada_em: "2026-10-20" }];
+  let s1 = M.situacao({ status: "Aprovado", aprovacao_origem: "entrega_chave", aprovacao_em: "2026-11-10T13:00:00Z" }, rep);
+  assert.equal(s1.status, "Aprovado"); assert.ok(s1.porEntrega); assert.equal(s1.aprovacaoOrigem, "entrega_chave");
+  assert.equal(M.ORIGENS_APROVACAO[s1.aprovacaoOrigem].label, "Entrega de Chave ao Cliente");
+  let t = M.resultadoTecnico(s1); assert.equal(t.key, "reprovada"); assert.equal(t.label, "Reprovado"); assert.equal(t.reprovacoes, 2); assert.equal(t.revistoria.numero, 2);
+  assert.equal(M.reprovada(s1), false, "Aprovado não leva o destaque de Rev. Reprovada (o resultado técnico aparece à parte)");
+  assert.equal(M.passaFiltroRapido("aprovados", { revistoria: s1.status }), true, "filtro Aprovados inclui a entrega de chave");
+  t = M.resultadoTecnico(M.situacao({ status: "Aprovado", aprovacao_origem: "entrega_chave" }, [{ numero: 1, status: "Agendada", data: "2026-12-01" }]));
+  assert.equal(t.key, "aguardando"); assert.equal(t.revistoria.data, "2026-12-01");
+  t = M.resultadoTecnico(M.situacao({ status: "Aprovado", aprovacao_origem: "entrega_chave" }, []));
+  assert.equal(t.key, "nao_realizada");
+  const s2 = M.situacao({ status: "Aprovado", aprovacao_origem: "tecnica" }, [{ numero: 1, status: "Aprovada", realizada_em: "2026-10-20" }]);
+  assert.ok(!s2.porEntrega); assert.equal(s2.aprovacaoOrigem, "tecnica"); assert.equal(M.resultadoTecnico(s2).key, "aprovada");
+  const s3 = M.situacao({ status: "Aprovado" }, []); assert.equal(s3.aprovacaoOrigem, "tecnica", "Aprovado sem origem gravada (antigo) = técnica");
+  const s4 = M.situacao({ status: "Em andamento", aprovacao_origem: "entrega_chave" }, []); assert.ok(!s4.porEntrega && !s4.aprovacaoOrigem);
+  const ind = M.indicadores([{ situacao: s1 }, { situacao: s2 }, { situacao: s4 }]);
+  assert.equal(ind.Aprovado, 2); assert.equal(ind.aprovEntrega, 1);
+  // anulados não contam no resultado técnico
+  t = M.resultadoTecnico(M.situacao({ status: "Aprovado", aprovacao_origem: "entrega_chave" }, [{ numero: 1, status: "Cancelada", anulado_em: "x" }]));
+  assert.equal(t.key, "nao_realizada");
 }
 
 console.log("Regras da Revistoria · Cliente verificadas.");
