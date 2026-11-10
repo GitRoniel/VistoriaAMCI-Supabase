@@ -2702,6 +2702,19 @@ body.ct-un-aberto{overflow:hidden}
   .lt-sp{display:none}
 }
 @media print{.rc-filters,#rcPop,.rv-ov{display:none!important}}
+/* Auditoria de responsividade (320–430 px): rótulos longos dos indicadores e das áreas quebram dentro do cartão
+   em vez de serem cortados ou empurrarem a página; campo de data inteiro. Só ajustes de quebra/tamanho, sem mudar o layout. */
+.ch-kpi span{overflow-wrap:anywhere;hyphens:auto;max-width:100%}
+@media(max-width:430px){
+  .ch-kpi{padding:6px 6px}
+  .ch-kpi span{letter-spacing:0;font-size:8px}
+  .rc-aba .vw-txt{min-width:0}
+  .rc-aba .vw-txt b{overflow-wrap:anywhere;hyphens:auto}
+}
+@media(max-width:380px){
+  .rc-aba .vw-ic{display:none}
+  .rc-f-data{flex:1 1 100%!important}
+}
 /* TEMA ESCURO · gerado por scripts/theme-dark.mjs (não editar à mão) */
 :root[data-theme="dark"] body{background:#212522;color:#d3ddd6}
 :root[data-theme="dark"] button{border:none;background:none}
