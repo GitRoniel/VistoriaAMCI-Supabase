@@ -103,12 +103,12 @@ export function passaFiltros(a, f, hoje) {
 }
 /** Indicadores do que está carregado e filtrado (cada atividade conta uma vez; canceladas fora). */
 export function indicadores(lista, hoje) {
-  const k = { total: 0, vistoria: 0, revistoria: 0, concluidas: 0, andamento: 0, pendente: 0, aprovada: 0, atrasada: 0, agendada: 0, unidades: 0 };
+  const k = { total: 0, vistoria: 0, revistoria: 0, concluidas: 0, andamento: 0, pendente: 0, aprovada: 0, atrasada: 0, agendada: 0, unidades: 0, hoje: 0 };
   const un = new Set();
   for (const a of lista) {
     const s = situacao(a, hoje);
     if (s === "cancelada") continue;
-    k.total++; k[a.tipo]++; un.add(a.unit_id);
+    k.total++; k[a.tipo]++; un.add(a.unit_id); if (a.data === hoje) k.hoje++;
     if (CONCLUIDAS.includes(s)) k.concluidas++;
     if (k[s] !== undefined) k[s]++;
   }
@@ -123,12 +123,28 @@ export function filtroDoKpi(key, f) {
   n.status = f.status === key ? "" : key;
   return n;
 }
-/** Agrupa por dia (ordem cronológica), garantindo o dia de hoje mesmo vazio quando estiver no intervalo. */
-export function porDia(lista, hoje, de, ate) {
+/**
+ * Indicadores de cada modo da agenda. Hoje em diante: o que vem pela frente (com o dia de hoje em destaque);
+ * Histórico e Período: também o resultado (concluídas, pendentes, aprovadas, atrasadas).
+ */
+export function kpisAgenda(modo) {
+  const k = Object.fromEntries(KPIS_AGENDA.map((x) => [x.key, x]));
+  if (modo === "futuro") return [k.total, { key: "hoje", label: "Hoje", dica: "Atividades de hoje", info: true }, k.vistoria, k.revistoria];
+  return [k.total, k.vistoria, k.revistoria, k.concluidas, k.pendente, k.aprovada, k.atrasada];
+}
+/** Situações que existem de hoje em diante (as demais só aparecem no histórico). */
+export const STATUS_FUTURO = ["agendada", "andamento", "cancelada"];
+export const MODOS_AGENDA = [
+  { key: "futuro", label: "Hoje em diante", dica: "Agendamentos de hoje e dos próximos dias" },
+  { key: "historico", label: "Histórico", dica: "Atividades anteriores a hoje, da mais recente para a mais antiga" },
+  { key: "periodo", label: "Período", dica: "Escolha as datas inicial e final" }
+];
+/** Agrupa por dia (ordem cronológica; `desc` = mais recente primeiro), com o dia de hoje mesmo vazio quando estiver no intervalo. */
+export function porDia(lista, hoje, de, ate, desc = false) {
   const m = new Map();
   for (const a of lista) { if (!m.has(a.data)) m.set(a.data, []); m.get(a.data).push(a); }
   if (hoje >= de && hoje <= ate && !m.has(hoje)) m.set(hoje, []);
-  return [...m.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1)).map(([data, itens]) => ({
+  return [...m.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1) * (desc ? -1 : 1)).map(([data, itens]) => ({
     data, itens: itens.sort((x, y) => (x.horario || "99:99").localeCompare(y.horario || "99:99") || String(x.projeto || "").localeCompare(String(y.projeto || ""), "pt-BR")
       || String(x.bloco).localeCompare(String(y.bloco), "pt-BR", { numeric: true }) || String(x.codigo).localeCompare(String(y.codigo), "pt-BR", { numeric: true }))
   }));
@@ -144,6 +160,19 @@ export const JANELA = 21;
 export const janelaInicial = (hoje) => ({ de: somaDias(hoje, -7), ate: somaDias(hoje, JANELA) });
 export const proximaJanela = (ate) => ({ de: somaDias(ate, 1), ate: somaDias(ate, JANELA) });
 export const janelaAnterior = (de) => ({ de: somaDias(de, -JANELA), ate: somaDias(de, -1) });
+/** Hoje em diante: começa hoje (nada anterior). Histórico: até ontem, começando pelos últimos 30 dias. */
+export const janelaFutura = (hoje) => ({ de: hoje, ate: somaDias(hoje, JANELA) });
+export const janelaHistorico = (hoje) => ({ de: somaDias(hoje, -30), ate: somaDias(hoje, -1) });
+export const PERIODO_MAX_DIAS = 366;
+export function validarPeriodoAgenda(de, ate) {
+  const ok = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d || "");
+  if (!ok(de) || !ok(ate)) return "Informe as datas inicial e final";
+  if (de > ate) return "Período inválido: a data inicial deve ser antes da final";
+  if (diasEntre(de, ate) + 1 > PERIODO_MAX_DIAS) return `Escolha um período de até ${PERIODO_MAX_DIAS} dias`;
+  return "";
+}
+/** Período personalizado (válido) ou os últimos 30 dias. */
+export const periodoAgenda = (de, ate, hoje) => (validarPeriodoAgenda(de, ate) ? { de: somaDias(hoje, -30), ate: hoje } : { de, ate });
 
 // ── Produtividade ──
 export const PERIODOS = [

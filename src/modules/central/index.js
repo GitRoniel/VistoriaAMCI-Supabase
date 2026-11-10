@@ -11,14 +11,18 @@ import { pintarProdutividade } from "./produtividade.js";
 import { abrirUnidade, fecharUnidade, recentes as recentesDe } from "./unidade.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// Ordem da página: Panorama (Vistorias e Revistorias) → Agenda Operacional → Produtividade; Unidades é a pesquisa.
 const ABAS = [
+  { key: "panorama", label: "Panorama", ic: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>' },
   { key: "agenda", label: "Agenda Operacional", ic: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h6"/>' },
   { key: "produtividade", label: "Produtividade", ic: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' },
-  { key: "unidades", label: "Unidades", ic: '<path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/>' },
-  { key: "panorama", label: "Panorama", ic: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>' }
+  { key: "unidades", label: "Unidades", ic: '<path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/>' }
 ];
 
-let host = null, root = null, aba = "agenda", filt = M.FILTRO0();
+let host = null, root = null, aba = "panorama", filt = M.FILTRO0();
+// Agenda: "futuro" (Hoje em diante, padrão ao abrir), "historico" (antes de hoje, do mais recente para o mais
+// antigo) ou "periodo" (datas escolhidas). O histórico nunca se mistura com a agenda do dia a dia.
+let agModo = "futuro", agPer = { de: "", ate: "" };
 let dados = [], janela = null, lim = null, carregando = "", erro = "", semFuncao = false, obs = null, cancelarRT = null, recarga = null, pedido = 0;
 let unid = { q: "", res: null, carregando: false, t: null, pedido: 0 };
 const prefs = { prod: null };
@@ -103,70 +107,91 @@ async function carregar(intervalo, modo = "trocar") {
     erro = err.message || "Não foi possível carregar a agenda.";
   }
   carregando = "";
-  const box = root?.querySelector("#ctAg"), topo = box?.scrollHeight || 0, pos = box?.scrollTop || 0;
-  pintarListaAgenda(modo === "trocar" ? "hoje" : null);
-  if (modo === "antes" && box) { const b2 = root.querySelector("#ctAg"); b2.scrollTop = pos + (b2.scrollHeight - topo); }
-  else if ((modo === "recarregar" || modo === "depois") && box) root.querySelector("#ctAg").scrollTop = pos;
+  const box = root?.querySelector("#ctAg"), pos = box?.scrollTop || 0;
+  pintarListaAgenda();
+  const b2 = root?.querySelector("#ctAg");
+  if (b2) b2.scrollTop = modo === "trocar" ? 0 : pos;   // novos dias entram no fim da lista: a posição não muda
 }
-function recarregarAgenda() { lim = null; janela = null; dados = []; if (aba === "agenda" && root) carregar(M.janelaInicial(host.hoje()), "trocar"); }
+/** Intervalo inicial de cada modo. */
+function intervaloModo() {
+  const hoje = host.hoje();
+  if (agModo === "historico") return M.janelaHistorico(hoje);
+  if (agModo === "periodo") return M.periodoAgenda(agPer.de, agPer.ate, hoje);
+  return M.janelaFutura(hoje);
+}
+function recarregarAgenda() { lim = null; janela = null; dados = []; if (aba === "agenda" && root) carregar(intervaloModo(), "trocar"); }
 function pintarAgenda(body) {
   if (!body.querySelector(".ct-agenda")) {
     body.innerHTML = `<div class="ct-agenda">
+      <div class="ct-agtop">
+        <div class="modetog ct-seg ct-modo" role="tablist" aria-label="Período da agenda">${M.MODOS_AGENDA.map((m) => `<button type="button" role="tab" data-ct-modo="${m.key}" title="${esc(m.dica)}">${esc(m.label)}</button>`).join("")}</div>
+        <div class="ct-per" id="ctPerF" hidden><label class="fx-field ct-f ct-fd"><span>De</span><input type="date" id="ctDe" aria-label="Data inicial"></label><label class="fx-field ct-f ct-fd"><span>Até</span><input type="date" id="ctAte" aria-label="Data final"></label></div>
+        <span class="ct-per-t" id="ctPer"></span>
+      </div>
       <div class="ct-kpis" id="ctKpis"></div>
       <div class="ct-fil">
         <div class="modetog ct-seg" role="tablist" aria-label="Tipo"><button type="button" data-ct-tipo="">Todas</button><button type="button" data-ct-tipo="vistoria">Vistorias</button><button type="button" data-ct-tipo="revistoria">Revistorias</button></div>
-        <div class="ct-chips" id="ctStatus" role="group" aria-label="Situação"></div>
         <label class="fx-field fx-sel ct-f"><span>Responsável</span><select id="ctResp" aria-label="Responsável"></select></label>
         <label class="fx-field fx-sel ct-f"><span>Bloco</span><select id="ctBloco" aria-label="Bloco ou conjunto"></select></label>
         <label class="fx-field ct-f ct-fq"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="ctQ" type="search" placeholder="Apto, bloco, cliente…" autocomplete="off" aria-label="Filtrar a agenda por apartamento, bloco, cliente ou responsável"></label>
-        <label class="fx-field ct-f ct-fd"><span>Ir para</span><input type="date" id="ctData" aria-label="Ir para a data"></label>
-        <button type="button" class="fx-btn" id="ctHoje">Hoje</button>
         <button type="button" class="fx-btn fx-clear" id="ctLimpar" hidden>Limpar</button>
+        <div class="ct-chips" id="ctStatus" role="group" aria-label="Situação"></div>
       </div>
-      <div class="ct-meta"><span id="ctPer"></span><span id="ctCount"></span></div>
-      <div class="ct-ag" id="ctAg" tabindex="0" aria-label="Agenda: role para ver os próximos dias"></div>
+      <div class="ct-meta"><span id="ctCount"></span></div>
+      <div class="ct-ag" id="ctAg" tabindex="0" aria-label="Agenda"></div>
     </div>`;
     const q = (s) => body.querySelector(s);
     q("#ctResp").addEventListener("change", (e) => { filt.resp = e.target.value; salvarPrefs(); pintarListaAgenda(); });
     q("#ctBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; salvarPrefs(); pintarListaAgenda(); });
     q("#ctQ").addEventListener("input", (e) => { filt.busca = e.target.value; pintarListaAgenda(); });
-    q("#ctData").addEventListener("change", (e) => irPara(e.target.value));
-    q("#ctHoje").addEventListener("click", () => irPara(host.hoje()));
+    const mudouPer = () => {
+      const de = q("#ctDe").value, ate = q("#ctAte").value;
+      const msg = M.validarPeriodoAgenda(de, ate);
+      if (msg) { if (de && ate) host.toast?.(msg); return; }
+      agPer = { de, ate }; recarregarAgenda();
+    };
+    q("#ctDe").addEventListener("change", mudouPer); q("#ctAte").addEventListener("change", mudouPer);
     q("#ctLimpar").addEventListener("click", () => { const p = filt.projetos; filt = { ...M.FILTRO0(), projetos: p }; salvarPrefs(); pintarListaAgenda(); });
-    q("#ctAg").addEventListener("scroll", () => { const b = q("#ctAg"); if (b.scrollTop + b.clientHeight >= b.scrollHeight - 160) maisDepois(); }, { passive: true });
+    q("#ctAg").addEventListener("scroll", () => { const b = q("#ctAg"); if (b.scrollTop + b.clientHeight >= b.scrollHeight - 160) carregarMais(); }, { passive: true });
   }
-  if (!janela) { carregar(M.janelaInicial(host.hoje()), "trocar"); return; }
+  if (!janela) { carregar(intervaloModo(), "trocar"); return; }
   pintarListaAgenda();
 }
-function irPara(data) {
-  if (!data) return;
-  const el = root.querySelector(`#ctAg [data-dia="${data}"]`);
-  if (el) { rolarPara(el); return; }
-  carregar({ de: M.somaDias(data, -7), ate: M.somaDias(data, M.JANELA) }, "trocar").then(() => {
-    const alvo = root.querySelector(`#ctAg [data-dia="${data}"]`) || [...root.querySelectorAll("#ctAg [data-dia]")].find((d) => d.dataset.dia >= data);
-    if (alvo) rolarPara(alvo);
-  });
+function trocarModo(m) {
+  if (m === agModo) return;
+  agModo = m;
+  if (m === "periodo" && !agPer.de) { const h = host.hoje(); agPer = { de: M.somaDias(h, -30), ate: h }; }
+  // situação "Atrasadas", "Concluídos"… só fazem sentido com datas passadas; ao voltar para hoje em diante, limpa
+  if (m === "futuro" && filt.status && !M.STATUS_FUTURO.includes(filt.status)) filt.status = "";
+  recarregarAgenda();
 }
-function rolarPara(el) { const box = root.querySelector("#ctAg"); if (box && el) box.scrollTop += el.getBoundingClientRect().top - box.getBoundingClientRect().top; }
-function maisDepois() {
+/** Rolagem até o fim: hoje em diante carrega os próximos dias; histórico, os dias mais antigos. */
+function carregarMais() {
   if (carregando || !janela || erro) return;
-  if (lim?.max && janela.ate >= lim.max && janela.ate >= M.somaDias(host.hoje(), 60)) return;
-  carregar(M.proximaJanela(janela.ate), "depois");
+  if (agModo === "futuro") { if (!fimFuturo()) carregar(M.proximaJanela(janela.ate), "depois"); }
+  else if (agModo === "historico" && temMaisAntigo()) carregar(M.janelaAnterior(janela.de), "antes");
 }
-function maisAntes() {
-  if (carregando || !janela) return;
-  carregar(M.janelaAnterior(janela.de), "antes");
-}
-function pintarListaAgenda(rolar) {
+const fimFuturo = () => !!(lim?.max && janela.ate >= lim.max && janela.ate >= M.somaDias(host.hoje(), 60));
+const temMaisAntigo = () => !lim?.min || janela.de > lim.min;
+function pintarListaAgenda() {
   const box = root?.querySelector("#ctAg"); if (!box) return;
   const hoje = host.hoje();
   const base = dados.filter((a) => M.passaFiltros(a, { ...filt, status: "", tipo: "" }, hoje));
   const vis = base.filter((a) => M.passaFiltros(a, filt, hoje));
-  // indicadores: período carregado + condomínio, responsável, bloco e busca; cada indicador aplica tipo/situação
+  root.querySelectorAll("[data-ct-modo]").forEach((b) => { const on = b.dataset.ctModo === agModo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
+  const pf = root.querySelector("#ctPerF"); pf.hidden = agModo !== "periodo";
+  if (agModo === "periodo") { const de = root.querySelector("#ctDe"), ate = root.querySelector("#ctAte"); if (de.value !== agPer.de) de.value = agPer.de; if (ate.value !== agPer.ate) ate.value = agPer.ate; }
+  root.querySelector("#ctPer").textContent = !janela ? "" : agModo === "futuro" ? `A partir de hoje, ${M.fmtD(hoje)}` : agModo === "historico" ? `Até ontem · carregado desde ${M.fmtD(janela.de)}` : `${M.fmtD(janela.de)} a ${M.fmtD(janela.ate)}`;
+  // indicadores: o que está carregado + condomínio, responsável, bloco e busca; cada indicador aplica tipo/situação
   const k = M.indicadores(base, hoje);
+  const kpis = M.kpisAgenda(agModo);
   const on = (key) => (key === "total" ? !filt.tipo && !filt.status : key === "vistoria" || key === "revistoria" ? filt.tipo === key : filt.status === key);
-  root.querySelector("#ctKpis").innerHTML = M.KPIS_AGENDA.map((x) => `<button type="button" class="ct-kpi k-${x.key}${on(x.key) ? " on" : ""}" data-ct-kpi="${x.key}" title="${esc(x.dica)}"><b>${k[x.key]}</b><span>${esc(x.label)}</span></button>`).join("");
-  root.querySelector("#ctStatus").innerHTML = M.FILTROS_STATUS.map((s) => `<button type="button" class="fchip${filt.status === s.key ? " active" : ""}" data-ct-status="${s.key}" style="--c:${M.SITUACOES[s.key === "concluidas" ? "aprovada" : s.key]?.cor || "#1f4a3f"}"><i></i>${esc(s.label)}</button>`).join("");
+  root.querySelector("#ctKpis").innerHTML = kpis.map((x) => x.info
+    ? `<div class="ct-kpi k-${x.key} k-info" title="${esc(x.dica)}"><b>${k[x.key]}</b><span>${esc(x.label)}</span></div>`
+    : `<button type="button" class="ct-kpi k-${x.key}${on(x.key) ? " on" : ""}" data-ct-kpi="${x.key}" title="${esc(x.dica)}"><b>${k[x.key]}</b><span>${esc(x.label)}</span></button>`).join("");
+  root.querySelector("#ctKpis").style.setProperty("--n", kpis.length);
+  const chips = M.FILTROS_STATUS.filter((s) => agModo !== "futuro" || M.STATUS_FUTURO.includes(s.key));
+  root.querySelector("#ctStatus").innerHTML = chips.map((s) => `<button type="button" class="fchip${filt.status === s.key ? " active" : ""}" data-ct-status="${s.key}" style="--c:${M.SITUACOES[s.key === "concluidas" ? "aprovada" : s.key]?.cor || "#1f4a3f"}"><i></i>${esc(s.label)}</button>`).join("");
   root.querySelectorAll("[data-ct-tipo]").forEach((b) => b.classList.toggle("active", b.dataset.ctTipo === filt.tipo));
   const resp = M.responsaveis(dados), selR = root.querySelector("#ctResp");
   selR.innerHTML = `<option value="">Todos</option>` + resp.map((n) => `<option${filt.resp && filt.resp.toLowerCase() === n.toLowerCase() ? " selected" : ""}>${esc(n)}</option>`).join("");
@@ -176,26 +201,28 @@ function pintarListaAgenda(rolar) {
   root.querySelector("#ctBloco").innerHTML = `<option value="">Todos</option>` + blocos.map((b) => `<option value="${esc(`${b.project_id}|${b.bloco}`)}"${filt.bloco === `${b.project_id}|${b.bloco}` ? " selected" : ""}>${esc((multi ? b.projeto + " · " : "") + (b.unidade_tipo === "casa" ? "Conj. " : "Bloco ") + b.bloco)}</option>`).join("");
   const q = root.querySelector("#ctQ"); if (q.value !== filt.busca) q.value = filt.busca;
   root.querySelector("#ctLimpar").hidden = !(filt.tipo || filt.status || filt.resp || filt.bloco || filt.busca);
-  root.querySelector("#ctPer").textContent = janela ? `Período carregado: ${M.fmtD(janela.de)} a ${M.fmtD(janela.ate)}` : "";
   root.querySelector("#ctCount").textContent = janela ? `${vis.length} atividade(s) · ${new Set(vis.map((a) => a.unit_id)).size} unidade(s)` : "";
   if (carregando === "trocar" || (!janela && !erro)) { box.innerHTML = esqueleto(); return; }
   if (erro && !dados.length) { box.innerHTML = `<div class="ct-vazio err"><b>${esc(erro)}</b><button type="button" class="btn g" data-ct-retry>Tentar de novo</button></div>`; return; }
-  const dias = M.porDia(vis, hoje, janela.de, janela.ate);
-  const podeAntes = !lim?.min || janela.de > lim.min;
-  let h = `<div class="ct-antes">${podeAntes ? `<button type="button" class="btn g ch-mini" data-ct-antes${carregando === "antes" ? " disabled" : ""}>${carregando === "antes" ? "Carregando…" : "Carregar dias anteriores"}</button>` : `<span>Início do histórico de atividades</span>`}</div>`;
-  if (!dias.length) h += `<div class="ct-vazio"><b>Nenhuma atividade com esses filtros no período carregado.</b><span>Role para ver mais dias, escolha uma data ou limpe os filtros.</span></div>`;
+  const desc = agModo === "historico";
+  const dias = M.porDia(vis, hoje, janela.de, janela.ate, desc);
+  let h = "";
+  if (!dias.length) h += `<div class="ct-vazio"><b>${agModo === "futuro" ? "Nenhuma atividade agendada com esses filtros." : "Nenhuma atividade com esses filtros no período."}</b><span>${agModo === "futuro" ? "Role para ver mais dias, use o Histórico para datas anteriores ou limpe os filtros." : "Escolha outro período ou limpe os filtros."}</span></div>`;
   for (const d of dias) {
     const r = M.rotuloDia(d.data, hoje), nV = d.itens.filter((a) => a.tipo === "vistoria").length, nR = d.itens.length - nV;
     h += `<section class="ct-dia${r.hoje ? " hoje" : ""}${r.passado ? " passado" : ""}" data-dia="${d.data}">
       <header class="ct-dh"><b>${esc(r.rel)}</b><span>${esc(r.data)}</span><em>${d.itens.length ? `${d.itens.length} atividade(s)${nV && nR ? ` · ${nV} V · ${nR} R` : ""}` : "Nenhuma atividade"}</em></header>
       ${d.itens.map((a) => linha(a, hoje)).join("")}</section>`;
   }
-  const fim = lim?.max && janela.ate >= lim.max && janela.ate >= M.somaDias(hoje, 60);
-  h += `<div class="ct-depois">${carregando === "depois" ? `<span class="ct-spin"></span>Carregando os próximos dias…` : fim ? "Fim da programação registrada" : `<button type="button" class="btn g ch-mini" data-ct-depois>Carregar mais dias</button>`}</div>`;
+  if (agModo === "futuro") {
+    const fim = fimFuturo();
+    h += `<div class="ct-depois">${carregando === "depois" ? `<span class="ct-spin"></span>Carregando os próximos dias…` : fim ? "Fim da programação registrada" : `<button type="button" class="btn g ch-mini" data-ct-mais>Carregar mais dias</button>`}</div>`;
+  } else if (agModo === "historico") {
+    h += `<div class="ct-depois">${carregando === "antes" ? `<span class="ct-spin"></span>Carregando dias anteriores…` : temMaisAntigo() ? `<button type="button" class="btn g ch-mini" data-ct-mais>Carregar dias anteriores</button>` : "Início do histórico de atividades"}</div>`;
+  }
   box.innerHTML = h;
-  if (rolar === "hoje") { const el = box.querySelector(`[data-dia="${hoje}"]`) || [...box.querySelectorAll("[data-dia]")].find((x) => x.dataset.dia >= hoje); if (el) rolarPara(el); }
-  // pouca coisa na tela: carrega os próximos dias sozinho até encher a área (ou acabar a programação)
-  if (!carregando && !erro && !fim && box.scrollHeight - box.clientHeight < 160) setTimeout(maisDepois, 0);
+  // pouca coisa na tela: carrega o próximo bloco sozinho até encher a área (ou acabar)
+  if (!carregando && !erro && agModo !== "periodo" && box.scrollHeight - box.clientHeight < 160) setTimeout(carregarMais, 0);
   if (erro) host.toast?.(erro);
 }
 function linha(a, hoje) {
@@ -203,14 +230,12 @@ function linha(a, hoje) {
   const st = a.tipo === "vistoria" ? host.vistoriaInfo(a.status) : null;
   const pill = a.tipo === "vistoria" ? `<span class="ct-st" style="background:${st.bg};color:${st.tx};border-color:${st.bd}">${esc(st.label)}</span>`
     : `<span class="ct-st rv s-${esc(String(a.status || "").toLowerCase().replace(/\s+/g, "-"))}">${esc(a.status || "—")}</span>`;
-  const pend = a.aps_total ? `<span class="ct-pd" title="${a.aps_resolvidas} de ${a.aps_total} pendência(s) resolvida(s)"><b>${a.aps_resolvidas}/${a.aps_total}</b><i style="--p:${Math.round((a.aps_resolvidas / a.aps_total) * 100)}%"></i></span>` : `<span class="ct-pd vazio" title="Sem pendências registradas">—</span>`;
   return `<button type="button" class="ct-row s-${s}" data-ct-unit="${a.unit_id}" style="--pj:${esc(corProj(a.project_id))}" title="Abrir a unidade (histórico completo)">
     <span class="ct-hr">${esc(a.horario || "—")}</span>
     <span class="ct-tp t-${a.tipo}" title="${esc(t.label)}${a.numero ? ` nº ${a.numero}` : ""}"><i>${t.sigla}</i>${esc(t.label)}${a.numero ? ` <small>nº ${a.numero}</small>` : ""}</span>
     <span class="ct-un"><b>${esc(rotuloUn(a))}</b><small><i></i>${esc(a.projeto)}${a.cliente ? ` · ${esc(a.cliente)}` : ""}</small></span>
-    <span class="ct-rs">${esc(a.responsavel || "—")}</span>
+    <span class="ct-rs">${a.responsavel ? esc(a.responsavel) : '<span class="ct-mut">sem responsável</span>'}</span>
     <span class="ct-sts">${pill}${s === "atrasada" || s === "pendente" ? `<em class="ct-sit" style="--c:${sit.cor}">${esc(sit.label)}</em>` : ""}</span>
-    ${pend}
   </button>`;
 }
 const esqueleto = () => `<div class="ct-skel" aria-hidden="true">${Array.from({ length: 7 }, (_, i) => `<i style="width:${92 - (i % 3) * 9}%"></i>`).join("")}</div><span class="ct-sr" role="status">Carregando a agenda…</span>`;
@@ -274,8 +299,9 @@ function clique(e) {
   if (tp) { filt.tipo = tp.dataset.ctTipo; salvarPrefs(); pintarListaAgenda(); return; }
   const st = t.closest("[data-ct-status]");
   if (st) { filt.status = filt.status === st.dataset.ctStatus ? "" : st.dataset.ctStatus; salvarPrefs(); pintarListaAgenda(); return; }
-  if (t.closest("[data-ct-antes]")) { maisAntes(); return; }
-  if (t.closest("[data-ct-depois]")) { maisDepois(); return; }
+  const md = t.closest("[data-ct-modo]");
+  if (md) { trocarModo(md.dataset.ctModo); return; }
+  if (t.closest("[data-ct-mais]")) { carregarMais(); return; }
   if (t.closest("[data-ct-retry]")) { recarregarAgenda(); }
 }
 function digitou(e) {
@@ -298,8 +324,11 @@ function aoMudar() {
 
 /* ── API para a tela de Vistorias ── */
 const api = {
-  /** Monta (ou mostra de novo) a central dentro de `el`. */
-  mostrar(el, h) {
+  /**
+   * Monta (ou mostra de novo) a central dentro de `el`. `entrando` = o usuário acabou de abrir a página:
+   * começa sempre pelo Panorama (no Resumo Geral do condomínio) e a agenda volta para "Hoje em diante".
+   */
+  mostrar(el, h, entrando = false) {
     const trocou = root !== el;
     host = h; root = el;
     if (!root) return;
@@ -307,6 +336,11 @@ const api = {
       lerPrefs();
       if (!root.dataset.ouvindo) { root.addEventListener("click", clique); root.addEventListener("input", digitou); root.dataset.ouvindo = "1"; }
       delete root.dataset.montado; janela = null; dados = []; lim = null;
+    }
+    if (entrando || trocou) {
+      aba = host.panorama ? "panorama" : "agenda";
+      if (agModo !== "futuro") { agModo = "futuro"; janela = null; dados = []; }
+      if (filt.status && !M.STATUS_FUTURO.includes(filt.status)) filt.status = "";
     }
     if (aba === "panorama" && !host.panorama) aba = "agenda";
     if (!cancelarRT && host.sb) cancelarRT = S.assinar(host.sb, aoMudar);

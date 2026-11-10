@@ -116,6 +116,21 @@ const g = M.agendamentosUnidade(d, H);
 assert.deepEqual([g.futuros.length, g.realizados.length, g.cancelados.length], [1, 2, 1]);
 assert.equal(M.ultimaAtividade(d, tl).titulo, "Revistoria realizada · reprovada");
 
+// Agenda: Hoje em diante (padrão), Histórico (mais recente primeiro) e Período
+assert.deepEqual(M.janelaFutura(H), { de: H, ate: M.somaDias(H, M.JANELA) }, "hoje em diante começa hoje");
+assert.deepEqual(M.janelaHistorico(H), { de: "2026-10-13", ate: "2026-11-11" }, "histórico termina ontem");
+assert.equal(M.validarPeriodoAgenda("2026-11-01", "2026-11-30"), "");
+assert.match(M.validarPeriodoAgenda("2026-11-30", "2026-11-01"), /inválido/);
+assert.match(M.validarPeriodoAgenda("2025-01-01", "2026-11-30"), /até 366 dias/);
+assert.deepEqual(M.periodoAgenda("", "", H), { de: "2026-10-13", ate: H }, "período inválido usa os últimos 30 dias");
+const hist = [v("Aprovado", "2026-11-01"), r("Aprovada", "2026-11-10"), v("Agendado", "2026-11-05")];
+assert.deepEqual(M.porDia(hist, H, "2026-10-13", "2026-11-11", true).map((d) => d.data), ["2026-11-10", "2026-11-05", "2026-11-01"], "histórico do mais recente para o mais antigo");
+assert.deepEqual(M.porDia(hist, H, "2026-10-13", "2026-11-11").map((d) => d.data), ["2026-11-01", "2026-11-05", "2026-11-10"]);
+assert.equal(M.indicadores([v("Agendado", H), r("Agendada", H), v("Agendado", "2026-11-13")], H).hoje, 2, "indicador Hoje");
+assert.deepEqual(M.kpisAgenda("futuro").map((k) => k.key), ["total", "hoje", "vistoria", "revistoria"]);
+assert.ok(M.kpisAgenda("historico").some((k) => k.key === "atrasada") && !M.kpisAgenda("futuro").some((k) => k.key === "atrasada"));
+assert.deepEqual(M.MODOS_AGENDA.map((m) => m.key), ["futuro", "historico", "periodo"]);
+
 // Estático: só leitura no banco e integração na tela
 const root = resolve(import.meta.dirname, "..");
 const mig = await readFile(resolve(root, "supabase/migrations/20261112120000_central_operacional.sql"), "utf8");
@@ -124,4 +139,14 @@ assert.equal((mig.match(/^language .*security definer/gim) || []).length, 1, "Ce
 assert.match(mig, /private\.project_role\(private\.unit_project_id\(p_unit_id\)\) is not null/, "Histórico da vistoria só para membros do condomínio.");
 const html = await readFile(resolve(root, "www/index.html"), "utf8");
 assert.ok(html.includes('id="centralRoot"') && html.includes('id="centralOv"') && html.includes('src="./central.js"'), "Central montada no Resumo Geral e na tela inicial.");
+assert.ok(html.includes("centralHost(false),true)"), "Resumo Geral abre no Panorama ao entrar na aba.");
+assert.ok(html.includes("Panorama de Vistorias") && html.includes("Panorama de Revistorias"), "Panorama separado em Vistorias e Revistorias.");
+const ctIdx = await readFile(resolve(root, "src/modules/central/index.js"), "utf8");
+assert.ok(ctIdx.indexOf('key: "panorama"') < ctIdx.indexOf('key: "agenda"') && ctIdx.indexOf('key: "agenda"') < ctIdx.indexOf('key: "produtividade"'), "Ordem: Panorama, Agenda, Produtividade.");
+// Mapas com a numeração da lista (pavimento + apto), só na apresentação
+assert.ok(html.includes("${unitCode(b,p,a)}</button>") && !html.includes('${LAYOUT.kind==="casa"?+a:a}</button>'), "Mapa da Vistoria com a numeração completa.");
+for (const m of ["revistoria-cliente", "chaves"]) {
+  const src = await readFile(resolve(root, `src/modules/${m}/index.js`), "utf8");
+  assert.ok(src.includes("${esc(host.codigo(b, p, a))}") && !src.includes("${esc(host.casa() ? +a : a)}"), `Mapa (${m}) com a numeração completa.`);
+}
 console.log("Regras da Central Operacional verificadas.");

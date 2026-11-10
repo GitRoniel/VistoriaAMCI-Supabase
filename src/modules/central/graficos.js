@@ -20,12 +20,12 @@ const periodoBalde = (ini, grao) => (grao === "mes" ? rotuloBalde(ini, "mes") : 
  * Barras agrupadas. baldes: [{ini, <serie>: n}], series: chaves de SERIES.
  * Rótulos do eixo X espaçados para não se sobreporem; números exatos na dica e na tabela.
  */
-export function barras({ id, titulo, baldes, series, grao, vazio = "Sem registros no período." }) {
+export function barras({ id, titulo, baldes, series, grao, vazio = "Sem registros no período.", classe = "" }) {
   const ss = series.map((k) => SERIES[k]);
   const max = Math.max(0, ...baldes.flatMap((b) => ss.map((s) => b[s.key] || 0)));
   const tot = Object.fromEntries(ss.map((s) => [s.key, baldes.reduce((n, b) => n + (b[s.key] || 0), 0)]));
   const leg = `<div class="cg-leg">${ss.map((s) => `<span><i style="--c:${s.cor}"></i>${esc(s.label)} <b>${tot[s.key]}</b></span>`).join("")}</div>`;
-  if (!baldes.length || !max) return `<figure class="cg" id="${esc(id)}"><figcaption>${esc(titulo)}</figcaption>${leg}<div class="cg-vazio">${esc(vazio)}</div></figure>`;
+  if (!baldes.length || !max) return `<figure class="cg ${esc(classe)}" id="${esc(id)}"><figcaption>${esc(titulo)}</figcaption>${leg}<div class="cg-vazio">${esc(vazio)}</div></figure>`;
   const { max: topo, passo } = escala(max, 4);
   const grade = [];
   for (let v = 0; v <= topo; v += passo) grade.push(v);
@@ -40,7 +40,7 @@ export function barras({ id, titulo, baldes, series, grao, vazio = "Sem registro
   }).join("");
   const tabela = `<details class="cg-tab"><summary>Ver tabela</summary><div class="cg-tw"><table><thead><tr><th>Período</th>${ss.map((s) => `<th>${esc(s.label)}</th>`).join("")}</tr></thead><tbody>${
     baldes.map((b) => `<tr><td>${esc(periodoBalde(b.ini, grao))}</td>${ss.map((s) => `<td>${b[s.key] || 0}</td>`).join("")}</tr>`).join("")}</tbody></table></div></details>`;
-  return `<figure class="cg" id="${esc(id)}" role="group" aria-label="${esc(titulo)}"><figcaption>${esc(titulo)}</figcaption>${leg}
+  return `<figure class="cg ${esc(classe)}" id="${esc(id)}" role="group" aria-label="${esc(titulo)}"><figcaption>${esc(titulo)}</figcaption>${leg}
     <div class="cg-area" style="--n:${grade.length - 1}">
       <div class="cg-y">${grade.slice().reverse().map((v) => `<span>${v}</span>`).join("")}</div>
       <div class="cg-plot"><div class="cg-grid">${grade.map(() => "<i></i>").join("")}</div><div class="cg-cols">${cols}</div></div>
