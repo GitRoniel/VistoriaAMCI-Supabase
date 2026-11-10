@@ -448,7 +448,7 @@ const api = {
     if (!root || !host.project) return;
     M.aplicarCores(window.AmciCores?.get());
     if (!ouvindoCores && window.AmciCores) { window.AmciCores.on(coresMudaram); ouvindoCores = true; }
-    if (!root.dataset.cores) { root.addEventListener("click", abrirCores); root.dataset.cores = "1"; }
+    if (!root.dataset.ouveCores) { root.addEventListener("click", abrirCores); root.dataset.ouveCores = "1"; }   // não usar data-cores aqui: é o seletor do botão
     if (projId !== host.project.id) {
       cancelar?.(); cancelar = null; dados = null; filt = FILTRO0(); nomes = []; projId = host.project.id; estado = "idle"; sit = new Map(); delete root.dataset.proj;
       if (pop?.classList.contains("open")) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); }

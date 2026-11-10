@@ -226,6 +226,7 @@ assert.ok(pan.indexOf('titulo:"Panorama Geral"') > 0 && pan.indexOf('titulo:"Pan
 assert.ok(html.includes('table:"revistorias_cliente"') && html.includes("RVC.passaFiltroRapido"), "Tempo real e filtro rápido da Revistoria · Cliente na Vistoria.");
 const revCliJs = await readFile(resolve(root, "www/revcliente.js"), "utf8").catch(() => "");
 assert.ok(revCliJs.includes("revistoria_agendar") && revCliJs.includes("revistoria_resultado") && revCliJs.includes("revistoria_reabrir") && !/\.from\("(revistorias_cliente|revistorias|client_inspections)"\)\.(insert|update|upsert|delete)/.test(revCliJs), "Aba Revistoria · Cliente grava só pelas funções do banco.");
+assert.ok(!/root\.dataset\.cores\b/.test(await readFile(resolve(root, "src/modules/chaves/index.js"), "utf8")), "Chaves: o contêiner não pode ter data-cores (qualquer clique abriria o editor de cores).");
 assert.ok(chavesJs.includes("rc-badge") && !/client_inspections"\)\.(update|insert)|revistoria_(agendar|resultado|cancelar|reabrir)/.test(chavesJs), "Controle de Chaves mostra a Revistoria · Cliente sem alterá-la.");
 const revLib = await readFile(resolve(root, "supabase/migrations/20261109120000_revistoria_liberacao_execucao.sql"), "utf8");
 assert.match(revLib, /alter table public\.revistorias_cliente\s+add column if not exists liberado/, "Liberação na própria linha da unidade (sem tabela nova).");
