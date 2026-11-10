@@ -19,20 +19,34 @@ export const EM_REVISTORIA = { key: "em_revistoria", label: "Em Revistoria", cor
 export const STATUS_ORDEM = ["Em andamento", "Agendado", "Aprovado"];
 export const info = (status) => STATUS[status] || SEM_REGISTRO;
 
-// Execução dos serviços (revistorias_cliente.execucao): equipe e responsável. Cores próprias, diferentes
-// das cores de status (o status pinta a unidade; a execução aparece como selo com a inicial).
-export const EXECUCOES = [
-  { key: "MOP_FELIPE", equipe: "M.O.P", responsavel: "Felipe", sigla: "F", cor: "#7b4fc9" },
-  { key: "MOP_RENATO", equipe: "M.O.P", responsavel: "Renato", sigla: "R", cor: "#c2185b" },
-  { key: "EMP_OSCAR", equipe: "EMP", responsavel: "Oscar", sigla: "O", cor: "#00838f" },
-  { key: "EMP_NILSON", equipe: "EMP", responsavel: "Nilson", sigla: "N", cor: "#8d5524" }
-];
-export const EQUIPES = ["M.O.P", "EMP"];
+// Execução dos serviços (revistorias_cliente.execucao = id estável da equipe em public.equipes_execucao).
+// A lista e as cores vêm do cadastro central (window.AmciCores → aplicarEquipes); as abaixo valem até carregar.
+// A cor da equipe pinta a unidade nos mapas da Revistoria e da Execução M.O.; equipes desativadas continuam
+// identificando as unidades já atribuídas (histórico), mas não aparecem para novas atribuições.
+import { EQUIPES_PADRAO, equipes as normalizarEquipes, SEM_EQUIPE } from "../cores/model.js";
+const paraExec = (e) => ({ key: e.id, equipe: e.grupo, responsavel: e.nome, sigla: e.sigla, cor: e.cor, borda: e.borda, texto: e.texto, ativo: e.ativo !== false, ordem: e.ordem || 0 });
+export const EXECUCOES = normalizarEquipes(EQUIPES_PADRAO).map(paraExec);
+export const EQUIPES = [];
+export const BOTOES_EXECUCAO = [];
+/** Troca a lista de equipes pela do cadastro central (mesmo array: quem importou vê a lista nova). */
+export function aplicarEquipes(cfg) {
+  const l = (cfg?.equipes?.length ? cfg.equipes : normalizarEquipes(EQUIPES_PADRAO)).map(paraExec);
+  EXECUCOES.splice(0, EXECUCOES.length, ...l);
+  EQUIPES.splice(0, EQUIPES.length, ...new Set(l.filter((e) => e.ativo).map((e) => e.equipe)));
+  BOTOES_EXECUCAO.splice(0, BOTOES_EXECUCAO.length, ...l.filter((e) => e.ativo).map((e) => ({ key: e.key, label: `${e.equipe} – ${e.responsavel}`, sigla: e.sigla, cor: e.cor })));
+}
+aplicarEquipes(null);
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
+/** Equipes que podem ser escolhidas (ativas) + a atual da unidade, mesmo desativada. */
+export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.key === atual);
+/** Cor do apartamento nos mapas da Revistoria / Execução M.O.: a da equipe; sem equipe = neutra. */
+export function corUnidade(s) {
+  const e = execInfo(s?.execucao);
+  return e ? { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e } : { ...SEM_EQUIPE, equipe: null };
+}
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
 export const FILTRO_LIBERADO = [{ key: "", label: "Todos" }, { key: "sim", label: "Liberados" }, { key: "nao", label: "Não liberados" }];
 /** Filtro rápido de Execução (botões da aba): acumulativo (Felipe + Renato…); vazio = todas as equipes. */
-export const BOTOES_EXECUCAO = EXECUCOES.map((e) => ({ key: e.key, label: `${e.equipe} – ${e.responsavel}`, sigla: e.sigla, cor: e.cor }));
 const listaExec = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 /** Liga/desliga uma equipe (ou "sem") na seleção, mantendo as outras. */
 export const alternarExecucao = (atual, clicado) => { const l = listaExec(atual); return l.includes(clicado) ? l.filter((k) => k !== clicado) : [...l, clicado]; };
@@ -42,6 +56,22 @@ export function passaExecucao(chave, execucao) {
   if (chave === "sem") return !execucao;
   if (chave.startsWith("equipe:")) return execInfo(execucao)?.equipe === chave.slice(7);
   return execucao === chave;
+}
+/**
+ * Botões de status da Execução M.O. (um por vez; clicar de novo mostra todas). Em andamento, Agendado e Aprovado
+ * são a situação da revistoria (revistorias_cliente.status); Finalizado = serviço da M.O. concluído
+ * (execucao_finalizada_em). São dimensões diferentes: uma unidade pode estar Em andamento e Finalizado.
+ */
+export const STATUS_EXECUCAO = [
+  { key: "em_andamento", label: "Em andamento", cor: "#d9a92f" },
+  { key: "finalizado", label: "Finalizado", cor: "#0f3b31" },
+  { key: "agendado", label: "Agendado", cor: "#2459b5" },
+  { key: "aprovado", label: "Aprovado", cor: "#268a4d" }
+];
+export function passaStatusExecucao(chave, s) {
+  if (!chave) return true;
+  if (chave === "finalizado") return !!s?.finalizada;
+  return s?.status === { em_andamento: "Em andamento", agendado: "Agendado", aprovado: "Aprovado" }[chave];
 }
 /** Filtro de relatório: "com" (relatório enviado), "sem" ou "" (todas). */
 export const FILTRO_RELATORIO = [{ key: "com", label: "Com relatório" }, { key: "sem", label: "Sem relatório" }];
@@ -155,7 +185,8 @@ export function situacao(a, ags = []) {
     realizadas: realizadas.length, aberto, ultima: realizadas.at(-1) || null,
     entrouEm: a.entrou_em || "", atualizadoEm: a.atualizado_em || "", atualizadoPor: a.atualizado_email || "",
     liberado: !!a.liberado, liberadoEm: a.liberado_em || "", liberadoPor: a.liberado_por || "",
-    execucao: execInfo(a.execucao) ? a.execucao : null, execucaoEm: a.execucao_em || "", execucaoPor: a.execucao_por || ""
+    execucao: execInfo(a.execucao) ? a.execucao : null, execucaoEm: a.execucao_em || "", execucaoPor: a.execucao_por || "",
+    finalizada: !!a.execucao_finalizada_em, finalizadaEm: a.execucao_finalizada_em || "", finalizadaPor: a.execucao_finalizada_por || ""
   };
 }
 
@@ -200,6 +231,7 @@ export function passaFiltros(u, f) {
   if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
   if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
   if (!passaRelatorio(f.relatorio, u.temRelatorio)) return false;
+  if (!passaStatusExecucao(f.statusExec, u.situacao)) return false;
   const q = norm(f.busca).replace(/\s/g, "");
   if (q) {
     const cod = norm(u.codigo), comBloco = norm(u.b) + cod;

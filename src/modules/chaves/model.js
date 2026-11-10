@@ -7,6 +7,10 @@
 // Chave perdida = sem status com ocorrência aberta: tem prioridade visual (cinza hachurado + selo).
 // O status da vistoria vem de client_inspections e é mostrado à parte: este módulo nunca o altera.
 
+import { SETORES_PADRAO } from "../cores/model.js";
+
+// Cores: as padrão abaixo valem até o Admin personalizar (tabela cores_legendas, via window.AmciCores);
+// aplicarCores() troca cor/borda/texto aqui mesmo, e todo o módulo passa a usar a cor configurada.
 export const SETORES = {
   base: { label: "Base", cor: "#2f6fdb", borda: "#2459b5", texto: "#ffffff" },
   cx: { label: "CX", cor: "#2f9e5b", borda: "#268a4d", texto: "#ffffff" },
@@ -15,6 +19,13 @@ export const SETORES = {
   cliente: { label: "Entregue para Cliente", cor: "#7b4fc9", borda: "#6340a8", texto: "#ffffff" },
   sem: { label: "Sem status", cor: "#e4e8e5", borda: "#c3cac5", texto: "#7a857e" }
 };
+/** Aplica as cores centralizadas (window.AmciCores.get()) nos setores; sem configuração = cor padrão. */
+export function aplicarCores(cfg) {
+  for (const k of Object.keys(SETORES)) {
+    const c = cfg?.setores?.[k] || SETORES_PADRAO[k];
+    if (c) Object.assign(SETORES[k], { cor: c.cor, borda: c.borda, texto: c.texto });
+  }
+}
 /** Setores para onde a chave pode ser transferida (ou regularizada). */
 export const SETORES_DESTINO = ["base", "cx", "asstec", "producao", "cliente"];
 export const STATUS_ORDEM = ["base", "cx", "asstec", "producao", "cliente", "sem"];

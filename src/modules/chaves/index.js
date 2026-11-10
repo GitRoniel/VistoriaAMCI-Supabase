@@ -185,7 +185,8 @@ function htmlMapa(lista, ok) {
   }
   return h + `<div class="legend ch-legend">${M.STATUS_ORDEM.map((s) => `<div class="lg"><span class="sw" style="background:${M.SETORES[s].cor};border-color:${M.SETORES[s].borda}"></span>${M.SETORES[s].label}</div>`).join("")}
     ${perdasOk() ? `<div class="lg"><span class="sw ch-sw-lost"></span>Sem status · chave perdida (aguardando chaveiro, cópia ou regularização)</div>` : ""}
-    <div class="lg ch-lg-dica">Toque na unidade para ver, transferir ou consultar o histórico</div></div>`;
+    <div class="lg ch-lg-dica">Toque na unidade para ver, transferir ou consultar o histórico</div>
+    ${window.AmciCores ? `<button type="button" class="btn g ch-mini lg-cores" data-cores title="${host.papel() === "admin" ? "Personalizar as cores das legendas (vale para todos os módulos)" : "Ver as cores das legendas"}">${host.papel() === "admin" ? "Personalizar cores" : "Cores das legendas"}</button>` : ""}</div>`;
 }
 
 function htmlLista(vis) {
@@ -426,11 +427,28 @@ async function enviar() {
 }
 
 /* ── API para a tela de Vistorias ── */
+// Cores centralizadas: aplicadas nos setores e repintadas quando o Admin muda (inclusive em outro aparelho).
+let ouvindoCores = false;
+function coresMudaram(cfg) {
+  M.aplicarCores(cfg);
+  if (!root?.isConnected || !host) return;
+  delete root.dataset.proj;   // chips e indicadores com as cores novas
+  if (dados) pintar();
+  if (cur && !preenchendo()) pintarPopup();
+}
+function abrirCores(e) {
+  if (!e.target.closest("[data-cores]")) return;
+  window.AmciCores?.abrirEditor({ admin: host?.papel() === "admin", aba: "setores", rotulos: Object.fromEntries(Object.entries(M.SETORES).map(([k, s]) => [k, s.label])) });
+}
+
 const api = {
   /** Mostra a aba (chamado ao abrir a aba Chaves). */
   show(h) {
     host = h; root = document.getElementById("chavesRoot");
     if (!root || !host.project) return;
+    M.aplicarCores(window.AmciCores?.get());
+    if (!ouvindoCores && window.AmciCores) { window.AmciCores.on(coresMudaram); ouvindoCores = true; }
+    if (!root.dataset.cores) { root.addEventListener("click", abrirCores); root.dataset.cores = "1"; }
     if (projId !== host.project.id) {
       cancelar?.(); cancelar = null; dados = null; filt = FILTRO0(); nomes = []; projId = host.project.id; estado = "idle"; sit = new Map(); delete root.dataset.proj;
       if (pop?.classList.contains("open")) { pop.querySelector(".ch-form")?.removeAttribute("data-dirty"); fechar(); }

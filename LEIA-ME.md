@@ -184,6 +184,24 @@ Aba **Resumo Geral** de cada condomínio e botão **Central Operacional** na tel
 - **Banco**: funções `central_agenda`, `central_agenda_limites`, `central_produtividade`, `central_unidade`, `central_buscar` e a view `central_checklist` (checklist sem repetidos, mesma regra da Lista e do relatório), todas SECURITY INVOKER (RLS de cada tabela). Única exceção: `private.central_hist_vistoria`, que mostra a membros do condomínio só status/data/horário/responsável da vistoria vindos do `audit_log`.
 - Testes: `scripts/test-central.mjs` (no `pnpm check`) e `scripts/db-tests/central/test.mjs` (Postgres local). Auditoria e sugestões: `docs/auditoria-vistorias-revistorias.md`.
 
+## Cores centralizadas (Admin) e equipes de mão de obra
+
+Configuração única para todo o aplicativo, editada só por administradores (`private.is_any_admin`) e lida por todos os usuários com acesso a algum condomínio. Código em `src/modules/cores` (build em `www/cores.js`, `window.AmciCores`), banco em `supabase/migrations/20261114120000_cores_equipes_execucao.sql`.
+
+- **Duas categorias independentes** (tabelas e identificadores próprios; alterar uma nunca muda a outra):
+  - **A · Legendas operacionais** — `public.cores_legendas` (categoria `setor_chave`, chaves `base`, `cx`, `asstec`, `producao`, `cliente`, `sem`). Só há linha para a cor personalizada; sem linha = cor padrão do app. Usadas no Controle de Chaves (mapa, lista, filtros, popup) e na marca da chave da Revistoria.
+  - **B · Equipes de mão de obra** — `public.equipes_execucao` (id estável, equipe, nome, sigla, cor, cor padrão, ativa, ordem). As equipes de antes mantiveram os ids (`MOP_FELIPE`…) e as cores; `revistorias_cliente.execucao` passou a ser chave estrangeira para o cadastro. Equipe nova recebe id `EQ_…` (sem mudar o código); renomear mantém id, cor e unidades; desativar preserva histórico e cor (não pode ser escolhida para novas unidades); não é possível apagar.
+- **Editor (Admin):** "Personalizar cores" na legenda do Controle de Chaves (abre na categoria A) e "Equipes e cores" na Execução M.O. (abre na categoria B). Seletor de cor com prévia antes de salvar, Salvar, Restaurar (por item) e Restaurar todas as cores padrão (com confirmação); equipes: sigla, equipe, nome, ativa e Nova equipe. Os demais usuários veem o editor só para consulta. O texto e a borda são calculados para manter o contraste.
+- **Sincronização:** as cores carregam uma vez por sessão (depois do login) e chegam em tempo real (Supabase Realtime) às telas abertas em qualquer aparelho; Controle de Chaves e Revistoria repintam sozinhos. Escrita só pelas funções `cores_legenda_salvar`, `cores_legenda_restaurar`, `equipe_execucao_salvar`, `equipe_execucao_restaurar_cor` (RLS: leitura para membros, nenhuma escrita direta).
+- Testes: `scripts/test-cores.mjs` (no `pnpm check`) e `scripts/db-tests/cores/test.mjs`.
+
+## Mapa da Revistoria / Execução M.O. pela equipe e botões de status
+
+- **Mapa (Acompanhamento Geral e Execução M.O.):** a cor do apartamento é a da **equipe de execução**; sem equipe = branco com contorno tracejado; fora da Revistoria · Cliente = cinza claro. Status, agendamento, aprovação e reprovação não pintam mais o mapa (continuam na lista, no popup, na dica e nos filtros). A sigla da equipe fica no canto inferior direito; na Execução M.O. aparecem também ✓ liberado e o canto da chave.
+- **Execução M.O. — botões de status** (indicadores clicáveis, um por vez; "Todas" limpa só o status): **Em andamento**, **Agendado** e **Aprovado** (situação da revistoria, `revistorias_cliente.status`) e **Finalizado** (serviço da M.O. concluído). São dimensões diferentes: uma unidade pode estar Em andamento e Finalizado.
+- **Execução finalizada:** no popup (cartão de execução), quem pode liberar/definir a equipe marca ou desmarca "Execução finalizada" (exige equipe definida); grava `execucao_finalizada_em/por` e entra no histórico. Não muda o status da revistoria.
+- **Filtros complementares** no padrão de chips das demais abas: Equipe (acumulativa, inclui "Sem equipe", com contagem) e Relatório (Com / Sem), além de Bloco, busca, Liberado e Chave. Todos combinam entre si e com o status; Limpar zera só os da área aberta.
+
 ## Numeração dos apartamentos nos mapas
 
 Todos os mapas (Vistoria, Revistoria, Controle de Chaves) mostram o número completo do apartamento, igual às listas: pavimento + apto gravados no banco (`units.pav` "4º" + `units.apto` "01" → **401**; térreo → **T01**; casas → número da casa). É só apresentação (`unitCode`/`host.codigo`): ids, chaves internas, filtros, pesquisa e vínculos não mudam.

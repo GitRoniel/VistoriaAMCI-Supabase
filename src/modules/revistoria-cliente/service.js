@@ -41,6 +41,8 @@ export const reabrir = (sb, a) => rpc(sb, "revistoria_reabrir", { p_unit_id: a.u
 export const liberar = (sb, a) => rpc(sb, "revistoria_liberar", { p_unit_id: a.unitId, p_liberado: a.liberado, p_pedido: a.pedido });
 /** Define quem executa (null = remove); anterior = o que a tela mostrava. */
 export const execucao = (sb, a) => rpc(sb, "revistoria_execucao", { p_unit_id: a.unitId, p_execucao: a.execucao || null, p_anterior: a.anterior || null, p_pedido: a.pedido });
+// Serviço da mão de obra concluído (ou reaberto). Mesma permissão de liberar/definir a equipe.
+export const finalizarExecucao = (sb, a) => rpc(sb, "revistoria_execucao_finalizar", { p_unit_id: a.unitId, p_finalizada: a.finalizada, p_pedido: a.pedido });
 // Correções do administrador num agendamento (o banco confere o papel e as regras de novo).
 export const corrigirAgendamento = (sb, a) => rpc(sb, "revistoria_agendamento_corrigir", { p_revistoria_id: a.id, p_data: a.data, p_horario: a.horario || "",
   p_responsavel: a.responsavel || "", p_realizada_em: a.realizada || null, p_motivo: a.motivo, p_pedido: a.pedido });

@@ -2069,15 +2069,65 @@ body.rv-aberto{overflow:hidden}
 .rc-exe-x{height:30px;padding:0 10px;border-radius:999px;border:1.5px dashed #c9d5cc;background:#fff;color:#52675d;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap}
 .rc-exe-x:hover{border-color:#9fb6a6;color:var(--ink)}
 .rc-exe-x[hidden]{display:none}
-/* Execução M.O.: filtro Com relatório / Sem relatório (em destaque, vale no Mapa e na Lista) */
-.rc-rel-fil{flex-wrap:wrap;gap:8px}
-.rc-rel-b{height:36px;display:inline-flex;align-items:center;gap:8px;padding:0 14px 0 11px;border-radius:11px;border:1.5px solid var(--rc);background:color-mix(in srgb,var(--rc) 7%,#fff);color:color-mix(in srgb,var(--rc) 82%,#10201a);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:.12s}
-.rc-rel-b.r-com{--rc:#2f6fdb}.rc-rel-b.r-sem{--rc:#b9770e}
-.rc-rel-b svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.rc-rel-b b{min-width:22px;padding:1px 7px;border-radius:999px;background:var(--rc);color:#fff;font-size:11.5px;text-align:center;font-variant-numeric:tabular-nums}
-.rc-rel-b:hover{background:color-mix(in srgb,var(--rc) 13%,#fff)}
-.rc-rel-b.on{background:var(--rc);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--rc) 35%,transparent)}
-.rc-rel-b.on b{background:#fff;color:var(--rc)}
+/* Execução M.O.: filtros complementares em chips (mesmo componente .fchip das demais abas) */
+.rc-fil-eq{gap:6px}
+.rc-fil-t{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+.rc-fil-t2{margin-left:10px;padding-left:12px;border-left:1px solid #dfe7e1}
+.rc-chip-n{margin-left:2px;min-width:18px;padding:0 5px;border-radius:999px;background:#eef3ef;color:#33463d;font-size:10.5px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.fchip.active .rc-chip-n{background:var(--c);color:#fff}
+.rc-k-sec{opacity:.92}
+.rc-fin{display:block;font-size:10px;font-weight:700;color:#0f3b31;margin-top:1px}
+/* Mapa da Revistoria / Execução M.O.: cor predominante = equipe; ícone da equipe no canto inferior direito */
+.rc-u.rc-eq .rc-mk-exe{background:#fff;color:var(--c);box-shadow:0 0 0 1.5px var(--c)}
+.rc-u.rc-semeq{border-style:dashed}
+.rc-legend .rc-lg-t{font-weight:800;color:var(--ink)}
+.rc-sw-eq{display:inline-flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;font-style:normal}
+.lg-cores{margin-left:auto}
+@media(max-width:720px){
+  .rc-fil-eq{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-8px;padding-right:8px}
+  .rc-fil-eq::-webkit-scrollbar{display:none}
+  .rc-fil-eq .fchip,.rc-fil-eq .rc-fil-t,.rc-fil-eq .rc-exe-x{flex:0 0 auto}
+  .lg-cores{margin-left:0}
+}
+/* Cores e equipes (editor do Admin, www/cores.js) */
+.cr-ov{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,30,24,.45)}
+.cr-ov.open{display:flex}
+body.cr-aberto{overflow:hidden}
+.cr-box{width:min(860px,100%);max-height:min(88vh,860px);display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(15,30,24,.28);overflow:hidden}
+.cr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #e6ece8}
+.cr-head b{display:block;font-size:16px;color:var(--ink)}
+.cr-head small{font-size:12px;color:var(--muted)}
+.cr-x{flex:0 0 auto}
+.cr-tabs{margin:12px 16px 0!important}
+.cr-msg{min-height:0;margin:8px 16px 0;font-size:12.5px;font-weight:700}
+.cr-msg.ok{color:#1d6b3c}.cr-msg.err{color:#9e2f25}.cr-msg.info{color:#52675d}
+.cr-body{padding:10px 16px 16px;overflow:auto}
+.cr-nota{margin:0 0 10px;font-size:12px;line-height:1.45;color:#52675d}
+.cr-ro{margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#f4f7f5;font-size:12px;color:#52675d}
+.cr-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.cr-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:7px 9px;border:1px solid #e3e9e4;border-radius:11px;background:#fbfcfb}
+.cr-row.off{opacity:.7}
+.cr-prev{display:inline-flex;align-items:center;gap:6px;min-width:150px;height:30px;padding:0 11px;border-radius:8px;border:1.5px solid;font-size:12.5px;font-weight:800;white-space:nowrap}
+.cr-prev-eq i{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:5px;background:#fff;color:#14241c;font-size:10.5px;font-style:normal;font-weight:900}
+.cr-cor input{width:42px;height:30px;padding:0;border:1.5px solid #d3ddd6;border-radius:8px;background:#fff;cursor:pointer}
+.cr-cor input:disabled{cursor:default;opacity:.7}
+.cr-st{font-size:11px;font-weight:700;color:var(--muted)}
+.cr-campos{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 260px;min-width:0}
+.cr-in{height:30px;padding:0 8px;border:1.5px solid #d3ddd6;border-radius:8px;background:#fff;font-size:12.5px;color:var(--ink);min-width:0}
+.cr-in.s{width:46px;text-transform:uppercase;text-align:center}.cr-in.g{width:90px}.cr-in.n{flex:1 1 120px}
+.cr-ativo{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#33463d}
+.cr-acoes{display:flex;gap:6px;margin-left:auto}
+.cr-rodape{display:flex;justify-content:flex-end;margin-top:10px}
+.cr-nova{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:12px;padding:9px;border:1.5px dashed #c9d5cc;border-radius:11px}
+.cr-nova>b{font-size:12.5px;color:var(--ink)}
+@media(max-width:720px){
+  .cr-ov{padding:0;align-items:flex-end}
+  .cr-box{max-height:92vh;border-radius:16px 16px 0 0;padding-bottom:var(--safe-b,0px)}
+  .cr-prev{min-width:0;flex:1 1 auto}
+  .cr-acoes{margin-left:0;width:100%}
+  .cr-acoes .btn{flex:1}
+  .cr-in{font-size:16px;height:36px}
+}
 /* Agendamentos: correções do administrador e registros anulados */
 .rc-ag-adm{display:flex;gap:6px;margin-top:4px}
 .rc-ag-b{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:7px;border:1px solid #cfdad3;background:#fff;color:#33463d;font-size:11px;font-weight:700;cursor:pointer}
@@ -2092,7 +2142,6 @@ body.rv-aberto{overflow:hidden}
 .rc-ag.anul .rc-ag1 span:not(.rc-ag-st){text-decoration:line-through}
 .rc-cor-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:7px 10px;border-radius:9px;background:#fdf6e8;border:1px solid #f0d6a8;font-size:12px}
 .rc-cor-h b{color:#7a4f06}
-@media(max-width:720px){.rc-rel-fil{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.rc-rel-b{flex:0 0 auto}}
 /* Lista compacta (só nesta aba): linhas baixas, fontes padronizadas, ações menores */
 .rc-tbl{font-size:11.5px}
 .rc-tbl thead th{padding:6px 7px;font-size:9.5px}
@@ -3506,12 +3555,32 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rc-exe-b.on i{background:#282828;color:var(--c)}
 :root[data-theme="dark"] .rc-exe-x{border:1.5px dashed #475049;background:#282828;color:#abbcb4}
 :root[data-theme="dark"] .rc-exe-x:hover{border-color:#515c55;color:#cfd9d7}
-:root[data-theme="dark"] .rc-rel-b{border:1.5px solid var(--rc);background:color-mix(in srgb,var(--rc) 7%,#282828);color:color-mix(in srgb,var(--rc) 82%,#dae2df)}
-:root[data-theme="dark"] .rc-rel-b svg{stroke:currentColor;fill:none}
-:root[data-theme="dark"] .rc-rel-b b{background:var(--rc);color:#fff}
-:root[data-theme="dark"] .rc-rel-b:hover{background:color-mix(in srgb,var(--rc) 13%,#282828)}
-:root[data-theme="dark"] .rc-rel-b.on{background:var(--rc);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--rc) 35%,transparent)}
-:root[data-theme="dark"] .rc-rel-b.on b{background:#282828;color:var(--rc)}
+:root[data-theme="dark"] .rc-fil-t{color:#a6b2ab}
+:root[data-theme="dark"] .rc-fil-t2{border-left:1px solid #404942}
+:root[data-theme="dark"] .rc-chip-n{background:#1f2420;color:#c1cec8}
+:root[data-theme="dark"] .fchip.active .rc-chip-n{background:var(--c);color:#fff}
+:root[data-theme="dark"] .rc-fin{color:#75dcc4}
+:root[data-theme="dark"] .rc-u.rc-eq .rc-mk-exe{background:#282828;color:var(--c);box-shadow:0 0 0 1.5px var(--c)}
+:root[data-theme="dark"] .rc-legend .rc-lg-t{color:#cfd9d7}
+:root[data-theme="dark"] .cr-ov{background:rgba(15,30,24,.45)}
+:root[data-theme="dark"] .cr-box{background:#282828;box-shadow:0 18px 50px rgba(0,0,0,0.504)}
+:root[data-theme="dark"] .cr-head{border-bottom:1px solid #3e4641}
+:root[data-theme="dark"] .cr-head b{color:#cfd9d7}
+:root[data-theme="dark"] .cr-head small{color:#a6b2ab}
+:root[data-theme="dark"] .cr-msg.ok{color:#77da9e}
+:root[data-theme="dark"] .cr-msg.err{color:#de7b73}
+:root[data-theme="dark"] .cr-msg.info{color:#abbcb4}
+:root[data-theme="dark"] .cr-nota{color:#abbcb4}
+:root[data-theme="dark"] .cr-ro{background:#212623;color:#abbcb4}
+:root[data-theme="dark"] .cr-row{border:1px solid #404741;background:#242924}
+:root[data-theme="dark"] .cr-prev{border:1.5px solid}
+:root[data-theme="dark"] .cr-prev-eq i{background:#282828;color:#d8e0dc}
+:root[data-theme="dark"] .cr-cor input{border:1.5px solid #444c47;background:#282828}
+:root[data-theme="dark"] .cr-st{color:#a6b2ab}
+:root[data-theme="dark"] .cr-in{border:1.5px solid #444c47;background:#282828;color:#cfd9d7}
+:root[data-theme="dark"] .cr-ativo{color:#c1cec8}
+:root[data-theme="dark"] .cr-nova{border:1.5px dashed #475049}
+:root[data-theme="dark"] .cr-nova>b{color:#cfd9d7}
 :root[data-theme="dark"] .rc-ag-b{border:1px solid #454e48;background:#282828;color:#c1cec8}
 :root[data-theme="dark"] .rc-ag-b svg{stroke:currentColor;fill:none}
 :root[data-theme="dark"] .rc-ag-b:hover{border-color:#515c55}
@@ -4181,6 +4250,7 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 <script src="./config.js"></script>
 <script src="./supabase-client.js"></script>
 <script src="./revistorias.js"></script>
+<script src="./cores.js" defer></script>
 <script src="./chaves.js" defer></script>
 <script src="./revcliente.js" defer></script>
 <script src="./central.js" defer></script>
@@ -5439,6 +5509,8 @@ async function loadIdentity(authUser){
   sortProjects();
   appProject=null;
   currentUser={id:authUser.id,usuario:authUser.email||profile?.email||"",nivel:"",nome:profile?.full_name||authUser.email||"Usuário"};
+  // Cores centralizadas (setores e equipes): carregadas uma vez por sessão e atualizadas em tempo real (www/cores.js)
+  window.AmciCores?.iniciar(supabase);
 }
 function setProjectFeedback(message){
   const el=document.getElementById("projectFeedback");el.textContent=message||"";el.classList.toggle("show",!!message);
@@ -6525,7 +6597,7 @@ async function bootAuthSteps(){
 function clearAuthReturn(){if(AUTH_RETURN&&history.replaceState)history.replaceState(null,"",location.pathname);}
 async function logout(){
   closeAdminArea({nav:false});if(adminRoute())history.replaceState(null,"",location.pathname+location.search);aprRows=[];aprUsers=[];updateAprBadges();
-  document.body.classList.add("auth-locked");stopRealtime();if(supabase)await supabase.auth.signOut({scope:"local"}).catch(()=>{});try{localStorage.removeItem(LOGIN_AT_KEY);}catch(e){}currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
+  document.body.classList.add("auth-locked");stopRealtime();window.AmciCores?.reset();if(supabase)await supabase.auth.signOut({scope:"local"}).catch(()=>{});try{localStorage.removeItem(LOGIN_AT_KEY);}catch(e){}currentUser=null;appProject=null;availableProjects=[];initState();updateProjectBrand();updateAuthUI();renderObra();renderCli();renderResumo();setSync("");showAuthView("login");const projectOverlay=document.getElementById("projectOv");projectOverlay.classList.remove("open");projectOverlay.setAttribute("aria-hidden","true");document.getElementById("loginOv").classList.add("open");
 }
 /* ── APROVAÇÕES DE ACESSO ── */
 const APR_STATUS={pending:{label:"Pendente",cls:"pending"},approved:{label:"Aprovado",cls:"active"},rejected:{label:"Rejeitado / bloqueado",cls:"blocked"}};
