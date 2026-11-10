@@ -375,3 +375,19 @@ Migration `supabase/migrations/20261118120000_relatorio_conversao.sql` e Edge Fu
   - Para conferir um PDF real (fora do repositório, por conter dados do cliente): `node scripts/conversor-test.mjs relatorio.pdf 32 39 saida.pdf`.
   - Banco: `scripts/db-tests/relatorios/test.mjs` (`reset.sh 20261117120000` antes, para testar também o backfill).
 - **Implantação:** aplicar a migration e publicar a função (`relatorio-converter`, `verify_jwt = true`). O service role é fornecido pelo próprio Supabase à função; nada vai para o navegador.
+
+## Auditoria de responsividade (10/11/2026)
+
+- **Varredura automática** (Playwright, prévia local com o Postgres e RLS reais):
+  - Larguras 320, 360, 375, 390, 414, 430, 768, 1280 e 1440 px; 171 estados em cada rodada.
+  - Telas cobertas: tela inicial, Resumo Geral (Panorama, Agenda, Produtividade, Unidades e gaveta da unidade), Vistorias (mapa, lista, popup), Revistoria (dois mapas, lista, popup, relatório/visualizador, envio em lote, equipes e cores), Chaves (mapa, lista, popup) e Relatórios.
+  - Em cada estado mede a rolagem horizontal da página, elementos fora da tela que não estão em contêiner rolável, caixas de diálogo maiores que a tela e alvos de toque pequenos.
+- **Encontrado e corrigido** (só CSS de quebra e tamanho, sem mudar o layout):
+  - A 320 px a aba Chaves rolava 6 px: o rótulo "Transferências hoje" não quebrava. Os rótulos dos indicadores (`.ch-kpi`, compartilhados com a Revistoria) agora quebram dentro do cartão.
+  - Cortes visuais a ≤ 430 px no botão "Acompanhamento Geral" e nos rótulos "Em andamento" e "Revistorias realizadas". Abaixo de 380 px o ícone da área sai e o campo Data ocupa a linha inteira.
+  - Rodada final: 0 problemas.
+- **Também conferido:**
+  - Teclado virtual (altura reduzida, campo focado no relatório): campo e botão continuam visíveis a 320, 375 e 430 px.
+  - Visualizador do relatório a 320 e 375 px: barra inteira na tela, página ajustada à largura, botões com altura de toque e tela cheia usando a altura toda.
+  - Áreas seguras: `viewport-fit=cover`, barra inferior e tela cheia do relatório com `env(safe-area-inset-*)`.
+- **Mantido de propósito:** as células dos mapas (apartamentos) têm menos de 24 px no celular, por serem uma grade densa com 8 aptos por andar. O toque abre o popup da unidade, e a Lista é a alternativa com alvos maiores.
