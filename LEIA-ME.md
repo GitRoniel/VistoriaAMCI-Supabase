@@ -195,9 +195,10 @@ Configuração única para todo o aplicativo, editada só por administradores (`
 - **Sincronização:** as cores carregam uma vez por sessão (depois do login) e chegam em tempo real (Supabase Realtime) às telas abertas em qualquer aparelho; Controle de Chaves e Revistoria repintam sozinhos. Escrita só pelas funções `cores_legenda_salvar`, `cores_legenda_restaurar`, `equipe_execucao_salvar`, `equipe_execucao_restaurar_cor` (RLS: leitura para membros, nenhuma escrita direta).
 - Testes: `scripts/test-cores.mjs` (no `pnpm check`) e `scripts/db-tests/cores/test.mjs`.
 
-## Mapa da Revistoria / Execução M.O. pela equipe e botões de status
+## Mapa da Execução M.O. pela equipe e botões de status
 
-- **Mapa (Acompanhamento Geral e Execução M.O.):** a cor do apartamento é a da **equipe de execução**; sem equipe = branco com contorno tracejado; fora da Revistoria · Cliente = cinza claro. Status, agendamento, aprovação e reprovação não pintam mais o mapa (continuam na lista, no popup, na dica e nos filtros). A sigla da equipe fica no canto inferior direito; na Execução M.O. aparecem também ✓ liberado e o canto da chave.
+- **Mapa da Execução M.O.:** a cor do apartamento é a da **equipe de execução**; sem equipe = branco com contorno tracejado; fora da Revistoria · Cliente = cinza claro. A sigla da equipe fica no canto inferior direito, com ✓ liberado e o canto da chave; a legenda lista as equipes.
+- **Mapa do Acompanhamento Geral:** não muda — continua pintado pela situação da revistoria (Aguardando agendamento, Agendado, Aprovado…), com o nº de revistorias realizadas (quando mais de uma), o contorno vermelho de Rev. Reprovada e a legenda de status.
 - **Execução M.O. — botões de status** (indicadores clicáveis, um por vez; "Todas" limpa só o status): **Em andamento**, **Agendado** e **Aprovado** (situação da revistoria, `revistorias_cliente.status`) e **Finalizado** (serviço da M.O. concluído). São dimensões diferentes: uma unidade pode estar Em andamento e Finalizado.
 - **Execução finalizada:** no popup (cartão de execução), quem pode liberar/definir a equipe marca ou desmarca "Execução finalizada" (exige equipe definida); grava `execucao_finalizada_em/por` e entra no histórico. Não muda o status da revistoria.
 - **Filtros complementares** no padrão de chips das demais abas: Equipe (acumulativa, inclui "Sem equipe", com contagem) e Relatório (Com / Sem), além de Bloco, busca, Liberado e Chave. Todos combinam entre si e com o status; Limpar zera só os da área aberta.
