@@ -51,12 +51,31 @@ export const anularAgendamento = (sb, a) => rpc(sb, "revistoria_agendamento_anul
 // ── Relatórios da revistoria (PDF no Storage privado; no banco só os metadados) e checklist ──
 export const BUCKET = "revistorias-relatorios";
 /** Relatórios ativos da unidade (mais recente primeiro). */
+const CAMPOS_REL = "id,unit_id,revistoria_id,caminho,nome_arquivo,tamanho,paginas,resumo,enviado_em,enviado_email,removido_em";
 export async function relatorios(sb, unitId) {
-  const { data, error } = await sb.from("revistorias_relatorios")
-    .select("id,unit_id,revistoria_id,caminho,nome_arquivo,tamanho,paginas,resumo,enviado_em,enviado_email,removido_em")
+  const ler = (campos) => sb.from("revistorias_relatorios").select(campos)
     .eq("unit_id", unitId).order("enviado_em", { ascending: false }).order("id", { ascending: false });
+  let { data, error } = await ler(CAMPOS_REL + ",conversao_status,conversao_erro,conversao_em,convertido_id");
+  if (error && naoInstalado(error)) ({ data, error } = await ler(CAMPOS_REL));   // conversão ainda não instalada no banco
   if (error) throw error;
   return (data || []).filter((r) => !r.removido_em);
+}
+/** Versões dos arquivos dos relatórios da unidade (original + convertidas), mais recentes primeiro. */
+export async function versoes(sb, unitId) {
+  const { data, error } = await sb.from("revistorias_relatorios_versoes")
+    .select("id,relatorio_id,tipo,versao,status,caminho,tamanho,paginas,resumo,erro,solicitado_email,criado_em,atualizado_em,concluido_em")
+    .eq("unit_id", unitId).order("relatorio_id", { ascending: false }).order("versao", { ascending: false });
+  if (error) { if (naoInstalado(error)) return []; throw error; }
+  return data || [];
+}
+/** Pede a conversão (ou o reprocessamento) do relatório para o modelo compacto; a Edge Function segue em segundo plano. */
+export async function converterRelatorio(sb, relatorioId, reprocessar = false) {
+  const { data, error } = await sb.functions.invoke("relatorio-converter", { body: { relatorio_id: relatorioId, reprocessar } });
+  if (!error) return data;
+  let corpo = null;
+  try { corpo = await error.context?.json?.(); } catch { /* sem corpo */ }
+  const st = error.context?.status;
+  throw new Error(corpo?.error || (st === 404 ? "O conversor ainda não foi instalado no servidor." : "Não foi possível iniciar a conversão. Tente de novo em instantes."));
 }
 /** Lê todas as páginas de uma consulta (a API devolve no máximo 1.000 linhas por vez). */
 async function todas(consulta, tamanho = 1000) {
@@ -103,7 +122,10 @@ export async function enviarRelatorio(sb, a) {
 /** Retira o relatório e apaga o arquivo do Storage. */
 export async function removerRelatorio(sb, id) {
   const r = await rpc(sb, "revistoria_relatorio_remover", { p_relatorio_id: id });
-  if (r?.caminho) await sb.storage.from(BUCKET).remove([r.caminho]).catch(() => {});
+  // versões convertidas do relatório retirado (o registro das versões fica no banco)
+  const { data: conv } = await sb.from("revistorias_relatorios_versoes").select("caminho").eq("relatorio_id", id).eq("tipo", "convertido");
+  const arquivos = [r?.caminho, ...(conv || []).map((v) => v.caminho)].filter(Boolean);
+  if (arquivos.length) await sb.storage.from(BUCKET).remove(arquivos).catch(() => {});
   return r;
 }
 /** URL assinada e temporária (nunca link público permanente). */

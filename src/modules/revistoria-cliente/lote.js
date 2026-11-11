@@ -187,7 +187,7 @@ async function enviarTodos(lista) {
   if (!confirm(`Enviar ${lista.length} relatório(s)?${st.comApontamentos ? " Os apontamentos lidos entram no checklist de cada unidade (sem duplicar os que já existem)." : ""}`)) return;
   st.fim = null; st.parar = false; st.enviando = { feitos: 0, total: lista.length, erros: 0 };
   pintar();
-  let ok = 0, comAps = 0;
+  let ok = 0, comAps = 0, conv = 0;
   for (const it of lista) {
     if (st !== me || st.parar) break;
     const u = it.unidade;
@@ -201,6 +201,8 @@ async function enviarTodos(lista) {
         it.resultado.aps = novos.length; it.resultado.pulados = it.aps.length - novos.length;
         if (novos.length) comAps++;
       }
+      // conversão automática para o modelo compacto (segue no servidor; uma falha aqui não desfaz o envio)
+      if (r?.relatorio?.id && !r.repetido) { try { await S.converterRelatorio(sb, r.relatorio.id); conv++; } catch (e) { console.warn("conversão", e); } }
       it.enviar = false; ok++;
       st.jaNome?.add(`${u.unitId}|${it.nome.toLowerCase()}`);
     } catch (err) {
@@ -214,7 +216,7 @@ async function enviarTodos(lista) {
   }
   if (st !== me) return;
   const parado = st.parar && st.enviando.feitos < lista.length;
-  st.fim = `${ok} relatório(s) enviado(s)${comAps ? ` · apontamentos no checklist de ${comAps} unidade(s)` : ""}${st.enviando.erros ? ` · ${st.enviando.erros} com erro` : ""}${parado ? " · envio interrompido" : ""}.`;
+  st.fim = `${ok} relatório(s) enviado(s)${conv ? ` · ${conv} em conversão para o modelo compacto` : ""}${comAps ? ` · apontamentos no checklist de ${comAps} unidade(s)` : ""}${st.enviando.erros ? ` · ${st.enviando.erros} com erro` : ""}${parado ? " · envio interrompido" : ""}.`;
   st.enviando = null; st.parar = false;
   host.toast?.(st.fim);
   try { st.aoMudar?.(); } catch { /* lista fechada */ }

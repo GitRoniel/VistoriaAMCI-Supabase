@@ -336,7 +336,7 @@ function htmlMapa(lista, ok) {
     const ex = c.equipe;
     const cor = s.status ? c : M.LEG_EXECUCAO.fora_revistoria;   // fora da revistoria (cor configurável)
     const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? (c.aprovada ? "rc-aprsemeq" : "rc-semeq") : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km}</button>`;
+    return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km}</button>`;
   };
   const g = host.grid();
   let h;
@@ -370,7 +370,8 @@ function htmlMapa(lista, ok) {
     <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.LEG_EXECUCAO.sem_equipe.cor};border-color:${M.LEG_EXECUCAO.sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.sem_equipe.label)}</div>
     <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.aprovado_sem_equipe.cor};border-color:${M.LEG_EXECUCAO.aprovado_sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.aprovado_sem_equipe.label)}</div>
     <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.fora_revistoria.cor};border-color:${M.LEG_EXECUCAO.fora_revistoria.borda}"></span>${esc(M.LEG_EXECUCAO.fora_revistoria.label)}</div>
-    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução</div>
+    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução (canto superior direito)</div>
+    <div class="lg"><span class="sw rc-sw-ent">${ICONE.chave}</span>Chave entregue ao cliente (canto superior esquerdo)</div>
     ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório</div></div>`;
 }

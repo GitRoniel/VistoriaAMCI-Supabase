@@ -253,5 +253,6 @@ assert.ok(html.includes('startImport("rev")') && html.includes("args.p_sincroniz
 await import("./test-revistoria-cliente.mjs");
 await import("./test-central.mjs");
 await import("./test-cores.mjs");
+await import("./test-conversao-tela.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");
