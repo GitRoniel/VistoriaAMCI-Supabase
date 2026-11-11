@@ -12,6 +12,7 @@ import * as M from "./model.js";
 import * as S from "./service.js";
 import { abrirRelatorio } from "./relatorio-tela.js";
 import { abrirLote } from "./lote.js";
+import { abrirConversaoLote } from "./conversao-lote.js";
 // Status da chave: mesmos dados e regras do Controle de Chaves (chaves_unidades / chaves_ocorrencias e chaves_transferir).
 import * as CM from "../chaves/model.js";
 import * as CS from "../chaves/service.js";
@@ -122,6 +123,7 @@ function casca() {
         ${M.FILTROS_REVISTORIA.map((f) => `<button type="button" class="fchip rc-fr${f.key === "todos" ? " fx-all" : ""}" data-fr="${f.key}" style="--c:${f.cor}"${so("acomp")}>${f.key === "todos" ? "" : "<i></i>"}${esc(f.label)}</button>`).join("")}
         <span class="ch-count" id="rcCount"></span>
         ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcLote" title="Enviar vários PDFs de relatório de uma vez; a unidade é reconhecida pelo nome do arquivo e pelo PDF"${so("exec")}>Relatórios em lote</button>` : ""}
+        ${podeEditar() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcConvLote" title="Gerar o relatório compacto de todos os PDFs do Mobuss já enviados que ainda não foram convertidos"${so("exec")}>Converter relatórios</button>` : ""}
         ${window.AmciCores ? `<button type="button" class="btn g ch-clear rc-imp" id="rcCores" title="${host.papel() === "admin" ? "Cores e cadastro das equipes de mão de obra (vale para todos os módulos)" : "Cores das equipes de mão de obra"}"${so("exec")}>${host.papel() === "admin" ? "Equipes e cores" : "Cores das equipes"}</button>` : ""}
         ${host.abrirChaves ? `<button type="button" class="btn g ch-clear rc-imp" id="rcChaves" title="Abrir o Controle de Chaves (setores, transferências e ocorrências de todas as unidades)"${so("exec")}>Controle de Chaves</button>` : ""}
         ${host.podeImportar?.() ? `<button type="button" class="btn g ch-clear rc-imp" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)"${so("acomp")}>Importar planilha</button>` : ""}
@@ -146,6 +148,7 @@ function casca() {
   q("#rcHr").addEventListener("click", () => { filt.hrSort = filt.hrSort === "asc" ? "desc" : "asc"; sincronizarFiltros(); pintarConteudo(); });
   q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
   q("#rcLote")?.addEventListener("click", () => abrirLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
+  q("#rcConvLote")?.addEventListener("click", () => abrirConversaoLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
   q("#rcChaves")?.addEventListener("click", () => host.abrirChaves?.());
   q("#rcCores")?.addEventListener("click", () => window.AmciCores?.abrirEditor({ admin: host.papel() === "admin", aba: "equipes", rotulos: Object.fromEntries(Object.entries(CM.SETORES).map(([k, x]) => [k, x.label])) }));
   // Limpar: bloco, busca e os filtros da área aberta (os da outra área continuam como estavam)

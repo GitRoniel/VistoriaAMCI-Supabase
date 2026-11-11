@@ -369,6 +369,12 @@ Migration `supabase/migrations/20261118120000_relatorio_conversao.sql` e Edge Fu
   - Em falha aparecem o motivo e "Tentar novamente". Relatório antigo aparece como "Pendente de conversão", com "Converter agora".
   - "Versões do relatório" lista o histórico (abrir versões anteriores, Reprocessar). Visitantes só visualizam.
   - O checklist continua lendo o original.
+- **Converter relatórios (em lote)** (11/11/2026, admin e revistorias): botão na barra da Execução M.O. (`conversao-lote.js`).
+  - Mostra quantos relatórios estão ativos, já convertidos, pendentes, com falha e em andamento.
+  - Converte de uma vez os pendentes e, se marcado, tenta de novo os que falharam: três por vez, cada um acompanhado até ficar Disponível ou Falha, com progresso e botão Parar.
+  - Usa o mesmo caminho do "Converter agora", com o login do usuário: o banco confere a permissão e não duplica conversões.
+  - Ao final lista os não convertidos, com a unidade e o motivo. O original nunca muda.
+  - Se a janela for fechada no meio, os que já começaram terminam no servidor e o restante continua pendente para a próxima vez.
 - **Mapa da Execução M.O.:** ✓ **Liberado** no canto superior direito e a marca de **chave entregue ao cliente** (a mesma do Acompanhamento Geral) no superior esquerdo; os dois podem aparecer juntos.
 - **Testes:**
   - `pnpm check` roda as regras da tela e do mapa (`scripts/test-conversao-tela.mjs`) e `scripts/conversor-test.mjs`. Este último usa um PDF sintético no formato do Mobuss, com dados fictícios (`scripts/fixtures/mobuss-sintetico.mjs`), e cobre o dicionário, a extração, a associação das fotos (inclusive com quebra de página), a geração, a proporção das fotos, as 3 fotos por linha e as validações.
