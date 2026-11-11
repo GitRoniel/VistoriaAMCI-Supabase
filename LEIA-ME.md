@@ -343,6 +343,13 @@ Migration `supabase/migrations/20261118120000_relatorio_conversao.sql` e Edge Fu
   - `leitor.js`: lê o texto **nativo** do PDF com posições (inclusive fontes Identity-H com ToUnicode) e as imagens desenhadas, com a posição em cada página. As fotos JPEG são copiadas como estão, sem recodificar. Não há OCR: PDF digitalizado (sem texto) é recusado com mensagem clara.
   - `extrator.js`: obra, bloco, apartamento, data/hora da vistoria, responsável (assinatura do termo), total de NCs declarado, ambientes, itens do checklist, cada **Não Conformidade** (número, ambiente, serviço do item, descrição escrita na vistoria sem o texto automático do Mobuss; vazia = "Não informado") e as fotos.
   - **Associação das fotos:** as fotos são ligadas pela posição entre "Anexos da Não Conformidade N" e o próximo bloco, inclusive quando o bloco atravessa a quebra de página. A ordem do documento é preservada e cada foto é usada uma vez. A lista "Imagem k: arquivo" confere a quantidade. "Anexos do Item" vira **foto do item (sem NC)**; foto fora de qualquer bloco fica **não associada**, com a página do original, sem ser atribuída a uma NC. As assinaturas do termo são ignoradas.
+  - **Variações do Mobuss tratadas** (11/11/2026, conversor `mobuss-compacto-2`):
+    - Relatórios com **mais de um agendamento**: o termo de assinatura do agendamento não realizado vem na 1ª página. A data e o total de NCs vêm só dos agendamentos realizados ("Realizado -" não conta), e o responsável vem do último termo.
+    - Fotos de uma NC em **duas colunas** (rótulos "Imagem 1  Imagem 5" na mesma linha).
+    - Item do checklist logo depois de uma **NC sem foto**.
+    - Serviço no **plural/singular** ("ESQUADRIAS -JANELAS" = Janelas).
+    - Caso real: BL H - APT 506.
+  - PDFs **digitalizados** (foto ou scan de papel, sem texto) não são convertidos: sem OCR, ficam só com o original.
   - `converter.js` valida antes de gerar: PDF legível, unidade e ambientes encontrados, pelo menos uma NC, **quantidade de NCs igual à declarada pelo Mobuss** e nenhuma foto usada duas vezes. Em caso de divergência a conversão falha e nada incompleto é gerado.
   - `gerador.js`: cabeçalho (obra, bloco, unidade, data, responsável, total de NCs), corpo por ambiente e fotos em encaixe proporcional (sem distorção). O resumo final traz totais, NCs por ambiente, NCs por serviço, a tabela de todos os apontamentos e observações da conversão (fotos de item, sem vínculo, NCs sem foto).
   - `dicionario.js` + tabela `relatorio_servicos_dicionario`: nome longo → nome curto (Cerâmica, Skin Coat, Piso Laminado, Tomadas, Louças e Metais, Portas, Janelas).

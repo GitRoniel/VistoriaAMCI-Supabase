@@ -79,10 +79,11 @@ export function origemNc(paragrafos) {
  */
 export function extrair(paginas) {
   const cab = { obra: "", unidade: "", bloco: "", apto: "", pavimento: "", dataVistoria: "", horaInicio: "", horaFim: "", responsavel: "",
-    formulario: "", ncsDeclaradas: null, geradoEm: "", cliente: "" };
+    formulario: "", ncsDeclaradas: null, agendamentosRealizados: 0, geradoEm: "", cliente: "" };
   const itens = [], ncs = [], fotosItem = [], naoAssociadas = [], avisos = [];
   const ambientes = [];
   const col = { desc: 161, resp: 392, obs: 490 };
+  let ncsRealizados = null, ncsSoltas = null;
   let seq = 0, assinaturas = 0, ambiente = "", anterior = "", ultimaLinha = "", item = null, nc = null, alvo = null, modo = "", descUltY = null, termo = false;
   const fechaDesc = () => {
     if (!nc || !nc.paragrafos) return;
@@ -130,21 +131,27 @@ export function extrair(paginas) {
         }
         continue;
       }
+      // um termo (assinaturas) termina quando começa outro agendamento ou o formulário do checklist: relatórios com
+      // mais de um agendamento trazem o termo do agendamento não realizado logo na 1ª página
+      if (termo && (/^agendamento\s+\d+/.test(n) || /^formul[aá]rio:/.test(n) || /\|\s*checklist/.test(n))) termo = false;
       if (!termo) {
         let m;
         if ((m = /^obra\s+(.+)$/i.exec(t)) && !cab.obra) { cab.obra = limpa(m[1]); continue; }
         if ((m = /^obra\s+(.+)$/i.exec(t))) { cab.obra = limpa(m[1]); continue; }
         if ((m = /^cliente\s+(.+)$/i.exec(t))) { cab.cliente = limpa(m[1].split("/")[0]); continue; }
+        // agendamentos: data e nº de NCs vêm dos REALIZADOS ("Realizado -" = não realizado, não conta)
+        const mnd = /n[aã]o conformidades\s+(\d+)\s*$/i.exec(t), linhaNc = mnd && !/^n[aã]o conformidade \d/i.test(t);
         if ((m = /^realizado\s+(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})(?:\s+at[ée]\s+(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2}))?/i.exec(t))) {
           cab.dataVistoria = iso(DATA.exec(m[1])); cab.horaInicio = m[2]; cab.horaFim = m[4] || "";
-        }
-        if ((m = /n[aã]o conformidades\s+(\d+)\s*$/i.exec(t)) && !/^n[aã]o conformidade \d/i.test(t)) cab.ncsDeclaradas = Number(m[1]);
+          if (linhaNc) { ncsRealizados = (ncsRealizados ?? 0) + Number(mnd[1]); cab.agendamentosRealizados++; }
+        } else if (linhaNc && !/^realizado\b/i.test(t)) ncsSoltas = Number(mnd[1]);
         if ((m = /^formul[aá]rio:\s*(.+?)\s*(\|.*)?$/i.exec(t))) { cab.formulario = limpa(m[1]); continue; }
       }
       if (/^termo de /.test(n)) { fechaItem(); termo = true; }
       if (termo) {
         // assinatura do termo: nome logo acima do rótulo "Responsável"
-        const rot = !cab.responsavel && l.itens.find((i) => norm(i.str) === "responsavel");
+        // vale o último termo (o do agendamento realizado, que vem depois do checklist)
+        const rot = l.itens.find((i) => norm(i.str) === "responsavel");
         if (rot) {
           const prev = ls.filter((x) => x.y > l.y + 4 && x.y < l.y + 22).flatMap((x) => x.itens)
             .filter((i) => !DATA.test(i.str)).sort((a, b) => Math.abs(a.x - rot.x) - Math.abs(b.x - rot.x));
@@ -168,6 +175,10 @@ export function extrair(paginas) {
         if (!item) avisos.push(`NC ${nc.numero}: sem item do checklist identificado antes dela`);
         ncs.push(nc); anterior = t; continue;
       }
+      // linha de item do checklist (número + data, antes da coluna Descrição): encerra a NC aberta, mesmo sem anexos
+      const p0 = l.itens[0];
+      const ehItem = p0 && /^\d{1,3}$/.test(limpa(p0.str)) && p0.x < col.desc - 20 && DATA.test(t) && !(nc && nc.paragrafos && p0.x > 20);
+      if (ehItem && nc && !modo) fechaNc();
       if (nc && !modo) {
         if (n === "descricao") { nc.paragrafos = []; descUltY = null; continue; }
         if (/^resumo das a[cç][oõ]es/.test(n)) { fechaDesc(); continue; }
@@ -186,7 +197,7 @@ export function extrair(paginas) {
       if (modo) {
         const mi = /^imagem\s+(\d+):\s*(.+)$/i.exec(t);
         if (mi) { alvo.arquivos[Number(mi[1]) - 1] = limpa(mi[2]); continue; }
-        if (/^imagem\s+\d+$/i.test(t)) continue;
+        if (/^(imagem\s+\d+\s*)+$/i.test(t)) continue;           // rótulos sob as fotos (uma ou duas colunas)
         // qualquer outra linha encerra o bloco de anexos
         if (modo === "nc") fechaNc(); else fechaAlvo();
       }
@@ -196,8 +207,7 @@ export function extrair(paginas) {
         continue;
       }
       // linha de item do checklist: número + data
-      const p0 = l.itens[0];
-      if (p0 && /^\d{1,3}$/.test(limpa(p0.str)) && p0.x < col.desc - 20 && DATA.test(t)) {
+      if (ehItem) {
         fechaItem();
         item = { nr: Number(limpa(p0.str)), ambiente, servico: "", resposta: "", observacao: "" };
         for (const it of l.itens) {
@@ -220,6 +230,7 @@ export function extrair(paginas) {
     }
   }
   fechaItem();
+  cab.ncsDeclaradas = ncsRealizados ?? ncsSoltas;
   ncs.forEach((x) => { delete x.arquivos; delete x.paragrafos; });
   fotosItem.forEach((x) => delete x.arquivos);
   const reprovados = itens.filter((i) => /reprov/i.test(i.resposta));

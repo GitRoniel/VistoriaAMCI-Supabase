@@ -35,7 +35,9 @@ export function criarDicionario(regras = []) {
     nome(original) {
       const o = String(original ?? "").replace(/\s+/g, " ").trim();
       if (!o) return { original: "", curto: "Não informado", encontrado: false };
-      const c = mapa.get(chaveServico(o));
+      // mesma palavra no singular/plural ("ESQUADRIAS - JANELA" × "ESQUADRIAS -JANELAS") é o mesmo serviço
+      const k = chaveServico(o);
+      const c = mapa.get(k) ?? (k.endsWith("s") ? mapa.get(k.slice(0, -1)) : mapa.get(k + "s"));
       if (c) return { original: o, curto: c, encontrado: true };
       semEquivalencia.add(o);
       return { original: o, curto: o, encontrado: false };

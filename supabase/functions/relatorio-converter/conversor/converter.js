@@ -6,7 +6,7 @@ import { extrair } from "./extrator.js";
 import { criarDicionario } from "./dicionario.js";
 import { criarGerador, resumir } from "./gerador.js";
 
-export const VERSAO_CONVERSOR = "mobuss-compacto-1";
+export const VERSAO_CONVERSOR = "mobuss-compacto-2";
 
 export class ErroConversao extends Error {
   constructor(msg, detalhe) { super(msg); this.name = "ErroConversao"; this.detalhe = detalhe; }

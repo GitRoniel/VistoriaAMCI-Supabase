@@ -61,6 +61,21 @@ ok(x.avisos.length === 0, "sem avisos: " + x.avisos.join(" | "));
   ok(x2.cabecalho.unidade === "BL B - APT 204" && x2.cabecalho.responsavel === E.cabecalho.responsavel, "PDF letra a letra: cabeçalho");
 }
 
+ok(x.totais.itensAvaliados === 5, `itens do checklist: ${x.totais.itensAvaliados} (item depois de NC sem foto não se perde)`);
+
+// ── variações reais do Mobuss: 2 agendamentos (termo do não realizado na 1ª página) e fotos em duas colunas ──
+{
+  const g3 = await gerarMobussSintetico(PDFLib, { doisAgendamentos: true, duasColunas: true });
+  const x3 = extrair((await criarLeitor(PDFLib)(g3.bytes)).paginas);
+  ok(x3.ncs.length === 5 && x3.cabecalho.ncsDeclaradas === 5, `2 agendamentos: NCs do agendamento realizado (${x3.ncs.length} lidas, ${x3.cabecalho.ncsDeclaradas} declaradas; o "0" do não realizado é ignorado)`);
+  ok(x3.cabecalho.dataVistoria === "2026-11-10" && x3.cabecalho.responsavel === E.cabecalho.responsavel, "2 agendamentos: data e responsável do realizado (termo final)");
+  ok(igual(x3.ncs[0].fotos.map((f) => f.arquivo), ["FOTO_A1.jpeg", "FOTO_A2.jpeg"]) && x3.totais.fotosNaoAssociadas === 0, "fotos em duas colunas (rótulos na mesma linha) ficam na NC");
+  ok(x3.totais.fotos === E.totalFotos && x3.totais.assinaturasIgnoradas === 2, `fotos: ${x3.totais.fotos}; assinaturas ignoradas: ${x3.totais.assinaturasIgnoradas}`);
+  let erro = ""; try { validar(x3, 4); } catch (e) { erro = e.message; }
+  ok(!erro, "2 agendamentos: passa na validação " + erro);
+}
+ok(criarDicionario().nome("ESQUADRIAS -JANELAS").curto === "Janelas", "dicionário: plural/singular ('ESQUADRIAS -JANELAS' = Janelas)");
+
 // ── conversão completa ──
 const etapas = [];
 const r = await converter(PDFLib, bytes, { regras: [], etapa: async (e) => { etapas.push(e); }, geradoEm: new Date("2026-11-10T12:00:00Z") });
