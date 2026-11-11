@@ -60,6 +60,18 @@ export async function relatorios(sb, unitId) {
   if (error) throw error;
   return (data || []).filter((r) => !r.removido_em);
 }
+/** Relatórios ativos do condomínio com a situação da conversão (conversão em lote). */
+export async function relatoriosConversao(sb, projectId) {
+  const rels = await todas(() => sb.from("revistorias_relatorios").select("id,unit_id,nome_arquivo,enviado_em,removido_em,conversao_status,conversao_erro,convertido_id")
+    .eq("project_id", projectId).order("id", { ascending: true }));
+  return rels.filter((r) => !r.removido_em);
+}
+/** Situação atual da conversão de um relatório. */
+export async function situacaoConversao(sb, id) {
+  const { data, error } = await sb.from("revistorias_relatorios").select("id,conversao_status,conversao_erro,convertido_id").eq("id", id).single();
+  if (error) throw error;
+  return data;
+}
 /** Versões dos arquivos dos relatórios da unidade (original + convertidas), mais recentes primeiro. */
 export async function versoes(sb, unitId) {
   const { data, error } = await sb.from("revistorias_relatorios_versoes")
