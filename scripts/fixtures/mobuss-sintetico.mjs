@@ -27,7 +27,10 @@ export function png(w, h, [r, g, b]) {
 /**
  * Gera o PDF. Retorna { bytes, esperado } com o que o conversor deve encontrar.
  */
-export async function gerarMobussSintetico(PDFLib, { letraALetra = false } = {}) {
+// doisAgendamentos: um 1º agendamento NÃO realizado ("Realizado -", 0 NCs) com o seu termo de assinatura já na
+// 1ª página, antes do agendamento realizado (caso real do BL H - APT 506). duasColunas: fotos de uma NC lado a lado,
+// com os rótulos "Imagem 1  Imagem 2" na mesma linha.
+export async function gerarMobussSintetico(PDFLib, { letraALetra = false, doisAgendamentos = false, duasColunas = false } = {}) {
   const { PDFDocument, StandardFonts } = PDFLib;
   const doc = await PDFDocument.create();
   const f = await doc.embedFont(StandardFonts.Helvetica), fb = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -79,7 +82,14 @@ export async function gerarMobussSintetico(PDFLib, { letraALetra = false } = {})
   T("Obra", 52.9, 753.1); T("OBRA TESTE", 78, 753.1);
   T("Unidade", 38.8, 740.1); T("BL B - APT 204", 78, 740.1);
   T("Cliente", 44.6, 727.1); T("CLIENTE FICTICIO / 000.000.000-00", 78, 727.1);
-  T("Agendamentos", 8, 712, 10, fb); T("Agendamento 1", 8, 698);
+  T("Agendamentos", 8, 712, 10, fb);
+  if (doisAgendamentos) {
+    // agendamento não realizado + termo dele (o leitor não pode parar aqui nem usar o "0")
+    T("Agendamento 1", 8, 780); T("Realizado", 34, 766); T("-", 78, 766); T("Não Conformidades", 276.1, 766); T("0", 362, 766);
+    T("TERMO DE VISTORIA DO CLIENTE", 200, 748, 9, fb); T("Pessoa Do Agendamento Antigo", 114.5, 730); T("Responsável", 138.8, 720);
+    pg.drawImage(assinatura, { x: 81, y: 722, width: 120, height: 22 });
+  }
+  T(doisAgendamentos ? "Agendamento 2" : "Agendamento 1", 8, 698);
   T("Realizado", 34, 684); T("10/11/2026 09:00", 78, 684); T("até", 153.4, 684); T("10/11/2026 10:15", 169, 684);
   T("Não Conformidades", 276.1, 684); T("5", 362, 684);
   T("Formulário:", 8, 668); T("CHECKLIST VISTORIA CLIENTE | Revisão:", 58, 668);
@@ -87,7 +97,13 @@ export async function gerarMobussSintetico(PDFLib, { letraALetra = false } = {})
   cabChecklist(616);
   item(598, 1, "REVESTIMENTO - PISO/ PAREDE (CERÂMICO)", "Reprovado");
   let y = ncCab(576, 10, "REVESTIMENTO - PISO/ PAREDE (CERÂMICO)", "COZINHA", ["Rejunte falhando junto ao ralo"]);
-  T("Anexos da Não Conformidade 10", 29, y); y = await fotos(y - 7, 2);
+  T("Anexos da Não Conformidade 10", 29, y);
+  if (duasColunas) {
+    // duas fotos lado a lado, rótulos na mesma linha
+    const a = await foto(), b = await foto();
+    pg.drawImage(a, { x: 85, y: y - 129, width: 65, height: 115 }); pg.drawImage(b, { x: 300, y: y - 129, width: 65, height: 115 });
+    T("Imagem 1", 101.4, y - 141); T("Imagem 2", 316.4, y - 141); y -= 157 + 150;
+  } else y = await fotos(y - 7, 2);
   if (y < 80) throw new Error("layout do sintético");
   lista(y + 10, ["FOTO_A1.jpeg", "FOTO_A2.jpeg"]);
 
