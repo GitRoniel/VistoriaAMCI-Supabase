@@ -10,7 +10,7 @@
 // O estado atravessa as quebras de página (um bloco pode começar numa página e terminar na outra).
 
 const limpa = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
-const norm = (s) => limpa(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const norm = (s) => limpa(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const TOL = 3.5;
 
 /** Linhas da página (de cima para baixo), cada uma com os itens da esquerda para a direita. */

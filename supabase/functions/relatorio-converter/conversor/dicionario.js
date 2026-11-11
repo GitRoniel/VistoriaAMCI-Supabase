@@ -16,7 +16,7 @@ export const PADRAO = [
 
 /** Chave de comparação: sem acentos, sem espaços nem pontuação, em minúsculas
  *  ("REVESTIMENTO - PISO/ PAREDE (CERÂMICO)" e "Revestimento - Piso/Parede (Cerâmico)" são o mesmo serviço). */
-export const chaveServico = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+export const chaveServico = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 /**
  * regras: [{ original, curto, ativo? }] — da tabela (prioridade) seguidas das padrão.

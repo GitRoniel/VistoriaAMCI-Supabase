@@ -206,8 +206,10 @@ export function criarLeitor(PDFLib) {
       };
       const cont = pg.node.Contents();
       const partes = !cont ? [] : cont instanceof PDFRawStream ? [cont] : cont.asArray().map((r) => ctx.lookup(r));
-      const juntos = []; for (const s of partes) { const u = bytesDe(s); juntos.push(...u, 10); }
-      percorrer(Uint8Array.from(juntos), pg.node.Resources(), [1, 0, 0, 1, 0, 0], 0);
+      const blocos = partes.map((s) => bytesDe(s)), total = blocos.reduce((t, u) => t + u.length + 1, 0);
+      const juntos = new Uint8Array(total); let pos = 0;
+      for (const u of blocos) { juntos.set(u, pos); pos += u.length; juntos[pos++] = 10; }
+      percorrer(juntos, pg.node.Resources(), [1, 0, 0, 1, 0, 0], 0);
       paginas.push({ numero: pi + 1, largura: width, altura: height, itens, imagens });
     });
     /** Bytes originais da foto (JPEG: DCTDecode), para incorporar no PDF novo sem recodificar. */
