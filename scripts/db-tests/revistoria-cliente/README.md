@@ -32,3 +32,16 @@ nada apagado; status da vistoria de nenhuma unidade muda; fica 1 revistoria apro
 repetidas ficam anuladas com motivo; horário do registro anulado mantido no atual; ciclo volta ao do 1º registro;
 evento "correcao" no histórico; unidades fora da regra (reprovada no meio, datas diferentes, em andamento) não
 mudam; rodar de novo não muda nada.
+
+## Chave com o cliente mantém a aprovação (`chave-cliente-reaprova.mjs`)
+
+```bash
+scripts/db-tests/chaves/reset.sh 20261118120000
+node scripts/db-tests/revistoria-cliente/chave-cliente-reaprova.mjs
+```
+
+Reproduz A-203/A-408 (aprovadas pela entrega da chave, reabertas, agendadas e reprovadas → Em andamento) e aplica
+`20261119120000_revistoria_chave_cliente_reaprova.sql` (duas vezes). Confere: voltam a Aprovado por entrega da chave
+com evento de reaprovação; revistoria reprovada e histórico intactos; chave na Base não muda; daqui em diante um
+resultado reprovado (tela ou planilha) com a chave com o cliente devolve a aprovação por entrega; aprovado
+tecnicamente continua técnico; chave devolvida antes do resultado segue a regra normal; função interna fechada.
