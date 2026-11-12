@@ -36,3 +36,6 @@ www/central.js
 www/pdfjs/
 www/relatorios.css
 www/cores.js
+www/offline.js
+www/offline.css
+www/sw.js

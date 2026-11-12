@@ -327,34 +327,47 @@ assert.equal(mesmaUnidade({ bloco: "A", apto: "T03" }, "A", "T03"), true); asser
   assert.equal(ord("desc"), "G602,C602,A101,A203,A408,E305");
 }
 
-// 21) Execução M.O. em três status (equipe + liberação; nunca a aprovação da revistoria), por unidade única.
+// 21) Situação da Execução M.O. (fonte de verdade da execução, também mostrada na Revistoria), por unidade única:
+//     Liberado > Em Andamento (equipe) > Encerrado (aprovado ou chave com o cliente, sem equipe) > A Executar.
 {
-  const mk = (id, st, ex, lib, extra = {}) => ({ unitId: id, b: "A", codigo: id, situacao: M.situacao({ status: st, execucao: ex, liberado: lib, ...extra }, []) });
+  const mk = (id, st, ex, lib, extra = {}, chave = { setor: "base" }) => ({ unitId: id, b: "A", codigo: id, chave, situacao: M.situacao({ status: st, execucao: ex, liberado: lib, ...extra }, []) });
   const U = [
     mk("1", "Em andamento", null, false),                  // 1) sem equipe → A Executar
     mk("2", "Agendado", "MOP_FELIPE", false),              // 2) equipe, sem liberação → Em Andamento
     mk("3", "Em andamento", "MOP_RENATO", true),           // 3) equipe e liberado → Liberado
-    mk("4", "Aprovado", null, false),                      // aprovado na revistoria, sem equipe → A Executar (não mistura)
-    mk("5", "Aprovado", null, true),                       // liberado sem equipe → Liberado
+    mk("4", "Aprovado", null, false),                      // 7) aprovado, sem equipe → Encerrado (fora de A Executar)
+    mk("5", "Aprovado", null, true),                       // liberado sem equipe → Liberado (prioridade)
     mk("6", "Em andamento", "EMP_OSCAR", false, { execucao_finalizada_em: "2026-11-10T10:00:00Z" }),   // finalizada não liberada → Em Andamento
-    mk("7", "Em andamento", "EQUIPE_QUE_NAO_EXISTE", false),   // equipe inválida = sem equipe
-    { unitId: "8", b: "A", codigo: "8", situacao: M.situacao(null, []) }   // fora da Revistoria · Cliente: não conta
+    mk("7", "Em andamento", "EQUIPE_QUE_NAO_EXISTE", false),   // equipe inválida = sem equipe → A Executar
+    mk("8", "Em andamento", null, false, {}, { setor: "cliente" }),   // 8) chave entregue ao cliente, sem equipe → Encerrado
+    mk("9", "Agendado", "MOP_FELIPE", false, {}, { setor: "cliente" }),   // chave com o cliente mas equipe trabalhando → Em Andamento
+    mk("10", "Em andamento", null, false, {}, { setor: "cliente", perdida: { etapa: "perdida" } }),   // chave perdida não conta como entregue
+    { unitId: "11", b: "A", codigo: "11", situacao: M.situacao(null, []) }   // fora da Revistoria · Cliente: não conta
   ];
-  assert.deepEqual(U.map((u) => M.etapaExecucao(u.situacao)), ["a_executar", "em_andamento", "liberado", "a_executar", "liberado", "em_andamento", "a_executar", ""]);
+  assert.deepEqual(U.map((u) => M.etapaExecucao(u.situacao, u.chave)),
+    ["a_executar", "em_andamento", "liberado", "encerrado", "liberado", "em_andamento", "a_executar", "encerrado", "em_andamento", "a_executar", ""]);
   const P = M.painelExecucao([...U, U[1], U[2]]);                                  // repetidas não contam de novo
-  assert.deepEqual(P, { total: 7, a_executar: 3, em_andamento: 2, liberado: 2 });
-  assert.equal(P.a_executar + P.em_andamento + P.liberado, P.total, "cada unidade em um único status");
-  // 4) troca de equipe e 5) liberação / reabertura (desfazer liberação) recalculam na hora, sem segunda ação
-  const muda = (o) => M.etapaExecucao(M.situacao({ status: "Em andamento", ...o }, []));
+  assert.deepEqual(P, { total: 10, a_executar: 3, em_andamento: 3, liberado: 2, encerrado: 2 });
+  assert.equal(P.a_executar + P.em_andamento + P.liberado + P.encerrado, P.total, "cada unidade em um único status");
+  // 4) troca de equipe, 5) liberação e 6) reabertura (desfazer liberação) recalculam na hora, sem segunda ação
+  const muda = (o, chave) => M.etapaExecucao(M.situacao({ status: "Em andamento", ...o }, []), chave);
   assert.equal(muda({ execucao: null }), "a_executar");
   assert.equal(muda({ execucao: "MOP_FELIPE" }), "em_andamento");
   assert.equal(muda({ execucao: "EMP_NILSON" }), "em_andamento");
   assert.equal(muda({ execucao: "EMP_NILSON", liberado: true }), "liberado");
   assert.equal(muda({ execucao: "EMP_NILSON", liberado: false }), "em_andamento");
   assert.equal(muda({ execucao: null, liberado: false }), "a_executar");
+  assert.equal(muda({ execucao: null }, { setor: "cliente" }), "encerrado", "entrega da chave tira de A Executar");
+  // 9) a situação da execução não muda o status da revistoria (e vice-versa)
+  const s9 = M.situacao({ status: "Agendado", execucao: "MOP_FELIPE", liberado: true }, []);
+  assert.equal(s9.status, "Agendado"); assert.equal(M.etapaExecucao(s9), "liberado");
+  // 10) mesma numeração em condomínios diferentes: cada unidade pelo seu id
+  const A = { unitId: 101, b: "A", codigo: "101", chave: { setor: "base" }, situacao: M.situacao({ status: "Em andamento", execucao: "MOP_FELIPE" }, []) };
+  const B = { unitId: 202, b: "A", codigo: "101", chave: { setor: "base" }, situacao: M.situacao({ status: "Em andamento" }, []) };
+  assert.deepEqual(M.painelExecucao([A, B]), { total: 2, a_executar: 1, em_andamento: 1, liberado: 0, encerrado: 0 });
   const fx = (k) => U.filter((u) => M.passaFiltros(u, { bloco: "ALL", busca: "", rapido: "todos", statusExec: k })).map((u) => u.unitId).join(",");
-  assert.equal(fx("a_executar"), "1,4,7"); assert.equal(fx("em_andamento"), "2,6"); assert.equal(fx("liberado"), "3,5");
-  assert.equal(M.execucaoInfo("liberado").label, "Liberado");
+  assert.equal(fx("a_executar"), "1,7,10"); assert.equal(fx("em_andamento"), "2,6,9"); assert.equal(fx("liberado"), "3,5"); assert.equal(fx("encerrado"), "4,8");
+  assert.equal(M.execucaoInfo("liberado").label, "Liberado"); assert.equal(M.execucaoInfo("encerrado").label, "Encerrado");
 }
 
 console.log("Regras da Revistoria · Cliente verificadas.");

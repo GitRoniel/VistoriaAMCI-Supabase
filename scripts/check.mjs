@@ -254,5 +254,6 @@ await import("./test-revistoria-cliente.mjs");
 await import("./test-central.mjs");
 await import("./test-cores.mjs");
 await import("./test-conversao-tela.mjs");
+await import("./test-offline.mjs");
 
 console.log("Verificações estáticas concluídas sem erros.");

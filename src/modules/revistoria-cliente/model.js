@@ -47,8 +47,8 @@ export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.ke
 /** Cor do apartamento no mapa da Execução M.O.: a da equipe; sem equipe = tom de destaque (falta mão de obra);
  *  sem equipe e já Aprovado na revistoria = cinza mais forte (concluída). O status da execução (A Executar,
  *  Em Andamento, Liberado) fica nos cartões, filtros, lista e painel — não muda a cor da equipe no mapa. */
-export function corUnidade(s) {
-  const e = execInfo(s?.execucao), etapa = etapaExecucao(s);
+export function corUnidade(s, chave = null) {
+  const e = execInfo(s?.execucao), etapa = etapaExecucao(s, chave);
   if (e) return { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e, aprovada: false, etapa };
   const leg = (k, padrao) => { const x = LEG_EXECUCAO[k] || padrao; return { cor: x.cor, borda: x.borda, texto: x.texto }; };
   if (s?.status === "Aprovado") return { ...leg("aprovado_sem_equipe", APROVADA_SEM_EQUIPE), equipe: null, aprovada: true, etapa };
@@ -69,35 +69,42 @@ export function passaExecucao(chave, execucao) {
   return execucao === chave;
 }
 /**
- * Situação da Execução M.O. (12/11/2026): três status, derivados só da equipe (revistorias_cliente.execucao) e da
- * liberação (revistorias_cliente.liberado) — nunca da situação da revistoria (aprovação/agendamento):
- *   Liberado     = liberação registrada (com ou sem equipe);
+ * Situação da Execução M.O. — fonte de verdade da execução, usada na Execução M.O. e mostrada também na Revistoria
+ * (campo próprio, separado do status da revistoria). Derivada só do registro atual da unidade
+ * (revistorias_cliente.execucao e .liberado, uma linha e uma equipe por unidade) e da chave no Controle de Chaves:
+ *   Liberado     = liberação registrada (prioridade sobre os demais);
  *   Em Andamento = equipe vinculada e ainda não liberado;
- *   A Executar   = sem equipe e não liberado.
- * Cada unidade da Revistoria · Cliente fica em exatamente um deles (uma linha por unidade, uma equipe por unidade).
- * "Execução finalizada" continua registrada no painel, mas não é status. Cores: legendas configuráveis (leg).
+ *   A Executar   = sem equipe, não liberado e ainda precisa de execução;
+ *   Encerrado    = sem equipe, mas já Aprovado na revistoria ou com a chave entregue ao cliente (não precisa mais de
+ *                  execução: sai de A Executar sem apagar nada).
+ * Cada unidade fica em exatamente um deles. "Execução finalizada" continua no painel, mas não é status.
+ * Cores (legendas configuráveis; chaves já existentes em cores_legendas, sem mudar o banco):
+ *   A Executar = st_em_andamento (amarelo), Em Andamento = st_agendado (azul), Liberado = st_aprovado (verde).
  */
 export const STATUS_EXECUCAO = [
-  { key: "a_executar", label: "A Executar", leg: "sem_equipe", desc: "Sem equipe de mão de obra demarcada" },
-  { key: "em_andamento", label: "Em Andamento", leg: "st_em_andamento", desc: "Equipe vinculada, ainda não liberado" },
-  { key: "liberado", label: "Liberado", leg: "liberado", desc: "Liberação registrada" }
+  { key: "a_executar", label: "A Executar", leg: "st_em_andamento", desc: "Sem equipe de mão de obra demarcada (ainda precisa de execução)" },
+  { key: "em_andamento", label: "Em Andamento", leg: "st_agendado", desc: "Equipe vinculada, ainda não liberado" },
+  { key: "liberado", label: "Liberado", leg: "st_aprovado", desc: "Liberação registrada" }
 ];
-export const execucaoInfo = (key) => STATUS_EXECUCAO.find((x) => x.key === key) || null;
-/** Status da execução da unidade ("" fora da Revistoria · Cliente). */
-export function etapaExecucao(s) {
+export const ENCERRADO = { key: "encerrado", label: "Encerrado", cor: "#e9edea", borda: "#b9c1bc", texto: "#4d5a53", desc: "Sem equipe, já aprovado ou com a chave entregue ao cliente: não precisa de execução" };
+export const execucaoInfo = (key) => STATUS_EXECUCAO.find((x) => x.key === key) || (key === ENCERRADO.key ? ENCERRADO : null);
+/** Status da execução da unidade ("" fora da Revistoria · Cliente). chave = situação da chave (Controle de Chaves). */
+export function etapaExecucao(s, chave = null) {
   if (!s?.status) return "";
   if (s.liberado) return "liberado";
-  return execInfo(s.execucao) ? "em_andamento" : "a_executar";
+  if (execInfo(s.execucao)) return "em_andamento";
+  if (s.status === "Aprovado" || (chave?.setor === "cliente" && !chave?.perdida)) return "encerrado";
+  return "a_executar";
 }
 aplicarEquipes(null);   // cores padrão (equipes, legendas e status) até a configuração central chegar
-export function passaStatusExecucao(chave, s) {
-  return !chave || etapaExecucao(s) === chave;
+export function passaStatusExecucao(filtro, s, chave = null) {
+  return !filtro || etapaExecucao(s, chave) === filtro;
 }
-/** Quantitativos da Execução M.O. por unidade única (A Executar + Em Andamento + Liberado = total). */
+/** Quantitativos da Execução M.O. por unidade única (A Executar + Em Andamento + Liberado + Encerrado = total). */
 export function painelExecucao(unidades) {
-  const vistas = new Set(), out = { total: 0, a_executar: 0, em_andamento: 0, liberado: 0 };
+  const vistas = new Set(), out = { total: 0, a_executar: 0, em_andamento: 0, liberado: 0, encerrado: 0 };
   for (const u of unidades || []) {
-    const e = etapaExecucao(u?.situacao); if (!e) continue;
+    const e = etapaExecucao(u?.situacao, u?.chave); if (!e) continue;
     const k = u.unitId ?? `${u.b}|${u.p}|${u.a}`; if (vistas.has(k)) continue;
     vistas.add(k); out.total++; out[e]++;
   }
@@ -327,7 +334,7 @@ export function passaFiltros(u, f) {
   if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
   if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
   if (!passaRelatorio(f.relatorio, u.temRelatorio)) return false;
-  if (!passaStatusExecucao(f.statusExec, u.situacao)) return false;
+  if (!passaStatusExecucao(f.statusExec, u.situacao, u.chave)) return false;
   // busca separada (padrão da aba Vistoria): nome do cliente e número da unidade (com ou sem o bloco)
   const qc = norm(f.cliente);
   if (qc && !norm(u.cliente).includes(qc)) return false;

@@ -35,19 +35,21 @@ export const APROVADA_SEM_EQUIPE = { cor: "#7d8782", borda: "#5f6964", texto: "#
  *  As telas não têm cor fixa para esses itens: leem daqui (com a cor personalizada aplicada por legendasExecucao). */
 export const CATEGORIA_EXECUCAO = "execucao_mapa";
 // Situação da Execução M.O. (12/11/2026): três status, derivados da equipe e da liberação da unidade, com as cores
-// destas chaves (as mesmas já configuráveis, sem mudar o banco): A Executar = sem_equipe, Em Andamento =
-// st_em_andamento, Liberado = liberado — nos cartões, filtros, lista e painel. No mapa, o apartamento continua na
-// cor da equipe (sem equipe = sem_equipe; aprovado sem equipe = aprovado_sem_equipe). grupo "legado" = chaves antigas
-// que continuam aceitas no banco (cores já salvas não se perdem), mas não aparecem mais no editor nem nas telas.
+// destas chaves (as mesmas já configuráveis, sem mudar o banco): A Executar = st_em_andamento (amarelo), Em Andamento =
+// st_agendado (azul), Liberado = st_aprovado (verde) — nos filtros, lista, painel e na Revistoria. No mapa da
+// Execução M.O., o apartamento continua na cor da equipe (sem equipe = sem_equipe; aprovado sem equipe =
+// aprovado_sem_equipe; ✓ = liberado). grupo "legado" = chave antiga aceita no banco, fora do editor e das telas.
 export const LEGENDAS_EXECUCAO_PADRAO = {
-  sem_equipe: { label: "A Executar / sem equipe (sem mão de obra alocada)", grupo: "status", ...SEM_EQUIPE },
-  st_em_andamento: { label: "Em Andamento (equipe vinculada, não liberado)", grupo: "status", cor: "#d9a92f", borda: "#b88f27", texto: "#14241c" },
-  liberado: { label: "Liberado (também a marca ✓ do mapa)", grupo: "status", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
-  fora_revistoria: { label: "Fora da Revistoria · Cliente", grupo: "mapa", cor: "#e3e7e4", borda: "#b9c1bc", texto: "#5f6b64" },
+  // situação da Execução M.O. (as chaves st_* ficaram com estes nomes no banco; o significado é o do rótulo)
+  st_em_andamento: { label: "A Executar (sem equipe, ainda precisa de execução)", grupo: "status", cor: "#e0a526", borda: "#b8861c", texto: "#2a1f05" },
+  st_agendado: { label: "Em Andamento (equipe vinculada, não liberado)", grupo: "status", cor: "#2f6fdb", borda: "#2459b5", texto: "#ffffff" },
+  st_aprovado: { label: "Liberado (liberação registrada)", grupo: "status", cor: "#2f9e5b", borda: "#268a4d", texto: "#ffffff" },
+  // mapa da Execução M.O. (cor por equipe)
+  sem_equipe: { label: "Sem equipe (sem mão de obra alocada)", grupo: "mapa", ...SEM_EQUIPE },
   aprovado_sem_equipe: { label: "Aprovado sem equipe", grupo: "mapa", ...APROVADA_SEM_EQUIPE },
-  st_finalizado: { label: "Finalizado (antigo)", grupo: "legado", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
-  st_agendado: { label: "Agendado (antigo)", grupo: "legado", cor: "#2459b5", borda: "#1e4b98", texto: "#ffffff" },
-  st_aprovado: { label: "Aprovado (antigo)", grupo: "legado", cor: "#268a4d", borda: "#207441", texto: "#ffffff" }
+  fora_revistoria: { label: "Fora da Revistoria · Cliente", grupo: "mapa", cor: "#e3e7e4", borda: "#b9c1bc", texto: "#5f6b64" },
+  liberado: { label: "Marca ✓ de liberado (mapa da Execução M.O.)", grupo: "mapa", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
+  st_finalizado: { label: "Finalizado (antigo)", grupo: "legado", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" }
 };
 /** Legendas da Execução M.O. com as cores personalizadas aplicadas (linhas de cores_legendas). */
 export function legendasExecucao(linhas = []) {

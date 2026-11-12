@@ -19,6 +19,7 @@ export const HM_ICON = {
   shield: svg('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
   condos: svg('<path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-5h6v5M9 9h.01M12 9h.01M15 9h.01M9 12.5h.01M12 12.5h.01M15 12.5h.01"/>'),
   logs: svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>'),
+  offline: svg('<path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9"/><path d="M12 12v8m0 0-3-3m3 3 3-3"/>'),
   logout: svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>'),
   moon: '<svg class="theme-ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
   sun: '<svg class="theme-ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
@@ -44,7 +45,7 @@ export function hmBtnHTML({ id = "", label, icon = "", href = "", cls = "", attr
   return `<button type="button"${a} aria-label="${esc(label)}">${inner}</button>`;
 }
 
-/** Menu do usuário (HM User): nome, administração (Liberações, Condomínios, Logs) e sair. */
+/** Menu do usuário (HM User): nome, administração (Liberações, Condomínios, Logs), Central Offline e sair. */
 export function hmUserHTML({ home = "/" } = {}) {
   const admin = HM_ADMIN_PAGES.map((p) => `<a class="hm-menu-item hm-menu-nav" role="menuitem" href="${esc(home)}#${p.id}" data-admin-page="${p.id}" hidden>${p.icon}<span>${esc(p.label)}</span>${p.badge ? `<span class="tab-badge" id="${p.badge}" hidden></span>` : ""}</a>`).join("");
   return `<div class="hm-user">
@@ -55,6 +56,7 @@ export function hmUserHTML({ home = "/" } = {}) {
                 <span class="hm-menu-lbl">Administração</span>
                 ${admin}
               </div>
+              <a class="hm-menu-item hm-menu-nav hm-menu-offline" role="menuitem" href="/offline.html" title="Relatórios guardados no aparelho para consultar sem internet">${HM_ICON.offline}<span>Central Offline</span></a>
               <button class="hm-menu-item hm-menu-out" id="hmLogout" type="button" role="menuitem">${HM_ICON.logout}Sair da conta</button>
             </div>
           </div>`;
