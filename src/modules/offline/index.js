@@ -20,11 +20,13 @@ import * as O from "./model.js";
 import { abrirBanco, bancosDeOutrasContas, apagarBanco } from "./store.js";
 import { listarObras, catalogoServidor, criarExecutor } from "./sync.js";
 import { criarVisualizador } from "../revistoria-cliente/visualizador.js";
+import { exportar, temPasta } from "./exportar.js";
 
 const page = document.getElementById("app");
 const IC = {
   nuvem: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9"/><path d="M12 12v8m0 0-3-3m3 3 3-3"/></svg>',
   ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>',
+  pc: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>',
   sinc: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>',
   lixo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>',
   pdf: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
@@ -37,6 +39,8 @@ let sb = null, store = null, usuario = null, online = navigator.onLine;
 let obrasSrv = [], catSrv = [], catEm = null, guardados = new Map(), obrasLocais = new Map(), fila = [];
 let selObra = "", tipos = { ...O.SELECAO_PADRAO }, estimativa = null, persistente = null, outrasContas = null;
 let filtroDocs = { obra: "", bloco: "", busca: "", soOffline: false, ordem: "unidade" };
+// Baixar no computador: condomínio, bloco e tipo escolhidos, andamento e resultado
+let pc = { obra: "", bloco: "", tipo: "convertido" }, pcProg = null, pcRes = null, pcCtrl = null, pcPasta = null, pcUltimo = null;
 let executor = null, progresso = null, alvoAtual = null, relatorio = null, carregandoCat = false, erroCat = "";
 
 /* ── início ── */
@@ -140,6 +144,7 @@ function montar() {
     <div id="ofRetomar"></div>
     <section class="pf-card of-sec of-preparar" id="ofPreparar"></section>
     <section class="pf-card of-sec" id="ofProgresso" hidden></section>
+    <section class="pf-card of-sec of-pc" id="ofPc"></section>
     <section class="pf-card of-sec" id="ofObras"></section>
     <section class="pf-card of-sec" id="ofDocs"></section>
     <section class="pf-card of-sec of-gerenciar" id="ofGerenciar"></section>`);
@@ -148,7 +153,7 @@ function montar() {
   page.addEventListener("input", (e) => { if (e.target.id === "ofBusca") { filtroDocs.busca = e.target.value; pintarDocs(); } });
   pintarTudo();
 }
-function pintarTudo() { if (!page.querySelector("#ofResumo")) return; pintarConexao(); pintarResumo(); pintarRetomar(); pintarPreparar(); pintarProgresso(); pintarObras(); pintarDocs(); pintarGerenciar(); }
+function pintarTudo() { if (!page.querySelector("#ofResumo")) return; pintarConexao(); pintarResumo(); pintarRetomar(); pintarPreparar(); pintarProgresso(); pintarPc(); pintarObras(); pintarDocs(); pintarGerenciar(); }
 
 function pintarConexao() {
   const el = page.querySelector("#ofConexao"); if (!el) return;
@@ -240,6 +245,91 @@ function pintarProgresso() {
       ${r.erro ? `<p class="of-err">${esc(r.erro)}</p>` : ""}`;
   }
 }
+/* ── Baixar no computador ── */
+const obraPc = () => pc.obra || selObra;
+function docsParaPc() {
+  const obras = obrasSrv.length ? obrasSrv : obrasConhecidas();
+  const ids = obraPc() === "todos" ? obras.map((o) => o.id) : [Number(obraPc())];
+  const tiposSel = O.TIPOS_PC[pc.tipo].tipos;
+  // com internet, o catálogo do servidor; sem internet, só o que está guardado neste aparelho
+  const base = online && catSrv.length ? catSrv : [...guardados.values()].filter((d) => d.versaoOk);
+  return base.filter((d) => ids.includes(Number(d.projectId)) && tiposSel.includes(d.tipo) && (!pc.bloco || d.bloco === pc.bloco));
+}
+const copiaLocalValida = (d) => { const l = guardados.get(d.id); return !!l?.versaoOk && (!online || l.versaoOk === d.versao); };
+function pintarPc() {
+  const el = page.querySelector("#ofPc"); if (!el) return;
+  const obras = obrasSrv.length ? obrasSrv : obrasConhecidas();
+  const docs = docsParaPc(), bytes = docs.reduce((s, d) => s + (d.tamanho || d.bytes || 0), 0), locais = docs.filter(copiaLocalValida).length;
+  const blocos = [...new Set([...catSrv, ...guardados.values()].filter((d) => obraPc() === "todos" || String(d.projectId) === String(obraPc())).map((d) => d.bloco).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true }));
+  const rodando = !!pcCtrl, pasta = temPasta();
+  const p = pcProg, r = pcRes;
+  const pct = p?.total ? Math.round((p.feitos / p.total) * 100) : 0;
+  el.innerHTML = `<div class="of-h"><h3>${IC.pc}Baixar no computador</h3><span>Salva os PDFs numa pasta do computador (organizados por condomínio e bloco) ou num arquivo .zip.</span></div>
+    <div class="of-prep">
+      <label class="of-campo"><span>Condomínio</span><select id="ofPcObra"${rodando ? " disabled" : ""}>
+        ${obras.map((o) => `<option value="${o.id}"${String(o.id) === String(obraPc()) ? " selected" : ""}>${esc(o.nome)}</option>`).join("")}
+        ${obras.length > 1 ? `<option value="todos"${obraPc() === "todos" ? " selected" : ""}>Todos os meus condomínios (${obras.length})</option>` : ""}
+      </select></label>
+      <div class="of-pc-linha">
+        <div class="of-seg" role="radiogroup" aria-label="Quais relatórios">
+          ${Object.values(O.TIPOS_PC).map((t) => `<label class="of-seg-op${pc.tipo === t.key ? " on" : ""}"><input type="radio" name="ofPcTipo" data-pctipo="${t.key}"${pc.tipo === t.key ? " checked" : ""}${rodando ? " disabled" : ""}>${esc(t.label)}</label>`).join("")}
+        </div>
+        <label class="of-campo of-pc-bloco"><span>Bloco</span><select id="ofPcBloco"${rodando ? " disabled" : ""}><option value="">Todos</option>${blocos.map((b) => `<option${b === pc.bloco ? " selected" : ""}>${esc(b)}</option>`).join("")}</select></label>
+      </div>
+      <div class="of-est"><span><b>${docs.length}</b> arquivo(s) · <b>${esc(O.fmtBytes(bytes))}</b>${locais ? ` · <b>${locais}</b> já neste aparelho (não baixa de novo)` : ""}</span>
+        <small>${!online ? "Sem internet: só os relatórios guardados neste aparelho." : pasta ? "Na pasta, os arquivos que já estiverem lá com o mesmo tamanho não são gravados de novo." : "Este navegador não permite escolher uma pasta: os arquivos vêm num .zip (abra com duplo clique)."}${bytes > O.LIMITE_ZIP ? ` O .zip é dividido em partes de até ${esc(O.fmtBytes(O.LIMITE_ZIP))}.` : ""}</small></div>
+      <div class="of-acoes">
+        ${pasta ? `<button type="button" class="pf-btn primary of-big" data-acao="pc-pasta"${rodando || !docs.length ? " disabled" : ""}>${IC.pc}Escolher pasta e salvar</button>` : ""}
+        <button type="button" class="pf-btn${pasta ? "" : " primary of-big"}" data-acao="pc-zip"${rodando || !docs.length ? " disabled" : ""}>${IC.nuvem}Baixar .zip</button>
+        ${rodando ? `<button type="button" class="pf-btn" data-acao="pc-cancelar">Cancelar</button>` : ""}
+      </div>
+      ${p && rodando ? `<div class="of-pc-prog"><div class="of-prog-n"><span><b>${p.feitos}</b> de ${p.total}</span><span><b>${pct}%</b></span><span><b>${esc(O.fmtBytes(p.bytes))}</b> de ${esc(O.fmtBytes(p.bytesTotal))}</span>${p.doAparelho ? `<span>${p.doAparelho} deste aparelho</span>` : ""}${p.jaNaPasta ? `<span>${p.jaNaPasta} já na pasta</span>` : ""}${p.falhas ? `<span class="of-err"><b>${p.falhas}</b> com falha</span>` : ""}</div>
+        <div class="of-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div></div>` : ""}
+      ${r && !rodando ? `<div class="of-pc-res ${r.falhas ? "warn" : r.fase === "concluido" ? "ok" : ""}">
+        <b>${r.fase === "cancelado" ? "Cancelado." : r.fase === "erro" ? `Não foi possível concluir: ${esc(r.erro || "")}` : r.modo === "pasta" ? `${r.salvos + r.jaNaPasta} de ${r.total} arquivo(s) na pasta “${esc(r.destino)}”.` : `${r.salvos} de ${r.total} arquivo(s) no ${r.partes > 1 ? `${r.partes} arquivos .zip` : ".zip"} “${esc(r.destino)}”.`}</b>
+        <span>${r.jaNaPasta ? `${r.jaNaPasta} já estavam na pasta · ` : ""}${r.doAparelho ? `${r.doAparelho} vieram deste aparelho · ` : ""}${esc(O.fmtBytes(r.bytes))}</span>
+        ${r.erros?.length ? `<div class="of-falhas"><b>Não salvos:</b><ul>${r.erros.slice(0, 30).map((x) => { const d = docsPorId(x.id); return `<li>${esc(d ? `${d.obra} · ${d.unidade} · ${O.TIPOS[d.tipo]?.curto || d.tipo}` : x.id)} — <i>${esc(x.erro)}</i></li>`; }).join("")}</ul>
+          <button type="button" class="pf-btn primary" data-acao="pc-repetir">Tentar de novo os não salvos</button></div>` : ""}</div>` : ""}
+    </div>`;
+}
+const docsPorId = (id) => catSrv.find((d) => d.id === id) || guardados.get(id) || null;
+async function baixarNoComputador(modo, somente = null) {
+  if (pcCtrl) return;
+  const docs = somente || docsParaPc();
+  if (!docs.length) return;
+  const obras = obrasSrv.length ? obrasSrv : obrasConhecidas();
+  const todos = obraPc() === "todos", nomeObra = todos ? "Todos os condominios" : (obras.find((o) => String(o.id) === String(obraPc()))?.nome || docs[0].obra);
+  const caminhos = O.caminhosNoComputador(docs, { comObra: todos });
+  let destino = O.nomeExportacao(nomeObra + (pc.bloco ? ` - ${pc.bloco.length <= 3 ? "Bloco " : ""}${pc.bloco}` : ""), pc.tipo, modo === "zip" ? new Date() : null);
+  let raiz = null;
+  if (modo === "pasta") {
+    try {
+      if (!somente || !pcPasta) pcPasta = await window.showDirectoryPicker({ id: "amci-relatorios", mode: "readwrite" });
+      if ((await pcPasta.requestPermission?.({ mode: "readwrite" })) === "denied") throw new Error("Sem permissão para gravar nesta pasta.");
+      raiz = await pcPasta.getDirectoryHandle(destino, { create: true });
+    } catch (err) { if (err?.name !== "AbortError") toast(err?.message || "Não foi possível usar esta pasta."); return; }
+  }
+  pcUltimo = { modo, docs: null }; pcRes = null; pcCtrl = new AbortController(); pcProg = { total: docs.length, feitos: 0, bytes: 0, bytesTotal: 0 };
+  pintarPc();
+  const r = await exportar({
+    sb, docs, caminhos, online, modo, pasta: raiz, sinal: pcCtrl.signal,
+    lerLocal: async (d) => (copiaLocalValida(d) ? store.bytes(d.id) : null),
+    entregarZip: (pedacos, parte) => salvarZip(pedacos, `${destino}${parte ? ` - parte ${parte}` : ""}.zip`),
+    aoProgresso: (p) => { pcProg = p; pintarPc(); }
+  });
+  pcCtrl = null;
+  pcRes = { ...r, fase: pcProg?.fase || "concluido", modo, destino: modo === "pasta" ? `${pcPasta?.name || ""}/${destino}` : `${destino}.zip` };
+  pcUltimo.docs = docs.filter((d) => r.erros.some((x) => x.id === d.id));
+  pintarPc();
+  if (pcRes.fase === "concluido") toast(r.falhas ? `${r.falhas} arquivo(s) não foram salvos.` : modo === "pasta" ? "Relatórios salvos na pasta." : "Download do .zip iniciado.");
+}
+function salvarZip(pedacos, nome) {
+  const url = URL.createObjectURL(new Blob(pedacos, { type: "application/zip" }));
+  const a = document.createElement("a"); a.href = url; a.download = nome;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 120000);
+}
+
 function pintarObras() {
   const el = page.querySelector("#ofObras"); if (!el) return;
   const lista = [...obrasLocais.values()].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
@@ -317,11 +407,18 @@ async function clique(e) {
   else if (a === "limpar") { if (confirm("Apagar todos os arquivos offline desta conta neste aparelho? Nada é apagado do servidor.")) { await store.limparTudo(); relatorio = null; progresso = null; await recarregarLocal(); pintarTudo(); toast("Arquivos offline apagados."); } }
   else if (a === "outras") { if (confirm("Apagar os arquivos offline de outras contas que já usaram este aparelho?")) { for (const n of outrasContas || []) await apagarBanco(n); outrasContas = await bancosDeOutrasContas(usuario.id); pintarGerenciar(); toast("Arquivos de outras contas apagados."); } }
   else if (a === "abrir") abrirDoc(doc);
+  else if (a === "pc-pasta") await baixarNoComputador("pasta");
+  else if (a === "pc-zip") await baixarNoComputador("zip");
+  else if (a === "pc-cancelar") pcCtrl?.abort();
+  else if (a === "pc-repetir" && pcUltimo?.docs?.length) await baixarNoComputador(pcUltimo.modo, pcUltimo.docs);
 }
 function mudanca(e) {
   const t = e.target;
   if (t.id === "ofObraSel") { selObra = t.value; pintarPreparar(); }
   else if (t.dataset.tipo) { tipos = { ...tipos, [t.dataset.tipo]: t.checked }; if (!tipos.convertido && !tipos.original) { tipos[t.dataset.tipo] = true; t.checked = true; } pintarPreparar(); }
+  else if (t.id === "ofPcObra") { pc = { ...pc, obra: t.value, bloco: "" }; pcRes = null; pintarPc(); }
+  else if (t.id === "ofPcBloco") { pc.bloco = t.value; pcRes = null; pintarPc(); }
+  else if (t.dataset.pctipo) { pc.tipo = t.dataset.pctipo; pcRes = null; pintarPc(); }
   else if (t.id === "ofFObra") { filtroDocs.obra = t.value; filtroDocs.bloco = ""; pintarDocs(); }
   else if (t.id === "ofFBloco") { filtroDocs.bloco = t.value; pintarDocs(); }
   else if (t.id === "ofFOff") { filtroDocs.soOffline = t.checked; pintarDocs(); }
