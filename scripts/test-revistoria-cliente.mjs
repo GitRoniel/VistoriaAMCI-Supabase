@@ -370,4 +370,20 @@ assert.equal(mesmaUnidade({ bloco: "A", apto: "T03" }, "A", "T03"), true); asser
   assert.equal(M.execucaoInfo("liberado").label, "Liberado"); assert.equal(M.execucaoInfo("encerrado").label, "Encerrado");
 }
 
+// 22) Imprimir/Exportar a Lista do Acompanhamento Geral: mesma linha da tela (data, situação, horário, responsável…)
+{
+  const L = (o, ags, extra = {}, chave = null) => M.linhaAgendamento({ b: "A", codigo: "604", cliente: "Fulano", situacao: M.situacao(o, ags), chave }, { vistoria: "Revistoria", acomp: "Com acomp.", hoje: "2026-11-12", ...extra });
+  let l = L({ status: "Agendado" }, [{ numero: 1, status: "Agendada", data: "2026-11-20", horario: "09:30:00", responsavel: "Ana", observacoes: "levar escada" }]);
+  assert.deepEqual([l.bloco, l.unidade, l.cliente, l.vistoria, l.revistoria, l.data, l.situacaoData, l.horario, l.responsavel, l.acomp, l.realizadas, l.agendadas, l.numero, l.obs, l.execucao],
+    ["A", "604", "Fulano", "Revistoria", "Agendado", "2026-11-20", "Agendada", "09:30", "Ana", "Com acomp.", 0, 1, 1, "levar escada", "A Executar"]);
+  l = L({ status: "Agendado" }, [{ numero: 1, status: "Agendada", data: "2026-11-05" }]);
+  assert.equal(l.situacaoData, "Vencida · sem resultado");
+  l = L({ status: "Em andamento", ciclo: 2 }, [{ numero: 1, status: "Reprovada", data: "2026-11-01", realizada_em: "2026-11-01", responsavel: "Bia" }]);
+  assert.match(l.situacaoData, /^Realizada · reprovada$/); assert.equal(l.responsavel, "Bia"); assert.equal(l.detalhes, "Rev. Reprovada · 2º ciclo"); assert.equal(l.realizadas, 1);
+  l = L({ status: "Em andamento" }, []);
+  assert.deepEqual([l.data, l.situacaoData, l.horario, l.responsavel], ["", "Aguardando agendamento", "", ""]);
+  l = L({ status: "Em andamento", liberado: true }, []); assert.equal(l.execucao, "Liberado");
+  l = L({ status: "Em andamento" }, [], {}, { setor: "cliente" }); assert.equal(l.execucao, "Encerrado");
+}
+
 console.log("Regras da Revistoria · Cliente verificadas.");
