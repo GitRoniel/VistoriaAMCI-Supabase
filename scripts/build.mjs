@@ -81,7 +81,9 @@ const revistoriasOptions = { ...buildOptions, entryPoints: ["./src/modules/visto
 // Para uma página nova, acrescente { js, css, out } aqui e o HTML em www/<modulo>/<pagina>.html.
 const PLATFORM_PAGES = [
   // Relatórios: abas Suprimentos (pedidos) e Contratos. /suprimentos/pedidos redireciona para cá.
-  { js: "./src/modules/relatorios/index.js", css: "./src/modules/relatorios/relatorios.css", out: "www/relatorios" }
+  { js: "./src/modules/relatorios/index.js", css: "./src/modules/relatorios/relatorios.css", out: "www/relatorios" },
+  // Central Offline: relatórios guardados no aparelho para consulta sem internet (IndexedDB + Service Worker).
+  { js: "./src/modules/offline/index.js", css: "./src/modules/offline/offline.css", out: "www/offline" }
 ];
 const platformBuilds = [
   { ...buildOptions, entryPoints: ["./src/platform/styles/platform.css"], outfile: "www/platform/platform.css", format: undefined, platform: undefined, target: ["chrome100", "safari15", "firefox100"] },
@@ -116,5 +118,29 @@ if (watch) {
   await Promise.all(platformBuilds.map((options) => build(options)));
   // Mantém o index da raiz sincronizado para quem abrir o projeto localmente.
   await copyFile(resolve(www, "index.html"), resolve(root, "index.html"));
+  await gerarServiceWorker();
   console.log("Build concluído em www/.");
+}
+
+/**
+ * Service Worker (www/sw.js): lista do que guardar para o aplicativo abrir sem internet e versão = hash do conteúdo
+ * (cada publicação com mudança troca o cache sozinha). Páginas com o endereço "limpo" da Vercel (cleanUrls).
+ */
+async function gerarServiceWorker() {
+  const { createHash } = await import("node:crypto");
+  const { readdir, stat } = await import("node:fs/promises");
+  const paginas = ["/", "/offline", "/relatorios"];
+  const arquivos = ["offline.js", "offline.css", "relatorios.js", "relatorios.css", "platform/platform.css", "platform/hmbar.css", "config.js",
+    "supabase-client.js", "revistorias.js", "cores.js", "chaves.js", "revcliente.js", "central.js", "pdfjs/pdf.min.js", "pdfjs/pdf.worker.min.js",
+    "manifest.webmanifest", "favicon.ico"];
+  const listar = async (dir) => (await readdir(resolve(www, dir), { withFileTypes: true })).flatMap((e) => (e.isFile() ? [`${dir}/${e.name}`] : []));
+  const assets = [...await listar("assets"), ...await listar("assets/icons").catch(() => [])].filter((f) => !/\.(md|txt)$/i.test(f));
+  const todos = [...arquivos, ...assets];
+  const h = createHash("sha256");
+  for (const f of ["index.html", "offline.html", "relatorios.html", ...todos]) {
+    try { if ((await stat(resolve(www, f))).isFile()) h.update(f).update(await readFile(resolve(www, f))); } catch { /* opcional */ }
+  }
+  const tpl = await readFile(resolve(root, "scripts/sw-template.js"), "utf8");
+  const precache = [...paginas, ...todos.map((f) => "/" + f)];
+  await writeFile(resolve(www, "sw.js"), tpl.replace("__VERSAO__", h.digest("hex").slice(0, 16)).replace("__PRECACHE__", JSON.stringify(precache)), "utf8");
 }

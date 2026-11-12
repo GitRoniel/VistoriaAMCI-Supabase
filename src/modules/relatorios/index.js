@@ -126,6 +126,8 @@ function mountTabs(tabs, user, modules = new Map()) {
 
 async function boot() {
   initTheme();
+  // Service Worker: o aplicativo (e a Central Offline) abre sem internet
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("/sw.js").catch(() => {});
   document.addEventListener("click", async (e) => {
     if (e.target.closest("[data-pf-logout]")) await logout();
   });
