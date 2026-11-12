@@ -43,6 +43,8 @@ const ICONE = {
   filtro: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>`,
   fechar: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`,
   calendario: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`,
+  imprimir: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 18H4v-7h16v7h-3M7 14h10v7H7z"/></svg>`,
+  exportar: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>`,
   importar: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 11-4-4m4 4 4-4M5 19h14"/></svg>`
 };
 const FORMS = {
@@ -131,6 +133,8 @@ function casca() {
           <label class="fx-field"><span>Até</span><input type="date" id="rcDtFim" aria-label="Período: data final"></label>
           <button class="fx-btn rc-dts" id="rcDtSort" type="button" aria-label="Ordenar por data">${ICONE.calendario}<span>Data ↑</span></button>
           <button class="fx-btn rc-hr" id="rcHr" type="button" aria-label="Ordenar por horário">${ICONE.relogio}<span>Horário ↑</span></button>
+          <button class="fx-btn" id="rcPrint" type="button" title="Imprimir a lista filtrada dos agendamentos">${ICONE.imprimir}Imprimir</button>
+          <button class="fx-btn" id="rcExport" type="button" title="Exportar a lista filtrada (abre no Excel)">${ICONE.exportar}Exportar</button>
           ${host.podeImportar?.() ? `<button type="button" class="fx-btn" id="rcImportar" title="Atualizar status, data e horário das revistorias pela planilha (colunas M, N e O)">${ICONE.importar}Importar planilha</button>` : ""}
         </div>
         <div class="fx-end">
@@ -193,6 +197,8 @@ function casca() {
   q("#rcLimparA").addEventListener("click", () => { const f0 = FILTRO0(); for (const k of ["bloco", "dtSort", "hrSort", "statusExec", ...CAMPOS_AREA.acomp]) filt[k] = f0[k]; sincronizarFiltros(); pintarConteudo(); });
   q("#rcMore").addEventListener("click", (e) => { const fx = q("#rcFx"), on = !fx.classList.contains("fx-open"); fx.classList.toggle("fx-open", on); e.currentTarget.setAttribute("aria-expanded", String(on)); });
   q("#rcImportar")?.addEventListener("click", () => host.importarRevistorias?.());
+  q("#rcPrint").addEventListener("click", imprimirLista);
+  q("#rcExport").addEventListener("click", exportarLista);
   q("#rcLote")?.addEventListener("click", () => abrirLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
   q("#rcConvLote")?.addEventListener("click", () => abrirConversaoLote({ host, unidades: todasUnidades, aoMudar: () => agendarRelatorios() }));
   q("#rcChaves")?.addEventListener("click", () => host.abrirChaves?.());
@@ -401,6 +407,65 @@ function htmlListaAcomp(vis) {
   };
   const g = esc(host.grupo()), un = host.casa() ? "Casa" : "Unidade";
   return `<div class="gridscroll rc-ltblw"><table class="ctbl rc-ltbl"><thead><tr><th class="cw-b">${g}</th><th class="cw-u">${un}</th><th class="th-cli">Cliente</th><th title="Status atual da vistoria original">Status da Vistoria</th><th>Status da Revistoria</th><th title="Situação real da mão de obra (aba Execução M.O.): A Executar, Em Andamento, Liberado ou Encerrado">Execução M.O.</th><th class="cw-d">Data da Revistoria</th><th class="cw-h">Horário</th><th class="th-cli">Responsável</th><th class="th-acomp" title="Acompanhamento técnico informado na vistoria">Acomp. Técnico (Vistoria)</th><th title="Revistorias realizadas (ciclos executados)">Qtd. de Revistorias</th><th>Ações</th></tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
+}
+
+/* ── Imprimir e Exportar (Acompanhamento Geral): a lista filtrada, na ordem da tela, com as mesmas colunas ── */
+/** Unidades da lista do Acompanhamento Geral com os filtros e a ordenação atuais (também no modo Mapa). */
+function linhasAcomp() {
+  const f = { ...filtroArea() }, ord = ordemUnidade();
+  return todasUnidades().filter((u) => u.situacao.status && M.passaFiltros(u, f))
+    .sort((x, y) => M.compararAgenda(x, y, filt.hrSort, ord, filt.dtSort))
+    .map((u) => M.linhaAgendamento(u, { vistoria: host.vistoriaLabel(u.vistoria), acomp: host.acomp?.(u.b, u.p, u.a)?.label || "", hoje: hoje() }));
+}
+/** Recorte aplicado (status, execução, filtros e ordem), impresso no cabeçalho. */
+function textoRecorte() {
+  const f = filtroArea(), st = M.FILTROS_REVISTORIA.find((x) => x.key === f.rapido), ex = M.execucaoInfo(f.statusExec);
+  return [st && st.key !== "todos" ? `status: ${st.label}` : "", ex ? `execução M.O.: ${ex.label}` : "", descreverRecorte(f),
+    `ordem: data ${filt.dtSort === "desc" ? "↓" : "↑"}, horário ${filt.hrSort === "desc" ? "↓" : "↑"}`].filter(Boolean).join(" · ");
+}
+const COLS_AGENDA = () => [host.grupo(), host.casa() ? "Casa" : "Unidade", "Cliente", "Status da Vistoria", "Status da Revistoria", "Execução M.O.", "Data da Revistoria", "Situação", "Horário", "Responsável", "Acomp. Técnico (Vistoria)", "Qtd. de Revistorias"];
+function imprimirLista() {
+  const rows = linhasAcomp();
+  if (!rows.length) { host.toast?.("Nada para imprimir com esses filtros"); return; }
+  const agora = new Date().toLocaleString("pt-BR"), rec = textoRecorte();
+  const w = window.open("", "_blank");
+  if (!w) { host.toast?.("Habilite pop-ups para imprimir"); return; }
+  const td = (v, c = "") => `<td${c ? ` class="${c}"` : ""}>${v === "" || v == null ? "—" : esc(String(v))}</td>`;
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Revistoria Cliente — Agendamentos</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&display=swap" rel="stylesheet"><style>
+    @page{size:landscape;margin:10mm}
+    *{box-sizing:border-box}
+    body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#12241a;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    h1{font-size:14px;margin:0 0 2px}
+    .sub{font-size:9.5px;color:#666;margin-bottom:9px}
+    table{width:100%;border-collapse:collapse;font-size:9.5px}
+    th,td{border:1px solid #ccc;padding:3px 5px;text-align:center;line-height:1.25;vertical-align:middle}
+    th{background:#2f4a34;color:#fff;font-size:8px;text-transform:uppercase;letter-spacing:.3px}
+    tr:nth-child(even) td{background:#f7f9f6}
+    td.l{text-align:left} td small{display:block;color:#666;font-size:8px}
+    td.venc{color:#b33636;font-weight:600}
+    thead{display:table-header-group} tr{page-break-inside:avoid}
+  </style></head><body>
+    <h1>${esc(host.project?.name || "")} · Revistoria · Cliente — Agendamentos</h1>
+    <div class="sub">Lista filtrada — gerado em ${esc(agora)} — ${rows.length} unidade(s)${rec ? ` — ${esc(rec)}` : ""}</div>
+    <table><thead><tr>${COLS_AGENDA().map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>
+    ${rows.map((r) => `<tr>${td(r.bloco)}${td(r.unidade)}${td(r.cliente, "l")}${td(r.vistoria)}<td>${esc(r.revistoria)}${r.detalhes ? `<small>${esc(r.detalhes)}</small>` : ""}</td>${td(r.execucao)}${td(r.data ? fmtD(r.data) : "")}${td(r.situacaoData, /^Vencida/.test(r.situacaoData) ? "venc" : "")}${td(r.horario)}${td(r.responsavel, "l")}${td(r.acomp)}<td>${r.realizadas}${r.agendadas ? `<small>+${r.agendadas} agend.</small>` : ""}</td></tr>`).join("")}
+    </tbody></table></body></html>`);
+  w.document.close();
+  w.onload = () => { const go = () => { w.focus(); w.print(); }; (w.document.fonts?.ready || Promise.resolve()).then(go, go); };
+}
+/** CSV com ; e BOM (abre direto no Excel em português), igual à exportação da aba Vistoria. */
+function exportarLista() {
+  const rows = linhasAcomp();
+  if (!rows.length) { host.toast?.("Nada para exportar com esses filtros"); return; }
+  const cab = [...COLS_AGENDA(), "Detalhes da Revistoria", "Agendamentos em aberto", "Nº do agendamento", "Observações"];
+  const dados = rows.map((r) => [r.bloco, r.unidade, r.cliente, r.vistoria, r.revistoria, r.execucao, r.data ? fmtD(r.data) : "", r.situacaoData, r.horario, r.responsavel, r.acomp, r.realizadas, r.detalhes, r.agendadas, r.numero, r.obs]);
+  const cel = (v) => { const t = String(v ?? ""); return /[";\n\r]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+  const texto = "\ufeff" + [cab, ...dados].map((l) => l.map(cel).join(";")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a"); a.href = url; a.download = `revistorias-${host.project?.slug || "condominio"}-${hoje()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  host.toast?.(`${rows.length} unidade(s) exportada(s)`);
 }
 
 /** Qtd. Apontamentos e Qtd. Resolvidas (com progresso): "—" sem relatório ou sem apontamentos, nunca 100% vazio. */

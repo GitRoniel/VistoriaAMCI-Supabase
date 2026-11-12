@@ -477,3 +477,23 @@ export function conferirExtraidos(textos, checklist) {
     return { texto, existente, repetido, usar: !existente && !repetido && !!k };
   });
 }
+
+/**
+ * Linha da Lista do Acompanhamento Geral para Imprimir/Exportar (os mesmos dados e regras das colunas da tela).
+ * @param u     unidade da lista ({ b, codigo, cliente, situacao, chave })
+ * @param extra { vistoria: rótulo do status da vistoria, acomp: acompanhamento técnico, hoje: "AAAA-MM-DD" }
+ */
+export function linhaAgendamento(u, { vistoria = "", acomp = "", hoje = "" } = {}) {
+  const s = u.situacao || {}, lista = s.lista || [], dr = dataRevistoria(s);
+  const r = s.aberto || (dr.tipo ? lista.filter((x) => x.status !== "Cancelada").at(-1) : null);
+  const ex = execucaoInfo(etapaExecucao(s, u.chave));
+  const situacaoData = !dr.data ? "Aguardando agendamento"
+    : dr.tipo === "agendada" ? (hoje && dr.data < hoje ? "Vencida · sem resultado" : "Agendada")
+    : `Realizada · ${String(dr.resultado || "").toLowerCase()}`.replace(/ · $/, "");
+  const detalhes = [reprovada(s) ? REPROVADA.label : "", s.porEntrega ? "Entrega de chave" : "", s.ciclo > 1 ? `${s.ciclo}º ciclo` : ""].filter(Boolean);
+  return {
+    bloco: u.b || "", unidade: u.codigo || "", cliente: u.cliente || "", vistoria, revistoria: info(s.status).label, detalhes: detalhes.join(" · "),
+    execucao: ex?.label || "", data: dr.data || "", situacaoData, horario: dr.hora || "", responsavel: r?.responsavel || "", acomp,
+    realizadas: s.realizadas || 0, agendadas: lista.filter((x) => ABERTOS.includes(x.status)).length, numero: r?.numero || "", obs: r?.observacoes || ""
+  };
+}
