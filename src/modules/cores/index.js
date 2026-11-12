@@ -99,9 +99,9 @@ function secaoLegendasExecucao(ro) {
   };
   const grupo = (g) => Object.keys(L).filter((k) => L[k].grupo === g).map(linha).join("");
   return `<h4 class="cr-sub">Situação da Execução M.O.</h4>
-    <p class="cr-nota">Cores dos três status da mão de obra (indicadores, filtros, lista, mapa e legendas): A Executar (sem equipe), Em Andamento (equipe vinculada, ainda não liberado) e Liberado. A equipe aparece pela sigla na cor da equipe; a marca da chave (canto esquerdo) usa as cores dos setores do Controle de Chaves (aba A).</p>
+    <p class="cr-nota">Cores dos três status da mão de obra (indicadores, filtros, lista e painel): A Executar (sem equipe), Em Andamento (equipe vinculada, ainda não liberado) e Liberado. No mapa, o apartamento fica na cor da equipe; sem equipe usa a cor de A Executar. A marca da chave (canto esquerdo) usa as cores dos setores do Controle de Chaves (aba A).</p>
     <ul class="cr-list">${grupo("status")}</ul>
-    <h4 class="cr-sub">Outras legendas do mapa da Execução M.O.</h4>
+    <h4 class="cr-sub">Outras cores do mapa da Execução M.O.</h4>
     <ul class="cr-list">${grupo("mapa")}</ul>
     ${ro ? "" : `<div class="cr-rodape"><button type="button" class="btn g" data-cr-padrao-legexec-todos${Object.values(L).some((x) => x.custom) ? "" : " disabled"}>Restaurar as cores padrão das legendas da M.O.</button></div>`}`;
 }

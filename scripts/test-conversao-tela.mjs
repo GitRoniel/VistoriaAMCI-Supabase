@@ -47,7 +47,7 @@ assert.match(tela, /criarVisualizador/); assert.match(tela, /Original Mobuss/); 
 const svc = await readFile(resolve(root, "src/modules/revistoria-cliente/service.js"), "utf8");
 assert.doesNotMatch(svc, /getPublicUrl/, "nada de link público: só URL assinada");
 const idx = await readFile(resolve(root, "src/modules/revistoria-cliente/index.js"), "utf8");
-const exec = idx.slice(idx.indexOf("// Execução M.O.: cor = status da execução"));
+const exec = idx.slice(idx.indexOf("// Execução M.O.: cor = equipe de execução"));
 assert.match(exec.slice(0, 1500), /rc-mk-ent[\s\S]*rc-mk-lib/, "Execução M.O.: chave entregue e liberado no mesmo botão");
 const html = await readFile(resolve(root, "www/index.html"), "utf8");
 const claro = html.slice(0, html.indexOf("TEMA ESCURO"));
