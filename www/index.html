@@ -4006,6 +4006,12 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rc-sec-ex{border-top:1px solid #404741;color:#e2c76e;background:#2b271b}
 :root[data-theme="dark"] .rc-rv-pct{color:#a6b2ab}
 :root[data-theme="dark"] .rc-etapa{border:1px solid var(--b);background:var(--c);color:var(--t)}
+:root[data-theme="dark"] .rc-u .rc-mk-libok{background:var(--c,#2f9e5b);color:#fff;box-shadow:0 0 0 1.5px #282828}
+:root[data-theme="dark"] .rc-mk-libok svg{stroke:currentColor;fill:none}
+:root[data-theme="dark"] .rc-ltbl td.cunit .rc-mk-libok{background:var(--c,#2f9e5b);color:#fff}
+:root[data-theme="dark"] .rc-sw-libok{background:var(--c)!important;border-color:var(--c)!important;color:#fff}
+:root[data-theme="dark"] .rc-sw-libok svg{stroke:currentColor;fill:none}
+:root[data-theme="dark"] .rc-etapa svg{stroke:currentColor;fill:none}
 :root[data-theme="dark"] button.rc-kp{background:transparent;border:0;border-right:1px solid #41473a;border-bottom:1px solid #41473a;color:inherit}
 :root[data-theme="dark"] button.rc-kp:hover{background:#202722}
 :root[data-theme="dark"] button.rc-kp.on{background:#1e2620;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.6)}
@@ -4060,7 +4066,20 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 .rc-rv-pct{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px}
 .rc-etapa{display:inline-flex;align-items:center;padding:1px 9px;border-radius:999px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:10.5px;font-weight:800;white-space:nowrap;line-height:1.6}
 .rc-tbl .rc-c-lib small{display:block}
-.rc-fil-st .fchip i{width:9px;height:9px;border-radius:3px}
+.rc-fil-st .fchip i,.rc-fx-ex .fchip i{width:9px;height:9px;border-radius:3px}
+/* Situação da Execução M.O. na Revistoria: ✓ verde de Liberado no canto superior direito (mapa e lista) */
+.rc-u .rc-mk-libok{position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;background:var(--c,#2f9e5b);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px #fff;pointer-events:none;z-index:1}
+.rc-mk-libok svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3}
+.rc-mk-libok svg circle{display:none}
+.rc-u .rc-n{top:auto;bottom:-5px}
+.rc-ltbl td.cunit .rc-mk-libok{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-left:3px;vertical-align:6px;border-radius:50%;background:var(--c,#2f9e5b);color:#fff}
+.rc-ltbl td.cunit .rc-mk-libok svg{width:10px;height:10px}
+.rc-sw-libok{display:inline-flex!important;align-items:center;justify-content:center;background:var(--c)!important;border-color:var(--c)!important;color:#fff;border-radius:50%!important}
+.rc-sw-libok svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:3}
+.rc-sw-libok svg circle{display:none}
+.rc-etapa svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4;margin:0 3px 0 -3px}
+.rc-etapa.sm{font-size:10px;padding:0 8px;line-height:1.7}
+.rc-ltbl .rc-c-ex{text-align:center}
 .rc-resumo .rc{padding:6px 10px;min-width:0;display:flex;flex-direction:column;justify-content:flex-start}
 .rc-resumo .rc-kp .rv{margin-top:2px}
 .rc-resumo .rl{align-items:flex-start;line-height:1.25;min-height:22px}

@@ -57,7 +57,7 @@ assert.equal(M.corUnidade(st({ execucao: null, status: "Aprovado" })).cor, C.APR
 assert.ok(M.corUnidade(st({ execucao: null, status: "Aprovado" })).aprovada && !M.corUnidade(st({ execucao: null })).aprovada);
 assert.notEqual(C.SEM_EQUIPE.cor.toLowerCase(), "#ffffff", "sem equipe não é mais branco");
 assert.notEqual(C.SEM_EQUIPE.cor, C.APROVADA_SEM_EQUIPE.cor);
-assert.equal(new Set([L.sem_equipe.cor, L.st_em_andamento.cor, L.liberado.cor]).size, 3, "três cores distintas para os status");
+assert.equal(new Set([L.st_em_andamento.cor, L.st_agendado.cor, L.st_aprovado.cor]).size, 3, "três cores distintas para os status");
 assert.equal(M.corUnidade(st({ execucao: "EMP_NILSON" })).cor, "#8d5524", "equipe desativada mantém a cor nas unidades dela");
 // setor e equipe independentes
 CM.aplicarCores({ setores: C.setores([{ categoria: "setor_chave", chave: "producao", cor: "#3366ff" }]) });
@@ -67,9 +67,9 @@ CM.aplicarCores(null);
 const a1 = st({ status: "Em andamento", execucao: "MOP_FELIPE", execucao_finalizada_em: "2026-11-10T12:00:00Z" }), a2 = st({ status: "Aprovado" });
 assert.equal(a1.finalizada, true); assert.equal(a2.finalizada, false);
 assert.ok(M.passaStatusExecucao("em_andamento", a1) && !M.passaStatusExecucao("liberado", a1), "finalizada sem liberação continua Em Andamento");
-assert.ok(M.passaStatusExecucao("a_executar", a2) && !M.passaStatusExecucao("em_andamento", a2) && M.passaStatusExecucao("", a2));
+assert.ok(M.passaStatusExecucao("encerrado", a2) && !M.passaStatusExecucao("a_executar", a2) && M.passaStatusExecucao("", a2), "aprovado sem equipe: Encerrado (fora de A Executar)");
 assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.label), ["A Executar", "Em Andamento", "Liberado"]);
-assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.cor), [L.sem_equipe.cor, L.st_em_andamento.cor, L.liberado.cor], "cores das legendas configuráveis");
+assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.cor), [L.st_em_andamento.cor, L.st_agendado.cor, L.st_aprovado.cor], "cores das legendas configuráveis (amarelo, azul, verde)");
 const u = (s, extra = {}) => ({ b: "A", codigo: "101", cliente: "", vistoria: "rv", chave: CM.situacao(null), temRelatorio: false, situacao: s, ...extra });
 const f0 = { bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: [], relatorio: "", statusExec: "", chave: "", data: "" };
 assert.equal(M.passaFiltros(u(a1), { ...f0, statusExec: "em_andamento", execucao: ["MOP_FELIPE"] }), true, "status + equipe juntos");
