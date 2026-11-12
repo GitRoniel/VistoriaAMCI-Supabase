@@ -43,32 +43,34 @@ assert.equal(M.execInfo("EMP_NILSON").ativo, false, "histórico preservado (desa
 // renomear: mesmo id, mesma cor
 M.aplicarEquipes({ equipes: C.equipes(linhas.map((l) => (l.id === "EQ_1A2B3C4D" ? { ...l, nome: "Carlos Henrique" } : l))) });
 assert.equal(M.execInfo("EQ_1A2B3C4D").cor, "#3366ff"); assert.equal(M.execRotulo("EQ_1A2B3C4D"), "M.O.P · Carlos Henrique");
-// cor do apartamento = equipe; sem equipe = neutra; status não muda a cor
+// cor do apartamento na Execução M.O. = status da execução (A Executar · Em Andamento · Liberado); a equipe vai na sigla
 const st = (o) => M.situacao({ status: "Agendado", ciclo: 1, versao: 1, ...o }, []);
-assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE" })).cor, "#ff0000");
-assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE", status: "Aprovado" })).cor, "#ff0000", "aprovado não compete com a cor da equipe");
-assert.equal(M.corUnidade(st({ execucao: null })).cor, C.SEM_EQUIPE.cor);
-assert.equal(M.corUnidade(st({ execucao: null, status: "Em andamento" })).cor, C.SEM_EQUIPE.cor, "sem equipe em andamento: tom de destaque");
-assert.equal(M.corUnidade(st({ execucao: null, status: "Agendado" })).cor, C.SEM_EQUIPE.cor);
-assert.equal(M.corUnidade(st({ execucao: null, status: "Aprovado" })).cor, C.APROVADA_SEM_EQUIPE.cor, "aprovado sem equipe: cinza mais forte");
-assert.ok(M.corUnidade(st({ execucao: null, status: "Aprovado" })).aprovada && !M.corUnidade(st({ execucao: null })).aprovada);
+const L = M.LEG_EXECUCAO;
+assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE" })).cor, L.st_em_andamento.cor, "equipe vinculada e não liberado: Em Andamento");
+assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE" })).equipe.cor, "#ff0000", "a equipe continua identificada (sigla na cor da equipe)");
+assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE", status: "Aprovado" })).cor, L.st_em_andamento.cor, "aprovação da revistoria não muda o status da execução");
+assert.equal(M.corUnidade(st({ execucao: null })).cor, L.sem_equipe.cor, "sem equipe: A Executar");
+assert.equal(M.corUnidade(st({ execucao: null, status: "Aprovado" })).cor, L.sem_equipe.cor, "aprovado sem equipe continua A Executar (não mistura com a revistoria)");
+assert.equal(M.corUnidade(st({ execucao: "MOP_FELIPE", liberado: true })).cor, L.liberado.cor, "liberado");
+assert.equal(M.corUnidade(st({ execucao: null, liberado: true })).etapa, "liberado", "liberado mesmo sem equipe");
 assert.notEqual(C.SEM_EQUIPE.cor.toLowerCase(), "#ffffff", "sem equipe não é mais branco");
-assert.notEqual(C.SEM_EQUIPE.cor, C.APROVADA_SEM_EQUIPE.cor);
-assert.equal(M.corUnidade(st({ execucao: "EMP_NILSON" })).cor, "#8d5524", "equipe desativada mantém a cor nas unidades dela");
+assert.equal(new Set([L.sem_equipe.cor, L.st_em_andamento.cor, L.liberado.cor]).size, 3, "três cores distintas");
+assert.equal(M.corUnidade(st({ execucao: "EMP_NILSON" })).equipe.cor, "#8d5524", "equipe desativada mantém a cor nas unidades dela");
 // setor e equipe independentes
 CM.aplicarCores({ setores: C.setores([{ categoria: "setor_chave", chave: "producao", cor: "#3366ff" }]) });
 assert.equal(M.execInfo("MOP_FELIPE").cor, "#ff0000", "mudar setor não muda equipe");
 CM.aplicarCores(null);
-// status da Execução M.O. (Em andamento, Finalizado, Agendado, Aprovado)
+// status da Execução M.O.: A Executar, Em Andamento, Liberado (equipe e liberação; finalizada não é status)
 const a1 = st({ status: "Em andamento", execucao: "MOP_FELIPE", execucao_finalizada_em: "2026-11-10T12:00:00Z" }), a2 = st({ status: "Aprovado" });
 assert.equal(a1.finalizada, true); assert.equal(a2.finalizada, false);
-assert.ok(M.passaStatusExecucao("finalizado", a1) && M.passaStatusExecucao("em_andamento", a1), "em andamento e finalizado ao mesmo tempo (dimensões diferentes)");
-assert.ok(M.passaStatusExecucao("aprovado", a2) && !M.passaStatusExecucao("agendado", a2) && M.passaStatusExecucao("", a2));
-assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.label), ["Em andamento", "Finalizado", "Agendado", "Aprovado"]);
+assert.ok(M.passaStatusExecucao("em_andamento", a1) && !M.passaStatusExecucao("liberado", a1), "finalizada sem liberação continua Em Andamento");
+assert.ok(M.passaStatusExecucao("a_executar", a2) && !M.passaStatusExecucao("em_andamento", a2) && M.passaStatusExecucao("", a2));
+assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.label), ["A Executar", "Em Andamento", "Liberado"]);
+assert.deepEqual(M.STATUS_EXECUCAO.map((x) => x.cor), [L.sem_equipe.cor, L.st_em_andamento.cor, L.liberado.cor], "cores das legendas configuráveis");
 const u = (s, extra = {}) => ({ b: "A", codigo: "101", cliente: "", vistoria: "rv", chave: CM.situacao(null), temRelatorio: false, situacao: s, ...extra });
 const f0 = { bloco: "ALL", busca: "", rapido: "todos", liberado: "", execucao: [], relatorio: "", statusExec: "", chave: "", data: "" };
-assert.equal(M.passaFiltros(u(a1), { ...f0, statusExec: "finalizado", execucao: ["MOP_FELIPE"] }), true, "status + equipe juntos");
-assert.equal(M.passaFiltros(u(a1), { ...f0, statusExec: "finalizado", execucao: ["EQ_1A2B3C4D"] }), false);
+assert.equal(M.passaFiltros(u(a1), { ...f0, statusExec: "em_andamento", execucao: ["MOP_FELIPE"] }), true, "status + equipe juntos");
+assert.equal(M.passaFiltros(u(a1), { ...f0, statusExec: "em_andamento", execucao: ["EQ_1A2B3C4D"] }), false);
 M.aplicarEquipes(null);
 assert.equal(M.execInfo("MOP_FELIPE").cor, "#7b4fc9", "sem cadastro carregado: equipes e cores de antes");
 // estático: tabelas separadas, escrita só por funções que conferem administrador

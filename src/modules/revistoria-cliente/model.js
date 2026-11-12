@@ -35,7 +35,7 @@ export const LEG_EXECUCAO = legendasExecucao([]);
  *  importou vê a configuração nova). */
 export function aplicarEquipes(cfg) {
   Object.assign(LEG_EXECUCAO, cfg?.execucao || legendasExecucao([]));
-  for (const x of STATUS_EXECUCAO) { const c = LEG_EXECUCAO["st_" + x.key]; if (c) x.cor = c.cor; }
+  for (const x of STATUS_EXECUCAO) { const c = LEG_EXECUCAO[x.leg]; if (c) Object.assign(x, { cor: c.cor, borda: c.borda, texto: c.texto }); }
   const l = (cfg?.equipes?.length ? cfg.equipes : normalizarEquipes(EQUIPES_PADRAO)).map(paraExec);
   EXECUCOES.splice(0, EXECUCOES.length, ...l);
   EQUIPES.splice(0, EQUIPES.length, ...new Set(l.filter((e) => e.ativo).map((e) => e.equipe)));
@@ -44,14 +44,13 @@ export function aplicarEquipes(cfg) {
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 /** Equipes que podem ser escolhidas (ativas) + a atual da unidade, mesmo desativada. */
 export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.key === atual);
-/** Cor do apartamento no mapa da Execução M.O.: a da equipe; sem equipe = tom de destaque (falta mão de obra);
- *  sem equipe e já Aprovado na revistoria = cinza mais forte (concluída). */
+/**
+ * Cor do apartamento no mapa da Execução M.O.: a do status da execução (A Executar, Em Andamento, Liberado — as
+ * mesmas dos indicadores, filtros, lista e legendas); a equipe aparece pela sigla, na cor da equipe.
+ */
 export function corUnidade(s) {
-  const e = execInfo(s?.execucao);
-  if (e) return { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e, aprovada: false };
-  const leg = (k, padrao) => { const x = LEG_EXECUCAO[k] || padrao; return { cor: x.cor, borda: x.borda, texto: x.texto }; };
-  if (s?.status === "Aprovado") return { ...leg("aprovado_sem_equipe", APROVADA_SEM_EQUIPE), equipe: null, aprovada: true };
-  return { ...leg("sem_equipe", SEM_EQUIPE), equipe: null, aprovada: false };
+  const e = execInfo(s?.execucao), st = execucaoInfo(etapaExecucao(s) || "a_executar");
+  return { cor: st.cor, borda: st.borda, texto: st.texto, equipe: e, etapa: st.key };
 }
 export { SEM_EQUIPE, APROVADA_SEM_EQUIPE };
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };
@@ -68,21 +67,39 @@ export function passaExecucao(chave, execucao) {
   return execucao === chave;
 }
 /**
- * Botões de status da Execução M.O. (um por vez; clicar de novo mostra todas). Em andamento, Agendado e Aprovado
- * são a situação da revistoria (revistorias_cliente.status); Finalizado = serviço da M.O. concluído
- * (execucao_finalizada_em). São dimensões diferentes: uma unidade pode estar Em andamento e Finalizado.
+ * Situação da Execução M.O. (12/11/2026): três status, derivados só da equipe (revistorias_cliente.execucao) e da
+ * liberação (revistorias_cliente.liberado) — nunca da situação da revistoria (aprovação/agendamento):
+ *   Liberado     = liberação registrada (com ou sem equipe);
+ *   Em Andamento = equipe vinculada e ainda não liberado;
+ *   A Executar   = sem equipe e não liberado.
+ * Cada unidade da Revistoria · Cliente fica em exatamente um deles (uma linha por unidade, uma equipe por unidade).
+ * "Execução finalizada" continua registrada no painel, mas não é status. Cores: legendas configuráveis (leg).
  */
 export const STATUS_EXECUCAO = [
-  { key: "em_andamento", label: "Em andamento", cor: "#d9a92f" },
-  { key: "finalizado", label: "Finalizado", cor: "#0f3b31" },
-  { key: "agendado", label: "Agendado", cor: "#2459b5" },
-  { key: "aprovado", label: "Aprovado", cor: "#268a4d" }
+  { key: "a_executar", label: "A Executar", leg: "sem_equipe", desc: "Sem equipe de mão de obra demarcada" },
+  { key: "em_andamento", label: "Em Andamento", leg: "st_em_andamento", desc: "Equipe vinculada, ainda não liberado" },
+  { key: "liberado", label: "Liberado", leg: "liberado", desc: "Liberação registrada" }
 ];
+export const execucaoInfo = (key) => STATUS_EXECUCAO.find((x) => x.key === key) || null;
+/** Status da execução da unidade ("" fora da Revistoria · Cliente). */
+export function etapaExecucao(s) {
+  if (!s?.status) return "";
+  if (s.liberado) return "liberado";
+  return execInfo(s.execucao) ? "em_andamento" : "a_executar";
+}
 aplicarEquipes(null);   // cores padrão (equipes, legendas e status) até a configuração central chegar
 export function passaStatusExecucao(chave, s) {
-  if (!chave) return true;
-  if (chave === "finalizado") return !!s?.finalizada;
-  return s?.status === { em_andamento: "Em andamento", agendado: "Agendado", aprovado: "Aprovado" }[chave];
+  return !chave || etapaExecucao(s) === chave;
+}
+/** Quantitativos da Execução M.O. por unidade única (A Executar + Em Andamento + Liberado = total). */
+export function painelExecucao(unidades) {
+  const vistas = new Set(), out = { total: 0, a_executar: 0, em_andamento: 0, liberado: 0 };
+  for (const u of unidades || []) {
+    const e = etapaExecucao(u?.situacao); if (!e) continue;
+    const k = u.unitId ?? `${u.b}|${u.p}|${u.a}`; if (vistas.has(k)) continue;
+    vistas.add(k); out.total++; out[e]++;
+  }
+  return out;
 }
 /** Filtro de relatório: "com" (relatório enviado), "sem" ou "" (todas). */
 export const FILTRO_RELATORIO = [{ key: "com", label: "Com relatório" }, { key: "sem", label: "Sem relatório" }];

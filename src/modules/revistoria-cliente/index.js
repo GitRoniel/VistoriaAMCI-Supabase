@@ -75,6 +75,8 @@ const rotuloLista = (u) => (host.casa() ? `Conj. ${u.b} · Casa ${+u.a}` : `Bloc
 const vistPill = (c) => { const vc = host.vistoriaCor(c); return `<span class="ch-vpill rc-vpill" style="background:${vc.bg};color:${vc.tx};border-color:${vc.bd}">${esc(host.vistoriaLabel(c))}</span>`; };
 // Liberação e execução (selos no mapa, colunas na lista, controles no painel).
 const execPill = (key, extra = "") => { const e = M.execInfo(key); return e ? `<span class="rc-exec${extra}" style="--c:${e.cor}"><i>${esc(e.sigla)}</i>${esc(e.equipe)} · ${esc(e.responsavel)}</span>` : '<span class="ch-mut">—</span>'; };
+/** Status da Execução M.O. (A Executar · Em Andamento · Liberado), nas cores das legendas configuráveis. */
+const etapaPill = (s, extra = "") => { const x = M.execucaoInfo(M.etapaExecucao(s)); return x ? `<span class="rc-etapa${extra}" style="--c:${x.cor};--b:${x.borda};--t:${x.texto}" title="${esc(x.desc)}">${esc(x.label)}</span>` : ""; };
 const libPill = (lib) => (lib ? '<span class="rc-lib on">✓ Liberado</span>' : '<span class="rc-lib">Não liberado</span>');
 // Chave: pílula com a cor do setor (como no Controle de Chaves) e selo neutro com a letra no mapa.
 const chavePill = (k, extra = "") => {
@@ -108,9 +110,9 @@ function filtroArea() {
 const so = (a) => ` data-so="${a}"`;
 function casca() {
   root.innerHTML = `
+    <div class="rc-panorama" id="rcKpis"></div>
+    <div class="rc-areas" role="tablist" aria-label="Módulo da revistoria">${AREAS.map((a) => `<button type="button" role="tab" class="rc-aba" data-area="${a.key}"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${a.ic}</svg></span><span class="vw-txt"><b>${esc(a.label)}</b><small>${esc(a.sub)}</small></span></button>`).join("")}</div>
     <div class="modetog rc-modo" role="tablist" aria-label="Visualização"><button type="button" role="tab" data-modo="mapa">Mapa</button><button type="button" role="tab" data-modo="lista">Lista</button></div>
-    <div class="rc-areas" role="tablist" aria-label="Área da revistoria">${AREAS.map((a) => `<button type="button" role="tab" class="rc-aba" data-area="${a.key}"><span class="vw-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${a.ic}</svg></span><span class="vw-txt"><b>${esc(a.label)}</b><small>${esc(a.sub)}</small></span></button>`).join("")}</div>
-    <div class="ch-top rc-top" id="rcKpis"></div>
     <div class="clif fx rc-fx" id="rcFx"${so("acomp")}>
       <div class="fx-row fx-main">
         <label class="fx-search">${ICONE.busca}<input type="search" id="rcCli" placeholder="Buscar cliente" autocomplete="off" aria-label="Buscar cliente"></label>
@@ -136,8 +138,12 @@ function casca() {
       <div class="ch-line">
         <label class="fx-field fx-sel"><span>${esc(host.grupo())}</span><select id="rcBloco" aria-label="${esc(host.grupo())}"><option value="ALL">Todos</option>${host.grupos().map((b) => `<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select></label>
         <label class="fx-field ch-f-apto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="rcBusca" type="search" placeholder="${host.casa() ? "Casa ou cliente" : "Unidade (ex.: 604 ou A604) ou cliente"}" aria-label="Buscar unidade ou cliente" autocomplete="off"></label>
-        <label class="fx-field fx-sel rc-f-lib"${so("exec")}><span>Liberado</span><select id="rcLib" aria-label="Liberado">${M.FILTRO_LIBERADO.map((o) => `<option value="${o.key}">${esc(o.label)}</option>`).join("")}</select></label>
         <label class="fx-field fx-sel rc-f-key"${so("exec")}><span>Chave</span><select id="rcChave" aria-label="Status da chave">${M.FILTRO_CHAVE.map((o) => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join("")}</select></label>
+      </div>
+      <div class="ch-line ch-chips rc-fil-st" role="group" aria-label="Filtrar pela situação da execução">
+        <span class="rc-fil-t">Situação</span>
+        <button type="button" class="fchip fx-all rc-stf" data-kx="statusExec:" style="--c:#1f4a3f" aria-pressed="false">Todas</button>
+        ${M.STATUS_EXECUCAO.map((x) => `<button type="button" class="fchip rc-stf" data-kx="statusExec:${x.key}" data-st-f="${x.key}" style="--c:${x.borda}" aria-pressed="false" title="${esc(x.desc)}"><i style="background:${x.cor};box-shadow:0 0 0 1px ${x.borda}"></i>${esc(x.label)}<b class="rc-chip-n" data-st-n="${x.key}"></b></button>`).join("")}
       </div>
       <div class="ch-line ch-chips rc-fil-eq" role="group" aria-label="Filtrar por equipe (mais de uma ao mesmo tempo)"${so("exec")}>
         <span class="rc-fil-t">Equipe</span>
@@ -160,7 +166,6 @@ function casca() {
   const q = (id) => root.querySelector(id);
   q("#rcBloco").addEventListener("change", (e) => { filt.bloco = e.target.value; pintarConteudo(); });
   q("#rcBusca").addEventListener("input", (e) => { filt.busca = e.target.value; pintarConteudo(); });
-  q("#rcLib").addEventListener("change", (e) => { filt.liberado = e.target.value; sincronizarFiltros(); pintarConteudo(); });
   // Execução: filtro rápido (um responsável por vez; clicar de novo mostra todas). Não atribui nada.
   root.querySelectorAll("[data-exe-f]").forEach((b) => b.addEventListener("click", () => { filt.execucao = M.alternarExecucao(filt.execucao, b.dataset.exeF); sincronizarFiltros(); pintarConteudo(); }));
   q("#rcExeX").addEventListener("click", () => { filt.execucao = []; sincronizarFiltros(); pintarConteudo(); });
@@ -204,7 +209,8 @@ function sincronizarFiltros() {
     const tot = adv + (filt.cliente ? 1 : 0) + (filt.rapido !== "todos" ? 1 : 0) + (filt.bloco !== "ALL" ? 1 : 0);
     q("#rcLimparA").hidden = !tot; q("#rcBadge").textContent = String(adv); q("#rcBadge").hidden = !adv;
   }
-  q("#rcLib").value = filt.liberado; q("#rcChave").value = filt.chave;
+  q("#rcChave").value = filt.chave;
+  root.querySelectorAll(".rc-stf").forEach((b) => { const on = b.dataset.kx === `statusExec:${filt.statusExec}`; b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
   root.querySelectorAll("[data-exe-f]").forEach((b) => { const on = filt.execucao.includes(b.dataset.exeF); b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
   q("#rcExeX").hidden = !filt.execucao.length;
   root.querySelectorAll("[data-rel-f]").forEach((b) => { const on = b.dataset.relF === filt.relatorio; b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
@@ -212,7 +218,6 @@ function sincronizarFiltros() {
   q("#rcDataX").hidden = !filt.data; q("#rcData").closest("label").classList.toggle("on", !!filt.data);
   q("#rcChave").closest("label").classList.toggle("on", !!filt.chave);
   q("#rcHr span").textContent = `Horário ${filt.hrSort === "asc" ? "↑" : "↓"}`;
-  q("#rcLib").closest("label").classList.toggle("on", !!filt.liberado);
   root.querySelectorAll(".rc-fr").forEach((b) => { const on = filt.rapido === b.dataset.fr; b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on)); });
   root.querySelectorAll("[data-modo]").forEach((b) => { const on = b.dataset.modo === modo; b.classList.toggle("active", on); b.setAttribute("aria-selected", String(on)); });
   root.querySelectorAll("[data-area]").forEach((b) => { const on = b.dataset.area === area; b.classList.toggle("on", on); b.setAttribute("aria-selected", String(on)); });
@@ -231,13 +236,16 @@ function cliqueRaiz(e) {
   const kx = e.target.closest("[data-kx]");
   if (kx) {
     const [campo, valor] = kx.dataset.kx.split(":");
+    if (kx.matches("[data-kpi]") && area !== "exec") { area = "exec"; if (cur) setTimeout(pintarPopup); }   // cartão da execução abre a Execução M.O.
     if (campo === "todos") { const f0 = FILTRO0(); for (const k of CAMPOS_AREA.exec) if (k !== "busca") filt[k] = f0[k]; }
     else if (campo === "execucao") filt.execucao = M.alternarExecucao(filt.execucao, valor);
     else filt[campo] = filt[campo] === valor ? "" : valor;
     sincronizarFiltros(); pintarConteudo(); return;
   }
   const fr = e.target.closest("[data-fr]");
-  if (fr) { filt.rapido = fr.dataset.fr === filt.rapido && fr.matches("[data-kpi]") ? "todos" : fr.dataset.fr; sincronizarFiltros(); pintarConteudo(); return; }
+  if (fr) {
+    if (fr.matches("[data-kpi]") && area !== "acomp") { area = "acomp"; if (cur) setTimeout(pintarPopup); }   // cartão da revistoria abre o Acompanhamento
+    filt.rapido = fr.dataset.fr === filt.rapido && fr.matches("[data-kpi]") ? "todos" : fr.dataset.fr; sincronizarFiltros(); pintarConteudo(); return; }
   const md = e.target.closest("[data-modo]");
   if (md) { modo = md.dataset.modo; sincronizarFiltros(); pintarConteudo(); }
 }
@@ -259,14 +267,13 @@ function pintarConteudo() {
   const naAba = lista.filter((u) => u.situacao.status);
   const vis = naAba.filter((u) => M.passaFiltros(u, filtroArea()));
   const ok = new Set(vis.map((u) => u.unitId));
-  const kp = root.querySelector("#rcKpis");
-  if (area === "acomp") {
-    // indicadores = mesma fonte da lista: unidades da aba com os filtros aplicados, exceto o de status
-    // (assim os cartões continuam mostrando a distribuição dos status do recorte escolhido)
-    const fBase = { ...filtroArea(), rapido: "todos" };
-    const base = naAba.filter((u) => M.passaFiltros(u, fBase));
-    kp.className = "rc-panorama"; kp.innerHTML = panoramaAcompanhamento(base, naAba.length, fBase);
-  } else { kp.className = "ch-top rc-top"; kp.innerHTML = kpisExecucao(naAba); }
+  // Resumo (topo, nos dois módulos) = mesma fonte do mapa e da lista: unidades da aba com os filtros do módulo
+  // aberto, exceto os de status (assim os cartões continuam mostrando a distribuição do recorte escolhido)
+  const fBase = { ...filtroArea(), rapido: "todos", statusExec: "" };
+  const base = naAba.filter((u) => M.passaFiltros(u, fBase));
+  const PE = M.painelExecucao(base);
+  root.querySelector("#rcKpis").innerHTML = panorama(base, naAba.length, fBase, PE);
+  root.querySelectorAll("[data-st-n]").forEach((b) => { b.textContent = String(PE[b.dataset.stN] ?? 0); });
   // nº de unidades de cada equipe nos botões de Execução (todas as unidades da aba)
   root.querySelectorAll("[data-exe-n]").forEach((b) => { b.textContent = String(naAba.filter((u) => M.passaExecucao(b.dataset.exeN, u.situacao.execucao)).length); });
   root.querySelectorAll("[data-rel-n]").forEach((b) => { const n = naAba.filter((u) => M.passaRelatorio(b.dataset.relN, u.temRelatorio)).length; b.textContent = apontOk ? String(n) : "…"; });
@@ -274,37 +281,58 @@ function pintarConteudo() {
   root.querySelector("#rcCountA").textContent = `${vis.length} de ${naAba.length} unidade(s)`;
   root.querySelector("#rcGrid").innerHTML = modo === "mapa" ? htmlMapa(lista, ok) : htmlLista(vis, naAba.length);
 }
+/** Texto do recorte filtrado (rodapé do resumo). */
+function descreverRecorte(f) {
+  const eq = (f.execucao || []).map((k) => (k === "sem" ? "sem equipe" : M.execInfo(k) ? `${M.execInfo(k).equipe} ${M.execInfo(k).responsavel}` : k));
+  return [f.bloco !== "ALL" ? `${host.grupo()} ${f.bloco}` : "", f.cliente ? `cliente “${f.cliente.trim()}”` : "", f.unidade ? `unidade “${f.unidade.trim()}”` : "",
+    f.busca ? `busca “${f.busca.trim()}”` : "", f.data ? `data ${fmtD(f.data)}` : "", f.dtIni || f.dtFim ? `período ${f.dtIni ? fmtD(f.dtIni) : "…"} a ${f.dtFim ? fmtD(f.dtFim) : "…"}` : "",
+    eq.length ? `equipe: ${eq.join(" + ")}` : "", f.relatorio ? (f.relatorio === "com" ? "com relatório" : "sem relatório") : "",
+    f.chave ? `chave: ${(M.FILTRO_CHAVE.find((o) => o.key === f.chave) || {}).label || f.chave}` : ""].filter(Boolean).join(" · ");
+}
 /**
- * Acompanhamento Geral (padrão da aba Vistoria): "Resumo da Revistoria" (indicadores) + "Percentual de Aprovação".
- * Tudo por unidade única (M.panorama); cartões de status filtram a lista (clicar de novo mostra todas).
- * O rodapé diz se os números são do total geral ou só do recorte filtrado.
+ * Resumo do topo (padrão da aba Vistoria), igual nos dois módulos e separado em duas seções:
+ *   Acompanhamento das Revistorias — unidades em revistoria, em andamento, agendados, aprovados, reprovadas e
+ *     realizadas (M.panorama, por unidade única); cartões filtram e abrem o Acompanhamento Geral;
+ *   Execução da Mão de Obra — A Executar, Em Andamento e Liberado (M.painelExecucao, por unidade única) e os
+ *     apontamentos resolvidos; cartões filtram e abrem a Execução M.O.
+ * + "Percentual de Aprovação" (só revistoria). O rodapé diz se os números são do total geral ou do recorte filtrado.
  */
-function panoramaAcompanhamento(base, totalAba, f) {
+function panorama(base, totalAba, f, PE) {
   const P = M.panorama(base, hoje()), S = M.STATUS;
   const card = (key, n, label, cor, borda, title) => {
-    const on = key && filt.rapido === key && key !== "todos";
+    const on = area === "acomp" && key && filt.rapido === key && key !== "todos";
     const tag = key ? "button" : "div", attr = key ? ` type="button" data-kpi data-fr="${key}" aria-pressed="${on}"` : "";
     return `<${tag} class="rc rc-kp${on ? " on" : ""}${key ? "" : " k-info"}"${attr} title="${esc(title)}"><div class="rl"><span class="sw" style="background:${cor};border-color:${borda}"></span>${esc(label)}</div><div class="rv">${n}</div></${tag}>`;
   };
-  const filtrado = f.bloco !== "ALL" || f.cliente || f.unidade || f.data || f.dtIni || f.dtFim;
-  const recorte = [f.bloco !== "ALL" ? `${host.grupo()} ${f.bloco}` : "", f.cliente ? `cliente “${f.cliente.trim()}”` : "", f.unidade ? `unidade “${f.unidade.trim()}”` : "",
-    f.data ? `data ${fmtD(f.data)}` : "", f.dtIni || f.dtFim ? `período ${f.dtIni ? fmtD(f.dtIni) : "…"} a ${f.dtFim ? fmtD(f.dtFim) : "…"}` : ""].filter(Boolean).join(" · ");
-  const rod = filtrado
+  const cardEx = (x) => {
+    const on = area === "exec" && filt.statusExec === x.key;
+    return `<button type="button" class="rc rc-kp rc-kx${on ? " on" : ""}" data-kpi data-kx="statusExec:${x.key}" aria-pressed="${on}" title="${esc(x.desc)} · ${PE.total ? Math.round((PE[x.key] / PE.total) * 100) : 0}% das unidades"><div class="rl"><span class="sw" style="background:${x.cor};border-color:${x.borda}"></span>${esc(x.label)}</div><div class="rv">${PE[x.key]}</div></button>`;
+  };
+  let apT = 0, apR = 0; for (const u of base) { const r = apont.get(u.unitId); if (r) { apT += r.total; apR += r.resolvidas; } }
+  const recorte = descreverRecorte(f);
+  const rod = recorte
     ? `<div class="rc tot rc-escopo filtrado"><div class="rl">Indicadores do filtro</div><div class="rv">${P.total} <span>de ${totalAba} unidade(s) · ${esc(recorte)}</span></div></div>`
     : `<div class="rc tot rc-escopo"><div class="rl">Total geral</div><div class="rv">${P.total} <span>unidade(s) em revistoria${P.aprovEntrega ? ` · aprovadas: ${P.aprovTecnica} por aprovação técnica e ${P.aprovEntrega} por entrega de chave` : ""}</span></div></div>`;
   const barra = (pct, cor) => `<div class="abar"><i style="width:${pct}%;background:${cor}"></i></div>`;
   const linhaPend = (rotulo, pct, n, cor, title) => `<div class="rc-pend" title="${esc(title)}"><span class="rc-pend-l"><i style="background:${cor}"></i>${esc(rotulo)}</span><b>${pct}%</b><small>${n}</small>${barra(pct, cor)}</div>`;
   return `<div class="clitop rc-clitop">
-    <div class="cbox"><div class="ch">Resumo da Revistoria</div><div class="resumo rc-resumo">
-      ${card("todos", P.total, "Unidades em revistoria", "#1f4a3f", "#1f4a3f", "Unidades com processo de revistoria (cada unidade conta uma vez)")}
-      ${card("em_andamento", P.emAndamento, "Em andamento", S["Em andamento"].cor, S["Em andamento"].borda, "Revistoria não concluída e sem agendamento em aberto")}
-      ${card("agendados", P.agendado, "Agendados", S.Agendado.cor, S.Agendado.borda, "Revistoria agendada")}
-      ${card("aprovados", P.aprovado, "Aprovados", S.Aprovado.cor, S.Aprovado.borda, `Aprovado: ${P.aprovTecnica} por aprovação técnica · ${P.aprovEntrega} por entrega de chave ao cliente`)}
-      ${card(M.REPROVADA.key, P.reprovadas, "Revistorias reprovadas", M.REPROVADA.cor, M.REPROVADA.borda, "Unidades não aprovadas cuja última revistoria realizada foi reprovada (já contadas em Em andamento ou Agendados)")}
-      ${card("", P.realizadas, "Revistorias realizadas", "#6b8040", "#5a6d35", "Revistorias efetivamente executadas (aprovadas ou reprovadas), somando os ciclos de cada unidade")}
-      ${card("", P.semana, `Próximos 7 dias${P.hoje ? ` · ${P.hoje} hoje` : ""}`, "#8fb3f0", "#2459b5", "Revistorias agendadas de hoje até os próximos 7 dias")}
-      ${rod}
-    </div></div>
+    <div class="cbox"><div class="ch">Resumo da Revistoria</div>
+      <div class="rc-sec-t"><span>Acompanhamento das revistorias</span></div>
+      <div class="resumo rc-resumo rc-res-rev">
+        ${card("todos", P.total, "Unidades em revistoria", "#1f4a3f", "#1f4a3f", "Unidades com processo de revistoria (cada unidade conta uma vez)")}
+        ${card("em_andamento", P.emAndamento, "Em andamento", S["Em andamento"].cor, S["Em andamento"].borda, "Revistoria não concluída e sem agendamento em aberto")}
+        ${card("agendados", P.agendado, "Agendados", S.Agendado.cor, S.Agendado.borda, "Revistoria agendada")}
+        ${card("aprovados", P.aprovado, "Aprovados", S.Aprovado.cor, S.Aprovado.borda, `Aprovado: ${P.aprovTecnica} por aprovação técnica · ${P.aprovEntrega} por entrega de chave ao cliente`)}
+        ${card(M.REPROVADA.key, P.reprovadas, "Revistorias reprovadas", M.REPROVADA.cor, M.REPROVADA.borda, "Unidades não aprovadas cuja última revistoria realizada foi reprovada (já contadas em Em andamento ou Agendados)")}
+        ${card("", P.realizadas, "Revistorias realizadas", "#6b8040", "#5a6d35", "Revistorias efetivamente executadas (aprovadas ou reprovadas), somando os ciclos de cada unidade")}
+      </div>
+      <div class="rc-sec-t rc-sec-ex"><span>Execução da mão de obra</span><small>${PE.total} unidade(s) · cada uma em um único status</small></div>
+      <div class="resumo rc-resumo rc-res-ex">
+        ${M.STATUS_EXECUCAO.map(cardEx).join("")}
+        <div class="rc rc-kp k-info" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><div class="rl"><span class="sw" style="background:#0097a7;border-color:#00838f"></span>Apontamentos resolvidos</div><div class="rv">${apontOk ? `${apR}/${apT}` : "…"}${apT ? `<small class="rc-rv-pct">${Math.round((apR / apT) * 100)}%</small>` : ""}</div></div>
+      </div>
+      <div class="resumo rc-resumo rc-res-tot">${rod}</div>
+    </div>
     <div class="cbox"><div class="ch">Percentual de Aprovação</div><div class="aprov rc-aprov">
       <div class="ac" title="Unidades aprovadas ÷ unidades em revistoria"><div class="al">Aprovação das revistorias</div><div class="av">${P.pct.aprovacao}%</div>${barra(P.pct.aprovacao, S.Aprovado.cor)}
         <div class="af">${P.aprovado} aprovada(s) de ${P.total}</div><div class="af rc-af-pend">${P.naoAprovadas} ainda não aprovada(s)</div></div>
@@ -315,18 +343,6 @@ function panoramaAcompanhamento(base, totalAba, f) {
       </div>
     </div></div>
   </div>`;
-}
-/** Execução M.O.: liberação, equipe, chave e checklist dos relatórios das unidades da aba. */
-function kpisExecucao(naAba) {
-  const lib = naAba.filter((u) => u.situacao.liberado).length;
-  let apT = 0, apR = 0; for (const u of naAba) { const r = apont.get(u.unitId); if (r) { apT += r.total; apR += r.resolvidas; } }
-  const pct = apT ? Math.round((apR / apT) * 100) : 0;
-  const n = (k) => naAba.filter((u) => M.passaStatusExecucao(k, u.situacao)).length;
-  const st = (key, label, cor, num, title) => `<button type="button" class="ch-kpi${filt.statusExec === key ? " on" : ""}" data-kx="statusExec:${key}" style="--c:${cor}" title="${esc(title)}" aria-pressed="${filt.statusExec === key}"><b>${num}</b><span>${esc(label)}</span></button>`;
-  return st("", "Todas", "#1f4a3f", naAba.length, "Todas as unidades da aba (os demais filtros continuam valendo)") +
-    M.STATUS_EXECUCAO.map((x) => st(x.key, x.label, x.cor, n(x.key), x.key === "finalizado" ? "Serviço da mão de obra concluído" : `Revistoria · Cliente: ${x.label}`)).join("") +
-    `<div class="ch-kpi k-info rc-k-sec" style="--c:#0f3b31" title="Unidades liberadas para a execução dos serviços"><b>${lib}</b><span>Liberadas</span></div>` +
-    `<div class="ch-kpi k-info rc-k-sec" style="--c:#0097a7" title="Apontamentos resolvidos no checklist dos relatórios (sem repetidos)"><b>${apontOk ? `${apR}/${apT}` : "…"}</b><span>Apontamentos resolvidos${apT ? ` · ${pct}%` : ""}</span></div>`;
 }
 
 function ordemUnidade() {
@@ -347,7 +363,7 @@ function htmlLista(vis, total) {
     const cSt = `<td class="rc-c-st">${badge(s.status)}${tagEntrega(s)}${rep ? '<span class="rc-rep-tag">Rev. Reprovada</span>' : ""}${s.ciclo > 1 ? `<small>${s.ciclo}º ciclo</small>` : ""}</td>`;
     const bHist = `<button type="button" class="btn g ch-mini" ${attrs} data-acao="historico">Histórico</button>`;
     return `<tr class="${cur?.unitId === u.unitId ? "is-sel" : ""}${rep ? " rc-tr-rep" : ""}">${cUn}${cSt}
-      <td class="rc-c-lib">${libPill(s.liberado)}</td>
+      <td class="rc-c-lib">${etapaPill(s)}${s.liberado && s.liberadoEm ? `<small>${esc(fmtD(s.liberadoEm))}</small>` : ""}</td>
       <td class="rc-c-exe">${execPill(s.execucao)}${s.finalizada ? `<small class="rc-fin">✓ finalizada ${esc(fmtD(s.finalizadaEm))}</small>` : ""}</td>
       <td class="rc-c-key">${chavePill(u.chave, " sm")}${u.chave.responsavel && !u.chave.perdida ? `<small>${esc(u.chave.responsavel)}</small>` : ""}</td>
       ${celulasApontamentos(u.unitId)}
@@ -355,7 +371,7 @@ function htmlLista(vis, total) {
     </tr>`;
   };
   // Execução M.O.
-  const cab = `<th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th>Liberado</th><th>Execução</th><th>Chave</th><th title="Apontamentos no checklist do relatório da unidade">Qtd. Apont.</th><th title="Apontamentos marcados como resolvidos no checklist">Qtd. Resolvidas</th><th>Ação</th>`;
+  const cab = `<th class="th-cli">Unidade</th><th>Revistoria · Cliente</th><th title="A Executar (sem equipe) · Em Andamento (equipe vinculada, não liberado) · Liberado">Situação M.O.</th><th>Equipe</th><th>Chave</th><th title="Apontamentos no checklist do relatório da unidade">Qtd. Apont.</th><th title="Apontamentos marcados como resolvidos no checklist">Qtd. Resolvidas</th><th>Ação</th>`;
   return `<div class="gridscroll ch-tblw rc-tblw"><table class="ctbl ch-tbl rc-tbl rc-tbl-exec"><thead><tr>${cab}</tr></thead><tbody>${vis.map(linha).join("")}</tbody></table></div>`;
 }
 
@@ -421,7 +437,7 @@ function htmlMapa(lista, ok) {
     if (!u) return `<span class="apt ch-u ch-void"></span>`;
     const s = u.situacao, i = s.info, c = M.corUnidade(s);
     const exe = area === "exec";
-    const tip = [u.titulo, !exe ? "" : s.execucao ? `Equipe: ${M.execRotulo(s.execucao)}${c.equipe && !c.equipe.ativo ? " (desativada)" : ""}${s.finalizada ? " · execução finalizada" : ""}` : s.status ? "Sem equipe de execução" : "",
+    const tip = [u.titulo, exe && s.status ? `Execução M.O.: ${M.execucaoInfo(M.etapaExecucao(s))?.label}` : "", !exe ? "" : s.execucao ? `Equipe: ${M.execRotulo(s.execucao)}${c.equipe && !c.equipe.ativo ? " (desativada)" : ""}${s.finalizada ? " · execução finalizada" : ""}` : s.status ? "Sem equipe de execução" : "",
       s.status ? `Revistoria · Cliente: ${i.label}` : "Sem registro na Revistoria · Cliente", s.aberto ? `agendada ${quandoAg(s.aberto)}` : "",
       s.realizadas ? `${s.realizadas} revistoria(s) realizada(s)` : "", s.status ? (s.liberado ? "Liberado" : "Não liberado") : "",
       !exe && s.execucao ? `Execução: ${M.execRotulo(s.execucao)}` : "", M.reprovada(s) ? "Revistoria reprovada" : "",
@@ -436,10 +452,10 @@ function htmlMapa(lista, ok) {
       const clsA = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
       return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${km}</button>`;
     }
-    // Execução M.O.: cor = equipe de execução (sem equipe = neutra)
+    // Execução M.O.: cor = status da execução (A Executar · Em Andamento · Liberado); equipe = sigla na cor da equipe
     const ex = c.equipe;
     const cor = s.status ? c : M.LEG_EXECUCAO.fora_revistoria;   // fora da revistoria (cor configurável)
-    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? (c.aprovada ? "rc-aprsemeq" : "rc-semeq") : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    const cls = ["apt", "ch-u", "rc-u", s.status ? `rc-et-${c.etapa}` : "rc-sem", s.status && c.etapa === "a_executar" ? "rc-semeq" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
     return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km}</button>`;
   };
   const g = host.grid();
@@ -465,16 +481,17 @@ function htmlMapa(lista, ok) {
     ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
   }
-  // Execução M.O.: legenda das equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
+  // Execução M.O.: legenda dos três status (cor do apartamento) e das equipes (sigla) — as desativadas só aparecem
+  // se ainda tiverem unidades
   const usadas = new Set(lista.map((u) => u.situacao.execucao).filter(Boolean));
   const eqs = M.EXECUCOES.filter((e) => e.ativo || usadas.has(e.key));
   return h + `<div class="legend ch-legend rc-legend">
-    <div class="lg rc-lg-t">Cor = equipe de execução:</div>
-    ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
-    <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.LEG_EXECUCAO.sem_equipe.cor};border-color:${M.LEG_EXECUCAO.sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.sem_equipe.label)}</div>
-    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.aprovado_sem_equipe.cor};border-color:${M.LEG_EXECUCAO.aprovado_sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.aprovado_sem_equipe.label)}</div>
+    <div class="lg rc-lg-t">Situação da M.O.:</div>
+    ${M.STATUS_EXECUCAO.map((x) => `<div class="lg" title="${esc(x.desc)}"><span class="sw${x.key === "a_executar" ? " rc-sw-semeq" : ""}" style="background:${x.cor};border-color:${x.borda}"></span>${esc(x.label)}</div>`).join("")}
     <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.fora_revistoria.cor};border-color:${M.LEG_EXECUCAO.fora_revistoria.borda}"></span>${esc(M.LEG_EXECUCAO.fora_revistoria.label)}</div>
-    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado para execução (canto superior direito)</div>
+    <div class="lg rc-lg-t">Equipe (sigla, canto inferior direito):</div>
+    ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
+    <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado (canto superior direito)</div>
     <div class="lg"><span class="sw rc-sw-ent">${ICONE.chave}</span>Chave entregue ao cliente (canto superior esquerdo)</div>
     ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para liberar, definir a equipe, transferir a chave ou abrir o relatório</div></div>`;
@@ -706,7 +723,8 @@ function htmlOperacao(s) {
   const exe = ed ? `<div class="rc-exe-opts" role="radiogroup" aria-label="Execução">${M.opcoesExecucao(s.execucao).map((e) => `<button type="button" role="radio" aria-checked="${s.execucao === e.key}" class="rc-exe-opt${s.execucao === e.key ? " sel" : ""}" style="--c:${e.cor}" data-exe="${e.key}" title="${esc(e.equipe)} · ${esc(e.responsavel)}"${dis}><i>${esc(e.sigla)}</i><span>${esc(e.responsavel)}<small>${esc(e.equipe)}</small></span></button>`).join("")}</div>
       ${s.execucao ? `<button type="button" class="rc-exe-none" data-exe=""${dis}>Remover execução</button>` : ""}`
     : ex ? execPill(s.execucao) : '<b class="rc-mut">Não definida</b>';
-  return `<div class="rc-or rc-or-lib"><span class="rc-or-t">Liberação</span><div class="rc-or-v">${lib}${quemLib ? `<small class="rc-or-q">${quemLib}</small>` : ""}</div></div>
+  return `<div class="rc-or rc-or-etapa"><span class="rc-or-t">Situação M.O.</span><div class="rc-or-v">${etapaPill(s)}<small class="rc-or-q">${esc(M.execucaoInfo(M.etapaExecucao(s))?.desc || "")}</small></div></div>
+    <div class="rc-or rc-or-lib"><span class="rc-or-t">Liberação</span><div class="rc-or-v">${lib}${quemLib ? `<small class="rc-or-q">${quemLib}</small>` : ""}</div></div>
     <div class="rc-or rc-or-ex"><span class="rc-or-t">Execução</span><div class="rc-or-v rc-or-exe">${exe}</div>
       ${!ed && ex ? `<div class="rc-or-d">Equipe ${esc(ex.equipe)} · Responsável ${esc(ex.responsavel)}${ex.ativo ? "" : " (equipe desativada)"}</div>` : ""}</div>
     <div class="rc-or rc-or-fin"><span class="rc-or-t">Finalizado</span><div class="rc-or-v">${ed
