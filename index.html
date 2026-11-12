@@ -3999,6 +3999,13 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .lt-opt small{color:#a6b2ab}
 :root[data-theme="dark"] .lt-fim{border:1px solid #405747;background:#1e2821;color:#c1cec8}
 :root[data-theme="dark"] .lt-fim b{color:#79d89e}
+:root[data-theme="dark"] .rc-resumo .rc:last-child{border-right:none}
+:root[data-theme="dark"] .rc-res-ex .rc,:root[data-theme="dark"] .rc-res-rev .rc{border-bottom:none}
+:root[data-theme="dark"] .rc-sec-t{color:#bac9c3;background:#222820;border-bottom:1px solid #41473a}
+:root[data-theme="dark"] .rc-sec-t small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-sec-ex{border-top:1px solid #404741;color:#e2c76e;background:#2b271b}
+:root[data-theme="dark"] .rc-rv-pct{color:#a6b2ab}
+:root[data-theme="dark"] .rc-etapa{border:1px solid var(--b);background:var(--c);color:var(--t)}
 :root[data-theme="dark"] button.rc-kp{background:transparent;border:0;border-right:1px solid #41473a;border-bottom:1px solid #41473a;color:inherit}
 :root[data-theme="dark"] button.rc-kp:hover{background:#202722}
 :root[data-theme="dark"] button.rc-kp.on{background:#1e2620;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.6)}
@@ -4021,8 +4028,9 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rc-ltbl tr.is-sel td{background:#1e2620}
 :root[data-theme="dark"] .rc-ltbl tr.rc-tr-rep td.cap{box-shadow:inset 3px 0 0 #d64545}
 @media(max-width:720px){
-  :root[data-theme="dark"] .rc-resumo .rc,:root[data-theme="dark"] .rc-resumo .rc:nth-child(7n),:root[data-theme="dark"] .rc-resumo .rc:nth-child(3n){border-right:1px solid #41473a}
-  :root[data-theme="dark"] .rc-resumo .rc:nth-child(3n+1){border-right:none}
+  :root[data-theme="dark"] .rc-resumo .rc,:root[data-theme="dark"] .rc-resumo .rc:nth-child(7n),:root[data-theme="dark"] .rc-resumo .rc:nth-child(3n){border-right:1px solid #41473a;border-bottom:1px solid #41473a}
+  :root[data-theme="dark"] .rc-res-rev .rc:nth-child(3n),:root[data-theme="dark"] .rc-res-ex .rc:nth-child(2n),:root[data-theme="dark"] .rc-res-tot .rc{border-right:none}
+  :root[data-theme="dark"] .rc-res-rev .rc:nth-child(n+4),:root[data-theme="dark"] .rc-res-ex .rc:nth-child(n+3){border-bottom:none}
 }
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
@@ -4040,7 +4048,19 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 .rc-clitop .cbox{display:flex;flex-direction:column}
 .rc-clitop .cbox .ch{padding:7px 12px;font-size:10.5px}
 .rc-clitop .cbox>.resumo,.rc-clitop .cbox>.aprov{flex:1 1 auto}
-.rc-resumo{grid-template-columns:repeat(7,minmax(0,1fr))}
+.rc-resumo{grid-template-columns:repeat(6,minmax(0,1fr))}
+.rc-res-ex{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rc-res-rev,.rc-res-ex{flex:0 0 auto!important}
+.rc-res-tot{grid-template-columns:1fr;flex:1 1 auto!important;align-content:end}
+.rc-resumo .rc:last-child{border-right:none}
+.rc-res-ex .rc,.rc-res-rev .rc{border-bottom:none}
+.rc-sec-t{display:flex;align-items:baseline;gap:8px;padding:5px 10px 3px;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#37564a;background:#f6f9f5;border-bottom:1px solid #eef2ea}
+.rc-sec-t small{font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--muted)}
+.rc-sec-ex{border-top:1px solid #e3e9e4;color:#5b4a12;background:#fbf8ef}
+.rc-rv-pct{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px}
+.rc-etapa{display:inline-flex;align-items:center;padding:1px 9px;border-radius:999px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:10.5px;font-weight:800;white-space:nowrap;line-height:1.6}
+.rc-tbl .rc-c-lib small{display:block}
+.rc-fil-st .fchip i{width:9px;height:9px;border-radius:3px}
 .rc-resumo .rc{padding:6px 10px;min-width:0;display:flex;flex-direction:column;justify-content:flex-start}
 .rc-resumo .rc-kp .rv{margin-top:2px}
 .rc-resumo .rl{align-items:flex-start;line-height:1.25;min-height:22px}
@@ -4098,18 +4118,19 @@ button.rc-kp:focus-visible{outline:2px solid #53775f;outline-offset:-2px}
 .rc-ltbl tbody tr:hover td.cap{background:#e9efe6}
 .rc-ltbl tr.is-sel td{background:#eef5f0}
 .rc-ltbl tr.rc-tr-rep td.cap{box-shadow:inset 3px 0 0 #d64545}
-@media(min-width:721px){.rc-resumo{grid-template-rows:1fr auto}}
 @media(max-width:1100px){
   .rc-root .rc-clitop{grid-template-columns:1fr}
 }
 @media(max-width:720px){
   .rc-panorama{margin-bottom:10px}
   .rc-clitop{gap:9px}
-  .rc-resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .rc-resumo .rc,.rc-resumo .rc:nth-child(7n),.rc-resumo .rc:nth-child(3n){border-right:1px solid #eef2ea}
-  .rc-resumo .rc:nth-child(3n+1){border-right:none}
-  .rc-resumo .rc-kp:first-child{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}
-  .rc-resumo .rc-kp:first-child .rv{margin:0}
+  .rc-res-rev{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rc-res-ex{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rc-res-tot{grid-template-columns:1fr}
+  .rc-resumo .rc,.rc-resumo .rc:nth-child(7n),.rc-resumo .rc:nth-child(3n){border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea}
+  .rc-res-rev .rc:nth-child(3n),.rc-res-ex .rc:nth-child(2n),.rc-res-tot .rc{border-right:none}
+  .rc-res-rev .rc:nth-child(n+4),.rc-res-ex .rc:nth-child(n+3){border-bottom:none}
+  .rc-sec-t small{display:none}
   .rc-resumo .rl{min-height:0}
   .rc-resumo .rc.tot{flex-wrap:wrap;row-gap:0}
   .rc-aprov .av{font-size:22px}
@@ -4123,6 +4144,8 @@ button.rc-kp:focus-visible{outline:2px solid #53775f;outline-offset:-2px}
 :root[data-theme="dark"] button.rc-kp:hover{background:#2c312a}
 :root[data-theme="dark"] button.rc-kp.on{background:#2a3a33;box-shadow:inset 0 -3px 0 #8fb9a3}
 :root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado{background:#30291c}
+:root[data-theme="dark"] .rc-sec-t{background:#242720;color:#b1c1b1;border-color:#41473a}
+:root[data-theme="dark"] .rc-sec-ex{background:#2b281d;color:#e1c88a;border-top-color:#41473a}
 :root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado .rl{color:#e1b56a}
 :root[data-theme="dark"] .rc-resumo .rc.tot .rv span{color:#9aa79f}
 :root[data-theme="dark"] .rc-pend b{color:#cbd6d4}
