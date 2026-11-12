@@ -289,4 +289,42 @@ assert.equal(mesmaUnidade({ bloco: "A", apto: "T03" }, "A", "T03"), true); asser
   assert.equal(t.key, "nao_realizada");
 }
 
+// 20) Acompanhamento Geral no padrão da aba Vistoria: panorama por unidade única, data da revistoria, período,
+//     busca separada por cliente e unidade e ordenação por data.
+{
+  const mk = (id, b, st, lista, cliente = "", extra = {}) => ({ unitId: id, b, codigo: id.slice(1), cliente, vistoria: "rv", chave: { setor: "base" }, situacao: M.situacao({ status: st, ...extra }, lista) });
+  const L = [
+    mk("A101", "A", "Aprovado", [{ numero: 1, status: "Reprovada", data: "2026-10-10" }, { numero: 2, status: "Reprovada", data: "2026-10-20" }, { numero: 3, status: "Aprovada", data: "2026-11-05", horario: "14:30:00", responsavel: "Vanilla" }], "Maria da Silva"),
+    mk("A203", "A", "Em andamento", [{ numero: 1, status: "Reprovada", data: "2026-11-03", horario: "09:00:00" }], "Ana Carolina"),
+    mk("A408", "A", "Aprovado", [], "Rodrigo", { aprovacao_origem: "entrega_chave" }),
+    mk("C602", "C", "Agendado", [{ numero: 1, status: "Agendada", data: "2026-11-09", horario: "09:00:00" }], "Carlos Eduardo"),
+    mk("G602", "G", "Agendado", [{ numero: 1, status: "Reprovada", data: "2026-11-06" }, { numero: 2, status: "Cancelada", data: "2026-11-10" }, { numero: 3, status: "Agendada", data: "2026-11-14", horario: "08:00:00" }], "Paulo Roberto"),
+    mk("E305", "E", "Em andamento", [], "Beatriz Costa"),
+    { unitId: "X", b: "A", codigo: "999", situacao: M.situacao(null, []) }          // fora da aba: não conta
+  ];
+  const P = M.panorama([...L, L[0], L[3]], "2026-11-12");                          // repetidas não contam de novo
+  assert.deepEqual([P.total, P.emAndamento, P.agendado, P.aprovado, P.aprovTecnica, P.aprovEntrega, P.naoAprovadas, P.reprovadas, P.realizadas, P.semana],
+    [6, 2, 2, 2, 1, 1, 4, 2, 5, 1]);                                                   // realizadas: 3 + 1 + 1 ciclos
+  assert.equal(P.emAndamento + P.agendado + P.aprovado, P.total);                  // cada unidade em um único status
+  assert.deepEqual(P.pct, { aprovacao: 33, pendente: 67, emAndamento: 33, agendado: 33, reprovada: 33 });
+  assert.deepEqual(M.panorama([]).pct, { aprovacao: 0, pendente: 0, emAndamento: 0, agendado: 0, reprovada: 0 });
+  // data da revistoria: agendamento em aberto ou a última não cancelada (com o resultado)
+  assert.deepEqual(M.dataRevistoria(L[0].situacao), { data: "2026-11-05", hora: "14:30", tipo: "realizada", resultado: "Aprovada" });
+  assert.deepEqual(M.dataRevistoria(L[4].situacao), { data: "2026-11-14", hora: "08:00", tipo: "agendada", resultado: "" });
+  assert.deepEqual(M.dataRevistoria(L[5].situacao), { data: "", hora: "", tipo: "", resultado: "" });
+  const f = (o) => L.slice(0, 6).filter((x) => M.passaFiltros(x, { bloco: "ALL", busca: "", rapido: "todos", ...o })).map((x) => x.unitId).join(",");
+  assert.equal(f({ cliente: "carlos" }), "C602");
+  assert.equal(f({ cliente: "ANA  carolina" }), "A203");                            // sem diferenciar maiúsculas/espaços
+  assert.equal(f({ unidade: "602" }), "C602,G602");
+  assert.equal(f({ unidade: "g602" }), "G602");
+  assert.equal(f({ dtIni: "2026-11-05", dtFim: "2026-11-09" }), "A101,C602");     // período (inclusive); sem data fica fora
+  assert.equal(f({ dtIni: "2026-11-10" }), "G602");
+  assert.equal(f({ dtFim: "2026-11-03" }), "A203");
+  assert.equal(f({ dtIni: "2026-11-01", rapido: "reprovada" }), "A203,G602");      // combinados
+  assert.equal(f({ dtIni: "2026-11-01", rapido: "reprovada", bloco: "G", cliente: "paulo" }), "G602");
+  const ord = (ds) => L.slice(0, 6).sort((x, y) => M.compararAgenda(x, y, "asc", () => 0, ds)).map((x) => x.unitId).join(",");
+  assert.equal(ord("asc"), "A203,A101,C602,G602,A408,E305");                        // sem data sempre no fim
+  assert.equal(ord("desc"), "G602,C602,A101,A203,A408,E305");
+}
+
 console.log("Regras da Revistoria · Cliente verificadas.");

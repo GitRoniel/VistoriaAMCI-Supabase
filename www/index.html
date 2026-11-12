@@ -3999,6 +3999,31 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .lt-opt small{color:#a6b2ab}
 :root[data-theme="dark"] .lt-fim{border:1px solid #405747;background:#1e2821;color:#c1cec8}
 :root[data-theme="dark"] .lt-fim b{color:#79d89e}
+:root[data-theme="dark"] button.rc-kp{background:transparent;border:0;border-right:1px solid #41473a;border-bottom:1px solid #41473a;color:inherit}
+:root[data-theme="dark"] button.rc-kp:hover{background:#202722}
+:root[data-theme="dark"] button.rc-kp.on{background:#1e2620;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.6)}
+:root[data-theme="dark"] button.rc-kp:focus-visible{outline:2px solid #53775f}
+:root[data-theme="dark"] .rc-resumo .rc.tot .rv span{color:#99a49d}
+:root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado{background:#2b251b}
+:root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado .rl{color:#efb962}
+:root[data-theme="dark"] .rc-af-pend{color:#f3b95e!important}
+:root[data-theme="dark"] .rc-pend-l{color:#b1c1b1}
+:root[data-theme="dark"] .rc-pend b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-pend small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-ltbl td.cunit{background:#282828;box-shadow:inset -1px 0 0 #20241d}
+:root[data-theme="dark"] .rc-ltbl td small{color:#a6b2ab}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt{color:#cfd9d7}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt small.rc-dt-agendada{color:#2459b5}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt.vencida,:root[data-theme="dark"] .rc-ltbl .rc-c-dt.vencida small{color:#b33636}
+:root[data-theme="dark"] .rc-ltbl .rc-c-n b{color:#cfd9d7}
+:root[data-theme="dark"] .rc-ltbl tbody tr:hover td{background:#222920}
+:root[data-theme="dark"] .rc-ltbl tbody tr:hover td.cap{background:#1e221c}
+:root[data-theme="dark"] .rc-ltbl tr.is-sel td{background:#1e2620}
+:root[data-theme="dark"] .rc-ltbl tr.rc-tr-rep td.cap{box-shadow:inset 3px 0 0 #d64545}
+@media(max-width:720px){
+  :root[data-theme="dark"] .rc-resumo .rc,:root[data-theme="dark"] .rc-resumo .rc:nth-child(7n),:root[data-theme="dark"] .rc-resumo .rc:nth-child(3n){border-right:1px solid #41473a}
+  :root[data-theme="dark"] .rc-resumo .rc:nth-child(3n+1){border-right:none}
+}
 /* /TEMA ESCURO */
 :root[data-theme="dark"] .hm-bar3 .p,:root[data-theme="dark"] .hm-nums .p i{background:#6f7a74}
 /* MODO ESCURO · ajustes manuais (o restante vem do bloco gerado acima) */
@@ -4007,6 +4032,107 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .tabs-strip{background:linear-gradient(145deg,#10231d,#15302a)}
 :root[data-theme="dark"] .donut circle:first-child{stroke:#2c3530}
 :root[data-theme="dark"] [style*="--c:#1f4a3f"]{--c:#8cc2a6!important}
+
+/* ── Revistoria · Cliente · Acompanhamento Geral no padrão da aba Vistoria · Cliente ──
+   Resumo da Revistoria + Percentual de Aprovação (.clitop/.cbox/.resumo/.aprov), filtros .fx e tabela .ctbl. */
+.rc-panorama{margin-bottom:12px}
+.rc-root .rc-clitop{grid-template-columns:1.6fr 1fr;gap:10px;margin-bottom:0}
+.rc-clitop .cbox{display:flex;flex-direction:column}
+.rc-clitop .cbox .ch{padding:7px 12px;font-size:10.5px}
+.rc-clitop .cbox>.resumo,.rc-clitop .cbox>.aprov{flex:1 1 auto}
+.rc-resumo{grid-template-columns:repeat(7,minmax(0,1fr))}
+.rc-resumo .rc{padding:6px 10px;min-width:0;display:flex;flex-direction:column;justify-content:flex-start}
+.rc-resumo .rc-kp .rv{margin-top:2px}
+.rc-resumo .rl{align-items:flex-start;line-height:1.25;min-height:22px}
+.rc-resumo .rl .sw{flex:0 0 auto;margin-top:1px}
+.rc-resumo .rv{margin-top:1px}
+button.rc-kp{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;font:inherit;text-align:left;background:transparent;border:0;border-right:1px solid #eef2ea;border-bottom:1px solid #eef2ea;color:inherit;cursor:pointer;transition:background .12s}
+button.rc-kp:hover{background:#f4f8f5}
+button.rc-kp.on{background:#eef5f0;box-shadow:inset 0 -3px 0 var(--ink)}
+button.rc-kp:focus-visible{outline:2px solid #53775f;outline-offset:-2px}
+.rc-resumo .rc.tot{display:flex;flex-direction:row;align-items:baseline;gap:8px;padding:6px 10px}
+.rc-resumo .rc.tot .rv{font-size:17px;margin:0}
+.rc-resumo .rc.tot .rv span{font-size:11px;color:#7d8b83;font-weight:600}
+.rc-resumo .rc-escopo.filtrado{background:#fff7e8}
+.rc-resumo .rc-escopo.filtrado .rl{color:#9a6510}
+.rc-aprov .ac{display:flex;flex-direction:column;min-width:0}
+.rc-aprov .av{font-size:27px}
+.rc-aprov .af{margin-top:4px}
+.rc-af-pend{color:#b9770e!important;margin-top:1px!important}
+.rc-pend{display:grid;grid-template-columns:minmax(0,1fr) auto 22px;align-items:center;gap:1px 8px;margin-top:6px;font-size:10.5px}
+.rc-pend-l{display:flex;align-items:center;gap:5px;color:var(--text-light);font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-pend-l i{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+.rc-pend b{font-variant-numeric:tabular-nums;color:var(--ink);font-size:11px}
+.rc-pend small{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.aprov .rc-pend .abar{grid-column:1/-1;margin-top:2px;height:5px}
+.rc-fx{margin-bottom:10px}
+.rc-fx .fx-lbl{min-width:58px}
+.rc-fx .rc-f-data{position:relative}
+.rc-ltbl{min-width:1060px}
+.rc-ltbl td{padding:4px 8px;vertical-align:middle}
+.rc-ltbl thead th{padding:6px 7px;line-height:1.2;white-space:normal;vertical-align:middle}
+.rc-ltbl thead th.th-acomp{width:auto;white-space:normal;max-width:96px}
+.rc-ltbl th.cw-b,.rc-ltbl td.cap{width:44px;min-width:44px;max-width:44px;padding-left:4px;padding-right:4px}
+.rc-ltbl th.cw-b{position:sticky;left:0;z-index:3}
+.rc-ltbl th.cw-u,.rc-ltbl td.cunit{position:sticky;left:44px;min-width:62px}
+.rc-ltbl th.cw-u{z-index:3}
+.rc-ltbl td.cunit{z-index:1;background:#fff;box-shadow:inset -1px 0 0 #eef2ea}
+.rc-ltbl td.ccli{max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.rc-ltbl td{padding-left:7px;padding-right:7px}
+.rc-ltbl td small{display:block;font-size:10px;line-height:1.2;color:var(--muted);font-weight:600;margin-top:1px}
+.rc-ltbl .ch-vpill{font-size:10.5px!important;padding:0 8px;line-height:1.7}
+.rc-ltbl .rc-c-st{text-align:left}
+.rc-ltbl .rc-c-st .rc-st-l{display:inline-flex;align-items:center;flex-wrap:nowrap}
+.rc-ltbl .rc-c-st .rc-badge{font-size:11px;padding:1px 8px 1px 6px}
+.rc-ltbl .rc-c-st .rc-ent-tag{margin:2px 0 0;display:flex;width:max-content}
+.rc-ltbl .rc-c-st small{display:block;margin-left:2px}
+.rc-ltbl .rc-c-dt{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.rc-ltbl .rc-c-dt small.rc-dt-agendada{color:#2459b5}
+.rc-ltbl .rc-c-dt.vencida,.rc-ltbl .rc-c-dt.vencida small{color:#b33636}
+.rc-ltbl .rc-c-hr{font-variant-numeric:tabular-nums}
+.rc-ltbl .rc-c-resp{text-align:left;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.rc-ltbl .rc-c-n b{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.rc-ltbl .rc-c-ac{white-space:nowrap;text-align:right;padding-right:10px}
+.rc-ltbl .rc-c-ac .ch-mini{height:26px;min-height:26px!important;padding:0 10px!important;font-size:11px!important}
+.rc-ltbl tbody tr:hover td{background:#f7faf6}
+.rc-ltbl tbody tr:hover td.cap{background:#e9efe6}
+.rc-ltbl tr.is-sel td{background:#eef5f0}
+.rc-ltbl tr.rc-tr-rep td.cap{box-shadow:inset 3px 0 0 #d64545}
+@media(min-width:721px){.rc-resumo{grid-template-rows:1fr auto}}
+@media(max-width:1100px){
+  .rc-root .rc-clitop{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .rc-panorama{margin-bottom:10px}
+  .rc-clitop{gap:9px}
+  .rc-resumo{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rc-resumo .rc,.rc-resumo .rc:nth-child(7n),.rc-resumo .rc:nth-child(3n){border-right:1px solid #eef2ea}
+  .rc-resumo .rc:nth-child(3n+1){border-right:none}
+  .rc-resumo .rc-kp:first-child{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}
+  .rc-resumo .rc-kp:first-child .rv{margin:0}
+  .rc-resumo .rl{min-height:0}
+  .rc-resumo .rc.tot{flex-wrap:wrap;row-gap:0}
+  .rc-aprov .av{font-size:22px}
+  .rc-pend{font-size:10px;gap:0 6px}
+  .rc-pend-l{white-space:normal;line-height:1.2;align-items:flex-start}
+  .rc-pend-l i{margin-top:2px}
+  .rc-fx .fx-lbl{min-width:0}
+  .rc-ltbl{min-width:1040px}
+}
+:root[data-theme="dark"] button.rc-kp{border-right-color:#41473a;border-bottom-color:#41473a}
+:root[data-theme="dark"] button.rc-kp:hover{background:#2c312a}
+:root[data-theme="dark"] button.rc-kp.on{background:#2a3a33;box-shadow:inset 0 -3px 0 #8fb9a3}
+:root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado{background:#30291c}
+:root[data-theme="dark"] .rc-resumo .rc-escopo.filtrado .rl{color:#e1b56a}
+:root[data-theme="dark"] .rc-resumo .rc.tot .rv span{color:#9aa79f}
+:root[data-theme="dark"] .rc-pend b{color:#cbd6d4}
+:root[data-theme="dark"] .rc-ltbl td.cunit{background:#282828;box-shadow:inset -1px 0 0 #41473a}
+:root[data-theme="dark"] .rc-ltbl tbody tr:hover td{background:#2c312a}
+:root[data-theme="dark"] .rc-ltbl tbody tr:hover td.cap{background:#2a3027}
+:root[data-theme="dark"] .rc-ltbl tr.is-sel td{background:#2a3a33}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt,:root[data-theme="dark"] .rc-ltbl .rc-c-n b{color:#e3ebe7}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt small.rc-dt-agendada{color:#8fb3f0}
+:root[data-theme="dark"] .rc-ltbl .rc-c-dt.vencida,:root[data-theme="dark"] .rc-ltbl .rc-c-dt.vencida small{color:#ef8a80}
 </style>
 </head>
 <body class="auth-locked">
@@ -5368,6 +5494,8 @@ function revcliHost(){
     grid:()=>LAYOUT.kind==="casa"?{grupos:LAYOUT.groups,maxCasas:LAYOUT.maxHouses,counts:LAYOUT.counts,pavLabel:PAVL}:{grupos:BLOCOS,pavs:PAVS,apts:APTS,pavLabel:PAVL},
     vistoria:(b,p,a)=>cliShow(state.cli[kC(b,p,a)]||"na"), vistoriaLabel:c=>CLL[c]||c, vistoriaCor:c=>CLR_C[c]||CLR_C.na,
     cliente:(b,p,a)=>state.cliInfo[kC(b,p,a)]?.cliente||"",
+    // Acomp. Técnico da vistoria original (só leitura na Revistoria; edita-se na aba Vistoria · Cliente)
+    acomp:(b,p,a)=>{const k=state.cliInfo[kC(b,p,a)]?.acomp||"";return {key:k,label:ACOMP[k]||""};},
     acompanhamento:id=>{const k=unitKey(id);return k?state.rvc[k]||null:null;}, agendamentos:id=>{const k=unitKey(id);return k?revList(k):[];},
     recarregar:rvcRecarregar, hoje:todayISO,
     // importação da planilha só de revistorias (mesmo importador da Visão Geral; só administradores)
