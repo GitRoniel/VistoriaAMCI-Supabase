@@ -44,13 +44,15 @@ export function aplicarEquipes(cfg) {
 export const execInfo = (key) => EXECUCOES.find((e) => e.key === key) || null;
 /** Equipes que podem ser escolhidas (ativas) + a atual da unidade, mesmo desativada. */
 export const opcoesExecucao = (atual) => EXECUCOES.filter((e) => e.ativo || e.key === atual);
-/**
- * Cor do apartamento no mapa da Execução M.O.: a do status da execução (A Executar, Em Andamento, Liberado — as
- * mesmas dos indicadores, filtros, lista e legendas); a equipe aparece pela sigla, na cor da equipe.
- */
+/** Cor do apartamento no mapa da Execução M.O.: a da equipe; sem equipe = tom de destaque (falta mão de obra);
+ *  sem equipe e já Aprovado na revistoria = cinza mais forte (concluída). O status da execução (A Executar,
+ *  Em Andamento, Liberado) fica nos cartões, filtros, lista e painel — não muda a cor da equipe no mapa. */
 export function corUnidade(s) {
-  const e = execInfo(s?.execucao), st = execucaoInfo(etapaExecucao(s) || "a_executar");
-  return { cor: st.cor, borda: st.borda, texto: st.texto, equipe: e, etapa: st.key };
+  const e = execInfo(s?.execucao), etapa = etapaExecucao(s);
+  if (e) return { cor: e.cor, borda: e.borda || e.cor, texto: e.texto || "#ffffff", equipe: e, aprovada: false, etapa };
+  const leg = (k, padrao) => { const x = LEG_EXECUCAO[k] || padrao; return { cor: x.cor, borda: x.borda, texto: x.texto }; };
+  if (s?.status === "Aprovado") return { ...leg("aprovado_sem_equipe", APROVADA_SEM_EQUIPE), equipe: null, aprovada: true, etapa };
+  return { ...leg("sem_equipe", SEM_EQUIPE), equipe: null, aprovada: false, etapa };
 }
 export { SEM_EQUIPE, APROVADA_SEM_EQUIPE };
 export const execRotulo = (key) => { const e = execInfo(key); return e ? `${e.equipe} · ${e.responsavel}` : "Sem execução"; };

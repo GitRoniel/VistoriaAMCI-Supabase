@@ -452,10 +452,11 @@ function htmlMapa(lista, ok) {
       const clsA = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", M.reprovada(s) ? "rc-rep" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
       return `<button type="button" class="${clsA}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${i.cor};color:${i.texto};border-color:${i.borda}">${esc(host.codigo(b, p, a))}${s.realizadas > 1 ? `<i class="rc-n">${s.realizadas}</i>` : ""}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${km}</button>`;
     }
-    // Execução M.O.: cor = status da execução (A Executar · Em Andamento · Liberado); equipe = sigla na cor da equipe
+    // Execução M.O.: cor = equipe de execução (sem equipe = neutra); o status da execução (A Executar, Em Andamento,
+    // Liberado) não muda a cor — fica nos cartões, filtros (que destacam as unidades), lista, painel e dica
     const ex = c.equipe;
     const cor = s.status ? c : M.LEG_EXECUCAO.fora_revistoria;   // fora da revistoria (cor configurável)
-    const cls = ["apt", "ch-u", "rc-u", s.status ? `rc-et-${c.etapa}` : "rc-sem", s.status && c.etapa === "a_executar" ? "rc-semeq" : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
+    const cls = ["apt", "ch-u", "rc-u", s.status ? "" : "rc-sem", ex && s.status ? "rc-eq" : "", s.status && !ex ? (c.aprovada ? "rc-aprsemeq" : "rc-semeq") : "", s.status && ok.has(u.unitId) ? "" : "off", cur?.unitId === u.unitId ? "is-sel" : ""].filter(Boolean).join(" ");
     return `<button type="button" class="${cls}" data-rcu data-b="${esc(b)}" data-p="${esc(p)}" data-a="${esc(a)}" title="${esc(tip)}" aria-label="${esc(tip)}" style="background:${cor.cor};color:${cor.texto};border-color:${cor.borda}">${esc(host.codigo(b, p, a))}${s.porEntrega ? `<i class="rc-mk-ent" aria-hidden="true">${ICONE.chave}</i>` : ""}${exe && s.liberado ? '<i class="rc-mk-lib" aria-hidden="true">✓</i>' : ""}${ex && s.status ? `<i class="rc-mk-exe" style="--c:${ex.cor}" aria-hidden="true">${esc(ex.sigla)}</i>` : ""}${km}</button>`;
   };
   const g = host.grid();
@@ -481,16 +482,15 @@ function htmlMapa(lista, ok) {
     ${legendaChave()}
     <div class="lg ch-lg-dica">Toque na unidade para agendar, registrar o resultado ou ver o histórico</div></div>`;
   }
-  // Execução M.O.: legenda dos três status (cor do apartamento) e das equipes (sigla) — as desativadas só aparecem
-  // se ainda tiverem unidades
+  // Execução M.O.: legenda das equipes (cor do apartamento) — as desativadas só aparecem se ainda tiverem unidades
   const usadas = new Set(lista.map((u) => u.situacao.execucao).filter(Boolean));
   const eqs = M.EXECUCOES.filter((e) => e.ativo || usadas.has(e.key));
   return h + `<div class="legend ch-legend rc-legend">
-    <div class="lg rc-lg-t">Situação da M.O.:</div>
-    ${M.STATUS_EXECUCAO.map((x) => `<div class="lg" title="${esc(x.desc)}"><span class="sw${x.key === "a_executar" ? " rc-sw-semeq" : ""}" style="background:${x.cor};border-color:${x.borda}"></span>${esc(x.label)}</div>`).join("")}
-    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.fora_revistoria.cor};border-color:${M.LEG_EXECUCAO.fora_revistoria.borda}"></span>${esc(M.LEG_EXECUCAO.fora_revistoria.label)}</div>
-    <div class="lg rc-lg-t">Equipe (sigla, canto inferior direito):</div>
+    <div class="lg rc-lg-t">Cor = equipe de execução:</div>
     ${eqs.map((e) => `<div class="lg"><span class="sw rc-sw-eq" style="background:${e.cor};border-color:${e.borda || e.cor};color:${e.texto || "#fff"}">${esc(e.sigla)}</span>${esc(e.equipe)} · ${esc(e.responsavel)}${e.ativo ? "" : " (desativada)"}</div>`).join("")}
+    <div class="lg"><span class="sw rc-sw-semeq" style="background:${M.LEG_EXECUCAO.sem_equipe.cor};border-color:${M.LEG_EXECUCAO.sem_equipe.borda}"></span>Sem equipe (sem mão de obra alocada)</div>
+    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.aprovado_sem_equipe.cor};border-color:${M.LEG_EXECUCAO.aprovado_sem_equipe.borda}"></span>${esc(M.LEG_EXECUCAO.aprovado_sem_equipe.label)}</div>
+    <div class="lg"><span class="sw" style="background:${M.LEG_EXECUCAO.fora_revistoria.cor};border-color:${M.LEG_EXECUCAO.fora_revistoria.borda}"></span>${esc(M.LEG_EXECUCAO.fora_revistoria.label)}</div>
     <div class="lg"><span class="sw rc-sw-lib">✓</span>Liberado (canto superior direito)</div>
     <div class="lg"><span class="sw rc-sw-ent">${ICONE.chave}</span>Chave entregue ao cliente (canto superior esquerdo)</div>
     ${legendaChave()}

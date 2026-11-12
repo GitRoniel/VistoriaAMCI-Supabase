@@ -36,14 +36,15 @@ export const APROVADA_SEM_EQUIPE = { cor: "#7d8782", borda: "#5f6964", texto: "#
 export const CATEGORIA_EXECUCAO = "execucao_mapa";
 // Situação da Execução M.O. (12/11/2026): três status, derivados da equipe e da liberação da unidade, com as cores
 // destas chaves (as mesmas já configuráveis, sem mudar o banco): A Executar = sem_equipe, Em Andamento =
-// st_em_andamento, Liberado = liberado. grupo "legado" = chaves antigas que continuam aceitas no banco (cores já
-// salvas não se perdem), mas não aparecem mais no editor nem nas telas.
+// st_em_andamento, Liberado = liberado — nos cartões, filtros, lista e painel. No mapa, o apartamento continua na
+// cor da equipe (sem equipe = sem_equipe; aprovado sem equipe = aprovado_sem_equipe). grupo "legado" = chaves antigas
+// que continuam aceitas no banco (cores já salvas não se perdem), mas não aparecem mais no editor nem nas telas.
 export const LEGENDAS_EXECUCAO_PADRAO = {
-  sem_equipe: { label: "A Executar (sem equipe demarcada)", grupo: "status", ...SEM_EQUIPE },
+  sem_equipe: { label: "A Executar / sem equipe (sem mão de obra alocada)", grupo: "status", ...SEM_EQUIPE },
   st_em_andamento: { label: "Em Andamento (equipe vinculada, não liberado)", grupo: "status", cor: "#d9a92f", borda: "#b88f27", texto: "#14241c" },
-  liberado: { label: "Liberado", grupo: "status", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
+  liberado: { label: "Liberado (também a marca ✓ do mapa)", grupo: "status", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
   fora_revistoria: { label: "Fora da Revistoria · Cliente", grupo: "mapa", cor: "#e3e7e4", borda: "#b9c1bc", texto: "#5f6b64" },
-  aprovado_sem_equipe: { label: "Aprovado sem equipe (antigo)", grupo: "legado", ...APROVADA_SEM_EQUIPE },
+  aprovado_sem_equipe: { label: "Aprovado sem equipe", grupo: "mapa", ...APROVADA_SEM_EQUIPE },
   st_finalizado: { label: "Finalizado (antigo)", grupo: "legado", cor: "#0f3b31", borda: "#0a2a23", texto: "#ffffff" },
   st_agendado: { label: "Agendado (antigo)", grupo: "legado", cor: "#2459b5", borda: "#1e4b98", texto: "#ffffff" },
   st_aprovado: { label: "Aprovado (antigo)", grupo: "legado", cor: "#268a4d", borda: "#207441", texto: "#ffffff" }
