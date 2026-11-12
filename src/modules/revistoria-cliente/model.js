@@ -129,13 +129,28 @@ export function agendaRevistoria(s) {
   return { data: r?.data ? String(r.data).slice(0, 10) : "", hora: r?.horario ? String(r.horario).slice(0, 5) : "" };
 }
 /**
- * Ordem da lista (igual à aba Vistoria): data da revistoria (mais cedo primeiro; sem data no fim) e, no mesmo dia,
- * horário do mais cedo para o mais tarde ("asc") ou o inverso ("desc"); sem horário fica depois dos com horário.
+ * Data da Revistoria exibida na lista (mesma fonte dos filtros e da ordenação): a do agendamento em aberto
+ * ("agendada") ou a da última revistoria não cancelada ("realizada", com o resultado); sem nenhuma, vazia.
  */
-export function compararAgenda(x, y, hrSort = "asc", ordemUnidade = () => 0) {
+export function dataRevistoria(s) {
+  const r = s?.aberto || [...(s?.lista || [])].filter((x) => x.status !== "Cancelada").at(-1) || null;
+  const { data, hora } = agendaRevistoria(s);
+  if (!r || !data) return { data: "", hora: "", tipo: "", resultado: "" };
+  const ag = agendamento(r);
+  return { data, hora, tipo: ag.aberto ? "agendada" : "realizada", resultado: ag.resultado };
+}
+/**
+ * Ordem da lista (igual à aba Vistoria): data da revistoria (mais cedo primeiro, ou a mais recente primeiro com
+ * dataSort "desc"; sem data sempre no fim) e, no mesmo dia, horário do mais cedo para o mais tarde ("asc") ou o
+ * inverso ("desc"); sem horário fica depois dos com horário.
+ */
+export function compararAgenda(x, y, hrSort = "asc", ordemUnidade = () => 0, dataSort = "asc") {
   const ax = agendaRevistoria(x.situacao), ay = agendaRevistoria(y.situacao);
-  const dx = ax.data || "9999-99-99", dy = ay.data || "9999-99-99";
-  if (dx !== dy) return dx < dy ? -1 : 1;
+  if (ax.data !== ay.data) {
+    if (!ax.data) return 1;
+    if (!ay.data) return -1;
+    return dataSort === "desc" ? (ax.data < ay.data ? 1 : -1) : (ax.data < ay.data ? -1 : 1);
+  }
   if (ax.hora !== ay.hora) {
     if (!ax.hora) return 1;
     if (!ay.hora) return -1;
@@ -239,6 +254,31 @@ export function indicadores(unidades, hoje = "") {
   }
   return out;
 }
+/**
+ * Panorama da aba (indicadores do topo e percentuais), sempre por UNIDADE ÚNICA: cada unidade entra uma vez, pelo
+ * status atual (Em andamento + Agendado + Aprovado = total); "Rev. Reprovada" é um recorte das não aprovadas cuja
+ * última revistoria realizada foi reprovada (não soma de novo). Revistorias realizadas = ciclos executados (soma).
+ *   Aprovação  = aprovadas ÷ unidades em revistoria × 100
+ *   Pendente   = não aprovadas ÷ unidades em revistoria × 100
+ */
+export function panorama(unidades, hoje = "") {
+  const vistas = new Set(), unicas = [];
+  for (const u of unidades || []) {
+    if (!u?.situacao?.status) continue;
+    const k = u.unitId ?? `${u.b}|${u.p}|${u.a}`;
+    if (vistas.has(k)) continue;
+    vistas.add(k); unicas.push(u);
+  }
+  const ind = indicadores(unicas, hoje), total = ind.total;
+  const reprovadas = unicas.filter((u) => reprovada(u.situacao)).length;
+  const naoAprovadas = total - ind.Aprovado;
+  const pct = (n) => (total ? Math.round((n / total) * 100) : 0);
+  return {
+    total, emAndamento: ind["Em andamento"], agendado: ind.Agendado, aprovado: ind.Aprovado, aprovEntrega: ind.aprovEntrega,
+    aprovTecnica: ind.Aprovado - ind.aprovEntrega, naoAprovadas, reprovadas, realizadas: ind.realizadas, semana: ind.semana, hoje: ind.hoje,
+    pct: { aprovacao: pct(ind.Aprovado), pendente: pct(naoAprovadas), emAndamento: pct(ind["Em andamento"]), agendado: pct(ind.Agendado), reprovada: pct(reprovadas) }
+  };
+}
 export function somaDias(iso, n) {
   const [y, m, d] = String(iso).split("-").map(Number); const t = new Date(Date.UTC(y, m - 1, d + n));
   return t.toISOString().slice(0, 10);
@@ -254,17 +294,26 @@ export function comparar(x, y, ordemUnidade = () => 0) {
 }
 
 const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
-/** Filtros da aba: bloco, busca (unidade ou cliente), filtro rápido, liberado e execução (todos juntos). */
+/** Filtros da aba: bloco, busca (unidade ou cliente; ou cliente e unidade separados), filtro rápido, data/período, liberado e execução (todos juntos). */
 export function passaFiltros(u, f) {
   if (f.bloco && f.bloco !== "ALL" && u.b !== f.bloco) return false;
   if (f.rapido === REPROVADA.key) { if (!reprovada(u.situacao)) return false; }
   else if (!passaFiltroRapido(f.rapido, { vistoria: u.vistoria, revistoria: u.situacao?.status }, "revistoria")) return false;
   if (!passaChave(f.chave, u.chave)) return false;
-  if (f.data && agendaRevistoria(u.situacao).data !== f.data) return false;
+  if (f.data || f.dtIni || f.dtFim) {
+    const d = agendaRevistoria(u.situacao).data;
+    if (f.data && d !== f.data) return false;
+    if ((f.dtIni || f.dtFim) && (!d || (f.dtIni && d < f.dtIni) || (f.dtFim && d > f.dtFim))) return false;
+  }
   if (!passaLiberado(f.liberado, u.situacao?.liberado)) return false;
   if (!passaExecucao(f.execucao, u.situacao?.execucao)) return false;
   if (!passaRelatorio(f.relatorio, u.temRelatorio)) return false;
   if (!passaStatusExecucao(f.statusExec, u.situacao)) return false;
+  // busca separada (padrão da aba Vistoria): nome do cliente e número da unidade (com ou sem o bloco)
+  const qc = norm(f.cliente);
+  if (qc && !norm(u.cliente).includes(qc)) return false;
+  const qu = norm(f.unidade).replace(/\s/g, "");
+  if (qu) { const cod = norm(u.codigo), comBloco = norm(u.b) + cod; if (!(cod.includes(qu) || comBloco.includes(qu))) return false; }
   const q = norm(f.busca).replace(/\s/g, "");
   if (q) {
     const cod = norm(u.codigo), comBloco = norm(u.b) + cod;
