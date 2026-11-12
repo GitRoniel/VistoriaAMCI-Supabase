@@ -166,3 +166,49 @@ export function usuarioDaSessao(texto) {
     return u?.id ? { id: String(u.id), email: u.email || "" } : null;
   } catch { return null; }
 }
+
+/* ── Baixar no computador (pasta ou .zip) ── */
+/** Escolhas de tipo para baixar no computador. */
+export const TIPOS_PC = {
+  convertido: { key: "convertido", label: "Relatórios compactos", tipos: ["convertido"] },
+  original: { key: "original", label: "Originais Mobuss", tipos: ["original"] },
+  ambos: { key: "ambos", label: "Os dois", tipos: ["convertido", "original"] }
+};
+/**
+ * Nome seguro para Windows, macOS e zip: sem acentos (o Explorer do Windows mostra errado acentos dentro de .zip),
+ * sem / \ : * ? " < > | e sem espaços/pontos no fim.
+ */
+export function nomeSeguro(s, reserva = "sem nome") {
+  const t = String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7e·]/g, "").replace(/·/g, "-").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "-").replace(/\s+/g, " ").replace(/-(\s*-)+/g, "-").trim().replace(/^[-\s]+|[-\s.]+$/g, "");
+  return t || reserva;
+}
+const pastaBloco = (b) => { const t = String(b || "").trim(); return !t ? "" : /^[A-Za-z0-9]{1,3}$/.test(t) ? `Bloco ${t}` : t; };
+/**
+ * Caminhos dos arquivos no computador, organizados por condomínio e bloco, sem repetidos:
+ *   "Alto do Jerivá/Bloco A/A - 101 - Compacto.pdf" (segundo relatório da mesma unidade: "… - Compacto (2).pdf").
+ * Com um condomínio só, a pasta do condomínio fica de fora (o .zip/pasta já leva o nome dele).
+ */
+export function caminhosNoComputador(docs, { comObra = true } = {}) {
+  const ord = [...docs].sort((a, b) => String(a.obra).localeCompare(String(b.obra), "pt-BR")
+    || String(a.bloco).localeCompare(String(b.bloco), "pt-BR", { numeric: true })
+    || String(a.unidade).localeCompare(String(b.unidade), "pt-BR", { numeric: true })
+    || (Number(a.relatorioId) || 0) - (Number(b.relatorioId) || 0) || String(a.tipo).localeCompare(String(b.tipo)));
+  const usados = new Set(), out = new Map();
+  for (const d of ord) {
+    const pastas = [comObra ? nomeSeguro(d.obra, "Condomínio") : "", nomeSeguro(pastaBloco(d.bloco), "")].filter(Boolean);
+    const base = `${nomeSeguro(d.unidade, "Unidade")} - ${TIPOS[d.tipo]?.curto || d.tipo}`;
+    let nome = `${base}.pdf`, n = 2;
+    while (usados.has([...pastas, nome].join("/").toLowerCase())) nome = `${base} (${n++}).pdf`;
+    const c = [...pastas, nome].join("/");
+    usados.add(c.toLowerCase()); out.set(d.id, c);
+  }
+  return out;
+}
+/** Nome do .zip (ou da pasta): "Relatorios compactos - Alto do Jerivá - 2026-11-12" (+ " - parte 2"). */
+export function nomeExportacao(obraNome, tipoPc, quando = new Date(), parte = 0) {
+  const t = { convertido: "Relatorios compactos", original: "Relatorios originais Mobuss", ambos: "Relatorios" }[tipoPc] || "Relatorios";
+  const dia = quando ? ` - ${quando.getFullYear()}-${pad(quando.getMonth() + 1)}-${pad(quando.getDate())}` : "";   // sem data = pasta fixa (reaproveitada)
+  return nomeSeguro(`${t} - ${obraNome}${dia}${parte ? ` - parte ${parte}` : ""}`);
+}
+/** Limite de cada .zip (memória do navegador): os arquivos são agrupados em partes de até este tamanho. */
+export const LIMITE_ZIP = 700 * 1048576;

@@ -58,7 +58,7 @@ export async function catalogoServidor(sb, obras) {
 }
 
 /** URLs assinadas (curtas) para baixar; em lote quando o cliente permite. */
-async function assinar(sb, caminhos) {
+export async function assinar(sb, caminhos) {
   const st = sb.storage.from(BUCKET), out = new Map();
   if (typeof st.createSignedUrls === "function") {
     for (let i = 0; i < caminhos.length; i += 50) {
