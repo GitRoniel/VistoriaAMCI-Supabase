@@ -2040,6 +2040,26 @@ body.rv-aberto{overflow:hidden}
 .rv-seg button:disabled{color:#a3aea7;cursor:not-allowed;background:#f4f6f5}
 .rv-pg{min-width:96px;text-align:center;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
 .rv-grp{display:inline-flex;align-items:center;gap:6px}
+/* Modo offline do relatório (situação no aparelho + baixar/remover só este relatório) */
+.rv-off{border:1px solid #d9e3dc;border-radius:12px;background:#f7faf8;padding:9px 12px;font-size:12.5px}
+.rv-off:empty{display:none}
+.rv-off-h{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-bottom:6px}
+.rv-off-h b{display:inline-flex;align-items:center;gap:6px;color:#1f4a3f;font-size:13px}
+.rv-off-h b svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rv-off-h span{color:#5d6b63;flex:1 1 220px}
+.rv-off-link{color:#1f4a3f;font-weight:700;text-decoration:underline;white-space:nowrap}
+.rv-off-msg{margin:0;color:#5d6b63}
+.rv-off-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rv-off-i{display:grid;grid-template-columns:minmax(120px,170px) auto 1fr auto;align-items:center;gap:6px 10px;padding:6px 8px;border-radius:9px;background:#fff;border:1px solid #e3eae5}
+.rv-off-n{font-weight:700;color:#12241a}
+.rv-off-st{display:inline-flex;align-items:center;justify-self:start;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;white-space:nowrap;background:#eef1ef;color:#5d6b63;border:1px solid #d4dbd6}
+.rv-off-i.k-ok .rv-off-st{background:#e6f4ea;color:#1d7a43;border-color:#a9d8b8}
+.rv-off-i.k-atualizacao .rv-off-st{background:#e8f0fb;color:#24569b;border-color:#b3c9ea}
+.rv-off-i.k-falha .rv-off-st{background:#fdecec;color:#b33636;border-color:#f0bcbc}
+.rv-off-i small{color:#6b7a71;font-size:11.5px;min-width:0}
+.rv-off-i .btn{min-height:30px;padding:0 12px;font-size:12px;white-space:nowrap}
+.rv-off-a{margin-top:6px;display:flex;justify-content:flex-end}
+@media(max-width:600px){.rv-off-i{grid-template-columns:1fr auto}.rv-off-i small{grid-column:1/-1;order:3}.rv-off-i .btn{grid-column:1/-1;order:4;width:100%}}
 .rv-conv{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.45}
 .rv-conv>div{display:flex;flex-direction:column;gap:3px;flex:1 1 220px;min-width:0}
 .rv-conv b{font-size:13px}
@@ -3663,6 +3683,19 @@ html[data-theme="dark"]{background-color:var(--status-top,var(--chrome-top))}
 :root[data-theme="dark"] .rv-seg button[aria-pressed=true]{background:#1f4a3f;color:#fff}
 :root[data-theme="dark"] .rv-seg button:disabled{color:#a3aea7;background:#222523}
 :root[data-theme="dark"] .rv-pg{color:#cfd9d7}
+:root[data-theme="dark"] .rv-off{border:1px solid #414b44;background:#212924}
+:root[data-theme="dark"] .rv-off-h b{color:#c7d3d0}
+:root[data-theme="dark"] .rv-off-h b svg{fill:none;stroke:currentColor}
+:root[data-theme="dark"] .rv-off-h span{color:#aab5ae}
+:root[data-theme="dark"] .rv-off-link{color:#c7d3d0}
+:root[data-theme="dark"] .rv-off-msg{color:#aab5ae}
+:root[data-theme="dark"] .rv-off-i{background:#282828;border:1px solid #3f4841}
+:root[data-theme="dark"] .rv-off-n{color:#d8e1dc}
+:root[data-theme="dark"] .rv-off-st{background:#202221;color:#aab5ae;border:1px solid #464b47}
+:root[data-theme="dark"] .rv-off-i.k-ok .rv-off-st{background:#1a261e;color:#73de9f;border-color:#435e4c}
+:root[data-theme="dark"] .rv-off-i.k-atualizacao .rv-off-st{background:#1a2129;color:#72a0de;border-color:#3e4959}
+:root[data-theme="dark"] .rv-off-i.k-falha .rv-off-st{background:#2b1b1b;color:#b33636;border-color:#563c3c}
+:root[data-theme="dark"] .rv-off-i small{color:#a0aca5}
 :root[data-theme="dark"] .rv-conv span{color:#b0bfb8}
 :root[data-theme="dark"] .rv-conv.run{background:#1b252a;border:1px solid #3b4b55}
 :root[data-theme="dark"] .rv-conv.err{background:#2b1d1b;border:1px solid #553f3b}
@@ -5565,7 +5598,9 @@ function revcliHost(){
     podeImportar:()=>adminProjects().some(p=>String(p.id)===String(appProject?.id)), importarRevistorias:()=>startImport("rev"),
     // Execução M.O.: atalho para o Controle de Chaves completo (mesma tela da aba Controle de Chaves)
     abrirChaves:()=>switchView("chaves"),
-    papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast
+    papel:()=>currentUser?.nivel||"", usuario:()=>({nome:currentUser?.nome||"",email:currentUser?.usuario||""}), toast,
+    // modo offline do relatório: mesmo armazenamento por usuário da Central Offline
+    usuarioId:()=>currentUser?.id?String(currentUser.id):""
   };
 }
 
