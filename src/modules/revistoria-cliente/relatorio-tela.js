@@ -12,6 +12,7 @@ import * as S from "./service.js";
 import * as C from "./conversao.js";
 import { extrair, mesmaUnidade } from "./relatorio.js";
 import { criarVisualizador } from "./visualizador.js";
+import * as OF from "../offline/individual.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pad = (n) => String(n).padStart(2, "0");
@@ -64,7 +65,8 @@ function el() {
 export async function abrirRelatorio(ctx) {
   const ov = el();
   st = { ...ctx, rels: null, rel: null, aps: [], apsTodos: [], versoes: [], escolha: null, aberto: "", viz: null, caixa: null, sond: null,
-    erro: "", extraidos: null, enviando: "", canal: null, pedindo: false };
+    erro: "", extraidos: null, enviando: "", canal: null, pedindo: false,
+    off: { chave: "", mapa: null, erro: "", ocupado: "" } };   // modo offline deste relatório (aparelho)
   ov.classList.add("open"); document.body.classList.add("rv-aberto");
   ov.querySelector("#rvKick").textContent = `${ctx.host.project.name} · ${ctx.host.casa() ? `Conjunto ${ctx.u.b}` : `Bloco ${ctx.u.b}`}`;
   ov.querySelector("#rvTit").textContent = `Relatório · ${ctx.host.casa() ? `Casa ${+ctx.u.a}` : `Apto ${ctx.u.codigo}`}`;
@@ -149,6 +151,7 @@ function pintar() {
     ${st.rel ? secaoDocumento() : ""}`;
   pintarChecklist();
   montarVisualizador();
+  conferirOffline();
 }
 const fmtTam = (v) => [v?.tamanho ? MB(v.tamanho) : "", v?.paginas ? `${v.paginas} pág.` : ""].filter(Boolean).join(" · ");
 function rotuloVersao(v, info) {
@@ -204,6 +207,7 @@ function secaoDocumento() {
       <span class="rv-grp"><button type="button" class="btn g" data-rv="menos" aria-label="Diminuir zoom">−</button><span id="rvZoom">100%</span><button type="button" class="btn g" data-rv="mais" aria-label="Aumentar zoom">+</button><button type="button" class="btn g" data-rv="ajustar" title="Ajustar à largura">Ajustar</button></span>
       <span class="rv-grp"><button type="button" class="btn g" data-rv="cheia" aria-label="Tela cheia" title="Tela cheia">⛶</button><button type="button" class="btn g" data-rv="abrir">Abrir</button><button type="button" class="btn g" data-rv="baixar">Baixar</button></span>
     </div>
+    <div class="rv-off" id="rvOff">${htmlOffline()}</div>
     <div class="rv-pdf" id="rvPdf"></div>
     ${historico(info)}
   </section>`;
@@ -226,6 +230,68 @@ function pintarChecklist() {
   c.innerHTML = `<div class="rv-sec-h"><b>Apontamentos · checklist</b><span class="rv-meta">${q.total ? `${q.resolvidas} de ${q.total} resolvido(s) · ${q.pct}%` : "sem apontamentos"}${varios ? ` · ${st.rels.length} relatórios` : ""}</span></div>
     ${preview}${lista}
     ${ed ? `<div class="rv-add">${!ex ? `<button type="button" class="btn g" data-rv="ler">Ler apontamentos do PDF</button>` : ""}<details><summary>Adicionar manualmente</summary><textarea id="rvNovo" rows="3" maxlength="6000" placeholder="Um apontamento por linha"></textarea><button type="button" class="btn p" data-rv="addman">Adicionar</button></details></div>` : ""}`;
+}
+
+/* ── Modo offline deste relatório: situação no aparelho + baixar / atualizar / remover só este relatório ── */
+const usuarioId = () => st?.host.usuarioId?.() || "";
+function docsOffline() {
+  if (!st?.rel) return [];
+  const u = st.u;
+  // compacto primeiro (o mais usado na obra), depois o original Mobuss
+  return OF.docsDoRelatorio(st.rel, st.versoes, { projectId: st.host.project.id, unitId: u.unitId, obra: st.host.project.name, bloco: u.b, pav: u.p, apto: u.a })
+    .sort((a, b) => (a.tipo === "convertido" ? -1 : 1) - (b.tipo === "convertido" ? -1 : 1));
+}
+/** Recarrega a situação no aparelho quando o relatório ou as versões mudam. */
+function conferirOffline(forcar = false) {
+  if (!st?.rel) return;
+  const docs = docsOffline(), chave = docs.map((d) => d.id + "=" + d.versao).join("|");
+  if (!forcar && chave === st.off.chave) return;
+  st.off.chave = chave;
+  if (!usuarioId()) { st.off.erro = "Entre na sua conta para usar o modo offline."; pintarOffline(); return; }
+  const me = st;
+  OF.estado(usuarioId(), docs).then((m) => { if (st !== me || st.off.chave !== chave) return; st.off.mapa = m; st.off.erro = ""; pintarOffline(); })
+    .catch((err) => { if (st !== me) return; st.off.erro = err?.message || "Modo offline indisponível neste navegador."; pintarOffline(); });
+}
+const ROT_OFF = { online: "Não baixado", ok: "Disponível offline", atualizacao: "Atualização disponível", falha: "Falha no download", removido: "Não está mais disponível" };
+function htmlOffline() {
+  const docs = docsOffline(); if (!docs.length) return "";
+  const o = st.off, mapa = o.mapa;
+  const cab = `<div class="rv-off-h"><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9"/><path d="M12 12v8m0 0-3-3m3 3 3-3"/></svg>Modo offline</b><span>Guarde este relatório neste aparelho para abrir sem internet.</span><a class="rv-off-link" href="/offline.html" target="_blank" rel="noopener">Central Offline</a></div>`;
+  if (o.erro) return `${cab}<p class="rv-off-msg">${esc(o.erro)}</p>`;
+  if (!mapa) return `${cab}<p class="rv-off-msg">Verificando o aparelho…</p>`;
+  const faltam = docs.filter((d) => mapa.get(d.id)?.key !== "ok");
+  const linha = (d) => {
+    const e = mapa.get(d.id) || { key: "online" }, l = e.local, ok = e.key === "ok", ocup = o.ocupado === d.id || o.ocupado === "todos";
+    const nome = d.tipo === "convertido" ? "Relatório compacto" : "Original Mobuss";
+    const det = l?.versaoOk ? `guardado ${esc(fmtDH(l.baixadoEm))}${l.bytes ? " · " + MB(l.bytes) : ""}` : d.tamanho ? MB(d.tamanho) : "";
+    const btn = ocup ? `<button type="button" class="btn g" disabled>Baixando…</button>`
+      : ok ? `<button type="button" class="btn g" data-rv="offrm" data-doc="${esc(d.id)}" title="Remove só deste aparelho (continua no servidor)">Remover do aparelho</button>`
+      : `<button type="button" class="btn p" data-rv="offbx" data-doc="${esc(d.id)}"${o.ocupado ? " disabled" : ""}>${e.key === "atualizacao" || (e.key === "falha" && l?.versaoOk) ? "Atualizar" : "Baixar para offline"}</button>`;
+    return `<li class="rv-off-i k-${esc(e.key)}" data-off="${esc(d.tipo)}"><span class="rv-off-n">${esc(nome)}</span><span class="rv-off-st">${e.key === "ok" ? "✓ " : ""}${esc(ROT_OFF[e.key] || e.label || "")}</span><small>${det}</small>${btn}</li>`;
+  };
+  return `${cab}<ul class="rv-off-l">${docs.map(linha).join("")}</ul>${faltam.length > 1 && !o.ocupado ? `<div class="rv-off-a"><button type="button" class="btn p" data-rv="offbx" data-doc="todos">Baixar os dois para offline</button></div>` : ""}`;
+}
+function pintarOffline() { const el = document.getElementById("rvOff"); if (el && st) el.innerHTML = htmlOffline(); }
+async function baixarOffline(id) {
+  if (!st || st.off.ocupado) return;
+  const docs = docsOffline().filter((d) => (id === "todos" ? st.off.mapa?.get(d.id)?.key !== "ok" : d.id === id));
+  if (!docs.length) return;
+  if (!navigator.onLine) { st.host.toast("Sem internet: conecte-se para baixar."); return; }
+  const me = st; st.off.ocupado = id; pintarOffline();
+  try {
+    const checklist = { unitId: st.u.unitId, projectId: Number(st.host.project.id), bloco: st.u.b, atualizadoEm: new Date().toISOString(), itens: st.aps.map((a) => ({ texto: a.texto, concluido: !!a.concluido })) };
+    const r = await OF.guardar({ sb: st.host.sb, userId: usuarioId(), docs, checklist });
+    if (st !== me) return;
+    st.host.toast(r.erros.length ? `Não foi possível baixar: ${r.erros[0].erro}` : docs.length > 1 ? "Relatório guardado para uso offline." : `${docs[0].tipo === "convertido" ? "Relatório compacto" : "Original Mobuss"} guardado para uso offline.`);
+  } catch (err) { if (st === me) st.host.toast(err?.message || "Não foi possível baixar."); }
+  finally { if (st === me) { st.off.ocupado = ""; conferirOffline(true); } }
+}
+async function removerOffline(id) {
+  if (!st || !confirm("Remover este documento deste aparelho? O relatório continua no servidor.")) return;
+  const me = st;
+  try { await OF.remover(usuarioId(), [id]); if (st === me) st.host.toast("Removido do aparelho."); }
+  catch (err) { if (st === me) st.host.toast(err?.message || "Não foi possível remover."); }
+  finally { if (st === me) conferirOffline(true); }
 }
 
 /* ── PDF (visualizador em rolagem contínua; o elemento rolável sobrevive às repinturas) ── */
@@ -298,6 +364,8 @@ async function clique(e) {
     st.escolha = t.dataset.tipo === "original" ? "original" : { id }; pintar(); return abrirPdf();
   }
   if (a === "converter") return pedirConversao(t.dataset.reproc === "1");
+  if (a === "offbx") return baixarOffline(t.dataset.doc);
+  if (a === "offrm") return removerOffline(t.dataset.doc);
   if (a === "abrir" || a === "baixar") {
     const w = a === "abrir" ? window.open("", "_blank") : null;
     try {
